@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>經卷研讀 | Book Studies - Bible Study</title>
-  <meta name="description" content="聖經經卷研讀 | Biblical Book Studies">
+  <title>經卷 | Biblical Books - Bible Study</title>
+  <meta name="description" content="聖經各卷書研讀 | Biblical Books Study">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,23 +16,23 @@
     .gradient-bg {
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at 20% 20%, rgba(236, 72, 153, 0.15), transparent 35%),
-                  radial-gradient(circle at 80% 0%, rgba(219, 39, 119, 0.15), transparent 30%),
-                  radial-gradient(circle at 50% 80%, rgba(190, 24, 93, 0.12), transparent 30%);
+      background: radial-gradient(circle at 20% 20%, rgba(168, 85, 247, 0.15), transparent 35%),
+                  radial-gradient(circle at 80% 0%, rgba(139, 92, 246, 0.15), transparent 30%),
+                  radial-gradient(circle at 50% 80%, rgba(124, 58, 237, 0.12), transparent 30%);
       filter: blur(60px);
       opacity: 0.9;
       animation: gradientShift 8s ease-in-out infinite;
     }
     @keyframes gradientShift {
       0%, 100% { 
-        background: radial-gradient(circle at 20% 20%, rgba(236, 72, 153, 0.15), transparent 35%),
-                    radial-gradient(circle at 80% 0%, rgba(219, 39, 119, 0.15), transparent 30%),
-                    radial-gradient(circle at 50% 80%, rgba(190, 24, 93, 0.12), transparent 30%);
+        background: radial-gradient(circle at 20% 20%, rgba(168, 85, 247, 0.15), transparent 35%),
+                    radial-gradient(circle at 80% 0%, rgba(139, 92, 246, 0.15), transparent 30%),
+                    radial-gradient(circle at 50% 80%, rgba(124, 58, 237, 0.12), transparent 30%);
       }
       50% { 
-        background: radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.2), transparent 35%),
-                    radial-gradient(circle at 20% 0%, rgba(219, 39, 119, 0.2), transparent 30%),
-                    radial-gradient(circle at 50% 20%, rgba(190, 24, 93, 0.15), transparent 30%);
+        background: radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.2), transparent 35%),
+                    radial-gradient(circle at 20% 0%, rgba(139, 92, 246, 0.2), transparent 30%),
+                    radial-gradient(circle at 50% 20%, rgba(124, 58, 237, 0.15), transparent 30%);
       }
     }
     .glass-card {
@@ -77,6 +77,14 @@
     .serif-font {
       font-family: 'Noto Serif TC', serif;
     }
+    .fade-in-up {
+      animation: fadeInUp 0.6s ease-out forwards;
+      opacity: 0;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body class="antialiased text-slate-900 bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 min-h-screen overflow-x-hidden">
@@ -89,20 +97,20 @@
       <header class="px-6 py-12 sm:py-16">
         <div class="mx-auto max-w-7xl">
           <div class="text-center space-y-6">
-            <a href="../index.html" class="inline-block mb-4 text-slate-600 hover:text-slate-900 transition-colors">
+            <a href="../index.html" class="inline-block mb-4 text-slate-600 hover:text-slate-900 transition-colors fade-in-up">
               <svg class="w-6 h-6 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
               </svg>
               返回主頁
             </a>
-            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight float-animation serif-font">
-              經卷研讀
-              <span class="block mt-2 bg-gradient-to-r from-pink-400 via-rose-500 to-fuchsia-600 bg-clip-text text-transparent pulse-animation">
-                Book Studies
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight float-animation serif-font fade-in-up" style="animation-delay: 0.1s;">
+              經卷
+              <span class="block mt-2 bg-gradient-to-r from-purple-400 via-violet-500 to-fuchsia-600 bg-clip-text text-transparent pulse-animation">
+                Biblical Books
               </span>
             </h1>
-            <p class="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto pulse-animation">
-              聖經各卷書深度研讀 | In-depth Biblical Book Studies
+            <p class="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto pulse-animation fade-in-up" style="animation-delay: 0.2s;">
+              深入研讀聖經各卷書 | In-Depth Study of Biblical Books
             </p>
           </div>
         </div>
@@ -112,59 +120,101 @@
       <main class="px-6 pb-16">
         <div class="mx-auto max-w-7xl">
           
-          <!-- Book Studies -->
+          <!-- Introduction Section -->
+          <section class="mb-16 fade-in-up" style="animation-delay: 0.3s;">
+            <div class="glass-card rounded-2xl p-8 sm:p-12">
+              <div class="text-center mb-8">
+                <h2 class="text-3xl sm:text-4xl font-semibold mb-4 serif-font text-slate-900">關於經卷研讀</h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-purple-500 to-violet-500 mx-auto rounded-full"></div>
+              </div>
+              <div class="space-y-4 text-lg leading-relaxed text-slate-700 max-w-3xl mx-auto">
+                <p>
+                  聖經由六十六卷書組成，每卷書都有其獨特的歷史背景、文學結構和神學信息。深入研讀各卷書能幫助我們更全面地理解神的話語，看見神在不同時代、不同處境中的啟示。
+                </p>
+                <p>
+                  透過探索每卷書的寫作背景、文學特色、主要信息，以及與其他經卷的關聯，我們能夠更準確地理解經文的原意，並將這些真理應用到我們的生活中。
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Biblical Books -->
           <section>
-            <div class="mb-12 text-center">
-              <h2 class="text-3xl sm:text-4xl font-semibold mb-3 serif-font">經卷研讀</h2>
-              <p class="text-slate-600">Book Studies</p>
+            <div class="mb-12 text-center fade-in-up" style="animation-delay: 0.4s;">
+              <h2 class="text-3xl sm:text-4xl font-semibold mb-3 serif-font text-slate-900">經卷研讀</h2>
+              <p class="text-slate-600">Biblical Books Study</p>
             </div>
             
             <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               
-              <!-- 創世記第一章 -->
-              <a href="創世記_第一章/index.html" class="category-card glass-card rounded-2xl p-6 hover:bg-white/90 group">
-                <div class="space-y-4">
-                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-400 via-indigo-500 to-purple-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
-                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                  </div>
-                  <div class="text-center">
-                    <h3 class="text-lg font-semibold mb-1 group-hover:text-blue-600 transition-colors serif-font text-slate-900">創世記第一章</h3>
-                    <p class="text-xs text-slate-600">Genesis 1</p>
-                    <p class="text-xs text-slate-500 mt-1">創造之工</p>
-                  </div>
-                </div>
-              </a>
-
-              <!-- 啟示錄 -->
-              <a href="啟示錄/index.html" class="category-card glass-card rounded-2xl p-6 hover:bg-white/90 group">
-                <div class="space-y-4">
-                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-amber-400 via-yellow-500 to-orange-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
-                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <!-- 創世記 -->
+              <a href="創世記_第一章/index.html" class="category-card glass-card rounded-2xl p-8 hover:bg-white/90 group">
+                <div class="space-y-6">
+                  <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-amber-400 via-orange-500 to-yellow-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
                     </svg>
                   </div>
                   <div class="text-center">
-                    <h3 class="text-lg font-semibold mb-1 group-hover:text-amber-600 transition-colors serif-font text-slate-900">啟示錄</h3>
-                    <p class="text-xs text-slate-600">Revelation</p>
-                    <p class="text-xs text-slate-500 mt-1">末世異象</p>
+                    <h3 class="text-2xl font-semibold mb-2 group-hover:text-amber-600 transition-colors serif-font text-slate-900">創世記</h3>
+                    <p class="text-sm text-slate-600 mb-3">Genesis</p>
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                      萬物的起源：從創造到列祖，認識神如何開始祂的救贖計劃。
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-center text-amber-600 group-hover:text-amber-700 transition-colors">
+                    <span class="text-sm font-medium">深入了解</span>
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
                   </div>
                 </div>
               </a>
 
               <!-- 羅馬書 -->
-              <a href="羅馬書/index.html" class="category-card glass-card rounded-2xl p-6 hover:bg-white/90 group">
-                <div class="space-y-4">
-                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-400 via-indigo-500 to-purple-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
-                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <a href="羅馬書/index.html" class="category-card glass-card rounded-2xl p-8 hover:bg-white/90 group">
+                <div class="space-y-6">
+                  <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-400 via-indigo-500 to-purple-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
                   </div>
                   <div class="text-center">
-                    <h3 class="text-lg font-semibold mb-1 group-hover:text-blue-600 transition-colors serif-font text-slate-900">羅馬書</h3>
-                    <p class="text-xs text-slate-600">Romans</p>
-                    <p class="text-xs text-slate-500 mt-1">因信稱義</p>
+                    <h3 class="text-2xl font-semibold mb-2 group-hover:text-blue-600 transition-colors serif-font text-slate-900">羅馬書</h3>
+                    <p class="text-sm text-slate-600 mb-3">Romans</p>
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                      因信稱義的福音：深入理解救恩的真理，以及如何在基督裡活出新生命。
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-center text-blue-600 group-hover:text-blue-700 transition-colors">
+                    <span class="text-sm font-medium">深入了解</span>
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </div>
+                </div>
+              </a>
+
+              <!-- 啟示錄 -->
+              <a href="啟示錄/概略/index.html" class="category-card glass-card rounded-2xl p-8 hover:bg-white/90 group">
+                <div class="space-y-6">
+                  <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-400 via-violet-500 to-fuchsia-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                    </svg>
+                  </div>
+                  <div class="text-center">
+                    <h3 class="text-2xl font-semibold mb-2 group-hover:text-purple-600 transition-colors serif-font text-slate-900">啟示錄</h3>
+                    <p class="text-sm text-slate-600 mb-3">Revelation</p>
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                      末世的啟示：從約翰的異象到新天新地，看見神最終的得勝與榮耀。
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-center text-purple-600 group-hover:text-purple-700 transition-colors">
+                    <span class="text-sm font-medium">深入了解</span>
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
                   </div>
                 </div>
               </a>
@@ -184,5 +234,26 @@
 
     </div>
   </div>
+
+  <script>
+    // Intersection Observer for animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+        }
+      });
+    }, observerOptions);
+
+    // Observe all animated elements
+    document.querySelectorAll('.fade-in-up, .category-card').forEach(el => {
+      observer.observe(el);
+    });
+  </script>
 </body>
 </html>

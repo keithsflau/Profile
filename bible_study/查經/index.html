@@ -66,7 +66,6 @@
       opacity: 0;
     }
     .category-card:nth-child(1) { animation-delay: 0.1s; }
-    .category-card:nth-child(2) { animation-delay: 0.2s; }
     .float-animation {
       animation: float 4s ease-in-out infinite;
     }
@@ -75,6 +74,14 @@
     }
     .serif-font {
       font-family: 'Noto Serif TC', serif;
+    }
+    .fade-in-up {
+      animation: fadeInUp 0.6s ease-out forwards;
+      opacity: 0;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
@@ -88,19 +95,19 @@
       <header class="px-6 py-12 sm:py-16">
         <div class="mx-auto max-w-7xl">
           <div class="text-center space-y-6">
-            <a href="../index.html" class="inline-block mb-4 text-slate-600 hover:text-slate-900 transition-colors">
+            <a href="../index.html" class="inline-block mb-4 text-slate-600 hover:text-slate-900 transition-colors fade-in-up">
               <svg class="w-6 h-6 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
               </svg>
               返回主頁
             </a>
-            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight float-animation serif-font">
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight float-animation serif-font fade-in-up" style="animation-delay: 0.1s;">
               查經
               <span class="block mt-2 bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-600 bg-clip-text text-transparent pulse-animation">
                 Bible Study Methods
               </span>
             </h1>
-            <p class="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto pulse-animation">
+            <p class="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto pulse-animation fade-in-up" style="animation-delay: 0.2s;">
               研讀方法與結構分析 | Study Methods & Structural Analysis
             </p>
           </div>
@@ -111,27 +118,53 @@
       <main class="px-6 pb-16">
         <div class="mx-auto max-w-7xl">
           
+          <!-- Introduction Section -->
+          <section class="mb-16 fade-in-up" style="animation-delay: 0.3s;">
+            <div class="glass-card rounded-2xl p-8 sm:p-12">
+              <div class="text-center mb-8">
+                <h2 class="text-3xl sm:text-4xl font-semibold mb-4 serif-font text-slate-900">關於查經</h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 mx-auto rounded-full"></div>
+              </div>
+              <div class="space-y-4 text-lg leading-relaxed text-slate-700 max-w-3xl mx-auto">
+                <p>
+                  有效的查經方法能幫助我們更深入地理解神的話語。聖經不僅是神的話語，也是文學作品，具有豐富的文學結構和寫作技巧。
+                </p>
+                <p>
+                  透過學習不同的查經方法和經文結構分析，我們能夠更準確地理解經文的原意，發現作者想要傳達的信息，並將這些真理應用到我們的生活中。
+                </p>
+              </div>
+            </div>
+          </section>
+
           <!-- Study Methods -->
           <section>
-            <div class="mb-12 text-center">
-              <h2 class="text-3xl sm:text-4xl font-semibold mb-3 serif-font">查經方法</h2>
+            <div class="mb-12 text-center fade-in-up" style="animation-delay: 0.4s;">
+              <h2 class="text-3xl sm:text-4xl font-semibold mb-3 serif-font text-slate-900">查經方法</h2>
               <p class="text-slate-600">Bible Study Methods</p>
             </div>
             
-            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="grid gap-6 sm:grid-cols-1 lg:grid-cols-3">
               
               <!-- 經文結構 -->
-              <a href="經文結構/index.html" class="category-card glass-card rounded-2xl p-6 hover:bg-white/90 group">
-                <div class="space-y-4">
-                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
-                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <a href="經文結構/index.html" class="category-card glass-card rounded-2xl p-8 hover:bg-white/90 group">
+                <div class="space-y-6">
+                  <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
                   </div>
                   <div class="text-center">
-                    <h3 class="text-lg font-semibold mb-1 group-hover:text-emerald-300 transition-colors serif-font">經文結構</h3>
-                    <p class="text-xs text-slate-600">Biblical Structure</p>
-                    <p class="text-xs text-slate-500 mt-1">文學結構分析</p>
+                    <h3 class="text-2xl font-semibold mb-2 group-hover:text-emerald-600 transition-colors serif-font text-slate-900">經文結構</h3>
+                    <p class="text-sm text-slate-600 mb-3">Biblical Structure</p>
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                      學習聖經的文學結構分析，包括平行結構、交叉結構、三文治結構等，幫助我們更深入地理解經文的組織與信息。
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-center text-emerald-600 group-hover:text-emerald-700 transition-colors">
+                    <span class="text-sm font-medium">深入了解</span>
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
                   </div>
                 </div>
               </a>
@@ -151,5 +184,26 @@
 
     </div>
   </div>
+
+  <script>
+    // Intersection Observer for animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+        }
+      });
+    }, observerOptions);
+
+    // Observe all animated elements
+    document.querySelectorAll('.fade-in-up, .category-card').forEach(el => {
+      observer.observe(el);
+    });
+  </script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>討論 | Theological Discussions - Bible Study</title>
+  <title>信仰討論 | Theological Discussions - Bible Study</title>
   <meta name="description" content="神學討論與議題探討 | Theological Discussions and Topics">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -78,6 +78,14 @@
     .serif-font {
       font-family: 'Noto Serif TC', serif;
     }
+    .fade-in-up {
+      animation: fadeInUp 0.6s ease-out forwards;
+      opacity: 0;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body class="antialiased text-slate-900 bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 min-h-screen overflow-x-hidden">
@@ -90,19 +98,19 @@
       <header class="px-6 py-12 sm:py-16">
         <div class="mx-auto max-w-7xl">
           <div class="text-center space-y-6">
-            <a href="../index.html" class="inline-block mb-4 text-slate-600 hover:text-slate-900 transition-colors">
+            <a href="../index.html" class="inline-block mb-4 text-slate-600 hover:text-slate-900 transition-colors fade-in-up">
               <svg class="w-6 h-6 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
               </svg>
               返回主頁
             </a>
-            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight float-animation serif-font">
-              討論
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight float-animation serif-font fade-in-up" style="animation-delay: 0.1s;">
+              信仰討論
               <span class="block mt-2 bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-600 bg-clip-text text-transparent pulse-animation">
                 Theological Discussions
               </span>
             </h1>
-            <p class="text-lg sm:text-xl text-white/70 max-w-2xl mx-auto pulse-animation">
+            <p class="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto pulse-animation fade-in-up" style="animation-delay: 0.2s;">
               神學議題探討與對話 | Theological Topics & Dialogues
             </p>
           </div>
@@ -113,75 +121,125 @@
       <main class="px-6 pb-16">
         <div class="mx-auto max-w-7xl">
           
+          <!-- Introduction Section -->
+          <section class="mb-16 fade-in-up" style="animation-delay: 0.3s;">
+            <div class="glass-card rounded-2xl p-8 sm:p-12">
+              <div class="text-center mb-8">
+                <h2 class="text-3xl sm:text-4xl font-semibold mb-4 serif-font text-slate-900">關於信仰討論</h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-sky-500 to-blue-500 mx-auto rounded-full"></div>
+              </div>
+              <div class="space-y-4 text-lg leading-relaxed text-slate-700 max-w-3xl mx-auto">
+                <p>
+                  信仰討論幫助我們更深入地思考重要的神學議題，建立更清晰的信仰理解。透過探討不同的觀點和聖經的教導，我們能夠在真理上更加堅固。
+                </p>
+                <p>
+                  本區涵蓋多個重要的神學議題，包括預定論、四律、神人合作說、千禧論等。每個議題都提供深入的探討、聖經基礎，以及不同的觀點，幫助我們在真理中成長。
+                </p>
+              </div>
+            </div>
+          </section>
+
           <!-- Discussion Topics -->
           <section>
-            <div class="mb-12 text-center">
-              <h2 class="text-3xl sm:text-4xl font-semibold mb-3 serif-font">討論主題</h2>
+            <div class="mb-12 text-center fade-in-up" style="animation-delay: 0.4s;">
+              <h2 class="text-3xl sm:text-4xl font-semibold mb-3 serif-font text-slate-900">討論主題</h2>
               <p class="text-slate-600">Discussion Topics</p>
             </div>
             
             <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               
               <!-- 預定論 -->
-              <a href="預定論/index.html" class="category-card glass-card rounded-2xl p-6 hover:bg-white/90 group">
-                <div class="space-y-4">
-                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-sky-400 via-blue-500 to-cyan-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
-                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <a href="預定論/index.html" class="category-card glass-card rounded-2xl p-8 hover:bg-white/90 group">
+                <div class="space-y-6">
+                  <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-sky-400 via-blue-500 to-cyan-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                   </div>
                   <div class="text-center">
-                    <h3 class="text-lg font-semibold mb-1 group-hover:text-sky-300 transition-colors serif-font">預定論</h3>
-                    <p class="text-xs text-slate-600">Predestination</p>
-                    <p class="text-xs text-slate-500 mt-1">神的主權與人的責任</p>
+                    <h3 class="text-2xl font-semibold mb-2 group-hover:text-sky-600 transition-colors serif-font text-slate-900">預定論</h3>
+                    <p class="text-sm text-slate-600 mb-3">Predestination</p>
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                      探討神的主權與人的責任，理解神在救恩中的預定與人的回應。
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-center text-sky-600 group-hover:text-sky-700 transition-colors">
+                    <span class="text-sm font-medium">深入了解</span>
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
                   </div>
                 </div>
               </a>
 
               <!-- 四律 -->
-              <a href="四律/index.html" class="category-card glass-card rounded-2xl p-6 hover:bg-white/90 group">
-                <div class="space-y-4">
-                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
-                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <a href="四律/index.html" class="category-card glass-card rounded-2xl p-8 hover:bg-white/90 group">
+                <div class="space-y-6">
+                  <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
                     </svg>
                   </div>
                   <div class="text-center">
-                    <h3 class="text-lg font-semibold mb-1 group-hover:text-emerald-300 transition-colors serif-font">四律</h3>
-                    <p class="text-xs text-slate-600">Four Laws</p>
-                    <p class="text-xs text-slate-500 mt-1">屬靈生命的四個原則</p>
+                    <h3 class="text-2xl font-semibold mb-2 group-hover:text-emerald-600 transition-colors serif-font text-slate-900">四律</h3>
+                    <p class="text-sm text-slate-600 mb-3">Four Laws</p>
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                      屬靈生命的四個原則，幫助我們理解屬靈成長的基礎與實踐。
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-center text-emerald-600 group-hover:text-emerald-700 transition-colors">
+                    <span class="text-sm font-medium">深入了解</span>
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
                   </div>
                 </div>
               </a>
 
               <!-- 神人合作說 -->
-              <a href="神人合作說/index.html" class="category-card glass-card rounded-2xl p-6 hover:bg-white/90 group">
-                <div class="space-y-4">
-                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-400 via-violet-500 to-indigo-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
-                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <a href="神人合作說/index.html" class="category-card glass-card rounded-2xl p-8 hover:bg-white/90 group">
+                <div class="space-y-6">
+                  <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-400 via-violet-500 to-indigo-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                     </svg>
                   </div>
                   <div class="text-center">
-                    <h3 class="text-lg font-semibold mb-1 group-hover:text-purple-600 transition-colors serif-font">神人合作說</h3>
-                    <p class="text-xs text-slate-600">Synergism</p>
-                    <p class="text-xs text-slate-500 mt-1">神與人的合作關係</p>
+                    <h3 class="text-2xl font-semibold mb-2 group-hover:text-purple-600 transition-colors serif-font text-slate-900">神人合作說</h3>
+                    <p class="text-sm text-slate-600 mb-3">Synergism</p>
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                      探討神與人在救恩和屬靈成長中的合作關係，理解神的主權與人的責任。
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-center text-purple-600 group-hover:text-purple-700 transition-colors">
+                    <span class="text-sm font-medium">深入了解</span>
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
                   </div>
                 </div>
               </a>
 
               <!-- 千禧論 -->
-              <a href="千禧論/index.html" class="category-card glass-card rounded-2xl p-6 hover:bg-white/90 group">
-                <div class="space-y-4">
-                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-amber-400 via-orange-500 to-red-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
-                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <a href="千禧論/index.html" class="category-card glass-card rounded-2xl p-8 hover:bg-white/90 group">
+                <div class="space-y-6">
+                  <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-amber-400 via-orange-500 to-red-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
                     </svg>
                   </div>
                   <div class="text-center">
-                    <h3 class="text-lg font-semibold mb-1 group-hover:text-amber-300 transition-colors serif-font">千禧論</h3>
-                    <p class="text-xs text-slate-600">Millennialism</p>
-                    <p class="text-xs text-slate-500 mt-1">千禧年的神學觀點</p>
+                    <h3 class="text-2xl font-semibold mb-2 group-hover:text-amber-600 transition-colors serif-font text-slate-900">千禧論</h3>
+                    <p class="text-sm text-slate-600 mb-3">Millennialism</p>
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                      探討千禧年的不同神學觀點，理解末世論中的各種解釋與聖經基礎。
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-center text-amber-600 group-hover:text-amber-700 transition-colors">
+                    <span class="text-sm font-medium">深入了解</span>
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
                   </div>
                 </div>
               </a>
@@ -201,5 +259,26 @@
 
     </div>
   </div>
+
+  <script>
+    // Intersection Observer for animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+        }
+      });
+    }, observerOptions);
+
+    // Observe all animated elements
+    document.querySelectorAll('.fade-in-up, .category-card').forEach(el => {
+      observer.observe(el);
+    });
+  </script>
 </body>
 </html>

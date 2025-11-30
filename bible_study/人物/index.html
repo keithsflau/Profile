@@ -68,7 +68,6 @@
     .category-card:nth-child(1) { animation-delay: 0.1s; }
     .category-card:nth-child(2) { animation-delay: 0.2s; }
     .category-card:nth-child(3) { animation-delay: 0.3s; }
-    .category-card:nth-child(4) { animation-delay: 0.4s; }
     .float-animation {
       animation: float 4s ease-in-out infinite;
     }
@@ -77,6 +76,14 @@
     }
     .serif-font {
       font-family: 'Noto Serif TC', serif;
+    }
+    .fade-in-up {
+      animation: fadeInUp 0.6s ease-out forwards;
+      opacity: 0;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
@@ -90,19 +97,19 @@
       <header class="px-6 py-12 sm:py-16">
         <div class="mx-auto max-w-7xl">
           <div class="text-center space-y-6">
-            <a href="../index.html" class="inline-block mb-4 text-white/60 hover:text-slate-900 transition-colors">
+            <a href="../index.html" class="inline-block mb-4 text-slate-600 hover:text-slate-900 transition-colors fade-in-up">
               <svg class="w-6 h-6 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
               </svg>
               返回主頁
             </a>
-            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight float-animation serif-font">
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight float-animation serif-font fade-in-up" style="animation-delay: 0.1s;">
               人物研讀
               <span class="block mt-2 bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-600 bg-clip-text text-transparent pulse-animation">
                 Character Studies
               </span>
             </h1>
-            <p class="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto pulse-animation">
+            <p class="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto pulse-animation fade-in-up" style="animation-delay: 0.2s;">
               聖經人物生命見證與屬靈功課 | Biblical Characters & Spiritual Lessons
             </p>
           </div>
@@ -113,27 +120,53 @@
       <main class="px-6 pb-16">
         <div class="mx-auto max-w-7xl">
           
+          <!-- Introduction Section -->
+          <section class="mb-16 fade-in-up" style="animation-delay: 0.3s;">
+            <div class="glass-card rounded-2xl p-8 sm:p-12">
+              <div class="text-center mb-8">
+                <h2 class="text-3xl sm:text-4xl font-semibold mb-4 serif-font text-slate-900">關於人物研讀</h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 mx-auto rounded-full"></div>
+              </div>
+              <div class="space-y-4 text-lg leading-relaxed text-slate-700 max-w-3xl mx-auto">
+                <p>
+                  聖經中記載了許多真實的人物，他們的生命故事見證了神的信實、慈愛與大能。透過研讀這些人物的生命歷程，我們不僅能認識歷史，更能從中學習寶貴的屬靈功課。
+                </p>
+                <p>
+                  每個人物的故事都向我們展示：神如何在不同的處境中工作，如何透過順服與信心成就祂的旨意，以及如何在軟弱中顯出祂的能力。讓我們一起從這些見證中學習，將這些功課應用到自己的生命中。
+                </p>
+              </div>
+            </div>
+          </section>
+
           <!-- Character Studies -->
           <section>
-            <div class="mb-12 text-center">
-              <h2 class="text-3xl sm:text-4xl font-semibold mb-3 serif-font">人物研讀</h2>
-              <p class="text-white/60">Character Studies</p>
+            <div class="mb-12 text-center fade-in-up" style="animation-delay: 0.4s;">
+              <h2 class="text-3xl sm:text-4xl font-semibold mb-3 serif-font text-slate-900">人物研讀</h2>
+              <p class="text-slate-600">Character Studies</p>
             </div>
             
-            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="grid gap-6 sm:grid-cols-1 lg:grid-cols-3">
               
               <!-- 約瑟 -->
-              <a href="約瑟/index.html" class="category-card glass-card rounded-2xl p-6 hover:bg-white/90 group">
-                <div class="space-y-4">
-                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-400 via-indigo-500 to-purple-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
-                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <a href="約瑟/index.html" class="category-card glass-card rounded-2xl p-8 hover:bg-white/90 group">
+                <div class="space-y-6">
+                  <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-400 via-indigo-500 to-purple-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                     </svg>
                   </div>
                   <div class="text-center">
-                    <h3 class="text-lg font-semibold mb-1 group-hover:text-blue-300 transition-colors serif-font">約瑟</h3>
-                    <p class="text-xs text-white/60">Joseph</p>
-                    <p class="text-xs text-slate-500 mt-1">從奴隸到宰相</p>
+                    <h3 class="text-2xl font-semibold mb-2 group-hover:text-blue-600 transition-colors serif-font text-slate-900">約瑟</h3>
+                    <p class="text-sm text-slate-600 mb-3">Joseph</p>
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                      從被賣為奴到成為埃及的宰相，約瑟的生命見證了神在苦難中的同在和信實。學習如何在逆境中持守信心，看見神如何將惡事轉為祝福。
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-center text-blue-600 group-hover:text-blue-700 transition-colors">
+                    <span class="text-sm font-medium">深入了解</span>
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
                   </div>
                 </div>
               </a>
@@ -153,5 +186,26 @@
 
     </div>
   </div>
+
+  <script>
+    // Intersection Observer for animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+        }
+      });
+    }, observerOptions);
+
+    // Observe all animated elements
+    document.querySelectorAll('.fade-in-up, .category-card').forEach(el => {
+      observer.observe(el);
+    });
+  </script>
 </body>
 </html>
