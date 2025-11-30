@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>羅馬書研讀 | Romans Study</title>
+  <meta name="description" content="羅馬書深度研讀 - 寫作背景、分段結構、釋經與應用">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    .serif-font {
+      font-family: 'Noto Serif TC', serif;
+    }
+    .gradient-bg {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.08), transparent 35%),
+                  radial-gradient(circle at 80% 0%, rgba(99, 102, 241, 0.08), transparent 30%),
+                  radial-gradient(circle at 50% 80%, rgba(139, 92, 246, 0.06), transparent 30%);
+      filter: blur(60px);
+      opacity: 0.9;
+      animation: gradientShift 8s ease-in-out infinite;
+    }
+    @keyframes gradientShift {
+      0%, 100% { 
+        background: radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.08), transparent 35%),
+                    radial-gradient(circle at 80% 0%, rgba(99, 102, 241, 0.08), transparent 30%),
+                    radial-gradient(circle at 50% 80%, rgba(139, 92, 246, 0.06), transparent 30%);
+      }
+      50% { 
+        background: radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.12), transparent 35%),
+                    radial-gradient(circle at 20% 0%, rgba(99, 102, 241, 0.12), transparent 30%),
+                    radial-gradient(circle at 50% 20%, rgba(139, 92, 246, 0.08), transparent 30%);
+      }
+    }
+    .glass-card {
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+    .glass-card:hover {
+      background: rgba(255, 255, 255, 0.9);
+      border-color: rgba(59, 130, 246, 0.3);
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2);
+    }
+    @keyframes fadeInUp {
+      from { 
+        opacity: 0; 
+        transform: translateY(30px); 
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0); 
+      }
+    }
+    @keyframes slideInLeft {
+      from { 
+        opacity: 0; 
+        transform: translateX(-30px); 
+      }
+      to { 
+        opacity: 1; 
+        transform: translateX(0); 
+      }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.05); }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+    }
+    .fade-in-up {
+      animation: fadeInUp 0.8s ease-out forwards;
+      opacity: 0;
+    }
+    .slide-in-left {
+      animation: slideInLeft 0.8s ease-out forwards;
+      opacity: 0;
+    }
+    .pulse-animation {
+      animation: pulse 2s ease-in-out infinite;
+    }
+    .float-animation {
+      animation: float 4s ease-in-out infinite;
+    }
+    .topic-card {
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      cursor: pointer;
+    }
+    .topic-card:hover {
+      transform: translateY(-8px) scale(1.03);
+    }
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease-out, padding 0.5s ease-out;
+    }
+    .accordion-content.active {
+      max-height: 2000px;
+      padding-top: 1.5rem;
+    }
+    .highlight-box {
+      position: relative;
+      overflow: hidden;
+    }
+    .highlight-box::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: linear-gradient(to bottom, #3b82f6, #8b5cf6);
+      animation: slideInLeft 0.5s ease-out;
+    }
+    .verse-highlight {
+      background: linear-gradient(120deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+      border-left: 3px solid #3b82f6;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      margin: 1rem 0;
+      transition: all 0.3s ease;
+    }
+    .verse-highlight:hover {
+      background: linear-gradient(120deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+      transform: translateX(5px);
+    }
+    .interactive-btn {
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .interactive-btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(59, 130, 246, 0.1);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+    .interactive-btn:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+    .stagger-animation {
+      opacity: 0;
+      animation: fadeInUp 0.8s ease-out forwards;
+    }
+    .stagger-animation:nth-child(1) { animation-delay: 0.1s; }
+    .stagger-animation:nth-child(2) { animation-delay: 0.2s; }
+    .stagger-animation:nth-child(3) { animation-delay: 0.3s; }
+    .stagger-animation:nth-child(4) { animation-delay: 0.4s; }
+    .stagger-animation:nth-child(5) { animation-delay: 0.5s; }
+    .stagger-animation:nth-child(6) { animation-delay: 0.6s; }
+    .stagger-animation:nth-child(7) { animation-delay: 0.7s; }
+    .image-container {
+      position: relative;
+      overflow: hidden;
+      border-radius: 0.5rem;
+    }
+    .image-container img {
+      transition: transform 0.5s ease, filter 0.3s ease;
+    }
+    .image-container:hover img {
+      transform: scale(1.1);
+      filter: brightness(1.1);
+    }
+    .map-container {
+      position: relative;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .map-container iframe {
+      border: none;
+      border-radius: 0.5rem;
+    }
+    @keyframes imageFadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    .image-fade-in {
+      animation: imageFadeIn 0.8s ease-out forwards;
+    }
+    .city-marker {
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    .city-marker:hover {
+      transform: scale(1.2);
+    }
+    .city-label {
+      pointer-events: none;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    }
+    .route-path {
+      animation: routeDraw 2s ease-in-out;
+    }
+    @keyframes routeDraw {
+      from {
+        stroke-dashoffset: 1000;
+      }
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+    .pulse-ring {
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body class="antialiased text-slate-900 bg-slate-50 min-h-screen overflow-x-hidden">
+  <div class="relative min-h-screen overflow-hidden">
+    <div aria-hidden="true" class="gradient-bg pointer-events-none"></div>
+    
+    <div class="relative z-10">
+      <!-- Header -->
+      <header class="px-6 py-12 sm:py-16">
+        <div class="mx-auto max-w-7xl">
+          <div class="text-center space-y-6">
+            <a href="../index.html" class="inline-block mb-4 text-slate-600 hover:text-slate-900 transition-colors fade-in-up">
+              <svg class="w-6 h-6 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+              </svg>
+              返回經卷目錄
+            </a>
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight float-animation serif-font">
+              羅馬書研讀
+              <span class="block mt-2 bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-600 bg-clip-text text-transparent pulse-animation">
+                Romans Study
+              </span>
+            </h1>
+            <p class="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto pulse-animation">
+              福音的大能：從定罪到稱義，從死亡到生命
+            </p>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main class="px-6 pb-16">
+        <div class="mx-auto max-w-7xl">
+          
+          <!-- 寫作背景 -->
+          <section class="mb-16 fade-in-up">
+            <div class="glass-card rounded-2xl p-8 highlight-box">
+              <h2 class="text-3xl sm:text-4xl font-bold mb-6 serif-font text-blue-600">
+                寫作背景
+              </h2>
+              <div class="space-y-4 text-slate-700 leading-relaxed">
+                <p class="text-lg">
+                  羅馬書是保羅在第三次宣教旅程中（約主後57年），於哥林多寫成的書信。當時保羅尚未到過羅馬教會，但計劃前往西班牙宣教，途經羅馬。這封書信是他最系統化、最完整的神學論述。
+                </p>
+                
+                <!-- 地圖和照片展示區 -->
+                <div class="grid md:grid-cols-2 gap-6 mt-8">
+                  <!-- 保羅宣教路線圖 -->
+                  <div class="glass-card rounded-xl p-6 overflow-hidden image-fade-in">
+                    <h3 class="text-xl font-semibold mb-4 text-indigo-600 serif-font">保羅第三次宣教旅程</h3>
+                    <div class="map-container w-full h-64 bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg p-4 relative overflow-hidden">
+                      <svg viewBox="0 0 800 400" class="w-full h-full" preserveAspectRatio="xMidYMid meet">
+                        <!-- 背景 -->
+                        <rect width="800" height="400" fill="url(#mapGradient)" opacity="0.3"/>
+                        <defs>
+                          <linearGradient id="mapGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#dbeafe;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#e0e7ff;stop-opacity:1" />
+                          </linearGradient>
+                          <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                            <polygon points="0 0, 10 3, 0 6" fill="#3b82f6" />
+                          </marker>
+                        </defs>
+                        
+                        <!-- 路線 -->
+                        <path id="route" d="M 150 200 Q 250 180, 350 200 T 550 200 Q 600 200, 650 200" 
+                              stroke="#3b82f6" 
+                              stroke-width="4" 
+                              fill="none" 
+                              stroke-dasharray="10,5"
+                              marker-end="url(#arrowhead)"
+                              class="route-path">
+                          <animate attributeName="stroke-dashoffset" from="0" to="15" dur="3s" repeatCount="indefinite"/>
+                        </path>
+                        
+                        <!-- 城市標記 -->
+                        <!-- 以弗所 -->
+                        <g class="city-marker" transform="translate(150, 200)">
+                          <circle cx="0" cy="0" r="12" fill="#3b82f6" stroke="#fff" stroke-width="3" class="city-dot"/>
+                          <circle cx="0" cy="0" r="12" fill="#3b82f6" opacity="0.3" class="pulse-ring">
+                            <animate attributeName="r" from="12" to="24" dur="2s" repeatCount="indefinite"/>
+                            <animate attributeName="opacity" from="0.5" to="0" dur="2s" repeatCount="indefinite"/>
+                          </circle>
+                          <text x="0" y="-25" text-anchor="middle" fill="#1e40af" font-size="14" font-weight="bold" class="city-label">以弗所</text>
+                          <text x="0" y="-10" text-anchor="middle" fill="#64748b" font-size="10">Ephesus</text>
+                        </g>
+                        
+                        <!-- 馬其頓 (腓立比/帖撒羅尼迦) -->
+                        <g class="city-marker" transform="translate(350, 200)">
+                          <circle cx="0" cy="0" r="12" fill="#6366f1" stroke="#fff" stroke-width="3" class="city-dot"/>
+                          <circle cx="0" cy="0" r="12" fill="#6366f1" opacity="0.3" class="pulse-ring">
+                            <animate attributeName="r" from="12" to="24" dur="2s" begin="0.5s" repeatCount="indefinite"/>
+                            <animate attributeName="opacity" from="0.5" to="0" dur="2s" begin="0.5s" repeatCount="indefinite"/>
+                          </circle>
+                          <text x="0" y="-25" text-anchor="middle" fill="#1e40af" font-size="14" font-weight="bold" class="city-label">馬其頓</text>
+                          <text x="0" y="-10" text-anchor="middle" fill="#64748b" font-size="10">Macedonia</text>
+                        </g>
+                        
+                        <!-- 哥林多 -->
+                        <g class="city-marker" transform="translate(650, 200)">
+                          <circle cx="0" cy="0" r="15" fill="#8b5cf6" stroke="#fff" stroke-width="3" class="city-dot final-city"/>
+                          <circle cx="0" cy="0" r="15" fill="#8b5cf6" opacity="0.3" class="pulse-ring">
+                            <animate attributeName="r" from="15" to="30" dur="2s" begin="1s" repeatCount="indefinite"/>
+                            <animate attributeName="opacity" from="0.5" to="0" dur="2s" begin="1s" repeatCount="indefinite"/>
+                          </circle>
+                          <text x="0" y="-30" text-anchor="middle" fill="#1e40af" font-size="16" font-weight="bold" class="city-label">哥林多</text>
+                          <text x="0" y="-12" text-anchor="middle" fill="#64748b" font-size="11">Corinth</text>
+                          <text x="0" y="5" text-anchor="middle" fill="#dc2626" font-size="10" font-weight="bold">寫羅馬書</text>
+                        </g>
+                        
+                        <!-- 其他城市點 -->
+                        <circle cx="250" cy="190" r="6" fill="#60a5fa" opacity="0.7"/>
+                        <circle cx="450" cy="200" r="6" fill="#60a5fa" opacity="0.7"/>
+                        <circle cx="550" cy="200" r="6" fill="#60a5fa" opacity="0.7"/>
+                        
+                        <!-- 圖例 -->
+                        <g transform="translate(20, 20)">
+                          <rect x="0" y="0" width="180" height="80" fill="rgba(255,255,255,0.9)" rx="8" stroke="#3b82f6" stroke-width="2"/>
+                          <text x="90" y="20" text-anchor="middle" fill="#1e40af" font-size="12" font-weight="bold">路線說明</text>
+                          <line x1="20" y1="35" x2="40" y2="35" stroke="#3b82f6" stroke-width="3" stroke-dasharray="5,3"/>
+                          <text x="45" y="38" fill="#64748b" font-size="10">宣教路線</text>
+                          <circle cx="30" cy="55" r="6" fill="#3b82f6"/>
+                          <text x="45" y="58" fill="#64748b" font-size="10">主要城市</text>
+                          <circle cx="30" cy="70" r="8" fill="#8b5cf6"/>
+                          <text x="45" y="73" fill="#64748b" font-size="10">目的地（哥林多）</text>
+                        </g>
+                      </svg>
+                    </div>
+                    <p class="text-sm text-slate-600 mt-3 leading-relaxed">
+                      保羅從以弗所出發，經過馬其頓、希臘，最後在哥林多停留三個月，期間寫成羅馬書。
+                    </p>
+                  </div>
+
+                  <!-- 哥林多古城照片 -->
+                  <div class="glass-card rounded-xl p-6 overflow-hidden image-fade-in" style="animation-delay: 0.2s;">
+                    <h3 class="text-xl font-semibold mb-4 text-indigo-600 serif-font">哥林多古城遺址</h3>
+                    <div class="image-container w-full h-64 border-2 border-blue-200 group">
+                      <img 
+                        src="https://images.unsplash.com/photo-1539650116574-75c0c6d73a6e?w=800&h=600&fit=crop&q=80" 
+                        alt="哥林多古城遺址" 
+                        class="w-full h-full object-cover"
+                        onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 800 600%27%3E%3Crect fill=%27%23e0e7ff%27 width=%27800%27 height=%27600%27/%3E%3Ctext x=%27400%27 y=%27300%27 text-anchor=%27middle%27 fill=%27%236366f1%27 font-size=%2724%27%3E哥林多古城遺址%3C/text%3E%3C/svg%3E'"
+                      >
+                      <div class="absolute inset-0 bg-gradient-to-t from-slate-900/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                        <p class="text-white text-sm font-semibold">哥林多古城遺址</p>
+                      </div>
+                    </div>
+                    <p class="text-sm text-slate-600 mt-3 leading-relaxed">
+                      哥林多是保羅寫羅馬書的地點，這座古城位於希臘，是當時重要的商業中心。
+                    </p>
+                  </div>
+                </div>
+
+                <!-- 羅馬帝國地圖 -->
+                <div class="mt-6 glass-card rounded-xl p-6 overflow-hidden image-fade-in" style="animation-delay: 0.3s;">
+                  <h3 class="text-xl font-semibold mb-4 text-indigo-600 serif-font">羅馬帝國地圖（主後1世紀）</h3>
+                  <div class="map-container w-full h-80 bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200">
+                    <iframe 
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2969.5!2d12.5!3d41.9!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDHCsDU0JzAwLjAiTiAxMsKwMzAnMDAuMCJF!5e0!3m2!1szh-TW!2shk!4v1234567890124!5m2!1szh-TW!2shk" 
+                      width="100%" 
+                      height="100%" 
+                      style="border:0;" 
+                      allowfullscreen="" 
+                      loading="lazy" 
+                      referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/10 to-transparent pointer-events-none rounded-lg"></div>
+                  </div>
+                  <p class="text-sm text-slate-600 mt-3 leading-relaxed">
+                    羅馬是當時羅馬帝國的首都，保羅計劃前往西班牙宣教時途經此地，因此寫信給羅馬教會。
+                  </p>
+                </div>
+
+                <!-- 歷史照片展示 -->
+                <div class="grid md:grid-cols-3 gap-4 mt-6">
+                  <div class="glass-card rounded-xl p-4 overflow-hidden group image-fade-in" style="animation-delay: 0.4s;">
+                    <div class="image-container w-full h-48 border-2 border-blue-200">
+                      <img 
+                        src="https://images.unsplash.com/photo-1527004013197-933c4bb611b3?w=400&h=300&fit=crop&q=80" 
+                        alt="古代書卷" 
+                        class="w-full h-full object-cover"
+                        onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 400 300%27%3E%3Crect fill=%27%23dbeafe%27 width=%27400%27 height=%27300%27/%3E%3Ctext x=%27200%27 y=%27150%27 text-anchor=%27middle%27 fill=%27%233b82f6%27%3E古代書卷%3C/text%3E%3C/svg%3E'"
+                      >
+                      <div class="absolute inset-0 bg-gradient-to-t from-slate-900/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
+                        <p class="text-white text-xs font-semibold">古代書卷</p>
+                      </div>
+                    </div>
+                    <p class="text-xs text-slate-600 mt-2 text-center">古代書卷</p>
+                  </div>
+
+                  <div class="glass-card rounded-xl p-4 overflow-hidden group image-fade-in" style="animation-delay: 0.5s;">
+                    <div class="image-container w-full h-48 border-2 border-blue-200">
+                      <img 
+                        src="https://images.unsplash.com/photo-1515542622106-78bda8ba0e5b?w=400&h=300&fit=crop&q=80" 
+                        alt="羅馬建築" 
+                        class="w-full h-full object-cover"
+                        onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 400 300%27%3E%3Crect fill=%27%23fef3c7%27 width=%27400%27 height=%27300%27/%3E%3Ctext x=%27200%27 y=%27150%27 text-anchor=%27middle%27 fill=%27%23f59e0b%27%3E羅馬建築%3C/text%3E%3C/svg%3E'"
+                      >
+                      <div class="absolute inset-0 bg-gradient-to-t from-slate-900/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
+                        <p class="text-white text-xs font-semibold">羅馬建築</p>
+                      </div>
+                    </div>
+                    <p class="text-xs text-slate-600 mt-2 text-center">羅馬建築遺跡</p>
+                  </div>
+
+                  <div class="glass-card rounded-xl p-4 overflow-hidden group image-fade-in" style="animation-delay: 0.6s;">
+                    <div class="image-container w-full h-48 border-2 border-blue-200">
+                      <img 
+                        src="https://images.unsplash.com/photo-1539650116574-75c0c6d73a6e?w=400&h=300&fit=crop&q=80" 
+                        alt="希臘遺址" 
+                        class="w-full h-full object-cover"
+                        onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 400 300%27%3E%3Crect fill=%27%23f3e8ff%27 width=%27400%27 height=%27300%27/%3E%3Ctext x=%27200%27 y=%27150%27 text-anchor=%27middle%27 fill=%27%238b5cf6%27%3E希臘遺址%3C/text%3E%3C/svg%3E'"
+                      >
+                      <div class="absolute inset-0 bg-gradient-to-t from-slate-900/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
+                        <p class="text-white text-xs font-semibold">希臘遺址</p>
+                      </div>
+                    </div>
+                    <p class="text-xs text-slate-600 mt-2 text-center">希臘古遺址</p>
+                  </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6 mt-6">
+                  <div class="verse-highlight">
+                    <p class="font-semibold text-blue-600 mb-2">寫作時間</p>
+                    <p>約主後57年，保羅在哥林多停留三個月期間</p>
+                  </div>
+                  <div class="verse-highlight">
+                    <p class="font-semibold text-blue-600 mb-2">寫作地點</p>
+                    <p>哥林多（參羅16:23，該猶是哥林多教會的人）</p>
+                  </div>
+                  <div class="verse-highlight">
+                    <p class="font-semibold text-blue-600 mb-2">寫作目的</p>
+                    <p>向羅馬教會介紹自己，闡明福音的核心真理，為未來的宣教旅程鋪路</p>
+                  </div>
+                  <div class="verse-highlight">
+                    <p class="font-semibold text-blue-600 mb-2">歷史背景</p>
+                    <p>羅馬教會由猶太和外邦信徒組成，需要處理律法與恩典、猶太人與外邦人的關係</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 分段結構 -->
+          <section class="mb-16 fade-in-up" style="animation-delay: 0.2s;">
+            <div class="glass-card rounded-2xl p-8">
+              <h2 class="text-3xl sm:text-4xl font-bold mb-6 serif-font text-indigo-600">
+                分段結構
+              </h2>
+              <div class="space-y-4">
+                <div class="grid gap-4">
+                  <div class="topic-card glass-card rounded-xl p-6" onclick="toggleSection(this)">
+                    <div class="flex items-center justify-between">
+                      <h3 class="text-xl font-semibold text-indigo-600 serif-font">一、引言與主題（1:1-17）</h3>
+                      <svg class="w-6 h-6 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                      </svg>
+                    </div>
+                    <div class="accordion-content">
+                      <p class="mt-4 text-slate-700">保羅的自我介紹、問候，以及全書的主題宣告：「我不以福音為恥；這福音本是神的大能，要救一切相信的，先是猶太人，後是希臘人。因為神的義正在這福音上顯明出來；這義是本於信，以至於信。」</p>
+                    </div>
+                  </div>
+
+                  <div class="topic-card glass-card rounded-xl p-6" onclick="toggleSection(this)">
+                    <div class="flex items-center justify-between">
+                      <h3 class="text-xl font-semibold text-indigo-300 serif-font">二、全人類的定罪（1:18-3:20）</h3>
+                      <svg class="w-6 h-6 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                      </svg>
+                    </div>
+                    <div class="accordion-content">
+                      <p class="mt-4 text-slate-700">論證全人類都在罪中，都需要神的救恩：外邦人的罪（1:18-32）、猶太人的罪（2:1-3:8）、全人類的結論（3:9-20）。</p>
+                    </div>
+                  </div>
+
+                  <div class="topic-card glass-card rounded-xl p-6" onclick="toggleSection(this)">
+                    <div class="flex items-center justify-between">
+                      <h3 class="text-xl font-semibold text-indigo-300 serif-font">三、因信稱義的福音（3:21-5:21）</h3>
+                      <svg class="w-6 h-6 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                      </svg>
+                    </div>
+                    <div class="accordion-content">
+                      <p class="mt-4 text-slate-700">闡明因信稱義的真理：稱義的方法（3:21-31）、稱義的例證（4:1-25）、稱義的果效（5:1-21）。</p>
+                    </div>
+                  </div>
+
+                  <div class="topic-card glass-card rounded-xl p-6" onclick="toggleSection(this)">
+                    <div class="flex items-center justify-between">
+                      <h3 class="text-xl font-semibold text-indigo-300 serif-font">四、成聖的生活（6:1-8:39）</h3>
+                      <svg class="w-6 h-6 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                      </svg>
+                    </div>
+                    <div class="accordion-content">
+                      <p class="mt-4 text-slate-700">論述稱義後的生活：與罪斷絕（6:1-23）、與律法的關係（7:1-25）、在聖靈裡的生活（8:1-39）。</p>
+                    </div>
+                  </div>
+
+                  <div class="topic-card glass-card rounded-xl p-6" onclick="toggleSection(this)">
+                    <div class="flex items-center justify-between">
+                      <h3 class="text-xl font-semibold text-indigo-300 serif-font">五、神對以色列的計劃（9:1-11:36）</h3>
+                      <svg class="w-6 h-6 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                      </svg>
+                    </div>
+                    <div class="accordion-content">
+                      <p class="mt-4 text-slate-700">解釋以色列的過去（9:1-29）、現在（9:30-10:21）、將來（11:1-36）。</p>
+                    </div>
+                  </div>
+
+                  <div class="topic-card glass-card rounded-xl p-6" onclick="toggleSection(this)">
+                    <div class="flex items-center justify-between">
+                      <h3 class="text-xl font-semibold text-indigo-300 serif-font">六、實際生活的應用（12:1-15:13）</h3>
+                      <svg class="w-6 h-6 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                      </svg>
+                    </div>
+                    <div class="accordion-content">
+                      <p class="mt-4 text-slate-700">將福音真理應用於生活：獻身的生活（12:1-2）、教會生活（12:3-13:14）、軟弱與剛強（14:1-15:13）。</p>
+                    </div>
+                  </div>
+
+                  <div class="topic-card glass-card rounded-xl p-6" onclick="toggleSection(this)">
+                    <div class="flex items-center justify-between">
+                      <h3 class="text-xl font-semibold text-indigo-300 serif-font">七、結語（15:14-16:27）</h3>
+                      <svg class="w-6 h-6 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                      </svg>
+                    </div>
+                    <div class="accordion-content">
+                      <p class="mt-4 text-slate-700">保羅的計劃、問候與頌讚。</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 核心議題討論 -->
+          <section class="mb-16 fade-in-up" style="animation-delay: 0.3s;">
+            <h2 class="text-3xl sm:text-4xl font-bold mb-8 serif-font text-center text-purple-600">
+              核心議題討論
+            </h2>
+            <div class="space-y-8">
+              
+              <!-- 議題1: 同性戀 -->
+              <div class="glass-card rounded-2xl p-8 stagger-animation">
+                <h3 class="text-2xl font-bold mb-6 serif-font text-red-600">1. 同性戀（1:26-27）</h3>
+                
+                <div class="verse-highlight mb-6">
+                  <p class="text-lg font-semibold mb-2">經文：</p>
+                  <p class="text-slate-700 italic">「因此，神任憑他們放縱可羞恥的情慾。他們的女人把順性的用處變為逆性的用處；男人也是如此，棄了女人順性的用處，慾火攻心，彼此貪戀，男和男行可羞恥的事，就在自己身上受這妄為當得的報應。」（羅1:26-27）</p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-6">
+                  <div class="glass-card rounded-xl p-6">
+                    <h4 class="text-xl font-semibold mb-4 text-blue-600">觀察（Observation）</h4>
+                    <ul class="space-y-2 text-slate-700 text-sm leading-relaxed">
+                      <li>• 這段經文出現在論述「外邦人的罪」的脈絡中</li>
+                      <li>• 保羅描述的是「放縱可羞恥的情慾」的行為</li>
+                      <li>• 用「順性」與「逆性」來對比正常與異常的關係</li>
+                      <li>• 指出這是「妄為當得的報應」</li>
+                      <li>• 上下文顯示這是拒絕認識神的後果之一</li>
+                    </ul>
+                  </div>
+
+                  <div class="glass-card rounded-xl p-6">
+                    <h4 class="text-xl font-semibold mb-4 text-indigo-600">解釋（Interpretation）</h4>
+                    <ul class="space-y-2 text-slate-700 text-sm leading-relaxed">
+                      <li>• 保羅明確指出同性性行為違反神的創造秩序</li>
+                      <li>• 「順性」指神在創造中設立的男女關係</li>
+                      <li>• 這不是針對性傾向，而是針對性行為</li>
+                      <li>• 這是人拒絕神、放縱私慾的表現之一</li>
+                      <li>• 需要以恩典和真理並重的方式回應</li>
+                    </ul>
+                  </div>
+
+                  <div class="glass-card rounded-xl p-6">
+                    <h4 class="text-xl font-semibold mb-4 text-purple-600">應用（Application）</h4>
+                    <ul class="space-y-2 text-slate-700 text-sm leading-relaxed">
+                      <li>• 持守聖經對性行為的標準，同時以愛心對待所有人</li>
+                      <li>• 認識到所有人都是罪人，都需要神的恩典</li>
+                      <li>• 在教會中提供支持，幫助有掙扎的人</li>
+                      <li>• 避免歧視，但也不妥協真理</li>
+                      <li>• 強調悔改和聖靈更新的可能性</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 議題2: 因信稱義 -->
+              <div class="glass-card rounded-2xl p-8 stagger-animation">
+                <h3 class="text-2xl font-bold mb-6 serif-font text-blue-600">2. 因信稱義（3:21-5:21）</h3>
+                
+                <div class="verse-highlight mb-6">
+                  <p class="text-lg font-semibold mb-2">核心經文：</p>
+                  <p class="text-slate-700 italic">「但如今，神的義在律法以外已經顯明出來，有律法和先知為證：就是神的義，因信耶穌基督加給一切相信的人，並沒有分別。因為世人都犯了罪，虧缺了神的榮耀；如今卻蒙神的恩典，因基督耶穌的救贖，就白白的稱義。」（羅3:21-24）</p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-6">
+                  <div class="glass-card rounded-xl p-6">
+                    <h4 class="text-xl font-semibold mb-4 text-blue-600">觀察（Observation）</h4>
+                    <ul class="space-y-2 text-slate-700 text-sm leading-relaxed">
+                      <li>• 「但如今」標誌著從定罪到稱義的轉折</li>
+                      <li>• 稱義是「在律法以外」，不靠行為</li>
+                      <li>• 稱義的基礎是「因信耶穌基督」</li>
+                      <li>• 稱義的範圍是「一切相信的人」</li>
+                      <li>• 稱義是「白白的」，是恩典</li>
+                    </ul>
+                  </div>
+
+                  <div class="glass-card rounded-xl p-6">
+                    <h4 class="text-xl font-semibold mb-4 text-indigo-600">解釋（Interpretation）</h4>
+                    <ul class="space-y-2 text-slate-700 text-sm leading-relaxed">
+                      <li>• 稱義是法律用語，指被宣告為義</li>
+                      <li>• 不是因為我們的行為，而是因為基督的義歸算給我們</li>
+                      <li>• 信心是接受這恩典的管道，不是功勞</li>
+                      <li>• 亞伯拉罕是信心的典範（4:1-25）</li>
+                      <li>• 稱義帶來與神和好、進入恩典中（5:1-2）</li>
+                    </ul>
+                  </div>
+
+                  <div class="glass-card rounded-xl p-6">
+                    <h4 class="text-xl font-semibold mb-4 text-purple-600">應用（Application）</h4>
+                    <ul class="space-y-2 text-slate-700 text-sm leading-relaxed">
+                      <li>• 放下靠行為得救的嘗試，單單信靠基督</li>
+                      <li>• 在得救的確據中得享平安和喜樂</li>
+                      <li>• 避免律法主義和反律主義兩個極端</li>
+                      <li>• 以感恩的心回應神的恩典</li>
+                      <li>• 在教會中強調福音的核心地位</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 議題3: 浸禮 -->
+              <div class="glass-card rounded-2xl p-8 stagger-animation">
+                <h3 class="text-2xl font-bold mb-6 serif-font text-indigo-600">3. 浸禮（6:1-11）</h3>
+                
+                <div class="verse-highlight mb-6">
+                  <p class="text-lg font-semibold mb-2">核心經文：</p>
+                  <p class="text-slate-700 italic">「所以，我們藉著洗禮歸入死，和他一同埋葬，原是叫我們一舉一動有新生的樣式，像基督藉著父的榮耀從死裡復活一樣。我們若在他死的形狀上與他聯合，也要在他復活的形狀上與他聯合。」（羅6:4-5）</p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-6">
+                  <div class="glass-card rounded-xl p-6">
+                    <h4 class="text-xl font-semibold mb-4 text-blue-600">觀察（Observation）</h4>
+                    <ul class="space-y-2 text-slate-700 text-sm leading-relaxed">
+                      <li>• 保羅用「歸入死」和「一同埋葬」描述洗禮</li>
+                      <li>• 洗禮與基督的死和復活緊密相連</li>
+                      <li>• 洗禮指向「新生的樣式」</li>
+                      <li>• 強調「在死的形狀上與他聯合」</li>
+                      <li>• 洗禮是與基督聯合的記號</li>
+                    </ul>
+                  </div>
+
+                  <div class="glass-card rounded-xl p-6">
+                    <h4 class="text-xl font-semibold mb-4 text-indigo-600">解釋（Interpretation）</h4>
+                    <ul class="space-y-2 text-slate-700 text-sm leading-relaxed">
+                      <li>• 浸禮（全身入水）最能表達「埋葬」的意義</li>
+                      <li>• 洗禮是外在記號，表明內在的屬靈事實</li>
+                      <li>• 不是洗禮本身拯救人，而是所代表的與基督聯合</li>
+                      <li>• 洗禮是公開見證，宣告與舊生命斷絕</li>
+                      <li>• 洗禮指向未來復活的盼望</li>
+                    </ul>
+                  </div>
+
+                  <div class="glass-card rounded-xl p-6">
+                    <h4 class="text-xl font-semibold mb-4 text-purple-600">應用（Application）</h4>
+                    <ul class="space-y-2 text-slate-700 text-sm leading-relaxed">
+                      <li>• 強調浸禮的重要性，作為順服的見證</li>
+                      <li>• 幫助信徒理解洗禮的屬靈意義</li>
+                      <li>• 提醒已受洗的信徒活出「新生的樣式」</li>
+                      <li>• 洗禮前要有充分的教導和準備</li>
+                      <li>• 洗禮是教會的重要見證時刻</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 議題4: 未聽福音的人得救原則 -->
+              <div class="glass-card rounded-2xl p-8 stagger-animation">
+                <h3 class="text-2xl font-bold mb-6 serif-font text-purple-600">4. 未聽福音的人得救原則（1:18-2:16）</h3>
+                
+                <div class="verse-highlight mb-6">
+                  <p class="text-lg font-semibold mb-2">核心經文：</p>
+                  <p class="text-slate-700 italic">「原來，神的忿怒從天上顯明在一切不虔不義的人身上，就是那些行不義阻擋真理的人。神的事情，人所能知道的，原顯明在人心裡，因為神已經給他們顯明。自從造天地以來，神的永能和神性是明明可知的，雖是眼不能見，但藉著所造之物就可以曉得，叫人無可推諉。」（羅1:18-20）</p>
+                  <p class="text-slate-700 italic mt-4">「沒有律法的外邦人若順著本性行律法上的事，他們雖然沒有律法，自己就是自己的律法。這是顯出律法的功用刻在他們心裡，他們是非之心同作見證，並且他們的思念互相較量，或以為是，或以為非。」（羅2:14-15）</p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-6">
+                  <div class="glass-card rounded-xl p-6">
+                    <h4 class="text-xl font-semibold mb-4 text-blue-600">觀察（Observation）</h4>
+                    <ul class="space-y-2 text-slate-700 text-sm leading-relaxed">
+                      <li>• 神透過「所造之物」向所有人啟示自己</li>
+                      <li>• 人「無可推諉」，因為有足夠的啟示</li>
+                      <li>• 外邦人有「是非之心」和「律法的功用刻在心裡」</li>
+                      <li>• 但保羅也指出所有人都「虧缺了神的榮耀」（3:23）</li>
+                      <li>• 需要「因信耶穌基督」才能稱義（3:22）</li>
+                    </ul>
+                  </div>
+
+                  <div class="glass-card rounded-xl p-6">
+                    <h4 class="text-xl font-semibold mb-4 text-indigo-600">解釋（Interpretation）</h4>
+                    <ul class="space-y-2 text-slate-700 text-sm leading-relaxed">
+                      <li>• 神透過普遍啟示（自然）向所有人顯明</li>
+                      <li>• 但普遍啟示不足以帶來救恩</li>
+                      <li>• 需要特殊啟示（福音）才能得救</li>
+                      <li>• 神的主權和人的責任需要平衡理解</li>
+                      <li>• 最終的判斷在於神，我們要忠於傳福音的使命</li>
+                    </ul>
+                  </div>
+
+                  <div class="glass-card rounded-xl p-6">
+                    <h4 class="text-xl font-semibold mb-4 text-purple-600">應用（Application）</h4>
+                    <ul class="space-y-2 text-slate-700 text-sm leading-relaxed">
+                      <li>• 不要因為神的主權而忽略傳福音的責任</li>
+                      <li>• 相信神是公義的，會按各人的情況審判</li>
+                      <li>• 專注於完成大使命，傳揚福音</li>
+                      <li>• 為未得之民禱告，支持宣教事工</li>
+                      <li>• 在神的主權和人的責任之間保持平衡</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 議題5: 信主之後仍會犯罪的出路 -->
+              <div class="glass-card rounded-2xl p-8 stagger-animation">
+                <h3 class="text-2xl font-bold mb-6 serif-font text-pink-600">5. 信主之後仍會犯罪的出路（7:14-8:2）</h3>
+                
+                <div class="verse-highlight mb-6">
+                  <p class="text-lg font-semibold mb-2">核心經文：</p>
+                  <p class="text-slate-700 italic">「我也知道在我裡頭，就是我肉體之中，沒有良善。因為，立志為善由得我，只是行出來由不得我。故此，我所願意的善，我反不做；我所不願意的惡，我倒去做。若我去做所不願意做的，就不是我做的，乃是住在我裡頭的罪做的。我覺得有個律，就是我願意為善的時候，便有惡與我同在。因為按著我裡面的意思，我是喜歡神的律；但我覺得肢體中另有個律和我心中的律交戰，把我擄去，叫我附從那肢體中犯罪的律。我真是苦啊！誰能救我脫離這取死的身體呢？感謝神，靠著我們的主耶穌基督就能脫離了。」（羅7:18-25）</p>
+                  <p class="text-slate-700 italic mt-4">「如今，那些在基督耶穌裡的就不定罪了。因為賜生命聖靈的律，在基督耶穌裡釋放了我，使我脫離罪和死的律了。」（羅8:1-2）</p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-6">
+                  <div class="glass-card rounded-xl p-6">
+                    <h4 class="text-xl font-semibold mb-4 text-blue-600">觀察（Observation）</h4>
+                    <ul class="space-y-2 text-slate-700 text-sm leading-relaxed">
+                      <li>• 保羅描述信主後仍有的掙扎</li>
+                      <li>• 「立志為善由得我，只是行出來由不得我」</li>
+                      <li>• 承認「我肉體之中，沒有良善」</li>
+                      <li>• 有「兩個律」在交戰</li>
+                      <li>• 出路是「靠著我們的主耶穌基督」</li>
+                    </ul>
+                  </div>
+
+                  <div class="glass-card rounded-xl p-6">
+                    <h4 class="text-xl font-semibold mb-4 text-indigo-600">解釋（Interpretation）</h4>
+                    <ul class="space-y-2 text-slate-700 text-sm leading-relaxed">
+                      <li>• 信主後仍有罪性，但不再被罪轄制</li>
+                      <li>• 聖靈住在我們裡面，提供得勝的能力</li>
+                      <li>• 「在基督耶穌裡就不定罪了」— 地位已改變</li>
+                      <li>• 成聖是漸進的過程，需要持續依靠聖靈</li>
+                      <li>• 第八章強調聖靈的工作和得勝</li>
+                    </ul>
+                  </div>
+
+                  <div class="glass-card rounded-xl p-6">
+                    <h4 class="text-xl font-semibold mb-4 text-purple-600">應用（Application）</h4>
+                    <ul class="space-y-2 text-slate-700 text-sm leading-relaxed">
+                      <li>• 承認自己的軟弱，不因犯罪而絕望</li>
+                      <li>• 依靠聖靈的能力，不靠自己的努力</li>
+                      <li>• 記住在基督裡「不定罪」的地位</li>
+                      <li>• 持續認罪、悔改，追求成聖</li>
+                      <li>• 在教會中彼此扶持，共同成長</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 議題6: 外邦人數滿足猶大家全家得救 -->
+              <div class="glass-card rounded-2xl p-8 stagger-animation">
+                <h3 class="text-2xl font-bold mb-6 serif-font text-cyan-600">6. 外邦人數滿足猶大家全家得救（11:11-32）</h3>
+                
+                <div class="verse-highlight mb-6">
+                  <p class="text-lg font-semibold mb-2">核心經文：</p>
+                  <p class="text-slate-700 italic">「我且說，他們失腳是要他們跌倒嗎？斷乎不是！反倒因他們的過失，救恩便臨到外邦人，要激動他們發憤。若他們的過失為天下的富足，他們的缺乏為外邦人的富足，何況他們的豐滿呢？」（羅11:11-12）</p>
+                  <p class="text-slate-700 italic mt-4">「弟兄們，我不願意你們不知道這奧秘，恐怕你們自以為聰明，就是以色列人有幾分是硬心的，等到外邦人的數目添滿了，於是以色列全家都要得救。如經上所記：必有一位救主從錫安出來，要消除雅各家的一切罪惡。」（羅11:25-26）</p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-6">
+                  <div class="glass-card rounded-xl p-6">
+                    <h4 class="text-xl font-semibold mb-4 text-blue-600">觀察（Observation）</h4>
+                    <ul class="space-y-2 text-slate-700 text-sm leading-relaxed">
+                      <li>• 以色列的「失腳」帶來外邦人的機會</li>
+                      <li>• 「等到外邦人的數目添滿了」</li>
+                      <li>• 「以色列全家都要得救」</li>
+                      <li>• 這是「奧秘」，不是人的推測</li>
+                      <li>• 神的計劃包括猶太人和外邦人</li>
+                    </ul>
+                  </div>
+
+                  <div class="glass-card rounded-xl p-6">
+                    <h4 class="text-xl font-semibold mb-4 text-indigo-600">解釋（Interpretation）</h4>
+                    <ul class="space-y-2 text-slate-700 text-sm leading-relaxed">
+                      <li>• 神有特定的時間表，外邦人得救有「數目」</li>
+                      <li>• 「以色列全家」可能指餘民或全體</li>
+                      <li>• 這不意味著所有猶太人都自動得救</li>
+                      <li>• 需要透過相信耶穌基督</li>
+                      <li>• 神的計劃最終要拯救祂的選民</li>
+                    </ul>
+                  </div>
+
+                  <div class="glass-card rounded-xl p-6">
+                    <h4 class="text-xl font-semibold mb-4 text-purple-600">應用（Application）</h4>
+                    <ul class="space-y-2 text-slate-700 text-sm leading-relaxed">
+                      <li>• 為猶太人歸主禱告，支持猶宣事工</li>
+                      <li>• 不要輕看猶太人，他們是神的選民</li>
+                      <li>• 積極向所有人傳福音，包括猶太人</li>
+                      <li>• 相信神會按祂的時間完成計劃</li>
+                      <li>• 在教會中接納不同背景的信徒</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 議題7: 順服在上位 -->
+              <div class="glass-card rounded-2xl p-8 stagger-animation">
+                <h3 class="text-2xl font-bold mb-6 serif-font text-amber-600">7. 順服在上位（13:1-7）</h3>
+                
+                <div class="verse-highlight mb-6">
+                  <p class="text-lg font-semibold mb-2">核心經文：</p>
+                  <p class="text-slate-700 italic">「在上有權柄的，人人當順服他，因為沒有權柄不是出於神的。凡掌權的都是神所命的。所以，抗拒掌權的就是抗拒神的命；抗拒的必自取刑罰。作官的原不是叫行善的懼怕，乃是叫作惡的懼怕。你願意不懼怕掌權的嗎？你只要行善，就可得他的稱讚；因為他是神的用人，是與你有益的。你若作惡，卻當懼怕；因為他不是空空地佩劍；他是神的用人，是伸冤的，刑罰那作惡的。所以你們必須順服，不但是因為刑罰，也是因為良心。你們納糧，也為這個緣故；因他們是神的差役，常常特管這事。凡人所當得的，就給他。當得糧的，給他納糧；當得稅的，給他上稅；當懼怕的，懼怕他；當恭敬的，恭敬他。」（羅13:1-7）</p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-6">
+                  <div class="glass-card rounded-xl p-6">
+                    <h4 class="text-xl font-semibold mb-4 text-blue-600">觀察（Observation）</h4>
+                    <ul class="space-y-2 text-slate-700 text-sm leading-relaxed">
+                      <li>• 「沒有權柄不是出於神的」</li>
+                      <li>• 「抗拒掌權的就是抗拒神的命」</li>
+                      <li>• 政府是「神的用人」</li>
+                      <li>• 順服是「因為良心」，不只是因為刑罰</li>
+                      <li>• 要納糧、上稅、恭敬掌權者</li>
+                    </ul>
+                  </div>
+
+                  <div class="glass-card rounded-xl p-6">
+                    <h4 class="text-xl font-semibold mb-4 text-indigo-600">解釋（Interpretation）</h4>
+                    <ul class="space-y-2 text-slate-700 text-sm leading-relaxed">
+                      <li>• 神設立政府來維持秩序和公義</li>
+                      <li>• 順服是原則，但有例外（違背神命令時）</li>
+                      <li>• 需要平衡順服政府和順服神</li>
+                      <li>• 當政府要求違背神時，要「順從神，不順從人」（徒5:29）</li>
+                      <li>• 順服不等於認同所有政策</li>
+                    </ul>
+                  </div>
+
+                  <div class="glass-card rounded-xl p-6">
+                    <h4 class="text-xl font-semibold mb-4 text-purple-600">應用（Application）</h4>
+                    <ul class="space-y-2 text-slate-700 text-sm leading-relaxed">
+                      <li>• 在一般情況下順服政府和法律</li>
+                      <li>• 履行公民責任（納稅、投票等）</li>
+                      <li>• 為在上位的禱告（提前2:1-2）</li>
+                      <li>• 當政府違背神時，以和平方式表達</li>
+                      <li>• 在順服神和順服人之間保持智慧平衡</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </section>
+
+          <!-- 互動環節 -->
+          <section class="mb-16 fade-in-up" style="animation-delay: 0.4s;">
+            <div class="glass-card rounded-2xl p-8">
+              <h2 class="text-3xl sm:text-4xl font-bold mb-6 serif-font text-center text-green-600">
+                互動思考
+              </h2>
+              <div class="grid md:grid-cols-2 gap-6">
+                <div class="glass-card rounded-xl p-6 interactive-btn" onclick="showAnswer(this, 'answer1')">
+                  <h3 class="text-xl font-semibold mb-4 text-green-600">思考問題 1</h3>
+                  <p class="text-slate-700 mb-4">「因信稱義」如何影響你對自己得救確據的理解？</p>
+                  <div id="answer1" class="hidden mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <p class="text-slate-700 text-sm">答案：因信稱義意味著我們的得救完全基於基督的工作，而不是我們的行為。這給我們確據，因為我們的救恩不依賴於自己的表現，而是依賴於神不變的應許。當我們軟弱時，可以確信神不會因為我們的行為而收回救恩。</p>
+                  </div>
+                </div>
+
+                <div class="glass-card rounded-xl p-6 interactive-btn" onclick="showAnswer(this, 'answer2')">
+                  <h3 class="text-xl font-semibold mb-4 text-green-600">思考問題 2</h3>
+                  <p class="text-slate-700 mb-4">羅馬書7章的掙扎與8章的得勝，如何幫助你理解成聖的過程？</p>
+                  <div id="answer2" class="hidden mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <p class="text-slate-700 text-sm">答案：第7章顯示即使信主後，我們仍會與罪掙扎，這是正常的。但第8章告訴我們，聖靈住在我們裡面，提供得勝的能力。成聖不是一次性的，而是持續依靠聖靈的過程。我們要記住在基督裡「不定罪」的地位，同時積極追求聖潔。</p>
+                  </div>
+                </div>
+
+                <div class="glass-card rounded-xl p-6 interactive-btn" onclick="showAnswer(this, 'answer3')">
+                  <h3 class="text-xl font-semibold mb-4 text-green-600">思考問題 3</h3>
+                  <p class="text-slate-700 mb-4">如何在持守聖經標準的同時，以愛心對待有不同觀點的人？</p>
+                  <div id="answer3" class="hidden mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <p class="text-slate-700 text-sm">答案：我們要「用愛心說誠實話」（弗4:15）。持守真理不等於缺乏愛心，表達愛心也不等於妥協真理。我們要以恩典和真理並重的方式，承認自己也是罪人，需要神的恩典，同時不否認聖經的標準。重點是關係和對話，而不是定罪和排斥。</p>
+                  </div>
+                </div>
+
+                <div class="glass-card rounded-xl p-6 interactive-btn" onclick="showAnswer(this, 'answer4')">
+                  <h3 class="text-xl font-semibold mb-4 text-green-600">思考問題 4</h3>
+                  <p class="text-slate-700 mb-4">羅馬書12:1-2的「將身體獻上當作活祭」對你的日常生活有什麼實際意義？</p>
+                  <div id="answer4" class="hidden mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <p class="text-slate-700 text-sm">答案：這意味著我們整個生命都要成為對神的敬拜。不是只在教會中，而是在工作、家庭、人際關係等各個領域都要活出神的旨意。要「心意更新而變化」，不被世界同化，而是以神的話語來塑造我們的思想和價值觀，好能「察驗何為神的善良、純全、可喜悅的旨意」。</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </div>
+      </main>
+
+      <!-- Footer -->
+      <footer class="text-center px-6 py-8 text-slate-600 text-sm border-t border-slate-200">
+        <p class="italic mb-2">"我不以福音為恥；這福音本是神的大能，要救一切相信的，先是猶太人，後是希臘人。" 羅馬書 1:16</p>
+        <p class="text-xs mt-4">© 2025 Bible Study Resources</p>
+      </footer>
+
+    </div>
+  </div>
+
+  <script>
+    function toggleSection(element) {
+      const content = element.querySelector('.accordion-content');
+      const icon = element.querySelector('svg');
+      
+      content.classList.toggle('active');
+      icon.classList.toggle('rotate-180');
+    }
+
+    function showAnswer(element, answerId) {
+      const answer = document.getElementById(answerId);
+      if (answer.classList.contains('hidden')) {
+        answer.classList.remove('hidden');
+        answer.style.animation = 'fadeInUp 0.5s ease-out';
+      } else {
+        answer.classList.add('hidden');
+      }
+    }
+
+    // 添加滾動動畫
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.stagger-animation').forEach(el => {
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>

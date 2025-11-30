@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聖經聖靈論整合課程 | Systematic Pneumatology</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; }
+        h1, h2, h3, h4 { font-family: 'Noto Serif TC', serif; }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .active-tab { border-bottom: 2px solid #1e40af; color: #1e40af; font-weight: bold; }
+        /* Smooth scrolling */
+        html { scroll-behavior: smooth; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <nav class="bg-slate-900 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-xl md:text-2xl font-bold tracking-wide">聖靈</h1>
+                <p class="text-xs text-slate-400">教會信仰傳統 & 教會課程框架</p>
+            </div>
+            <div class="hidden md:flex space-x-6 text-sm">
+                <a href="#intro" class="hover:text-blue-300 transition">課程導論</a>
+                <a href="#personhood" class="hover:text-blue-300 transition">位格與工作</a>
+                <a href="#gifts" class="hover:text-blue-300 transition">屬靈恩賜</a>
+                <a href="#activity" class="hover:text-blue-300 transition">互動研經</a>
+            </div>
+        </div>
+    </nav>
+
+    <header id="intro" class="bg-white py-16 border-b border-gray-200">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <span class="inline-block py-1 px-3 rounded-full bg-blue-100 text-blue-800 text-xs font-semibold mb-4">系統主日學 Systematics</span>
+            <h2 class="text-4xl font-bold text-slate-900 mb-6">認識三一真神的第三位格</h2>
+            <p class="text-lg text-gray-600 leading-relaxed mb-8">
+                本課程綜合整本聖經，探討聖靈的位格、工作及恩賜。特別針對當代教會對「方言」與「恩賜」的迷思，
+                提供基於聖經嚴謹釋經（Exegesis）的福音派立場回應。
+            </p>
+            <a href="#activity" class="inline-block bg-blue-900 hover:bg-blue-800 text-white font-medium py-3 px-8 rounded-lg transition shadow-md">
+                進入互動研經室
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-12 gap-10">
+        
+        <aside class="hidden md:block md:col-span-3">
+            <div class="sticky top-24 space-y-2">
+                <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">課程模組</h3>
+                <button onclick="showSection('module1')" class="w-full text-left px-4 py-2 rounded hover:bg-gray-100 text-gray-700 transition font-medium border-l-4 border-transparent focus:border-blue-900 module-btn" id="btn-module1">1. 聖靈的位格與神性</button>
+                <button onclick="showSection('module2')" class="w-full text-left px-4 py-2 rounded hover:bg-gray-100 text-gray-700 transition font-medium border-l-4 border-transparent focus:border-blue-900 module-btn" id="btn-module2">2. 舊約中的聖靈 (Ruach)</button>
+                <button onclick="showSection('module3')" class="w-full text-left px-4 py-2 rounded hover:bg-gray-100 text-gray-700 transition font-medium border-l-4 border-transparent focus:border-blue-900 module-btn" id="btn-module3">3. 救恩與成聖</button>
+                <button onclick="showSection('module4')" class="w-full text-left px-4 py-2 rounded hover:bg-gray-100 text-gray-700 transition font-medium border-l-4 border-transparent focus:border-blue-900 module-btn" id="btn-module4">4. 屬靈恩賜與方言</button>
+            </div>
+        </aside>
+
+        <div class="col-span-1 md:col-span-9 space-y-12" id="content-container">
+            
+            <section id="module1" class="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+                <div class="flex items-center mb-6">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-bold mr-4">1</div>
+                    <h3 class="text-2xl font-bold text-slate-800">聖靈是誰？(Who is the Holy Spirit?)</h3>
+                </div>
+                <div class="prose max-w-none text-gray-600">
+                    <p class="mb-4">
+                        聖靈不僅僅是一種能力或影響力，祂是一個擁有理智、情感與意志的<strong>位格 (Person)</strong>。按照尼西亞信經及我們篤信的真理，祂與聖父、聖子同尊同榮。
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                        <div class="bg-slate-50 p-5 rounded-lg border-l-4 border-blue-900">
+                            <h4 class="font-bold text-slate-900 mb-2">祂是神 (Deity)</h4>
+                            <p class="text-sm italic">"彼得說：亞拿尼亞！...你不是欺哄人，是欺哄神了。"</p>
+                            <p class="text-xs text-right font-bold mt-1">— 使徒行傳 5:3-4</p>
+                        </div>
+                        <div class="bg-slate-50 p-5 rounded-lg border-l-4 border-blue-900">
+                            <h4 class="font-bold text-slate-900 mb-2">祂有位格 (Personality)</h4>
+                            <p class="text-sm italic">"聖靈顯明這事..." (來 9:8)<br>"聖靈擔憂..." (弗 4:30)</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+             <section id="module2" class="bg-white p-8 rounded-xl shadow-sm border border-gray-100 hidden">
+                <div class="flex items-center mb-6">
+                    <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-800 font-bold mr-4">2</div>
+                    <h3 class="text-2xl font-bold text-slate-800">舊約中的聖靈 (The Spirit in the OT)</h3>
+                </div>
+                <div class="prose max-w-none text-gray-600">
+                    <p class="mb-4">
+                        在舊約中，希伯來文 <strong>Ruach (רוּחַ)</strong> 既指「風」、「氣息」，也指神的靈。祂參與了創造，並賦予人能力去完成神的託付。
+                    </p>
+                    <ul class="list-disc pl-5 space-y-2 mt-4">
+                        <li><strong>創造之工：</strong>「神的靈運行在水面上。」(創世記 1:2)</li>
+                        <li><strong>賦予領袖能力：</strong>聖靈降在士師（如基甸）、君王（如大衛）和先知身上，是為了<strong>特定的事奉</strong>，而不一定是永久的內住（這與新約不同）。</li>
+                        <li><strong>預言新約：</strong>以西結預言神將賜下新心與新靈（結 36:26-27）。</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="module3" class="bg-white p-8 rounded-xl shadow-sm border border-gray-100 hidden">
+                <div class="flex items-center mb-6">
+                    <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-800 font-bold mr-4">3</div>
+                    <h3 class="text-2xl font-bold text-slate-800">救恩與成聖 (Soteriology & Sanctification)</h3>
+                </div>
+                <div class="prose max-w-none text-gray-600">
+                    <div class="bg-yellow-50 border border-yellow-200 p-4 rounded-md mb-6">
+                        <h4 class="font-bold text-yellow-800 mb-2">關鍵主日學區分：洗與充滿</h4>
+                        <p class="text-sm text-yellow-900">
+                            教會與許多福音派教會強調：
+                            <br>1. <strong>聖靈的洗</strong>：身分上的改變，發生於重生時，一次完成 (One Baptism)。
+                            <br>2. <strong>聖靈充滿</strong>：生活上的管理，需每日順服，多次經歷 (Many Fillings)。
+                        </p>
+                    </div>
+
+                    <div class="overflow-hidden bg-white shadow sm:rounded-lg">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">工作 (Work)</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">經文 (Scripture)</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">意義 (Meaning)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200 text-sm">
+                                <tr>
+                                    <td class="px-6 py-4 font-medium">重生 (Regeneration)</td>
+                                    <td class="px-6 py-4">約翰福音 3:5</td>
+                                    <td class="px-6 py-4">賜予屬靈生命，使人知罪悔改。</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 font-medium">內住 (Indwelling)</td>
+                                    <td class="px-6 py-4">羅馬書 8:9</td>
+                                    <td class="px-6 py-4">聖靈住在每一個真信徒裡面，以此為印記。</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 font-medium">成聖 (Sanctification)</td>
+                                    <td class="px-6 py-4">加拉太書 5:22-23</td>
+                                    <td class="px-6 py-4">結出聖靈的果子，活出基督的樣式。</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="module4" class="bg-white p-8 rounded-xl shadow-sm border border-gray-100 hidden">
+                <div class="flex items-center mb-6">
+                    <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-800 font-bold mr-4">4</div>
+                    <h3 class="text-2xl font-bold text-slate-800">屬靈恩賜與方言 (Spiritual Gifts & Tongues)</h3>
+                </div>
+                
+                <div class="prose max-w-none text-gray-600 space-y-8">
+                    <div>
+                        <p>
+                            屬靈恩賜（希臘文 <em>Charismata</em>）是聖靈隨己意分給各人的禮物，<strong>目的只有一個：建立基督的身體（教會），而非高舉個人</strong>。所有信徒至少擁有一種恩賜。
+                        </p>
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold text-slate-900 text-lg mb-3">恩賜分類：羅馬書 vs 哥林多前書</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-0 border border-gray-200 rounded-lg overflow-hidden">
+                            <div class="bg-blue-50 p-6">
+                                <h5 class="font-bold text-blue-900 mb-2">羅馬書 12:6-8</h5>
+                                <p class="text-xs text-blue-800 mb-4 uppercase tracking-wide">動機性恩賜 (Motivational Gifts)</p>
+                                <ul class="list-disc pl-5 space-y-1 text-sm text-blue-900">
+                                    <li>預言 (Prophecy) - 宣講神的心意</li>
+                                    <li>執事 (Serving) - 實務服事</li>
+                                    <li>教導 (Teaching)</li>
+                                    <li>勸化 (Exhorting)</li>
+                                    <li>施捨 (Giving) - 慷慨奉獻</li>
+                                    <li>治理 (Leading)</li>
+                                    <li>憐憫人的 (Showing Mercy)</li>
+                                </ul>
+                            </div>
+                            <div class="bg-purple-50 p-6 border-t md:border-t-0 md:border-l border-gray-200">
+                                <h5 class="font-bold text-purple-900 mb-2">哥林多前書 12:8-10</h5>
+                                <p class="text-xs text-purple-800 mb-4 uppercase tracking-wide">顯明性恩賜 (Manifestation Gifts)</p>
+                                <ul class="list-disc pl-5 space-y-1 text-sm text-purple-900">
+                                    <li>智慧的言語、知識的言語</li>
+                                    <li>信心、醫病的恩賜</li>
+                                    <li>行異能 (Miracles)</li>
+                                    <li>作先知說預言</li>
+                                    <li>辨別諸靈</li>
+                                    <li><strong>說方言 (Tongues)</strong></li>
+                                    <li><strong>翻方言 (Interpretation)</strong></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 border-l-4 border-slate-600 p-6 rounded-r-lg">
+                        <h4 class="font-bold text-slate-900 mb-3 flex items-center">
+                            <span class="text-xl mr-2">⚖️</span> 
+                            福音派對「方言」(Glossolalia) 的立場
+                        </h4>
+                        <p class="mb-4 text-sm">
+                            針對靈恩運動（Charismatic Movement）常強調方言為「聖靈充滿的必要憑據」，我們基於教會及傳統福音派釋經，提出以下糾正：
+                        </p>
+                        <ol class="list-decimal pl-5 space-y-3 text-sm">
+                            <li>
+                                <strong>方言不是得救或聖靈洗的標記：</strong>
+                                <br>保羅在 <span class="font-semibold text-slate-800">林前 12:30</span> 清楚反問：「豈都是說方言的嗎？」答案顯然是否定的。聖靈隨己意分賜恩賜，沒有一種恩賜是所有信徒都必須具備的。
+                            </li>
+                            <li>
+                                <strong>方言的定義與用途：</strong>
+                                <br>聖經中的方言主要是「別國的話」（徒 2:4）或造就自己的禱告語言。若是造就教會，必須有人<strong>翻譯</strong>，否則在聚會中應當閉口（林前 14:28）。
+                            </li>
+                            <li>
+                                <strong>教會秩序優先：</strong>
+                                <br>神不是叫人混亂，乃是叫人安靜。<span class="font-semibold text-slate-800">林前 14:40</span>「凡事都要規規矩矩的按著次序行」。過度高舉方言往往導致教會混亂與信徒間的比較，這並非聖靈的心意。
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+            <section id="activity" class="pt-10 border-t border-gray-200">
+                <h3 class="text-3xl font-bold text-slate-900 mb-8 text-center">互動主日學研習 (Theological Interactive Lab)</h3>
+                
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+                    <div class="flex border-b border-gray-200 bg-gray-50 overflow-x-auto">
+                        <button onclick="switchTab('tab1')" id="btn-tab1" class="flex-1 py-4 px-4 text-center font-medium text-gray-600 hover:text-blue-800 active-tab transition whitespace-nowrap">
+                            經文配對
+                        </button>
+                        <button onclick="switchTab('tab2')" id="btn-tab2" class="flex-1 py-4 px-4 text-center font-medium text-gray-600 hover:text-blue-800 transition whitespace-nowrap">
+                            主日學測試
+                        </button>
+                        <button onclick="switchTab('tab3')" id="btn-tab3" class="flex-1 py-4 px-4 text-center font-medium text-gray-600 hover:text-blue-800 transition whitespace-nowrap">
+                            恩賜自測 (新)
+                        </button>
+                    </div>
+
+                    <div id="tab1" class="p-8">
+                        <p class="mb-6 text-gray-600 text-center">點擊下方的主日學概念，顯示對應的支撐經文。</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-3">
+                                <button onclick="revealVerse('v1')" class="w-full text-left p-4 rounded bg-blue-50 hover:bg-blue-100 text-blue-900 font-semibold transition flex justify-between items-center">
+                                    <span>聖靈就是真理</span>
+                                    <span class="text-blue-400">→</span>
+                                </button>
+                                <button onclick="revealVerse('v2')" class="w-full text-left p-4 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-900 font-semibold transition flex justify-between items-center">
+                                    <span>身體是聖靈的殿</span>
+                                    <span class="text-emerald-400">→</span>
+                                </button>
+                                <button onclick="revealVerse('v3')" class="w-full text-left p-4 rounded bg-purple-50 hover:bg-purple-100 text-purple-900 font-semibold transition flex justify-between items-center">
+                                    <span>不可銷滅聖靈的感動</span>
+                                    <span class="text-purple-400">→</span>
+                                </button>
+                                <button onclick="revealVerse('v4')" class="w-full text-left p-4 rounded bg-orange-50 hover:bg-orange-100 text-orange-900 font-semibold transition flex justify-between items-center">
+                                    <span>方言的限制</span>
+                                    <span class="text-orange-400">→</span>
+                                </button>
+                            </div>
+                            <div class="bg-slate-800 text-white p-6 rounded-lg flex items-center justify-center min-h-[200px]">
+                                <p id="verse-display" class="text-lg italic text-center text-slate-300">
+                                    "請選擇左側的主日學主題..."
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tab2" class="p-8 hidden">
+                        <div id="quiz-container">
+                            <div class="mb-8">
+                                <h4 class="text-lg font-bold text-gray-800 mb-3">1. 關於「聖靈的洗」(Spirit Baptism)，以下哪項符合我們宗派的理解？</h4>
+                                <div class="space-y-2">
+                                    <button onclick="checkAnswer(this, false, '不正確。聖靈的洗是一次性的，充滿才是多次的。')" class="w-full text-left p-3 border rounded hover:bg-gray-50 transition">A. 是一個信徒悔改後，需要不斷追求的第二次祝福。</button>
+                                    <button onclick="checkAnswer(this, true, '正確！林前12:13 指出我們都從一位聖靈受洗，成了一個身體。這是發生在救恩那刻。')" class="w-full text-left p-3 border rounded hover:bg-gray-50 transition">B. 是發生在重生得救時，使我們歸入基督身體的一次性事件。</button>
+                                    <button onclick="checkAnswer(this, false, '不正確。說方言是恩賜之一，並非聖靈的洗的唯一或必要憑據。')" class="w-full text-left p-3 border rounded hover:bg-gray-50 transition">C. 必須伴隨著說方言作為憑據。</button>
+                                </div>
+                                <div class="feedback mt-2 text-sm font-medium hidden"></div>
+                            </div>
+                            <hr class="my-6">
+                            <div class="mb-8">
+                                <h4 class="text-lg font-bold text-gray-800 mb-3">2. 聖靈的果子 (Fruit) 與恩賜 (Gifts) 有何主要區別？</h4>
+                                <div class="space-y-2">
+                                    <button onclick="checkAnswer(this, true, '正確！果子關乎生命品格（加5），恩賜關乎事奉能力（林前12）。')" class="w-full text-left p-3 border rounded hover:bg-gray-50 transition">A. 果子是生命品格的流露，恩賜是事奉能力的賦予。</button>
+                                    <button onclick="checkAnswer(this, false, '不正確。所有信徒都應當結出聖靈果子。')" class="w-full text-left p-3 border rounded hover:bg-gray-50 transition">B. 果子只有特別屬靈的人才有，恩賜則是每個人都有。</button>
+                                </div>
+                                <div class="feedback mt-2 text-sm font-medium hidden"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tab3" class="p-8 hidden">
+                        <h4 class="text-lg font-bold text-gray-800 mb-4 text-center">恩賜反思練習：羅馬書 12 章</h4>
+                        <p class="text-sm text-gray-500 text-center mb-6">這不是心理測驗，而是幫助你反思聖靈在你生命中的驅動力。</p>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-gray-50 p-4 rounded hover:shadow-md transition cursor-pointer border border-transparent hover:border-blue-300" onclick="alert('這可能是「預言/宣講」的恩賜特質：對罪敏感，渴望看見公義。')">
+                                <span class="text-2xl block mb-2">📢</span>
+                                <h5 class="font-bold">你是否...</h5>
+                                <p class="text-sm text-gray-600">對於分辨對錯非常敏感，且很有勇氣指出不公義的事？</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded hover:shadow-md transition cursor-pointer border border-transparent hover:border-blue-300" onclick="alert('這可能是「執事/服事」的恩賜特質：喜歡在幕後實際地滿足他人需求。')">
+                                <span class="text-2xl block mb-2">🤲</span>
+                                <h5 class="font-bold">你是否...</h5>
+                                <p class="text-sm text-gray-600">看到具體需要（如椅子沒排好）會比別人先動手去做，且樂在其中？</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded hover:shadow-md transition cursor-pointer border border-transparent hover:border-blue-300" onclick="alert('這可能是「教導」的恩賜特質：渴望查考真理的細節並傳遞清楚。')">
+                                <span class="text-2xl block mb-2">📖</span>
+                                <h5 class="font-bold">你是否...</h5>
+                                <p class="text-sm text-gray-600">對於聖經的真理細節非常執著，並喜歡有系統地解釋給人聽？</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded hover:shadow-md transition cursor-pointer border border-transparent hover:border-blue-300" onclick="alert('這可能是「憐憫」的恩賜特質：容易與受傷的人共鳴。')">
+                                <span class="text-2xl block mb-2">❤️</span>
+                                <h5 class="font-bold">你是否...</h5>
+                                <p class="text-sm text-gray-600">容易感受到別人的痛苦，且願意花時間陪伴受傷心靈的人？</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 1rem; color: #707070; font-size: 0.875rem;">
+        <p style="font-style: italic; margin-bottom: 0.25rem;">But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his understanding. Jeremiah 10:12</p>
+        <p style="font-size: 0.75rem; margin-bottom: 0.25rem; margin-top: 0.5rem;">「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12</p>
+        <p style="font-size: 0.75rem; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #d1d5db;">@ 2025 Generated by Gemini Pro 3.0  Prepared by SF Lau</p>
+    </footer>
+
+    <script>
+        // Module Navigation Logic
+        function showSection(moduleId) {
+            // Hide all sections inside the module container
+            const sections = ['module1', 'module2', 'module3', 'module4'];
+            sections.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.classList.add('hidden');
+                    el.classList.remove('fade-in');
+                }
+            });
+
+            // Show selected
+            const active = document.getElementById(moduleId);
+            if (active) {
+                active.classList.remove('hidden');
+                active.classList.add('fade-in');
+            }
+
+            // Update sidebar styles
+            const buttons = document.querySelectorAll('.module-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-blue-50', 'text-blue-900', 'border-blue-900');
+                btn.classList.add('border-transparent');
+            });
+            const activeBtn = document.getElementById('btn-' + moduleId);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-blue-50', 'text-blue-900', 'border-blue-900');
+                activeBtn.classList.remove('border-transparent');
+            }
+        }
+
+        // Initialize first module
+        showSection('module1');
+
+        // Interactive Activity: Tab Switching
+        function switchTab(tabId) {
+            ['tab1', 'tab2', 'tab3'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+                document.getElementById('btn-' + id).classList.remove('active-tab');
+            });
+            
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById(tabId).classList.add('fade-in');
+            document.getElementById('btn-' + tabId).classList.add('active-tab');
+        }
+
+        // Interactive Activity: Verse Reveal
+        const verses = {
+            'v1': '<strong>約翰福音 16:13</strong><br>「只等真理的聖靈來了，他要引導你們明白一切的真理...」',
+            'v2': '<strong>哥林多前書 6:19</strong><br>「豈不知你們的身子就是聖靈的殿嗎？這聖靈是從神而來，住在你們裡頭的...」',
+            'v3': '<strong>帖撒羅尼迦前書 5:19</strong><br>「不要銷滅聖靈的感動。」(Quench not the Spirit)',
+            'v4': '<strong>哥林多前書 12:30</strong><br>「豈都是得恩賜醫病的嗎？豈都是說方言的嗎？豈都是翻方言的嗎？」<br><span class="text-sm text-gray-400 mt-2 block">(保羅的反問句結構顯示答案為：不)</span>'
+        };
+
+        function revealVerse(key) {
+            const display = document.getElementById('verse-display');
+            display.innerHTML = verses[key];
+            display.classList.remove('text-slate-300', 'italic');
+            display.classList.add('text-white', 'font-serif', 'text-xl', 'fade-in');
+            void display.offsetWidth; // Trigger reflow
+        }
+
+        // Interactive Activity: Quiz Logic
+        function checkAnswer(btn, isCorrect, explanation) {
+            const parent = btn.parentElement.parentElement;
+            const feedback = parent.querySelector('.feedback');
+            
+            // Reset styles for siblings
+            const siblings = btn.parentElement.children;
+            for (let i = 0; i < siblings.length; i++) {
+                siblings[i].classList.remove('bg-green-100', 'border-green-500', 'bg-red-100', 'border-red-500');
+                siblings[i].classList.add('border-gray-200');
+            }
+
+            if (isCorrect) {
+                btn.classList.remove('hover:bg-gray-50');
+                btn.classList.add('bg-green-50', 'border-green-500', 'text-green-900');
+                feedback.innerHTML = `<span class="text-green-600">✅ ${explanation}</span>`;
+            } else {
+                btn.classList.remove('hover:bg-gray-50');
+                btn.classList.add('bg-red-50', 'border-red-500', 'text-red-900');
+                feedback.innerHTML = `<span class="text-red-600">❌ ${explanation}</span>`;
+            }
+            feedback.classList.remove('hidden');
+            feedback.classList.add('fade-in');
+        }
+    </script>
+</body>
+</html>

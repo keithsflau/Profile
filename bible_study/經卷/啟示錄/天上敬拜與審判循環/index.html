@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>啟示錄：天上敬拜與審判循環</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        
+        body { font-family: 'Noto Sans TC', sans-serif; }
+        h1, h2, h3, h4 { font-family: 'Noto Serif TC', serif; }
+        
+        /* Glorious Glow Effects */
+        .holy-glow {
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.4);
+            animation: pulse-glow 3s infinite;
+        }
+        .emerald-rainbow {
+            box-shadow: 0 0 0 8px rgba(16, 185, 129, 0.2), 0 0 40px rgba(16, 185, 129, 0.3);
+        }
+        
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 30px rgba(251, 191, 36, 0.4); }
+            50% { box-shadow: 0 0 50px rgba(251, 191, 36, 0.7); }
+            100% { box-shadow: 0 0 30px rgba(251, 191, 36, 0.4); }
+        }
+
+        /* Creature Positioning */
+        .creature-card {
+            transition: all 0.3s ease;
+        }
+        .creature-card:hover {
+            transform: scale(1.05);
+            background-color: #fffbeb;
+        }
+
+        /* Judgment Table Rows */
+        .judgment-row:hover {
+            background-color: #f8fafc;
+        }
+        .judgment-cell {
+            transition: all 0.2s;
+        }
+        .judgment-row:hover .judgment-cell {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-200">
+
+    <header class="bg-black/50 backdrop-blur-md sticky top-0 z-50 border-b border-amber-900/50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-xl md:text-2xl font-bold text-amber-500">啟示錄視像教學</h1>
+                <p class="text-xs text-slate-400">教會課程框架 | 敬拜與審判</p>
+            </div>
+            <nav class="space-x-4 text-sm">
+                <a href="#throne-room" class="hover:text-amber-400 transition">天上敬拜</a>
+                <a href="#judgments" class="hover:text-amber-400 transition">七印七號七碗</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-12 space-y-24">
+
+        <section id="throne-room" class="scroll-mt-24">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-amber-100 mb-4">一、天上敬拜的中心 (啟 4-5)</h2>
+                <p class="text-slate-400 max-w-2xl mx-auto">
+                    這是一個「同心圓」的敬拜結構。請點擊圖中的元素（寶座、活物、長老），查看其象徵意義。
+                    這場景宣告了神是創造主（第4章）與救贖主（第5章）。
+                </p>
+            </div>
+
+            <div class="flex flex-col lg:flex-row gap-8 items-center justify-center">
+                
+                <div class="relative w-full max-w-2xl aspect-square bg-slate-800 rounded-full border border-slate-700 p-8 md:p-16 flex items-center justify-center shadow-2xl overflow-hidden">
+                    
+                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-indigo-900/40 via-slate-900 to-slate-900"></div>
+                    
+                    <div class="absolute inset-4 border-2 border-dashed border-slate-600 rounded-full animate-[spin_60s_linear_infinite] opacity-30"></div>
+                    <button onclick="showInfo('elders')" class="absolute top-4 left-1/2 -translate-x-1/2 bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1 rounded-full text-xs border border-slate-500 z-20">二十四位長老</button>
+                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div class="w-[90%] h-[90%] rounded-full border border-slate-700/50 flex items-center justify-center">
+                            <span class="absolute text-slate-600 font-serif text-4xl opacity-20 select-none">👑</span>
+                        </div>
+                    </div>
+
+                    <div class="absolute w-2/3 h-2/3 bg-cyan-900/20 rounded-full backdrop-blur-sm border border-cyan-500/20 z-10 flex items-center justify-center">
+                        <span class="text-cyan-300/30 text-xs font-serif italic absolute bottom-4">玻璃海 (聖潔區隔)</span>
+                    </div>
+
+                    <div class="absolute z-20 w-full h-full flex flex-col justify-between items-center py-20 pointer-events-none">
+                        <button onclick="showInfo('creatures')" class="pointer-events-auto bg-amber-900/80 hover:bg-amber-800 text-amber-100 px-2 py-1 rounded text-xs border border-amber-700 transform translate-y-4">🦅 鷹</button>
+                        <button onclick="showInfo('creatures')" class="pointer-events-auto bg-amber-900/80 hover:bg-amber-800 text-amber-100 px-2 py-1 rounded text-xs border border-amber-700 transform -translate-y-4">🦁 獅</button>
+                    </div>
+                    <div class="absolute z-20 w-full h-full flex justify-between items-center px-20 pointer-events-none">
+                        <button onclick="showInfo('creatures')" class="pointer-events-auto bg-amber-900/80 hover:bg-amber-800 text-amber-100 px-2 py-1 rounded text-xs border border-amber-700 transform translate-x-4">🐮 牛</button>
+                        <button onclick="showInfo('creatures')" class="pointer-events-auto bg-amber-900/80 hover:bg-amber-800 text-amber-100 px-2 py-1 rounded text-xs border border-amber-700 transform -translate-x-4">👤 人</button>
+                    </div>
+
+                    <button onclick="showInfo('throne')" class="relative z-30 w-32 h-32 bg-gradient-to-br from-amber-300 via-amber-500 to-yellow-700 rounded-full flex items-center justify-center holy-glow emerald-rainbow hover:scale-105 transition cursor-pointer group">
+                        <div class="text-center">
+                            <span class="block text-2xl group-hover:hidden">👑</span>
+                            <span class="block text-xs font-bold text-amber-900 uppercase">寶座</span>
+                            <span class="hidden group-hover:block text-[10px] text-amber-900 font-bold mt-1">聖哉!聖哉!聖哉!</span>
+                        </div>
+                    </button>
+                    
+                    <button onclick="showInfo('lamb')" class="absolute z-40 bottom-[28%] right-[28%] w-12 h-12 bg-rose-600 text-white rounded-full flex items-center justify-center shadow-lg border-2 border-rose-300 hover:scale-110 transition cursor-pointer" title="被殺的羔羊">
+                        🐑
+                    </button>
+
+                </div>
+
+                <div class="w-full lg:w-1/3 bg-slate-800 border border-slate-700 rounded-xl p-6 min-h-[300px] relative">
+                    <div id="info-placeholder" class="absolute inset-0 flex items-center justify-center text-slate-500">
+                        <p>點擊左側圖示查看詳情</p>
+                    </div>
+                    <div id="info-content" class="hidden">
+                        <h3 id="info-title" class="text-2xl font-bold text-amber-400 mb-2"></h3>
+                        <div class="w-10 h-1 bg-amber-600 mb-4"></div>
+                        <p id="info-desc" class="text-slate-300 leading-relaxed mb-4"></p>
+                        <div class="bg-slate-900/50 p-3 rounded border-l-2 border-indigo-500">
+                            <p class="text-xs text-indigo-300 font-mono">主日學關鍵：</p>
+                            <p id="info-theo" class="text-sm text-indigo-100 italic"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="judgments" class="scroll-mt-24">
+            <div class="mb-10 border-l-4 border-red-600 pl-6">
+                <h2 class="text-3xl font-bold text-white">二、審判的螺旋結構：七印、七號、七碗</h2>
+                <p class="mt-2 text-slate-400">
+                    注意觀察審判程度的加劇：從 1/4 (印) 到 1/3 (號) 再到 全地 (碗)。
+                    這不僅是時間順序，更是神對罪惡容忍度的極限逼近。
+                </p>
+            </div>
+
+            <div class="overflow-x-auto rounded-xl border border-slate-700 shadow-2xl">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-800 text-slate-400 text-sm uppercase tracking-wider">
+                            <th class="p-4 w-16 text-center border-r border-slate-700">序號</th>
+                            <th class="p-4 w-1/3 border-r border-slate-700 bg-indigo-900/20 text-indigo-300">
+                                七印 (The 7 Seals)<br>
+                                <span class="text-xs text-slate-500 normal-case">災害程度：1/4 (局部)</span>
+                            </th>
+                            <th class="p-4 w-1/3 border-r border-slate-700 bg-emerald-900/20 text-emerald-300">
+                                七號 (The 7 Trumpets)<br>
+                                <span class="text-xs text-slate-500 normal-case">災害程度：1/3 (加劇)</span>
+                            </th>
+                            <th class="p-4 w-1/3 bg-rose-900/20 text-rose-300">
+                                七碗 (The 7 Bowls)<br>
+                                <span class="text-xs text-slate-500 normal-case">災害程度：全地 (決絕)</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-700 bg-slate-900/80">
+                        <tr class="judgment-row group">
+                            <td class="p-4 text-center font-bold text-slate-500 group-hover:text-white border-r border-slate-700">1</td>
+                            <td class="p-4 border-r border-slate-700 judgment-cell">
+                                <span class="font-bold text-indigo-400">白馬 (征服)</span>
+                                <p class="text-xs text-slate-400 mt-1">假和平、迷惑</p>
+                            </td>
+                            <td class="p-4 border-r border-slate-700 judgment-cell">
+                                <span class="font-bold text-emerald-400">地受審判</span>
+                                <p class="text-xs text-slate-400 mt-1">1/3 的地、樹木被燒</p>
+                            </td>
+                            <td class="p-4 judgment-cell">
+                                <span class="font-bold text-rose-400">毒瘡</span>
+                                <p class="text-xs text-slate-400 mt-1">拜獸像者生惡瘡</p>
+                            </td>
+                        </tr>
+                        <tr class="judgment-row group">
+                            <td class="p-4 text-center font-bold text-slate-500 group-hover:text-white border-r border-slate-700">2</td>
+                            <td class="p-4 border-r border-slate-700 judgment-cell">
+                                <span class="font-bold text-indigo-400">紅馬 (戰爭)</span>
+                                <p class="text-xs text-slate-400 mt-1">奪去太平、互相殘殺</p>
+                            </td>
+                            <td class="p-4 border-r border-slate-700 judgment-cell">
+                                <span class="font-bold text-emerald-400">海受審判</span>
+                                <p class="text-xs text-slate-400 mt-1">1/3 海變血，生物死</p>
+                            </td>
+                            <td class="p-4 judgment-cell">
+                                <span class="font-bold text-rose-400">海全變血</span>
+                                <p class="text-xs text-slate-400 mt-1">海中活物都死了</p>
+                            </td>
+                        </tr>
+                        <tr class="judgment-row group">
+                            <td class="p-4 text-center font-bold text-slate-500 group-hover:text-white border-r border-slate-700">3</td>
+                            <td class="p-4 border-r border-slate-700 judgment-cell">
+                                <span class="font-bold text-indigo-400">黑馬 (饑荒)</span>
+                                <p class="text-xs text-slate-400 mt-1">天秤衡量穀物，經濟崩潰</p>
+                            </td>
+                            <td class="p-4 border-r border-slate-700 judgment-cell">
+                                <span class="font-bold text-emerald-400">江河受審判</span>
+                                <p class="text-xs text-slate-400 mt-1">1/3 江河變苦(茵蔯)</p>
+                            </td>
+                            <td class="p-4 judgment-cell">
+                                <span class="font-bold text-rose-400">江河全變血</span>
+                                <p class="text-xs text-slate-400 mt-1">這是神公義的報應</p>
+                            </td>
+                        </tr>
+                        <tr class="judgment-row group">
+                            <td class="p-4 text-center font-bold text-slate-500 group-hover:text-white border-r border-slate-700">4</td>
+                            <td class="p-4 border-r border-slate-700 judgment-cell">
+                                <span class="font-bold text-indigo-400">灰馬 (死亡)</span>
+                                <p class="text-xs text-slate-400 mt-1">殺害地上 1/4 的人</p>
+                            </td>
+                            <td class="p-4 border-r border-slate-700 judgment-cell">
+                                <span class="font-bold text-emerald-400">天體受審判</span>
+                                <p class="text-xs text-slate-400 mt-1">1/3 日月星變黑</p>
+                            </td>
+                            <td class="p-4 judgment-cell">
+                                <span class="font-bold text-rose-400">烈日烤人</span>
+                                <p class="text-xs text-slate-400 mt-1">人卻不悔改，反褻瀆神</p>
+                            </td>
+                        </tr>
+                        <tr class="judgment-row group bg-slate-800/30">
+                            <td class="p-4 text-center font-bold text-slate-500 group-hover:text-white border-r border-slate-700">5</td>
+                            <td class="p-4 border-r border-slate-700 judgment-cell">
+                                <span class="font-bold text-white">祭壇下的呼冤</span>
+                                <p class="text-xs text-slate-400 mt-1">殉道者的禱告</p>
+                            </td>
+                            <td class="p-4 border-r border-slate-700 judgment-cell">
+                                <span class="font-bold text-white">第一禍：蝗蟲</span>
+                                <p class="text-xs text-slate-400 mt-1">無底坑開，痛苦五個月</p>
+                            </td>
+                            <td class="p-4 judgment-cell">
+                                <span class="font-bold text-white">獸國變黑暗</span>
+                                <p class="text-xs text-slate-400 mt-1">人因痛苦咬舌，仍不悔改</p>
+                            </td>
+                        </tr>
+                        <tr class="judgment-row group bg-slate-800/30">
+                            <td class="p-4 text-center font-bold text-slate-500 group-hover:text-white border-r border-slate-700">6</td>
+                            <td class="p-4 border-r border-slate-700 judgment-cell">
+                                <span class="font-bold text-white">天崩地裂</span>
+                                <p class="text-xs text-slate-400 mt-1">羔羊的忿怒臨到</p>
+                            </td>
+                            <td class="p-4 border-r border-slate-700 judgment-cell">
+                                <span class="font-bold text-white">第二禍：馬軍</span>
+                                <p class="text-xs text-slate-400 mt-1">殺掉 1/3 的人</p>
+                            </td>
+                            <td class="p-4 judgment-cell">
+                                <span class="font-bold text-white">哈米吉多頓</span>
+                                <p class="text-xs text-slate-400 mt-1">伯拉大河乾涸，集結爭戰</p>
+                            </td>
+                        </tr>
+                        <tr class="judgment-row group bg-slate-800/50 border-t-2 border-slate-600">
+                            <td class="p-4 text-center font-bold text-slate-500 group-hover:text-white border-r border-slate-700">7</td>
+                            <td class="p-4 border-r border-slate-700 judgment-cell">
+                                <span class="font-bold text-indigo-200">寂靜半小時</span>
+                                <p class="text-xs text-slate-400 mt-1">引出七號</p>
+                            </td>
+                            <td class="p-4 border-r border-slate-700 judgment-cell">
+                                <span class="font-bold text-emerald-200">國度降臨</span>
+                                <p class="text-xs text-slate-400 mt-1">世上的國成了主基督的國</p>
+                            </td>
+                            <td class="p-4 judgment-cell">
+                                <span class="font-bold text-rose-200">成了！</span>
+                                <p class="text-xs text-slate-400 mt-1">大地震、大城裂開、大雹</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="mt-4 p-4 bg-slate-800 rounded border border-slate-700 flex items-start">
+                <span class="text-2xl mr-3">💡</span>
+                <div>
+                    <h4 class="font-bold text-white text-sm">主日學觀察：出埃及記的重演</h4>
+                    <p class="text-xs text-slate-400 mt-1">
+                        你是否發現「號」與「碗」的內容（水變血、黑暗、蛙/靈、瘡、雹）與《出埃及記》十災高度相似？
+                        啟示錄告訴我們，神正在進行一場「終極的法老對抗戰」，目的是要將祂的百姓從世界的轄制中完全釋放出來。
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer style="text-align: center; padding: 1rem; color: #707070; font-size: 0.875rem;">
+        <p style="font-style: italic; margin-bottom: 0.25rem;">But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his understanding. Jeremiah 10:12</p>
+        <p style="font-size: 0.75rem; margin-bottom: 0.25rem; margin-top: 0.5rem;">「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12</p>
+        <p style="font-size: 0.75rem; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #d1d5db;">@ 2025 Generated by Gemini Pro 3.0  Prepared by SF Lau</p>
+    </footer>
+
+    <script>
+        // Data for Throne Room
+        const throneData = {
+            throne: {
+                title: "寶座上的全能者",
+                desc: "寶座是第4章的中心（出現14次）。坐寶座的好像碧玉和紅寶石，這代表了神的榮耀與威嚴。虹圍著寶座，好像綠寶石，象徵神在審判中仍守約施慈愛（挪亞之約）。",
+                theo: "神的主權 (Sovereignty)：宇宙並非失控，而是有一位掌權者坐在寶座上。"
+            },
+            creatures: {
+                title: "四活物 (Four Living Creatures)",
+                desc: "獅子（萬獸之王）、牛（家畜之首/力量）、人（萬物之靈/智慧）、鷹（飛禽之王/迅速）。他們前後遍體都滿了眼睛，晝夜不住地說：聖哉！聖哉！聖哉！",
+                theo: "受造界的代表 (Creation)：代表整個自然界都在敬拜創造主。神不僅是人的神，也是萬物的神。"
+            },
+            elders: {
+                title: "二十四位長老 (24 Elders)",
+                desc: "身穿白衣（聖潔/得勝），頭戴金冠冕（權柄/獎賞）。他們代表舊約十二支派與新約十二使徒的總和。",
+                theo: "教會的代表 (The Church)：代表歷世歷代所有屬神的子民，在天上事奉神。"
+            },
+            lamb: {
+                title: "被殺的羔羊 (The Lamb)",
+                desc: "第5章的焦點。獅子卻像羔羊，並是被殺過的（站立，象徵復活）。唯有祂配展開書卷（揭開神的救贖與審判計劃）。",
+                theo: "基督論的核心 (Christology)：歷史的鑰匙掌握在受難並復活的基督手中。"
+            }
+        };
+
+        function showInfo(key) {
+            const data = throneData[key];
+            const placeholder = document.getElementById('info-placeholder');
+            const content = document.getElementById('info-content');
+            
+            placeholder.classList.add('hidden');
+            content.classList.remove('hidden');
+            content.classList.remove('animate-fade-in'); // reset animation
+            void content.offsetWidth; // trigger reflow
+            content.classList.add('animate-fade-in'); // start animation
+
+            document.getElementById('info-title').textContent = data.title;
+            document.getElementById('info-desc').textContent = data.desc;
+            document.getElementById('info-theo').textContent = data.theo;
+        }
+
+        // Add fade animation via JS class injection
+        document.head.insertAdjacentHTML("beforeend", `<style>.animate-fade-in { animation: fadeIn 0.5s ease-out; } @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }</style>`)
+    </script>
+</body>
+</html>
