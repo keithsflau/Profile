@@ -1,0 +1,1641 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <title>馬可福音互動查經工具</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #0f172a;
+        --bg-elevated: #111827;
+        --bg-soft: #020617;
+        --accent: #f97316;
+        --accent-soft: rgba(248, 171, 84, 0.12);
+        --accent-strong: #fb923c;
+        --text: #e5e7eb;
+        --muted: #9ca3af;
+        --border: #1f2937;
+        --danger: #f97373;
+        --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.6);
+        --radius-lg: 18px;
+        --radius-md: 12px;
+        --radius-pill: 999px;
+        --transition-fast: 180ms ease-out;
+        --transition-med: 260ms cubic-bezier(0.16, 1, 0.3, 1);
+        --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+          "Segoe UI", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: var(--font-sans);
+        background: radial-gradient(circle at top, #7c2d12 0, #020617 45%, #000 100%);
+        color: var(--text);
+        display: flex;
+        align-items: stretch;
+        justify-content: center;
+        padding: 24px 16px;
+      }
+
+      .shell {
+        width: 100%;
+        max-width: 1280px;
+        background: linear-gradient(145deg, #020617 0, #020617 40%, #030712 100%);
+        border-radius: 24px;
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        box-shadow: var(--shadow-soft);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .shell::before,
+      .shell::after {
+        content: "";
+        position: absolute;
+        inset: -120px;
+        background:
+          radial-gradient(circle at 10% 0%, rgba(248, 171, 84, 0.18) 0, transparent 55%),
+          radial-gradient(circle at 80% 0%, rgba(52, 211, 153, 0.07) 0, transparent 55%);
+        opacity: 0.7;
+        pointer-events: none;
+        mix-blend-mode: screen;
+      }
+
+      .shell::after {
+        inset: auto;
+        top: 40%;
+        background:
+          radial-gradient(circle at 15% 120%, rgba(248, 250, 252, 0.07) 0, transparent 60%),
+          radial-gradient(circle at 90% 130%, rgba(248, 171, 84, 0.2) 0, transparent 65%);
+        opacity: 0.6;
+      }
+
+      .shell-inner {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        max-height: calc(100vh - 48px);
+      }
+
+      header {
+        padding: 18px 22px 10px;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+        backdrop-filter: blur(16px);
+        background: radial-gradient(circle at 0 0, rgba(248, 171, 84, 0.18) 0, transparent 55%);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .title-block {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .app-title {
+        font-size: 1.2rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #e5e7eb;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .badge {
+        font-size: 0.7rem;
+        padding: 2px 9px;
+        border-radius: 999px;
+        border: 1px solid rgba(248, 171, 84, 0.8);
+        color: #fed7aa;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        background: rgba(15, 23, 42, 0.9);
+      }
+
+      .subtitle {
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+
+      .hero-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 18px;
+        background:
+          conic-gradient(from 200deg, #fb923c, #f97316, #fed7aa, #92400e, #22c55e, #fb923c);
+        padding: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 16px 40px rgba(8, 47, 73, 0.9);
+      }
+
+      .hero-icon-inner {
+        width: 100%;
+        height: 100%;
+        border-radius: 16px;
+        background: radial-gradient(circle at 30% 0, #fffbeb 0, #0f172a 55%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #f9fafb;
+        font-weight: 700;
+        font-size: 0.96rem;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
+        gap: 12px;
+        padding: 12px 14px 18px;
+        height: 100%;
+        max-height: calc(100vh - 90px);
+      }
+
+      @media (max-width: 900px) {
+        .layout {
+          grid-template-columns: minmax(0, 1fr);
+          grid-template-rows: auto 1fr;
+        }
+      }
+
+      .sidebar {
+        background: radial-gradient(circle at 0 0, rgba(31, 41, 55, 0.9) 0, #020617 65%);
+        border-radius: var(--radius-lg);
+        border: 1px solid rgba(248, 171, 84, 0.6);
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.9);
+      }
+
+      .sidebar-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .sidebar-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #e5e7eb;
+      }
+
+      .tagline {
+        font-size: 0.75rem;
+        color: var(--muted);
+      }
+
+      .tab-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .tab-button {
+        border: none;
+        border-radius: var(--radius-pill);
+        padding: 6px 11px;
+        font-size: 0.8rem;
+        background: rgba(15, 23, 42, 0.9);
+        color: var(--muted);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: background var(--transition-fast), color var(--transition-fast),
+          box-shadow var(--transition-fast), transform var(--transition-fast);
+      }
+
+      .tab-button span.icon {
+        font-size: 0.9rem;
+      }
+
+      .tab-button.active {
+        background: linear-gradient(135deg, #c2410c, #ea580c);
+        color: #f9fafb;
+        box-shadow: 0 0 0 1px rgba(248, 171, 84, 0.7),
+          0 12px 30px rgba(8, 47, 73, 0.95);
+        transform: translateY(-1px);
+      }
+
+      .tab-button:hover:not(.active) {
+        background: rgba(15, 23, 42, 0.9);
+        color: #e5e7eb;
+        box-shadow: 0 0 0 1px rgba(55, 65, 81, 0.7);
+      }
+
+      .section-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--muted);
+        margin: 2px 4px 0;
+      }
+
+      .list {
+        margin-top: 2px;
+        padding: 4px;
+        border-radius: 12px;
+        background: radial-gradient(circle at 0 0, rgba(15, 23, 42, 0.9) 0, #020617 70%);
+        border: 1px solid rgba(55, 65, 81, 0.9);
+        overflow: auto;
+        flex: 1;
+      }
+
+      .list-item {
+        padding: 7px 8px;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        cursor: pointer;
+        border: 1px solid transparent;
+        position: relative;
+        transition: background var(--transition-fast), border-color var(--transition-fast),
+          transform var(--transition-fast), box-shadow var(--transition-fast);
+      }
+
+      .list-item::before {
+        content: "";
+        position: absolute;
+        inset: -1px;
+        border-radius: inherit;
+        background: radial-gradient(circle at 0 0, rgba(248, 171, 84, 0.24), transparent 60%);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity var(--transition-fast);
+      }
+
+      .list-item:hover::before {
+        opacity: 0.8;
+      }
+
+      .list-item:hover {
+        background: rgba(15, 23, 42, 0.98);
+        transform: translateY(-1px);
+        border-color: rgba(248, 171, 84, 0.7);
+        box-shadow: 0 14px 28px rgba(15, 23, 42, 0.9);
+      }
+
+      .list-item.active {
+        background: radial-gradient(circle at 0 0, rgba(180, 83, 9, 0.9) 0, #020617 70%);
+        border-color: rgba(248, 171, 84, 0.9);
+        box-shadow: 0 16px 32px rgba(15, 23, 42, 1);
+      }
+
+      .list-item-title {
+        font-size: 0.86rem;
+        font-weight: 600;
+        color: #e5e7eb;
+      }
+
+      .list-item-ref {
+        font-size: 0.75rem;
+        color: var(--muted);
+      }
+
+      .list-item-note {
+        font-size: 0.74rem;
+        color: #fed7aa;
+      }
+
+      .main-panel {
+        background: radial-gradient(circle at 100% 0, rgba(15, 23, 42, 0.9) 0, #020617 70%);
+        border-radius: var(--radius-lg);
+        border: 1px solid rgba(148, 163, 184, 0.26);
+        padding: 14px 16px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        min-width: 0;
+        overflow: hidden;
+      }
+
+      .panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .panel-title-group {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .panel-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #e5e7eb;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .panel-subtitle {
+        font-size: 0.82rem;
+        color: var(--muted);
+      }
+
+      .pill {
+        font-size: 0.72rem;
+        padding: 4px 9px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(248, 171, 84, 0.7);
+        color: #fed7aa;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .pill-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 999px;
+        background: radial-gradient(circle at 30% 0, #fffbeb 0, #f97316 55%);
+        box-shadow: 0 0 0 1px rgba(234, 88, 12, 0.8);
+      }
+
+      .content-scroll {
+        flex: 1;
+        min-height: 0;
+        border-radius: 14px;
+        border: 1px solid rgba(31, 41, 55, 0.9);
+        background:
+          radial-gradient(circle at 0 0, rgba(15, 23, 42, 0.9) 0, #020617 70%),
+          linear-gradient(135deg, rgba(15, 23, 42, 0.9), #020617);
+        padding: 12px 14px;
+        overflow: auto;
+        position: relative;
+        isolation: isolate;
+      }
+
+      .content-scroll::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 0 0, rgba(248, 171, 84, 0.14), transparent 55%);
+        mix-blend-mode: soft-light;
+        opacity: 0.7;
+        pointer-events: none;
+      }
+
+      .fade-enter {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+
+      .fade-enter-active {
+        opacity: 1;
+        transform: translateY(0);
+        transition: opacity 220ms ease-out, transform 220ms ease-out;
+      }
+
+      h2 {
+        font-size: 1rem;
+        margin: 0 0 6px;
+      }
+
+      h3 {
+        font-size: 0.9rem;
+        margin: 10px 0 4px;
+        color: #fed7aa;
+      }
+
+      p {
+        font-size: 0.86rem;
+        line-height: 1.7;
+        color: #e5e7eb;
+        margin: 4px 0;
+      }
+
+      p.small {
+        font-size: 0.8rem;
+        color: var(--muted);
+      }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 2px 0 6px;
+      }
+
+      .chip {
+        font-size: 0.72rem;
+        padding: 3px 7px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(248, 171, 84, 0.7);
+        color: #fed7aa;
+      }
+
+      .section-divider {
+        border: none;
+        border-top: 1px dashed rgba(55, 65, 81, 0.8);
+        margin: 8px 0;
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+        gap: 10px;
+      }
+
+      @media (max-width: 800px) {
+        .grid-2 {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+
+      .card {
+        border-radius: 12px;
+        border: 1px solid rgba(55, 65, 81, 0.9);
+        background: radial-gradient(circle at 0 0, rgba(180, 83, 9, 0.55) 0, #020617 70%);
+        padding: 9px 10px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .card.soft {
+        background: radial-gradient(circle at 100% 0, rgba(248, 171, 84, 0.22) 0, #020617 70%);
+      }
+
+      .card::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 0 0, rgba(248, 171, 84, 0.18), transparent 55%);
+        opacity: 0.6;
+        mix-blend-mode: soft-light;
+        pointer-events: none;
+      }
+
+      .card h4 {
+        font-size: 0.85rem;
+        margin: 0 0 4px;
+        color: #ffedd5;
+      }
+
+      .card p {
+        font-size: 0.8rem;
+        color: #fee2c8;
+      }
+
+      .verse-box {
+        margin-top: 4px;
+        padding: 6px 8px;
+        border-radius: 10px;
+        background: rgba(15, 23, 42, 0.96);
+        border: 1px solid rgba(55, 65, 81, 0.9);
+        font-size: 0.82rem;
+        color: #e5e7eb;
+        position: relative;
+      }
+
+      .verse-ref {
+        font-size: 0.76rem;
+        color: #fed7aa;
+        margin-bottom: 2px;
+      }
+
+      .label {
+        font-size: 0.75rem;
+        color: #fed7aa;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        margin-bottom: 3px;
+      }
+
+      .monospace {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+          "Courier New", monospace;
+        letter-spacing: 0.06em;
+      }
+
+      .hint {
+        font-size: 0.75rem;
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .hint-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.9);
+      }
+
+      .verse-btn {
+        margin-top: 8px;
+        padding: 6px 12px;
+        border-radius: var(--radius-pill);
+        border: 1px solid rgba(248, 171, 84, 0.8);
+        background: radial-gradient(circle at 0 0, rgba(248, 171, 84, 0.2), #0b1120);
+        color: #ffedd5;
+        font-size: 0.8rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        box-shadow: 0 10px 20px rgba(15, 23, 42, 0.9);
+        transition: transform var(--transition-fast), box-shadow var(--transition-fast),
+          background var(--transition-fast);
+      }
+
+      .verse-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 14px 28px rgba(15, 23, 42, 1);
+        background: radial-gradient(circle at 0 0, rgba(248, 171, 84, 0.28), #020617);
+      }
+
+      .verse-btn span.icon {
+        font-size: 0.9rem;
+      }
+
+      .modal {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 40;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 220ms ease-out;
+      }
+
+      .modal.visible {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .modal-backdrop {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 10% 0, rgba(248, 171, 84, 0.12), transparent 60%),
+          radial-gradient(circle at 90% 100%, rgba(15, 23, 42, 0.96), #020617);
+        backdrop-filter: blur(10px);
+      }
+
+      .modal-dialog {
+        position: relative;
+        width: min(640px, 94vw);
+        max-height: min(70vh, 540px);
+        border-radius: 18px;
+        border: 1px solid rgba(248, 171, 84, 0.7);
+        background: radial-gradient(circle at 0 0, rgba(180, 83, 9, 0.7), #020617 70%);
+        box-shadow: 0 24px 80px rgba(15, 23, 42, 0.95);
+        padding: 12px 14px 10px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 4px;
+      }
+
+      .modal-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #e5e7eb;
+      }
+
+      .modal-ref {
+        font-size: 0.78rem;
+        color: #ffedd5;
+      }
+
+      .modal-close {
+        border: none;
+        width: 26px;
+        height: 26px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.9);
+        color: #e5e7eb;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        box-shadow: 0 0 0 1px rgba(248, 171, 84, 0.6);
+        transition: background var(--transition-fast), transform var(--transition-fast),
+          box-shadow var(--transition-fast);
+      }
+
+      .modal-close:hover {
+        background: rgba(180, 83, 9, 0.9);
+        transform: translateY(-1px);
+        box-shadow: 0 12px 26px rgba(15, 23, 42, 0.95);
+      }
+
+      .modal-body {
+        border-radius: 12px;
+        border: 1px solid rgba(30, 64, 175, 0.9);
+        background: rgba(15, 23, 42, 0.98);
+        padding: 10px 10px 8px;
+        font-size: 0.86rem;
+        line-height: 1.7;
+        color: #e5e7eb;
+        overflow: auto;
+      }
+
+      .modal-body p {
+        margin: 2px 0;
+      }
+
+      .modal-hint {
+        margin-top: 4px;
+        font-size: 0.76rem;
+        color: var(--muted);
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: rgba(31, 41, 55, 0.9);
+        border-radius: 999px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(55, 65, 81, 1);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <div class="shell-inner">
+        <header>
+          <div class="hero-icon" aria-hidden="true">
+            <div class="hero-icon-inner">馬可</div>
+          </div>
+          <div class="title-block">
+            <div class="app-title">
+              MARK STUDY
+              <span class="badge">互動研經</span>
+            </div>
+            <div class="subtitle">
+              馬可福音：神子以僕人樣式，立刻順服差遣，為多人捨命作贖價（可 10:45）
+            </div>
+          </div>
+        </header>
+
+        <div class="layout">
+          <aside class="sidebar">
+            <div class="sidebar-header">
+              <div>
+                <div class="sidebar-title">馬可福音結構與人物</div>
+                <div class="tagline">先揀選主題，再點選分段／人物進入內容</div>
+              </div>
+            </div>
+
+            <div class="tab-row" id="tab-row">
+              <button class="tab-button active" data-tab="outline">
+                <span class="icon">📖</span>
+                書卷與經文分段
+              </button>
+              <button class="tab-button" data-tab="characters">
+                <span class="icon">👥</span>
+                重要人物
+              </button>
+              <button class="tab-button" data-tab="words">
+                <span class="icon">🔤</span>
+                原文難字
+              </button>
+              <button class="tab-button" data-tab="themes">
+                <span class="icon">✨</span>
+                屬靈主題
+              </button>
+            </div>
+
+            <div class="section-label" id="list-label">經文分段</div>
+            <div class="list" id="sidebar-list" aria-label="列表"></div>
+            <div class="hint">
+              <span class="hint-dot"></span>
+              點擊項目即可在右邊顯示詳細內容與經文重點
+            </div>
+          </aside>
+
+          <main class="main-panel">
+            <div class="panel-header">
+              <div class="panel-title-group">
+                <div class="panel-title" id="panel-title">書卷簡介與整體概覽</div>
+                <div class="panel-subtitle" id="panel-subtitle">
+                  馬可以行動快速、焦點清晰的筆觸，描述神子如何在地上以僕人樣式服事眾人。
+                </div>
+              </div>
+              <div class="pill">
+                <span class="pill-dot"></span>
+                <span id="pill-text">整卷鳥瞰</span>
+              </div>
+            </div>
+
+            <section class="content-scroll" id="content-scroll" aria-live="polite">
+              <!-- 內容會由 JavaScript 動態載入 -->
+            </section>
+          </main>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="verse-modal" aria-hidden="true">
+      <div class="modal-backdrop" data-modal-close></div>
+      <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="verse-modal-title">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title" id="verse-modal-title">相關經文</div>
+            <div class="modal-ref" id="verse-modal-ref"></div>
+          </div>
+          <button class="modal-close" type="button" title="關閉" data-modal-close>✕</button>
+        </div>
+        <div class="modal-body" id="verse-modal-body"></div>
+        <div class="modal-hint">提示：可配合手上的聖經一同閱讀整段經文。</div>
+      </div>
+    </div>
+
+    <script>
+      const outlineItems = [
+        {
+          id: "intro",
+          title: "書卷簡介：神子的福音",
+          ref: "可 1:1",
+          note: "開宗明義的宣告",
+          content: {
+            heading: "『神的兒子耶穌基督福音的起頭』",
+            intro:
+              "馬可從一開始就表明寫作焦點：這是關於耶穌基督、神兒子的好消息。全卷不著重出生背景，而是直接進入公開事奉，強調祂的權柄與僕人樣式。",
+            structure: [
+              "作者背景：傳統認為出自馬可之手，與彼得關係密切，反映早期教會對主的見證。",
+              "寫作對象：許多學者認為主要對象包括外邦信徒，因此會解釋猶太習俗。",
+              "特點：『立刻』『又』等用詞頻密，令敘事節奏快速，凸顯主的行動與順服。"
+            ],
+            verses: {
+              ref: "可 1:1",
+              text: "『神的兒子耶穌基督福音的起頭。』"
+            },
+            popupVerses: [
+              {
+                ref: "馬可福音 1:1",
+                text: "1:1 神的兒子耶穌基督福音的起頭。"
+              }
+            ],
+            spiritual: [
+              "福音不是一套抽象道理，而是關於一位真實的人——神子在歷史中的行動。",
+              "整卷邀請讀者不單『聽說』耶穌，而是跟著祂的腳蹤，看見祂如何服事、受苦與得榮耀。",
+              "信徒今天亦被呼召活出『福音的起頭』——在自己的處境中讓別人看見福音的實際。"
+            ]
+          }
+        },
+        {
+          id: "preparation",
+          title: "預備與公開事奉開始",
+          ref: "可 1:2–3:6",
+          note: "曠野的聲音與加利利的權柄",
+          content: {
+            heading: "從曠野呼聲到加利利的醫治與教導",
+            intro:
+              "馬可把施洗約翰、主的受洗、受試探與加利利初期事奉濃縮在首章，強調主帶著權柄與憐憫進入人群當中。",
+            structure: [
+              "曠野的施洗者（1:2-8）：引用先知的預言，表明有一位能力比他更大的要來。",
+              "受洗與受試探（1:9-13）：天上聲音見證祂是愛子，同時在曠野勝過試探。",
+              "初期呼召與醫治（1:14-45）：呼召門徒、趕鬼、醫治、禱告，顯出祂的權柄與服事節奏。",
+              "與宗教領袖的衝突（2:1–3:6）：赦罪與醫治、論安息日，顯出新舊皮袋的張力。"
+            ],
+            verses: {
+              ref: "可 1:11；2:10-11",
+              text:
+                "『你是我的愛子，我喜悅你。』／『人子在地上有赦罪的權柄…我吩咐你起來。』"
+            },
+            popupVerses: [
+              {
+                ref: "馬可福音 1:10-11",
+                text:
+                  "1:10 他從水裡一上來，就看見天裂開了，聖靈彷彿鴿子降在他身上。\n" +
+                  "1:11 又有聲音從天上來說：你是我的愛子，我喜悅你。"
+              },
+              {
+                ref: "馬可福音 2:10-11",
+                text:
+                  "2:10 但要叫你們知道人子在地上有赦罪的權柄…\n" +
+                  "2:11 就對癱子說：我吩咐你，起來，拿你的褥子回家去吧。"
+              }
+            ],
+            spiritual: [
+              "主在事奉起點就同時經歷肯定與試探，提醒我們服事不會避開屬靈爭戰。",
+              "赦罪與醫治同時出現，顯明祂關心人全人的需要，不單外在疾病。",
+              "面對傳統與制度的壓力，主仍然以人的需要與父的心意為優先。"
+            ]
+          }
+        },
+        {
+          id: "galilee_ministry",
+          title: "加利利服事與比喻",
+          ref: "可 3:7–6:56",
+          note: "呼召、比喻與神蹟",
+          content: {
+            heading: "在群眾與門徒之間來回，顯出國度的權柄",
+            intro:
+              "這一大段中，主一方面向群眾教導與醫治，另一方面把重點放在訓練門徒，讓他們學習在信心與軟弱之間成長。",
+            structure: [
+              "揀選十二門徒（3:13-19）：呼召他們『常和自己同在』，又差他們出去傳道。",
+              "關於撒但與聖靈的嚴肅教導（3:20-35）。",
+              "天國比喻（4 章）：撒種、燈放在燈臺上、種子生長、自動發芽、芥菜種等，顯明國度既隱藏又有大能。",
+              "平靜風浪與趕出群鬼（4:35–5:20）：顯出對自然與邪靈的權柄。",
+              "醫治血漏婦人與使睚魯女兒復活（5:21-43）：信心被鼓勵，恐懼被安慰。",
+              "在本鄉受拒與差遣十二門徒（6:1-13）：拒絕與差遣並存。"
+            ],
+            verses: {
+              ref: "可 4:39-41；5:34",
+              text:
+                "『風就止住，大大的平靜了…這到底是誰？連風和海也聽從他了！』／『女兒，你的信救了你…』"
+            },
+            popupVerses: [
+              {
+                ref: "馬可福音 4:39-41",
+                text:
+                  "4:39 耶穌醒了，斥責風，向海說：住了吧！靜了吧！\n" +
+                  "4:40 對門徒說：為什麼膽怯？你們還沒有信心嗎？\n" +
+                  "4:41 他們就大大地懼怕，彼此說：這到底是誰？連風和海也聽從他了！"
+              },
+              {
+                ref: "馬可福音 5:33-34",
+                text:
+                  "5:33 那女人…既恐懼又戰兢，…把實情全告訴他。\n" +
+                  "5:34 耶穌對她說：女兒，你的信救了你，平平安安地回去吧…"
+              }
+            ],
+            spiritual: [
+              "主不單向群眾宣講國度，也耐心在門徒身上實習這些真理，讓他們在失敗與懼怕中學信心。",
+              "人生的風浪與內心的恐懼，都在主的權柄之下；祂關心的不只是平靜環境，更是建造信心。",
+              "在醫治與復活的故事中，看見祂尊重每個人的故事與痛苦。"
+            ]
+          }
+        },
+        {
+          id: "identity_and_cost",
+          title: "身份啟示與作門徒的代價",
+          ref: "可 7–10 章",
+          note: "你們說我是誰？",
+          content: {
+            heading: "從彼得認信到十字架道路的教導",
+            intro:
+              "馬可在這幾章集中處理一個核心問題：耶穌到底是誰？跟隨祂意味著甚麼？答案與十字架緊緊相連。",
+            structure: [
+              "潔淨與內心（7:1-23）：真污穢從人心裡發出，不只在外在儀文。",
+              "外邦人的信心與天國擴展（7:24–8:10）。",
+              "伯賽大瞎子的漸進醫治（8:22-26）：象徵門徒對主身份的理解也需要過程。",
+              "彼得的認信與主第一次預言受苦（8:27-38）：『你是基督。』『若有人要跟從我…』",
+              "變像與從山上下來（9:2-29）：榮耀與日常軟弱並存。",
+              "關於謙卑、接待、婚姻、財富與作大（9–10 章）。"
+            ],
+            verses: {
+              ref: "可 8:29, 34；10:45",
+              text:
+                "『你們說我是誰？彼得回答說：你是基督。』／『若有人要跟從我…當捨己，背起他的十字架來跟從我。』／『人子來…是要服事人，並且要捨命作多人的贖價。』"
+            },
+            popupVerses: [
+              {
+                ref: "馬可福音 8:29, 34",
+                text:
+                  "8:29 …彼得回答說：你是基督。\n" +
+                  "8:34 …若有人要跟從我，就當捨己，背起他的十字架來跟從我。"
+              },
+              {
+                ref: "馬可福音 10:45",
+                text:
+                  "10:45 因為人子來，並不是要受人的服事，乃是要服事人，並且要捨命作多人的贖價。"
+              }
+            ],
+            spiritual: [
+              "認出主是基督，不只是一個正確答案，而是帶來生命方向的根本轉變。",
+              "作門徒不只是得著祝福，也是同行十字架的道路，學習捨己與服事。",
+              "主以自己的生命詮釋何謂『作大』——不是掌控，而是服事與捨命。"
+            ]
+          }
+        },
+        {
+          id: "jerusalem_and_cross",
+          title: "進耶路撒冷與十字架",
+          ref: "可 11–15 章",
+          note: "從榮耀進城到受死",
+          content: {
+            heading: "僕人君王在十字架上得榮耀",
+            intro:
+              "最後幾章從榮耀進城開始，經過聖殿清理、比喻與爭辯、末世教訓、逾越節筵席、客西馬尼與審判，最終走上各各他的十字架。",
+            structure: [
+              "榮耀進城與咒詛無花果樹、潔淨聖殿（11 章）：象徵表面虔誠卻無果子的審判。",
+              "與宗教領袖的問答與比喻（12 章）：園戶、納稅、復活、最大的誡命、寡婦兩個小錢。",
+              "橄欖山講論（13 章）：對將來患難與警醒的教導。",
+              "逾越節與最後晚餐（14:12-31）：設立餅與杯，預告門徒跌倒。",
+              "客西馬尼與被捕（14:32-52）：在極大壓力中順服父旨意。",
+              "彼得三次不認主與主受審（14:53–15:15）。",
+              "被釘十字架與死（15:16-41）：百夫長的認信、殿裡幔子裂開。",
+              "埋葬與安息日（15:42-47）。"
+            ],
+            verses: {
+              ref: "可 14:36；15:39",
+              text:
+                "『阿爸，父啊！在你凡事都能…然而不要從我的意思，只要從你的意思。』／『這人真是神的兒子！』"
+            },
+            popupVerses: [
+              {
+                ref: "馬可福音 14:35-36",
+                text:
+                  "14:35 他就稍往前走，俯伏在地，禱告說：倘若可行，便叫那時候過去。\n" +
+                  "14:36 他說：阿爸，父啊！在你凡事都能，求你將這杯撤去；然而不要從我的意思，只要從你的意思。"
+              },
+              {
+                ref: "馬可福音 15:37-39",
+                text:
+                  "15:37 耶穌大聲喊叫，氣就斷了。\n" +
+                  "15:38 殿裡的幔子從上到下裂為兩半。\n" +
+                  "15:39 …百夫長看見耶穌這樣喊叫斷氣，就說：這人真是神的兒子！"
+              }
+            ],
+            spiritual: [
+              "主在極大痛苦中仍稱父為『阿爸』，展示了親密與順服並存的關係。",
+              "十字架在人看來是羞辱與失敗，卻在上主計劃中成為榮耀與拯救的中心。",
+              "外邦百夫長的認信提醒我們：十字架的信息向萬民敞開。"
+            ]
+          }
+        },
+        {
+          id: "resurrection",
+          title: "復活的清晨與見證起點",
+          ref: "可 16 章",
+          note: "從恐懼到傳揚",
+          content: {
+            heading: "空墳墓的驚惶與差遣",
+            intro:
+              "馬可用簡潔有力的方式描述復活清晨的驚人經歷：婦女看見空墳墓、天使的宣告，並被差遣把信息傳給門徒與彼得。",
+            structure: [
+              "婦女在一大清早去膏主的身體，卻發現石頭已被滾開（16:1-4）。",
+              "天使宣告祂已經復活，不在這裡了（16:5-7）。",
+              "特別提及『和門徒並彼得』，為失敗的門徒預備復興之路（16:7）。",
+              "婦女起初驚恐戰兢，不敢作聲，卻為後來教會見證鋪路。"
+            ],
+            verses: {
+              ref: "可 16:6-7",
+              text:
+                "『…你們尋找那釘十字架的拿撒勒人耶穌；他已經復活了，不在這裡了…要去告訴他的門徒和彼得…』"
+            },
+            popupVerses: [
+              {
+                ref: "馬可福音 16:6-7",
+                text:
+                  "16:6 天使對她們說：不要驚恐！你們尋找那釘十字架的拿撒勒人耶穌；他已經復活了，不在這裡了…\n" +
+                  "16:7 你們可以去告訴他的門徒和彼得說：他在你們以先往加利利去…"
+              }
+            ],
+            spiritual: [
+              "復活的信息首先臨到在十字架旁忠心的婦女，顯出主尊重常被忽略的一群。",
+              "特別提名彼得，顯明失敗並不是結局，主主動為跌倒的人預備回轉之路。",
+              "今日的信徒也是這復活信息的承繼者，被呼召在恐懼中仍然學習順服差遣。"
+            ]
+          }
+        }
+      ];
+
+      const characterItems = [
+        {
+          id: "jesus",
+          title: "耶穌（神子、僕人）",
+          ref: "全卷",
+          note: "中心人物",
+          content: {
+            heading: "有權柄的僕人君王",
+            background:
+              "馬可特別強調主既是神的兒子，又以僕人樣式服事人：祂趕鬼、醫病、教導、餵飽群眾，又甘願走上十字架，為多人捨命作贖價。",
+            traits: [
+              "行動迅速：經常用『立刻』、『隨即』等字眼，顯出順服與迫切。",
+              "權柄明顯：眾人希奇祂的教訓，因為祂教訓他們正像有權柄的人（1:22）。",
+              "憐憫深厚：看見人如同沒有牧人的羊，就憐憫他們（6:34）。",
+              "順服至死：在客西馬尼甘願順服父的旨意。"
+            ],
+            keyStories: [
+              "在會堂裡教訓人，趕出污鬼（1 章）。",
+              "赦免癱子罪、醫治病人、潔淨長大痲瘋（2–3 章）。",
+              "平靜風浪、趕出群鬼、醫治血漏婦人、使睚魯女兒復活（4–5 章）。",
+              "餵飽五千人、在海面上走（6 章）。",
+              "三次預言受苦、教導作門徒的代價（8–10 章）。",
+              "進耶路撒冷、受審、被釘、埋葬與復活（11–16 章）。"
+            ],
+            spiritual: [
+              "祂的僕人樣式並不否定祂的神性，反而在謙卑中顯出榮耀。",
+              "信徒蒙召效法祂的榜樣，在服事中顯出愛與真理，而不是追求權勢。",
+              "祂的十字架與復活成為我們得救與跟隨的根基。"
+            ],
+            popupVerses: [
+              {
+                ref: "馬可福音 1:22, 27",
+                text:
+                  "1:22 眾人都希奇他的教訓；因為他教訓他們，正像有權柄的人，不像文士。\n" +
+                  "1:27 眾人都驚訝，以致彼此對問說：這是甚麼事？是個新道理啊！他用權柄吩咐污鬼，連污鬼也聽從了他。"
+              },
+              {
+                ref: "馬可福音 10:45",
+                text:
+                  "10:45 因為人子來，並不是要受人的服事，乃是要服事人，並且要捨命作多人的贖價。"
+              }
+            ]
+          }
+        },
+        {
+          id: "twelve",
+          title: "十二門徒",
+          ref: "可 3; 4; 6; 8–10; 14 章",
+          note: "被呼召又常軟弱的一群",
+          content: {
+            heading: "與主同行又常不明白的跟隨者",
+            background:
+              "十二門徒被主從不同背景中呼召出來：有漁夫、有稅吏、有激進分子。他們既經歷主的教導與神蹟，也多次表現不明白、爭論誰為大、在壓力下跌倒。",
+            traits: [
+              "真實：聖經沒有美化他們的軟弱，反而誠實記錄他們的失敗。",
+              "可塑：在主的耐心塑造下，逐漸從懼怕與自我中心中被更新。",
+              "被差遣：受訓練後被差出去宣講與醫治，成為國度見證的一部分。"
+            ],
+            keyStories: [
+              "被主一一呼召，『立刻』放下網跟從祂（1:16-20; 2:13-14; 3:13-19）。",
+              "在風浪中驚慌，問：我們喪命，你不顧嗎？（4:35-41）。",
+              "在變像山前與榮耀有獨特經歷（9:2-8）。",
+              "三次聽見受苦預言，卻仍在爭論誰最大（9:30-37; 10:35-45）。",
+              "客西馬尼睡著、逃跑（14 章）。"
+            ],
+            spiritual: [
+              "主呼召的不是完美的人，而是願意讓祂在生命中工作的人。",
+              "失敗並不否定呼召，只要願意回轉，就能在祂手中被重用。",
+              "作門徒是一段與主同行、被祂改變的過程，不是一夜之間的改變。"
+            ],
+            popupVerses: [
+              {
+                ref: "馬可福音 3:13-15",
+                text:
+                  "3:13 耶穌上了山，隨自己的意思叫人來，他們便來到他那裡。\n" +
+                  "3:14 他就設立十二個人，要他們常和自己同在，也要差他們去傳道，\n" +
+                  "3:15 並給他們權柄趕鬼。"
+              }
+            ]
+          }
+        },
+        {
+          id: "peter",
+          title: "彼得",
+          ref: "可 1; 5; 8–9; 14 章",
+          note: "衝動卻被主堅固的門徒代表",
+          content: {
+            heading: "從打魚之人到見證十字架與復活",
+            background:
+              "彼得在馬可福音中常常作為門徒群體的代表。他有熱情、有衝動，也有大失敗；最終卻成為復活信息的重要見證人。",
+            traits: [
+              "熱情：立刻放下網跟隨主，願意踏出第一步。",
+              "衝動：曾勸主不要走十字架路，被責備為『撒但』。",
+              "軟弱：在壓力下三次不認主，卻被主預先代求並重新堅固。"
+            ],
+            keyStories: [
+              "在家中經歷主醫治岳母（1:29-31）。",
+              "在睚魯女兒復活時在場（5:37-43）。",
+              "在該撒利亞腓立比認信主是基督，卻不明白十字架（8:27-33）。",
+              "在變像山看見主榮耀（9:2-8）。",
+              "在大祭司院中三次不認主（14:66-72）。"
+            ],
+            spiritual: [
+              "主預先知道門徒的軟弱，卻仍然揀選並愛他們。",
+              "對彼得而言，十字架不再只是絆腳石，而是他日後信息的核心。",
+              "我們的跌倒若帶來真實悔改，就能成為別人得安慰與堅固的見證。"
+            ],
+            popupVerses: [
+              {
+                ref: "馬可福音 8:32-33",
+                text:
+                  "8:32 耶穌明明地說這話，彼得就拉著他，勸他。\n" +
+                  "8:33 耶穌轉過來，看著門徒，就責備彼得說：撒但，退我後邊去吧！因為你不體貼神的意思，只體貼人的意思。"
+              },
+              {
+                ref: "馬可福音 14:72",
+                text:
+                  "14:72 立時，雞叫了第二遍。彼得想起耶穌對他所說的話…思想起來，就哭了。"
+              }
+            ]
+          }
+        },
+        {
+          id: "women",
+          title: "跟隨主的婦女",
+          ref: "可 5; 12; 14–16 章",
+          note: "愛與忠心的見證者",
+          content: {
+            heading: "在邊緣位置卻被主重視的一群",
+            background:
+              "馬可多次提到婦女：包括血漏婦人、為主澆膏的婦人、在十字架與墳墓旁不離不棄的婦女們。她們在當時社會中多處於邊緣，卻在福音故事中扮演重要角色。",
+            traits: [
+              "勇敢：在恐懼與羞辱中仍然來到主面前（如血漏婦人）。",
+              "慷慨：把極貴的香膏澆在主身上，被主稱為是美事（14:3-9）。",
+              "忠心：在眾人離開之時仍然在十字架與墳墓旁守望（15–16 章）。"
+            ],
+            keyStories: [
+              "血漏婦人暗暗摸主衣裳，得到醫治（5:25-34）。",
+              "窮寡婦獻上兩個小錢（12:41-44）。",
+              "在伯大尼為主澆膏的婦人（14:3-9）。",
+              "十字架與墳墓旁的婦女（15:40-47; 16:1-8）。"
+            ],
+            spiritual: [
+              "主看重內心對祂的信靠與愛，不在乎社會所看重的地位與能力。",
+              "在眾人退後時仍然站立，是對主愛與忠心的寶貴見證。",
+              "許多時候，福音的第一批見證者往往是在人看來微不足道的一群。"
+            ],
+            popupVerses: [
+              {
+                ref: "馬可福音 5:33-34",
+                text:
+                  "5:33 那女人…既恐懼又戰兢…把實情全告訴他。\n" +
+                  "5:34 耶穌對她說：女兒，你的信救了你，平平安安地回去吧…"
+              },
+              {
+                ref: "馬可福音 14:8-9",
+                text:
+                  "14:8 她所作的是盡她所能的…\n" +
+                  "14:9 我實在告訴你們：普天之下，無論在甚麼地方傳這福音，也要述說這女人所作的，以為記念。"
+              }
+            ]
+          }
+        }
+      ];
+
+      const wordItems = [
+        {
+          id: "euthys",
+          title: "εὐθύς（euthys）",
+          ref: "立刻、隨即",
+          note: "全卷多次出現（特別是 1 章）",
+          content: {
+            meaning:
+              "原意有『立刻、馬上』之意，在馬可福音中用來描寫主的行動與事態的發展，使整卷帶有緊湊、迫切的感覺。",
+            usage:
+              "在 1 章中，主受洗後『隨即』從水裡上來；門徒『立刻』撇下網跟隨；污鬼也『立刻』聽命而出。",
+            spiritual: [
+              "主對父旨意的順服是『立刻』的，提醒信徒不要在明知的順服上拖延。",
+              "門徒對呼召的回應也是立刻的，顯出價值觀的徹底翻轉。"
+            ]
+          }
+        },
+        {
+          id: "huios_tou_theou",
+          title: "υἱὸς τοῦ θεοῦ（huios tou theou）",
+          ref: "神的兒子",
+          note: "可 1:1; 3:11; 15:39 等",
+          content: {
+            meaning:
+              "這稱號指向主與父獨特的關係與權柄，不單是比喻性的『好人』或『義人』，而是帶有神性身份的宣告。",
+            usage:
+              "從開頭的標題、污鬼的認出，到十字架下百夫長的認信，整卷由不同口中見證祂是神的兒子。",
+            spiritual: [
+              "承認祂是神的兒子，意味著承認祂在生命中擁有最終的主權。",
+              "十字架並沒有否定祂的身份，反而成為這身份最深刻的彰顯。"
+            ]
+          }
+        },
+        {
+          id: "diakoneo",
+          title: "διακονέω（diakoneō）",
+          ref: "服事、服事人",
+          note: "可 1:13; 1:31; 10:45 等",
+          content: {
+            meaning:
+              "原意指伺候、供應、服事，在馬可中既用於天使服事主，也用於主服事人與門徒彼此服事。",
+            usage:
+              "主被稱為來是要『服事人』，並且要捨命作多人的贖價（10:45）；彼得的岳母得醫治後『就服事他們』（1:31）。",
+            spiritual: [
+              "真正的偉大不是被服事，而是甘心服事別人。",
+              "被主醫治與更新的人，自然會在生活中回應服事。"
+            ]
+          }
+        }
+      ];
+
+      const themeItems = [
+        {
+          id: "servant_king",
+          title: "僕人君王：有權柄的服事",
+          ref: "可 1–10 章",
+          note: "神子卻以僕人樣式來",
+          content: {
+            summary:
+              "馬可同時強調主的權柄與僕人身份：祂在教導與神蹟中顯出前所未有的權柄，卻選擇服事與捨己，而不是享受人的服事。",
+            points: [
+              "在會堂裡的教訓與趕鬼，眾人驚訝（1 章）。",
+              "醫治病人與趕鬼後，仍然退到曠野禱告，顯出事奉的源頭在父（1:35）。",
+              "多次憐憫群眾、餵飽飢餓的人（6; 8 章）。",
+              "在教導門徒誰為大時，以服事與捨命作例子（9–10 章）。"
+            ],
+            application: [
+              "教會與信徒的領導風格，應該以服事與謙卑為核心，而不是權力與地位。",
+              "每一個服事都是效法那位為我們捨己的主，是對祂的回應。"
+            ]
+          }
+        },
+        {
+          id: "discipleship_cross",
+          title: "作門徒與十字架的道路",
+          ref: "可 8:27–10:52",
+          note: "認信與跟隨",
+          content: {
+            summary:
+              "在彼得認出主是基督之後，主多次教導作門徒必須與十字架聯繫：捨己、背十字架、捨命。",
+            points: [
+              "主三次預言自己的受苦、被殺與復活（8:31; 9:31; 10:33-34）。",
+              "每次預言之後，都跟隨著關於門徒生活的教導（捨己、服事、作僕人）。",
+              "門徒多次不明白，甚至爭論誰為大，卻在主忍耐引導下學習真偉大。"
+            ],
+            application: [
+              "信主不單是接受祝福，更是願意在每日生活中背起自己的十字架。",
+              "十字架的道路既包括受苦，也包括在其中經歷主的同在與更新。"
+            ]
+          }
+        }
+      ];
+
+      const tabs = {
+        outline: outlineItems,
+        characters: characterItems,
+        words: wordItems,
+        themes: themeItems
+      };
+
+      const listLabelText = {
+        outline: "經文分段",
+        characters: "重要人物",
+        words: "原文詞彙",
+        themes: "屬靈主題"
+      };
+
+      const pillText = {
+        outline: "分段與重點",
+        characters: "人物背景與屬靈提醒",
+        words: "詞義與應用",
+        themes: "主題與實踐"
+      };
+
+      let currentTab = "outline";
+      let currentId = outlineItems[0].id;
+
+      const tabRow = document.getElementById("tab-row");
+      const sidebarList = document.getElementById("sidebar-list");
+      const listLabel = document.getElementById("list-label");
+      const panelTitle = document.getElementById("panel-title");
+      const panelSubtitle = document.getElementById("panel-subtitle");
+      const pillEl = document.getElementById("pill-text");
+      const contentScroll = document.getElementById("content-scroll");
+
+      function renderSidebar() {
+        const data = tabs[currentTab];
+        sidebarList.innerHTML = "";
+        listLabel.textContent = listLabelText[currentTab];
+
+        data.forEach((item) => {
+          const div = document.createElement("div");
+          div.className = "list-item" + (item.id === currentId ? " active" : "");
+          div.dataset.id = item.id;
+
+          div.innerHTML = `
+            <div class="list-item-title">${item.title}</div>
+            <div class="list-item-ref">${item.ref}</div>
+            ${item.note ? `<div class="list-item-note">${item.note}</div>` : ""}
+          `;
+
+          div.addEventListener("click", () => {
+            currentId = item.id;
+            renderSidebar();
+            renderContent();
+          });
+
+          sidebarList.appendChild(div);
+        });
+      }
+
+      function renderContent() {
+        const data = tabs[currentTab];
+        const item = data.find((x) => x.id === currentId) ?? data[0];
+
+        panelTitle.textContent = item.title;
+        panelSubtitle.textContent = item.ref + (item.note ? " ｜ " + item.note : "");
+        pillEl.textContent = pillText[currentTab];
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "fade-enter";
+
+        if (currentTab === "outline") {
+          const c = item.content;
+          wrapper.innerHTML = `
+            <h2>${c.heading}</h2>
+            <p>${c.intro}</p>
+            <div class="chips">
+              <span class="chip">分段重點</span>
+              <span class="chip">經文觀察</span>
+              <span class="chip">生命回應</span>
+            </div>
+            <hr class="section-divider" />
+            <div class="grid-2">
+              <div>
+                <div class="label">結構與重點</div>
+                ${c.structure
+                  .map(
+                    (line) => `
+                  <p>• ${line}</p>
+                `
+                  )
+                  .join("")}
+              </div>
+              <div>
+                <div class="card soft">
+                  <h4>關鍵經文</h4>
+                  <div class="verse-box">
+                    <div class="verse-ref">${c.verses.ref}</div>
+                    <div>${c.verses.text}</div>
+                  </div>
+                  <button class="verse-btn" type="button" data-verse-kind="outline">
+                    <span class="icon">🔍</span>
+                    閱讀相關經文
+                  </button>
+                  <p class="small">
+                    建議：可打開紙本聖經或電子版，把整段經文細讀，
+                    用螢光筆標記重複字詞與轉折，幫助掌握段落焦點。
+                  </p>
+                </div>
+              </div>
+            </div>
+            <hr class="section-divider" />
+            <div class="label">屬靈反思</div>
+            ${c.spiritual
+              .map(
+                (line) => `
+              <p>◆ ${line}</p>
+            `
+              )
+              .join("")}
+          `;
+        } else if (currentTab === "characters") {
+          const c = item.content;
+          wrapper.innerHTML = `
+            <h2>${c.heading}</h2>
+            <p>${c.background}</p>
+            <div class="chips">
+              <span class="chip">人物背景</span>
+              <span class="chip">性格與學習</span>
+              <span class="chip">屬靈提醒</span>
+            </div>
+            <hr class="section-divider" />
+            <div class="grid-2">
+              <div>
+                <div class="card">
+                  <h4>人物特色</h4>
+                  ${c.traits
+                    .map(
+                      (t) => `
+                    <p>• ${t}</p>
+                  `
+                    )
+                    .join("")}
+                </div>
+                <div class="card soft" style="margin-top:6px;">
+                  <h4>出現重點經文</h4>
+                  ${c.keyStories
+                    .map(
+                      (s) => `
+                    <p>• ${s}</p>
+                  `
+                    )
+                    .join("")}
+                  <button class="verse-btn" type="button" data-verse-kind="character">
+                    <span class="icon">📖</span>
+                    選讀人物相關經文
+                  </button>
+                </div>
+              </div>
+              <div>
+                <div class="label">屬靈反思與應用</div>
+                ${c.spiritual
+                  .map(
+                    (line) => `
+                  <p>◆ ${line}</p>
+                `
+                  )
+                  .join("")}
+                <p class="small">
+                  小建議：可以嘗試把自己代入此人處境，寫下一段禱告回應，
+                  思考若你在他的光景裡，會如何回應主的呼召與提醒。
+                </p>
+              </div>
+            </div>
+          `;
+        } else if (currentTab === "words") {
+          const c = item.content;
+          wrapper.innerHTML = `
+            <h2>${item.title}</h2>
+            <p class="monospace">${item.ref}</p>
+            <div class="chips">
+              <span class="chip">原文詞義</span>
+              <span class="chip">在馬可中的用法</span>
+              <span class="chip">生命應用</span>
+            </div>
+            <hr class="section-divider" />
+            <div class="grid-2">
+              <div>
+                <div class="card">
+                  <h4>詞義說明</h4>
+                  <p>${c.meaning}</p>
+                  <p>${c.usage}</p>
+                </div>
+              </div>
+              <div>
+                <div class="card soft">
+                  <h4>靈修反思</h4>
+                  ${c.spiritual
+                    .map(
+                      (line) => `
+                    <p>◆ ${line}</p>
+                  `
+                    )
+                    .join("")}
+                  <p class="small">
+                    可以在讀經時用筆記紀錄每次出現這個字的上下文與重點，
+                    幫助我們更整全地理解經文的用詞與信息。
+                  </p>
+                </div>
+              </div>
+            </div>
+          `;
+        } else if (currentTab === "themes") {
+          const c = item.content;
+          wrapper.innerHTML = `
+            <h2>${item.title}</h2>
+            <p>${c.summary}</p>
+            <div class="chips">
+              <span class="chip">整卷主題</span>
+              <span class="chip">神人關係</span>
+              <span class="chip">生活應用</span>
+            </div>
+            <hr class="section-divider" />
+            <div class="grid-2">
+              <div>
+                <div class="card">
+                  <h4>經文重點</h4>
+                  ${c.points
+                    .map(
+                      (line) => `
+                    <p>• ${line}</p>
+                  `
+                    )
+                    .join("")}
+                </div>
+              </div>
+              <div>
+                <div class="card soft">
+                  <h4>實際應用</h4>
+                  ${c.application
+                    .map(
+                      (line) => `
+                    <p>◆ ${line}</p>
+                  `
+                    )
+                    .join("")}
+                  <p class="small">
+                    可嘗試為此主題設計一個簡短分享或小組聚會，
+                    讓經文從查考走向彼此勉勵與實際行動。
+                  </p>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        contentScroll.innerHTML = "";
+        contentScroll.appendChild(wrapper);
+
+        const verseBtn = wrapper.querySelector(".verse-btn");
+        if (verseBtn) {
+          verseBtn.addEventListener("click", () => {
+            if (currentTab === "outline") {
+              const c = item.content;
+              const list = c.popupVerses || (c.verses ? [c.verses] : []);
+              openVerseModal(item.title, list);
+            } else if (currentTab === "characters") {
+              const c = item.content;
+              const list = c.popupVerses || [];
+              openVerseModal(item.title, list);
+            } else if (currentTab === "words") {
+              const c = item.content;
+              const list = [{ ref: item.ref, text: c.meaning + "\n\n" + c.usage }];
+              openVerseModal(item.title, list);
+            } else if (currentTab === "themes") {
+              const c = item.content;
+              const list = [{ ref: item.ref, text: c.summary }];
+              openVerseModal(item.title, list);
+            }
+          });
+        }
+
+        requestAnimationFrame(() => {
+          wrapper.classList.add("fade-enter-active");
+        });
+      }
+
+      const verseModal = document.getElementById("verse-modal");
+      const verseModalRef = document.getElementById("verse-modal-ref");
+      const verseModalBody = document.getElementById("verse-modal-body");
+
+      function openVerseModal(title, verseList) {
+        if (!Array.isArray(verseList) || verseList.length === 0) return;
+        const lines = [];
+        const refs = [];
+        verseList.forEach((v) => {
+          if (v.ref) refs.push(v.ref);
+          if (v.text) {
+            const parts = String(v.text).split("\n");
+            parts.forEach((p) => {
+              if (p.trim()) lines.push(`<p>${p}</p>`);
+            });
+          }
+        });
+        document.getElementById("verse-modal-title").textContent = title + "｜相關經文";
+        verseModalRef.textContent = refs.join("；");
+        verseModalBody.innerHTML = lines.join("");
+        verseModal.classList.add("visible");
+        verseModal.setAttribute("aria-hidden", "false");
+      }
+
+      function closeVerseModal() {
+        verseModal.classList.remove("visible");
+        verseModal.setAttribute("aria-hidden", "true");
+      }
+
+      verseModal.addEventListener("click", (event) => {
+        const target = event.target;
+        if (target.matches("[data-modal-close]")) {
+          closeVerseModal();
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          closeVerseModal();
+        }
+      });
+
+      tabRow.addEventListener("click", (event) => {
+        const btn = event.target.closest(".tab-button");
+        if (!btn) return;
+        const tab = btn.dataset.tab;
+        if (!tab || tab === currentTab) return;
+
+        currentTab = tab;
+        const data = tabs[currentTab];
+        currentId = data[0]?.id;
+
+        document.querySelectorAll(".tab-button").forEach((el) => {
+          el.classList.toggle("active", el.dataset.tab === currentTab);
+        });
+
+        renderSidebar();
+        renderContent();
+      });
+
+      renderSidebar();
+      renderContent();
+    </script>
+  </body>
+</html>
+
+

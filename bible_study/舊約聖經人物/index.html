@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>人物研讀 | Character Studies - Bible Study</title>
+  <meta name="description" content="聖經人物研讀與生命見證 | Biblical Character Studies and Life Testimonies">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    .gradient-bg {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.15), transparent 35%),
+                  radial-gradient(circle at 80% 0%, rgba(139, 92, 246, 0.15), transparent 30%),
+                  radial-gradient(circle at 50% 80%, rgba(16, 185, 129, 0.12), transparent 30%);
+      filter: blur(60px);
+      opacity: 0.9;
+      animation: gradientShift 8s ease-in-out infinite;
+    }
+    @keyframes gradientShift {
+      0%, 100% { 
+        background: radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.15), transparent 35%),
+                    radial-gradient(circle at 80% 0%, rgba(139, 92, 246, 0.15), transparent 30%),
+                    radial-gradient(circle at 50% 80%, rgba(16, 185, 129, 0.12), transparent 30%);
+      }
+      50% { 
+        background: radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.2), transparent 35%),
+                    radial-gradient(circle at 20% 0%, rgba(139, 92, 246, 0.2), transparent 30%),
+                    radial-gradient(circle at 50% 20%, rgba(16, 185, 129, 0.15), transparent 30%);
+      }
+    }
+    .glass-card {
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    .glass-card:hover {
+      background: rgba(255, 255, 255, 0.9);
+      border-color: rgba(99, 102, 241, 0.4);
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.2), 0 10px 10px -5px rgba(99, 102, 241, 0.1);
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.05); }
+    }
+    @keyframes cardEntrance {
+      from { opacity: 0; transform: translateY(30px) scale(0.9); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .category-card {
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      animation: cardEntrance 0.8s ease-out forwards;
+      opacity: 0;
+    }
+    .category-card:nth-child(1) { animation-delay: 0.1s; }
+    .category-card:nth-child(2) { animation-delay: 0.2s; }
+    .category-card:nth-child(3) { animation-delay: 0.3s; }
+    .float-animation {
+      animation: float 4s ease-in-out infinite;
+    }
+    .pulse-animation {
+      animation: pulse 2s ease-in-out infinite;
+    }
+    .serif-font {
+      font-family: 'Noto Serif TC', serif;
+    }
+    .fade-in-up {
+      animation: fadeInUp 0.6s ease-out forwards;
+      opacity: 0;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="antialiased text-slate-900 bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 min-h-screen overflow-x-hidden">
+  <div class="relative min-h-screen overflow-hidden">
+    <div aria-hidden="true" class="gradient-bg pointer-events-none"></div>
+    
+    <div class="relative z-10">
+      
+      <!-- Header -->
+      <header class="px-6 py-12 sm:py-16">
+        <div class="mx-auto max-w-7xl">
+          <div class="text-center space-y-6">
+            <a href="../index.html" class="inline-block mb-4 text-slate-600 hover:text-slate-900 transition-colors fade-in-up">
+              <svg class="w-6 h-6 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+              </svg>
+              返回主頁
+            </a>
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight float-animation serif-font fade-in-up" style="animation-delay: 0.1s;">
+              人物研讀
+              <span class="block mt-2 bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-600 bg-clip-text text-transparent pulse-animation">
+                Character Studies
+              </span>
+            </h1>
+            <p class="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto pulse-animation fade-in-up" style="animation-delay: 0.2s;">
+              聖經人物生命見證與屬靈功課 | Biblical Characters & Spiritual Lessons
+            </p>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main class="px-6 pb-16">
+        <div class="mx-auto max-w-7xl">
+          
+          <!-- Introduction Section -->
+          <section class="mb-16 fade-in-up" style="animation-delay: 0.3s;">
+            <div class="glass-card rounded-2xl p-8 sm:p-12">
+              <div class="text-center mb-8">
+                <h2 class="text-3xl sm:text-4xl font-semibold mb-4 serif-font text-slate-900">關於人物研讀</h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 mx-auto rounded-full"></div>
+              </div>
+              <div class="space-y-4 text-lg leading-relaxed text-slate-700 max-w-3xl mx-auto">
+                <p>
+                  聖經中記載了許多真實的人物，他們的生命故事見證了神的信實、慈愛與大能。透過研讀這些人物的生命歷程，我們不僅能認識歷史，更能從中學習寶貴的屬靈功課。
+                </p>
+                <p>
+                  每個人物的故事都向我們展示：神如何在不同的處境中工作，如何透過順服與信心成就祂的旨意，以及如何在軟弱中顯出祂的能力。讓我們一起從這些見證中學習，將這些功課應用到自己的生命中。
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Character Studies -->
+          <section>
+            <div class="mb-12 text-center fade-in-up" style="animation-delay: 0.4s;">
+              <h2 class="text-3xl sm:text-4xl font-semibold mb-3 serif-font text-slate-900">舊約人物一覽</h2>
+              <p class="text-slate-600 text-sm sm:text-base">按人物進入，細讀背景、原文與屬靈功課</p>
+            </div>
+            
+            <div class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+              <!-- 亞當 -->
+              <a href="亞當/index.html" class="category-card glass-card rounded-2xl p-7 hover:bg-white/90 group">
+                <div class="space-y-5">
+                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-400 via-sky-400 to-indigo-400 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                    <span class="text-xl font-semibold text-white">亞</span>
+                  </div>
+                  <div class="text-center">
+                    <h3 class="text-xl font-semibold mb-1 group-hover:text-emerald-600 transition-colors serif-font text-slate-900">亞當</h3>
+                    <p class="text-xs text-slate-500 mb-2">受造之首．墮落之源</p>
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                      第一個人，被照著神形像而造，卻在試探中失敗，讓罪與死進入世界，提醒我們尊貴呼召與墮落本相。
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-center text-emerald-600 group-hover:text-emerald-700 transition-colors">
+                    <span class="text-sm font-medium">研讀亞當</span>
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </div>
+                </div>
+              </a>
+
+              <!-- 夏娃 -->
+              <a href="夏娃/index.html" class="category-card glass-card rounded-2xl p-7 hover:bg-white/90 group">
+                <div class="space-y-5">
+                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-rose-400 via-pink-400 to-indigo-400 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                    <span class="text-xl font-semibold text-white">娃</span>
+                  </div>
+                  <div class="text-center">
+                    <h3 class="text-xl font-semibold mb-1 group-hover:text-rose-600 transition-colors serif-font text-slate-900">夏娃</h3>
+                    <p class="text-xs text-slate-500 mb-2">關係．試探．盼望</p>
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                      第一個女人，被造作幫助者，在關係與試探中跌倒，同時在審判宣告裡仍接收到救贖應許的盼望。
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-center text-rose-600 group-hover:text-rose-700 transition-colors">
+                    <span class="text-sm font-medium">研讀夏娃</span>
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </div>
+                </div>
+              </a>
+
+              <!-- 挪亞 -->
+              <a href="挪亞/index.html" class="category-card glass-card rounded-2xl p-7 hover:bg-white/90 group">
+                <div class="space-y-5">
+                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-sky-400 via-indigo-400 to-emerald-400 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                    <span class="text-xl font-semibold text-white">挪</span>
+                  </div>
+                  <div class="text-center">
+                    <h3 class="text-xl font-semibold mb-1 group-hover:text-sky-600 transition-colors serif-font text-slate-900">挪亞</h3>
+                    <p class="text-xs text-slate-500 mb-2">洪水世代的義人</p>
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                      在敗壞暴力的世代裡與神同行，憑信建造方舟，全家得救，見證審判中的憐憫與約的記號。
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-center text-sky-600 group-hover:text-sky-700 transition-colors">
+                    <span class="text-sm font-medium">研讀挪亞</span>
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </div>
+                </div>
+              </a>
+
+              <!-- 亞伯拉罕 -->
+              <a href="亞伯拉罕/index.html" class="category-card glass-card rounded-2xl p-7 hover:bg-white/90 group">
+                <div class="space-y-5">
+                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-400 via-sky-400 to-amber-400 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                    <span class="text-xl font-semibold text-white">伯</span>
+                  </div>
+                  <div class="text-center">
+                    <h3 class="text-xl font-semibold mb-1 group-hover:text-indigo-600 transition-colors serif-font text-slate-900">亞伯拉罕</h3>
+                    <p class="text-xs text-slate-500 mb-2">信心之父．應許之約</p>
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                      從離開本地本族到成為萬國祝福的管道，在等候與試驗中學習因信稱義與順服的道路。
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-center text-indigo-600 group-hover:text-indigo-700 transition-colors">
+                    <span class="text-sm font-medium">研讀亞伯拉罕</span>
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </div>
+                </div>
+              </a>
+
+              <!-- 以撒 -->
+              <a href="以撒/index.html" class="category-card glass-card rounded-2xl p-7 hover:bg-white/90 group">
+                <div class="space-y-5">
+                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-sky-400 via-emerald-400 to-amber-300 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                    <span class="text-xl font-semibold text-white">撒</span>
+                  </div>
+                  <div class="text-center">
+                    <h3 class="text-xl font-semibold mb-1 group-hover:text-sky-600 transition-colors serif-font text-slate-900">以撒</h3>
+                    <p class="text-xs text-slate-500 mb-2">應許之子．祭壇順服</p>
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                      在祭壇上被綁、在平凡中挖井，以安靜溫柔的生命承傳應許，提醒我們在日常裡忠心跟隨。
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-center text-sky-600 group-hover:text-sky-700 transition-colors">
+                    <span class="text-sm font-medium">研讀以撒</span>
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </div>
+                </div>
+              </a>
+
+              <!-- 雅各 -->
+              <a href="雅各/index.html" class="category-card glass-card rounded-2xl p-7 hover:bg-white/90 group">
+                <div class="space-y-5">
+                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-violet-400 via-pink-400 to-emerald-400 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                    <span class="text-xl font-semibold text-white">雅</span>
+                  </div>
+                  <div class="text-center">
+                    <h3 class="text-xl font-semibold mb-1 group-hover:text-violet-600 transition-colors serif-font text-slate-900">雅各</h3>
+                    <p class="text-xs text-slate-500 mb-2">抓奪．摔跤．改名</p>
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                      從抓住哥哥腳跟到與神摔跤被改名為以色列，在破碎與更新中學習讓神作王。
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-center text-violet-600 group-hover:text-violet-700 transition-colors">
+                    <span class="text-sm font-medium">研讀雅各</span>
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </div>
+                </div>
+              </a>
+
+              <!-- 約瑟 -->
+              <a href="約瑟/index.html" class="category-card glass-card rounded-2xl p-7 hover:bg-white/90 group">
+                <div class="space-y-5">
+                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-amber-400 via-orange-400 to-sky-400 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                    <span class="text-xl font-semibold text-white">瑟</span>
+                  </div>
+                  <div class="text-center">
+                    <h3 class="text-xl font-semibold mb-1 group-hover:text-amber-600 transition-colors serif-font text-slate-900">約瑟</h3>
+                    <p class="text-xs text-slate-500 mb-2">苦難中蒙保守</p>
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                      從被賣為奴到作宰相，經歷誣告與監獄，在神同在中學習饒恕，看見神使惡轉為善。
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-center text-amber-600 group-hover:text-amber-700 transition-colors">
+                    <span class="text-sm font-medium">研讀約瑟</span>
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </div>
+                </div>
+              </a>
+
+              <!-- 撒母耳 -->
+              <a href="撒母耳/index.html" class="category-card glass-card rounded-2xl p-7 hover:bg-white/90 group">
+                <div class="space-y-5">
+                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-teal-400 via-emerald-400 to-sky-400 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                    <span class="text-xl font-semibold text-white">撒</span>
+                  </div>
+                  <div class="text-center">
+                    <h3 class="text-xl font-semibold mb-1 group-hover:text-teal-600 transition-colors serif-font text-slate-900">撒母耳</h3>
+                    <p class="text-xs text-slate-500 mb-2">聆聽．代禱．領導</p>
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                      從童年學習說「僕人敬聽」，到作先知和士師，在轉變的世代中忠心帶領百姓歸向神。
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-center text-teal-600 group-hover:text-teal-700 transition-colors">
+                    <span class="text-sm font-medium">研讀撒母耳</span>
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </div>
+                </div>
+              </a>
+
+              <!-- 參孫 -->
+              <a href="參孫/index.html" class="category-card glass-card rounded-2xl p-7 hover:bg-white/90 group">
+                <div class="space-y-5">
+                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-slate-800 via-slate-700 to-orange-500 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                    <span class="text-xl font-semibold text-white">孫</span>
+                  </div>
+                  <div class="text-center">
+                    <h3 class="text-xl font-semibold mb-1 group-hover:text-slate-800 transition-colors serif-font text-slate-900">參孫</h3>
+                    <p class="text-xs text-slate-500 mb-2">能力．失敗．最後呼求</p>
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                      有大能卻多次因情慾失腳，最後在呼求中再被使用，成為嚴肅警戒與恩典盼望的見證。
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-center text-slate-800 group-hover:text-black transition-colors">
+                    <span class="text-sm font-medium">研讀參孫</span>
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </div>
+                </div>
+              </a>
+
+              <!-- 大衞 -->
+              <a href="大衞/index.html" class="category-card glass-card rounded-2xl p-7 hover:bg-white/90 group">
+                <div class="space-y-5">
+                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-rose-400 via-orange-400 to-indigo-400 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                    <span class="text-xl font-semibold text-white">衞</span>
+                  </div>
+                  <div class="text-center">
+                    <h3 class="text-xl font-semibold mb-1 group-hover:text-rose-600 transition-colors serif-font text-slate-900">大衞</h3>
+                    <p class="text-xs text-slate-500 mb-2">牧童．君王．詩人</p>
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                      合神心意卻曾大大跌倒，在詩篇與悔改中學習敬畏與依靠，見證神的約與憐憫。
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-center text-rose-600 group-hover:text-rose-700 transition-colors">
+                    <span class="text-sm font-medium">研讀大衞</span>
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </div>
+                </div>
+              </a>
+
+              <!-- 以利亞 -->
+              <a href="以利亞/index.html" class="category-card glass-card rounded-2xl p-7 hover:bg-white/90 group">
+                <div class="space-y-5">
+                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-400 via-red-400 to-sky-400 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                    <span class="text-xl font-semibold text-white">亞</span>
+                  </div>
+                  <div class="text-center">
+                    <h3 class="text-xl font-semibold mb-1 group-hover:text-orange-600 transition-colors serif-font text-slate-900">以利亞</h3>
+                    <p class="text-xs text-slate-500 mb-2">迦密山與曠野之路</p>
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                      在屬靈爭戰中剛強站立，卻也經歷憂鬱與孤單，讓我們學習在軟弱裡被神恢復。
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-center text-orange-600 group-hover:text-orange-700 transition-colors">
+                    <span class="text-sm font-medium">研讀以利亞</span>
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </div>
+                </div>
+              </a>
+
+              <!-- 以利沙 -->
+              <a href="以利沙/index.html" class="category-card glass-card rounded-2xl p-7 hover:bg-white/90 group">
+                <div class="space-y-5">
+                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-400 via-teal-400 to-indigo-400 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                    <span class="text-xl font-semibold text-white">沙</span>
+                  </div>
+                  <div class="text-center">
+                    <h3 class="text-xl font-semibold mb-1 group-hover:text-emerald-600 transition-colors serif-font text-slate-900">以利沙</h3>
+                    <p class="text-xs text-slate-500 mb-2">承傳．憐憫．神蹟</p>
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                      承接衣缽，用神蹟服事窮困與有需要的人，彰顯神在日常生活中的憐憫與供應。
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-center text-emerald-600 group-hover:text-emerald-700 transition-colors">
+                    <span class="text-sm font-medium">研讀以利沙</span>
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </div>
+                </div>
+              </a>
+
+              <!-- 但以理 -->
+              <a href="但以理/index.html" class="category-card glass-card rounded-2xl p-7 hover:bg-white/90 group">
+                <div class="space-y-5">
+                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-slate-800 via-sky-500 to-indigo-500 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                    <span class="text-xl font-semibold text-white">但</span>
+                  </div>
+                  <div class="text-center">
+                    <h3 class="text-xl font-semibold mb-1 group-hover:text-sky-700 transition-colors serif-font text-slate-900">但以理</h3>
+                    <p class="text-xs text-slate-500 mb-2">獅子坑中的禱告人</p>
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                      在外邦帝國中持守分別為聖與禱告生活，在歷史動盪裡見證天上主宰的權柄。
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-center text-sky-700 group-hover:text-sky-800 transition-colors">
+                    <span class="text-sm font-medium">研讀但以理</span>
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </div>
+                </div>
+              </a>
+
+              <!-- 耶利米 -->
+              <a href="耶利米/index.html" class="category-card glass-card rounded-2xl p-7 hover:bg-white/90 group">
+                <div class="space-y-5">
+                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-400 via-slate-400 to-slate-700 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                    <span class="text-xl font-semibold text-white">米</span>
+                  </div>
+                  <div class="text-center">
+                    <h3 class="text-xl font-semibold mb-1 group-hover:text-indigo-600 transition-colors serif-font text-slate-900">耶利米</h3>
+                    <p class="text-xs text-slate-500 mb-2">流淚中的真理見證</p>
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                      在被拒與眼淚中仍忠心說真話，宣告審判，也宣告新約的盼望與未來的復興。
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-center text-indigo-600 group-hover:text-indigo-700 transition-colors">
+                    <span class="text-sm font-medium">研讀耶利米</span>
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </div>
+                </div>
+              </a>
+
+              <!-- 路得 -->
+              <a href="路得/index.html" class="category-card glass-card rounded-2xl p-7 hover:bg-white/90 group">
+                <div class="space-y-5">
+                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-rose-400 via-amber-300 to-emerald-400 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                    <span class="text-xl font-semibold text-white">得</span>
+                  </div>
+                  <div class="text-center">
+                    <h3 class="text-xl font-semibold mb-1 group-hover:text-rose-600 transition-colors serif-font text-slate-900">路得</h3>
+                    <p class="text-xs text-slate-500 mb-2">外邦女子．忠誠之愛</p>
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                      從摩押到伯利恆，在婆媳關係與日常拾穗中活出約中的慈愛，成為大衞與基督家譜中的一環。
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-center text-rose-600 group-hover:text-rose-700 transition-colors">
+                    <span class="text-sm font-medium">研讀路得</span>
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </div>
+                </div>
+              </a>
+
+              <!-- 阿摩司 -->
+              <a href="阿摩司/index.html" class="category-card glass-card rounded-2xl p-7 hover:bg-white/90 group">
+                <div class="space-y-5">
+                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-400 via-sky-400 to-amber-400 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                    <span class="text-xl font-semibold text-white">摩</span>
+                  </div>
+                  <div class="text-center">
+                    <h3 class="text-xl font-semibold mb-1 group-hover:text-indigo-600 transition-colors serif-font text-slate-900">阿摩司</h3>
+                    <p class="text-xs text-slate-500 mb-2">牧人先知．公義之聲</p>
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                      從提哥亞牧人被呼召，向繁榮卻不義的以色列宣講：神厭惡虛假敬拜，喜愛公平與公義如江河滔滔。
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-center text-indigo-600 group-hover:text-indigo-700 transition-colors">
+                    <span class="text-sm font-medium">研讀阿摩司</span>
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </div>
+                </div>
+              </a>
+
+              <!-- 底波拉 -->
+              <a href="底波拉/index.html" class="category-card glass-card rounded-2xl p-7 hover:bg-white/90 group">
+                <div class="space-y-5">
+                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-pink-400 via-violet-400 to-emerald-400 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                    <span class="text-xl font-semibold text-white">底</span>
+                  </div>
+                  <div class="text-center">
+                    <h3 class="text-xl font-semibold mb-1 group-hover:text-pink-600 transition-colors serif-font text-slate-900">底波拉</h3>
+                    <p class="text-xs text-slate-500 mb-2">女先知．以色列的母</p>
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                      在士師時代作女先知與士師，以屬靈母親的心腸喚醒沉睡的以色列，帶領他們起來爭戰與歌唱。
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-center text-pink-600 group-hover:text-pink-700 transition-colors">
+                    <span class="text-sm font-medium">研讀底波拉</span>
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </div>
+                </div>
+              </a>
+
+              <!-- 基甸 -->
+              <a href="基甸/index.html" class="category-card glass-card rounded-2xl p-7 hover:bg-white/90 group">
+                <div class="space-y-5">
+                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-400 via-sky-400 to-slate-500 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                    <span class="text-xl font-semibold text-white">甸</span>
+                  </div>
+                  <div class="text-center">
+                    <h3 class="text-xl font-semibold mb-1 group-hover:text-emerald-600 transition-colors serif-font text-slate-900">基甸</h3>
+                    <p class="text-xs text-slate-500 mb-2">懼怕．信心．警戒</p>
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                      從酒榨裡的懼怕者到三百人的領袖，在軟弱中經歷神得勝，卻也在晚年被以弗得與權勢絆倒。
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-center text-emerald-600 group-hover:text-emerald-700 transition-colors">
+                    <span class="text-sm font-medium">研讀基甸</span>
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </div>
+                </div>
+              </a>
+
+              <!-- 約西亞王 -->
+              <a href="約西亞/index.html" class="category-card glass-card rounded-2xl p-7 hover:bg-white/90 group">
+                <div class="space-y-5">
+                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-400 via-sky-400 to-amber-400 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                    <span class="text-xl font-semibold text-white">約</span>
+                  </div>
+                  <div class="text-center">
+                    <h3 class="text-xl font-semibold mb-1 group-hover:text-indigo-600 transition-colors serif-font text-slate-900">約西亞王</h3>
+                    <p class="text-xs text-slate-500 mb-2">律法復興．領袖警戒</p>
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                      因聽見律法就撕裂衣服，帶領猶大大力改革與守逾越節，卻也在急進出戰中陣亡，提醒領袖在策略上仍要謙卑尋求神。
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-center text-indigo-600 group-hover:text-indigo-700 transition-colors">
+                    <span class="text-sm font-medium">研讀約西亞王</span>
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </div>
+                </div>
+              </a>
+
+            </div>
+          </section>
+
+        </div>
+      </main>
+
+      <!-- Footer -->
+      <footer style="text-align: center; padding: 1rem; color: #707070; font-size: 0.875rem;">
+        <p style="font-style: italic; margin-bottom: 0.25rem;">But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his understanding. Jeremiah 10:12</p>
+        <p style="font-size: 0.75rem; margin-bottom: 0.25rem; margin-top: 0.5rem;">「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12</p>
+        <p style="font-size: 0.75rem; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #d1d5db;">@ 2025 Bible Character Studies</p>
+      </footer>
+
+    </div>
+  </div>
+
+  <script>
+    // Intersection Observer for animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+        }
+      });
+    }, observerOptions);
+
+    // Observe all animated elements
+    document.querySelectorAll('.fade-in-up, .category-card').forEach(el => {
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>

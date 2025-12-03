@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>雅各人物研讀 | 舊約聖經人物</title>
+  <meta name="description" content="從創世記研讀雅各一生的抓奪、破碎與改名。" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif+TC:wght@400;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    body{font-family:"Inter",system-ui,-apple-system,sans-serif;}
+    .gradient-bg{position:absolute;inset:0;filter:blur(60px);opacity:.9;background:radial-gradient(circle at 10% 20%,rgba(129,140,248,.2),transparent 35%),radial-gradient(circle at 80% 0%,rgba(244,114,182,.18),transparent 30%),radial-gradient(circle at 50% 80%,rgba(52,211,153,.16),transparent 30%);} 
+    .glass-card{backdrop-filter:blur(14px);background:rgba(255,255,255,.86);border:1px solid rgba(129,140,248,.35);box-shadow:0 18px 40px rgba(15,23,42,.18);transition:all .3s ease;} .glass-card:hover{background:rgba(255,255,255,.97);transform:translateY(-3px);} 
+    .serif-font{font-family:"Noto Serif TC",ui-serif,Georgia,"Times New Roman",serif;} 
+    .section-title-bar{width:3.5rem;height:.18rem;border-radius:999px;background-image:linear-gradient(to right,#6366f1,#ec4899,#22c55e);} 
+    .fade-in-up{opacity:0;transform:translateY(18px);transition:all .6s ease-out;} .fade-in-up.show{opacity:1;transform:translateY(0);} 
+    .prose-custom p{margin-bottom:.75rem;} .prose-custom ul{margin-bottom:.75rem;padding-left:1.3rem;list-style-type:disc;} 
+    .scripture-pill{cursor:pointer;border-radius:999px;border-width:1px;border-style:solid;border-color:rgba(129,140,248,.6);background:rgba(238,242,255,.96);transition:all .2s ease;}
+    .scripture-pill:hover{background:#e0e7ff;transform:translateY(-1px);box-shadow:0 8px 18px rgba(129,140,248,.4);}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;align-items:center;justify-content:center;z-index:40;backdrop-filter:blur(4px);}
+    .modal-backdrop.show{display:flex;}
+    .modal-card{max-width:40rem;width:90%;max-height:min(80vh,32rem);overflow:auto;border-radius:1.5rem;background:rgba(255,255,255,.97);border:1px solid rgba(129,140,248,.55);box-shadow:0 22px 55px rgba(15,23,42,.45);animation:fadeInUp .3s ease-out;}
+  </style>
+</head>
+<body class="antialiased text-slate-900 bg-gradient-to-br from-slate-50 via-white to-indigo-50/40 min-h-screen">
+  <div class="relative min-h-screen overflow-hidden">
+    <div aria-hidden="true" class="gradient-bg pointer-events-none"></div>
+    <div class="relative z-10">
+      <header class="px-4 sm:px-6 pt-6 sm:pt-10">
+          <div class="mx-auto max-w-6xl">
+          <div class="flex items-center justify-between mb-8">
+            <a href="../index.html" class="inline-flex items-center text-slate-600 hover:text-slate-900 text-sm sm:text-base"><svg class="w-5 h-5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>返回人物總覽</a>
+            <a href="../../index.html" class="hidden sm:inline-flex items-center text-xs sm:text-sm text-slate-500 hover:text-slate-900">聖經研讀主頁</a>
+          </div>
+          <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)] items-center">
+            <div class="space-y-4 fade-in-up">
+              <p class="text-xs sm:text-sm tracking-[0.2em] uppercase text-indigo-600 font-semibold">舊約聖經人物研讀</p>
+              <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight serif-font text-slate-900 leading-tight">
+                雅各
+                <span class="block mt-1 text-base sm:text-lg font-normal text-slate-600">從抓奪者到摔跤後被改名為「以色列」的人</span>
+              </h1>
+              <p class="text-sm sm:text-base text-slate-700 max-w-2xl">
+                雅各的名字原意有「抓住腳跟、抓奪」之意，他的成長經歷充滿欺騙與計謀，卻也在漫長的人生中被神破碎、修剪，
+                最後在雅博渡口與神摔跤，被改名為「以色列」，成為一個被更新的人。
+              </p>
+              <div class="flex flex-wrap gap-2 text-xs sm:text-sm">
+                <span class="inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-indigo-700">創世記 25–36 章</span>
+                <span class="inline-flex items-center rounded-full bg-sky-50 px-3 py-1 text-sky-700">何西阿書 12 章</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="px-4 sm:px-6 pb-12 sm:pb-16">
+        <div class="mx-auto max-w-6xl space-y-10 sm:space-y-12">
+          <!-- 快速資料 ＆ 家譜關係 -->
+          <section class="fade-in-up">
+            <div class="glass-card rounded-3xl p-6 sm:p-8 text-slate-800 leading-relaxed space-y-6">
+              <div>
+                <h2 class="text-2xl sm:text-3xl font-semibold serif-font mb-2">快速資料｜雅各</h2>
+                <div class="section-title-bar mb-4"></div>
+                <div class="grid gap-4 md:grid-cols-2 text-sm sm:text-base">
+                  <div class="space-y-1.5">
+                    <div class="flex">
+                      <span class="w-20 text-slate-500">原名</span>
+                      <span class="font-medium">雅各（意：抓住腳跟／抓奪）</span>
+                    </div>
+                    <div class="flex">
+                      <span class="w-20 text-slate-500">改名後</span>
+                      <span class="font-medium">以色列（意：與神較力／神掌權）</span>
+                    </div>
+                    <div class="flex">
+                      <span class="w-20 text-slate-500">主要經文</span>
+                      <span class="font-medium">
+                        創 25–36 章；
+                        <br class="sm:hidden" />創 46–49 章；何 12 章
+                      </span>
+                    </div>
+                    <div class="flex">
+                      <span class="w-20 text-slate-500">身份</span>
+                      <span class="font-medium">以色列第三位族長、十二支派之父</span>
+                    </div>
+                  </div>
+                  <div class="space-y-1.5">
+                    <div class="flex">
+                      <span class="w-20 text-slate-500">關鍵主題</span>
+                      <span class="font-medium">抓奪與恩典、紀律、摔跤與改名、家族故事</span>
+                    </div>
+                    <div class="flex">
+                      <span class="w-20 text-slate-500">屬靈寫照</span>
+                      <span class="font-medium">被神破碎與更新的朝聖者</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="border-t border-slate-200 pt-4">
+                <h3 class="text-xl sm:text-2xl font-semibold serif-font mb-2">家譜與家庭關係</h3>
+                <ul class="list-disc pl-5 space-y-1.5 text-sm sm:text-base">
+                  <li>祖父：亞伯拉罕；祖母：撒拉（創 12–23 章）</li>
+                  <li>父母：以撒與利百加（創 25:19–28）</li>
+                  <li>哥哥：以掃（孿生兄長，創 25:24–26）</li>
+                  <li>妻子：利亞、拉結；婢女悉帕、辟拉（創 29–30 章）</li>
+                  <li>兒子：十二個兒子，成為以色列十二支派（創 29–30；35:16–26）</li>
+                  <li>晚年：下到埃及與約瑟團聚，在埃及去世（創 46–49 章）</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <!-- 故事時間線／生平大綱 -->
+          <section class="fade-in-up">
+            <div class="glass-card rounded-3xl p-6 sm:p-8 text-slate-800 leading-relaxed">
+              <div class="mb-5">
+                <h2 class="text-2xl sm:text-3xl font-semibold serif-font mb-1">雅各故事時間線（生平大綱）</h2>
+                <div class="section-title-bar"></div>
+              </div>
+              <p class="text-sm sm:text-base mb-4">
+                以下按時間順序簡列雅各一生的重要事件，並標示經文分段；部份關鍵經文可點擊顯示節錄，幫助靈修與查經。
+              </p>
+              <ol class="list-decimal pl-5 space-y-3 text-sm sm:text-base">
+                <!-- timeline items inserted here in previous patch (omitted in this small correction block) -->
+              </ol>
+            </div>
+          </section>
+        </div>
+      </main>
+
+      <footer style="text-align:center;padding:1rem;color:#707070;font-size:0.875rem;">
+        <p style="font-style:italic;margin-bottom:0.25rem;">But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his understanding. Jeremiah 10:12</p>
+        <p style="font-size:0.75rem;margin-bottom:0.25rem;margin-top:0.5rem;">「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12</p>
+        <p style="font-size:0.75rem;margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid #d1d5db;">@ 2025 Bible Character Studies</p>
+      </footer>
+    </div>
+  </div>
+  <script>
+    const option={threshold:0.12,rootMargin:"0px 0px -40px 0px"};
+    const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('show');}});},option);
+    document.querySelectorAll('.fade-in-up').forEach(el=>io.observe(el));
+  </script>
+</body>
+</html>

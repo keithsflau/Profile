@@ -1,0 +1,2100 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <title>路加福音互動查經工具</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #0f172a;
+        --bg-elevated: #111827;
+        --bg-soft: #020617;
+        --accent: #38bdf8;
+        --accent-soft: rgba(56, 189, 248, 0.1);
+        --accent-strong: #0ea5e9;
+        --text: #e5e7eb;
+        --muted: #9ca3af;
+        --border: #1f2937;
+        --danger: #f97373;
+        --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.6);
+        --radius-lg: 18px;
+        --radius-md: 12px;
+        --radius-pill: 999px;
+        --transition-fast: 180ms ease-out;
+        --transition-med: 260ms cubic-bezier(0.16, 1, 0.3, 1);
+        --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+          "Segoe UI", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: var(--font-sans);
+        background: radial-gradient(circle at top, #1d3557 0, #020617 45%, #000 100%);
+        color: var(--text);
+        display: flex;
+        align-items: stretch;
+        justify-content: center;
+        padding: 24px 16px;
+      }
+
+      .shell {
+        width: 100%;
+        max-width: 1280px;
+        background: linear-gradient(145deg, #020617 0, #020617 40%, #030712 100%);
+        border-radius: 24px;
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        box-shadow: var(--shadow-soft);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .shell::before,
+      .shell::after {
+        content: "";
+        position: absolute;
+        inset: -120px;
+        background:
+          radial-gradient(circle at 10% 0%, rgba(56, 189, 248, 0.09) 0, transparent 55%),
+          radial-gradient(circle at 80% 0%, rgba(52, 211, 153, 0.07) 0, transparent 55%);
+        opacity: 0.7;
+        pointer-events: none;
+        mix-blend-mode: screen;
+      }
+
+      .shell::after {
+        inset: auto;
+        top: 40%;
+        background:
+          radial-gradient(circle at 15% 120%, rgba(248, 250, 252, 0.07) 0, transparent 60%),
+          radial-gradient(circle at 90% 130%, rgba(248, 113, 113, 0.08) 0, transparent 65%);
+        opacity: 0.6;
+      }
+
+      .shell-inner {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        max-height: calc(100vh - 48px);
+      }
+
+      header {
+        padding: 18px 22px 10px;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+        backdrop-filter: blur(16px);
+        background: radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.08) 0, transparent 55%);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .title-block {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .app-title {
+        font-size: 1.2rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #e5e7eb;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .badge {
+        font-size: 0.7rem;
+        padding: 2px 9px;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.65);
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .subtitle {
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+
+      .hero-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 18px;
+        background:
+          conic-gradient(from 200deg, #22d3ee, #a5b4fc, #38bdf8, #22c55e, #f97316, #22d3ee);
+        padding: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 16px 40px rgba(8, 47, 73, 0.9);
+      }
+
+      .hero-icon-inner {
+        width: 100%;
+        height: 100%;
+        border-radius: 16px;
+        background: radial-gradient(circle at 30% 0, #fefce8 0, #0f172a 55%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #f9fafb;
+        font-weight: 700;
+        font-size: 0.96rem;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
+        gap: 12px;
+        padding: 12px 14px 18px;
+        height: 100%;
+        max-height: calc(100vh - 90px);
+      }
+
+      @media (max-width: 900px) {
+        .layout {
+          grid-template-columns: minmax(0, 1fr);
+          grid-template-rows: auto 1fr;
+        }
+      }
+
+      .sidebar {
+        background: radial-gradient(circle at 0 0, rgba(31, 41, 55, 0.9) 0, #020617 65%);
+        border-radius: var(--radius-lg);
+        border: 1px solid rgba(30, 64, 175, 0.7);
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.9);
+      }
+
+      .sidebar-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .sidebar-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #e5e7eb;
+      }
+
+      .tagline {
+        font-size: 0.75rem;
+        color: var(--muted);
+      }
+
+      .tab-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .tab-button {
+        border: none;
+        border-radius: var(--radius-pill);
+        padding: 6px 11px;
+        font-size: 0.8rem;
+        background: rgba(15, 23, 42, 0.9);
+        color: var(--muted);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: background var(--transition-fast), color var(--transition-fast),
+          box-shadow var(--transition-fast), transform var(--transition-fast);
+      }
+
+      .tab-button span.icon {
+        font-size: 0.9rem;
+      }
+
+      .tab-button.active {
+        background: linear-gradient(135deg, #0369a1, #0891b2);
+        color: #f9fafb;
+        box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.7),
+          0 12px 30px rgba(8, 47, 73, 0.95);
+        transform: translateY(-1px);
+      }
+
+      .tab-button:hover:not(.active) {
+        background: rgba(15, 23, 42, 0.9);
+        color: #e5e7eb;
+        box-shadow: 0 0 0 1px rgba(55, 65, 81, 0.7);
+      }
+
+      .section-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--muted);
+        margin: 2px 4px 0;
+      }
+
+      .list {
+        margin-top: 2px;
+        padding: 4px;
+        border-radius: 12px;
+        background: radial-gradient(circle at 0 0, rgba(15, 23, 42, 0.9) 0, #020617 70%);
+        border: 1px solid rgba(30, 64, 175, 0.65);
+        overflow: auto;
+        flex: 1;
+      }
+
+      .list-item {
+        padding: 7px 8px;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        cursor: pointer;
+        border: 1px solid transparent;
+        position: relative;
+        transition: background var(--transition-fast), border-color var(--transition-fast),
+          transform var(--transition-fast), box-shadow var(--transition-fast);
+      }
+
+      .list-item::before {
+        content: "";
+        position: absolute;
+        inset: -1px;
+        border-radius: inherit;
+        background: radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.24), transparent 60%);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity var(--transition-fast);
+      }
+
+      .list-item:hover::before {
+        opacity: 0.8;
+      }
+
+      .list-item:hover {
+        background: rgba(15, 23, 42, 0.98);
+        transform: translateY(-1px);
+        border-color: rgba(56, 189, 248, 0.7);
+        box-shadow: 0 14px 28px rgba(15, 23, 42, 0.9);
+      }
+
+      .list-item.active {
+        background: radial-gradient(circle at 0 0, rgba(37, 99, 235, 0.65) 0, #020617 70%);
+        border-color: rgba(59, 130, 246, 0.9);
+        box-shadow: 0 16px 32px rgba(15, 23, 42, 1);
+      }
+
+      .list-item-title {
+        font-size: 0.86rem;
+        font-weight: 600;
+        color: #e5e7eb;
+      }
+
+      .list-item-ref {
+        font-size: 0.75rem;
+        color: var(--muted);
+      }
+
+      .list-item-note {
+        font-size: 0.74rem;
+        color: #a5b4fc;
+      }
+
+      .main-panel {
+        background: radial-gradient(circle at 100% 0, rgba(15, 23, 42, 0.9) 0, #020617 70%);
+        border-radius: var(--radius-lg);
+        border: 1px solid rgba(148, 163, 184, 0.26);
+        padding: 14px 16px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        min-width: 0;
+        overflow: hidden;
+      }
+
+      .panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .panel-title-group {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .panel-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #e5e7eb;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .panel-subtitle {
+        font-size: 0.82rem;
+        color: var(--muted);
+      }
+
+      .pill {
+        font-size: 0.72rem;
+        padding: 4px 9px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        color: var(--muted);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .pill-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 999px;
+        background: radial-gradient(circle at 30% 0, #fef3c7 0, #22c55e 55%);
+        box-shadow: 0 0 0 1px rgba(22, 163, 74, 0.6);
+      }
+
+      .content-scroll {
+        flex: 1;
+        min-height: 0;
+        border-radius: 14px;
+        border: 1px solid rgba(31, 41, 55, 0.9);
+        background:
+          radial-gradient(circle at 0 0, rgba(15, 23, 42, 0.9) 0, #020617 70%),
+          linear-gradient(135deg, rgba(15, 23, 42, 0.9), #020617);
+        padding: 12px 14px;
+        overflow: auto;
+        position: relative;
+        isolation: isolate;
+      }
+
+      .content-scroll::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.1), transparent 55%);
+        mix-blend-mode: soft-light;
+        opacity: 0.7;
+        pointer-events: none;
+      }
+
+      .fade-enter {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+
+      .fade-enter-active {
+        opacity: 1;
+        transform: translateY(0);
+        transition: opacity 220ms ease-out, transform 220ms ease-out;
+      }
+
+      h2 {
+        font-size: 1rem;
+        margin: 0 0 6px;
+      }
+
+      h3 {
+        font-size: 0.9rem;
+        margin: 10px 0 4px;
+        color: #bfdbfe;
+      }
+
+      p {
+        font-size: 0.86rem;
+        line-height: 1.7;
+        color: #d1d5db;
+        margin: 4px 0;
+      }
+
+      p.small {
+        font-size: 0.8rem;
+        color: var(--muted);
+      }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 2px 0 6px;
+      }
+
+      .chip {
+        font-size: 0.72rem;
+        padding: 3px 7px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(148, 163, 184, 0.5);
+        color: #cbd5f5;
+      }
+
+      .section-divider {
+        border: none;
+        border-top: 1px dashed rgba(55, 65, 81, 0.8);
+        margin: 8px 0;
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+        gap: 10px;
+      }
+
+      @media (max-width: 800px) {
+        .grid-2 {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+
+      .card {
+        border-radius: 12px;
+        border: 1px solid rgba(55, 65, 81, 0.9);
+        background: radial-gradient(circle at 0 0, rgba(30, 64, 175, 0.45) 0, #020617 70%);
+        padding: 9px 10px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .card.soft {
+        background: radial-gradient(circle at 100% 0, rgba(37, 99, 235, 0.22) 0, #020617 70%);
+      }
+
+      .card::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.12), transparent 55%);
+        opacity: 0.6;
+        mix-blend-mode: soft-light;
+        pointer-events: none;
+      }
+
+      .card h4 {
+        font-size: 0.85rem;
+        margin: 0 0 4px;
+        color: #e5e7eb;
+      }
+
+      .card p {
+        font-size: 0.8rem;
+        color: #cbd5f5;
+      }
+
+      .verse-box {
+        margin-top: 4px;
+        padding: 6px 8px;
+        border-radius: 10px;
+        background: rgba(15, 23, 42, 0.96);
+        border: 1px solid rgba(55, 65, 81, 0.9);
+        font-size: 0.82rem;
+        color: #e5e7eb;
+        position: relative;
+      }
+
+      .verse-ref {
+        font-size: 0.76rem;
+        color: #93c5fd;
+        margin-bottom: 2px;
+      }
+
+      .label {
+        font-size: 0.75rem;
+        color: #93c5fd;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        margin-bottom: 3px;
+      }
+
+      .monospace {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+          "Courier New", monospace;
+        letter-spacing: 0.06em;
+      }
+
+      .word-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 8px;
+        margin-top: 4px;
+      }
+
+      .word-card {
+        border-radius: 11px;
+        border: 1px solid rgba(55, 65, 81, 0.9);
+        background: radial-gradient(circle at 0 0, rgba(30, 64, 175, 0.3), #020617 70%);
+        padding: 7px 8px;
+      }
+
+      .word-term {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 4px;
+        margin-bottom: 2px;
+      }
+
+      .word-greek {
+        font-size: 0.9rem;
+        color: #e5e7eb;
+      }
+
+      .word-translit {
+        font-size: 0.72rem;
+        color: #a5b4fc;
+      }
+
+      .word-meaning {
+        font-size: 0.8rem;
+        color: #d1d5db;
+      }
+
+      .word-ref {
+        font-size: 0.74rem;
+        color: #93c5fd;
+        margin-top: 2px;
+      }
+
+      .hint {
+        font-size: 0.75rem;
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .hint-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.9);
+      }
+
+      .verse-btn {
+        margin-top: 8px;
+        padding: 6px 12px;
+        border-radius: var(--radius-pill);
+        border: 1px solid rgba(56, 189, 248, 0.8);
+        background: radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.2), #0b1120);
+        color: #e0f2fe;
+        font-size: 0.8rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        box-shadow: 0 10px 20px rgba(15, 23, 42, 0.9);
+        transition: transform var(--transition-fast), box-shadow var(--transition-fast),
+          background var(--transition-fast);
+      }
+
+      .verse-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 14px 28px rgba(15, 23, 42, 1);
+        background: radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.28), #020617);
+      }
+
+      .verse-btn span.icon {
+        font-size: 0.9rem;
+      }
+
+      .modal {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 40;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 220ms ease-out;
+      }
+
+      .modal.visible {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .modal-backdrop {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 10% 0, rgba(56, 189, 248, 0.12), transparent 60%),
+          radial-gradient(circle at 90% 100%, rgba(15, 23, 42, 0.96), #020617);
+        backdrop-filter: blur(10px);
+      }
+
+      .modal-dialog {
+        position: relative;
+        width: min(640px, 94vw);
+        max-height: min(70vh, 540px);
+        border-radius: 18px;
+        border: 1px solid rgba(148, 163, 184, 0.7);
+        background: radial-gradient(circle at 0 0, rgba(30, 64, 175, 0.7), #020617 70%);
+        box-shadow: 0 24px 80px rgba(15, 23, 42, 0.95);
+        padding: 12px 14px 10px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 4px;
+      }
+
+      .modal-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #e5e7eb;
+      }
+
+      .modal-ref {
+        font-size: 0.78rem;
+        color: #bfdbfe;
+      }
+
+      .modal-close {
+        border: none;
+        width: 26px;
+        height: 26px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.9);
+        color: #e5e7eb;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.6);
+        transition: background var(--transition-fast), transform var(--transition-fast),
+          box-shadow var(--transition-fast);
+      }
+
+      .modal-close:hover {
+        background: rgba(30, 64, 175, 0.9);
+        transform: translateY(-1px);
+        box-shadow: 0 12px 26px rgba(15, 23, 42, 0.95);
+      }
+
+      .modal-body {
+        border-radius: 12px;
+        border: 1px solid rgba(30, 64, 175, 0.9);
+        background: rgba(15, 23, 42, 0.98);
+        padding: 10px 10px 8px;
+        font-size: 0.86rem;
+        line-height: 1.7;
+        color: #e5e7eb;
+        overflow: auto;
+      }
+
+      .modal-body p {
+        margin: 2px 0;
+      }
+
+      .modal-hint {
+        margin-top: 4px;
+        font-size: 0.76rem;
+        color: var(--muted);
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: rgba(31, 41, 55, 0.9);
+        border-radius: 999px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(55, 65, 81, 1);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <div class="shell-inner">
+        <header>
+          <div class="hero-icon" aria-hidden="true">
+            <div class="hero-icon-inner">路加</div>
+          </div>
+          <div class="title-block">
+            <div class="app-title">
+              LUKE STUDY
+              <span class="badge">互動研經</span>
+            </div>
+            <div class="subtitle">路加福音：人子降臨，為要尋找拯救失喪的人（路 19:10）</div>
+          </div>
+        </header>
+
+        <div class="layout">
+          <aside class="sidebar">
+            <div class="sidebar-header">
+              <div>
+                <div class="sidebar-title">路加福音結構與人物</div>
+                <div class="tagline">先揀選主題，再點選分段／人物進入內容</div>
+              </div>
+            </div>
+
+            <div class="tab-row" id="tab-row">
+              <button class="tab-button active" data-tab="outline">
+                <span class="icon">📖</span>
+                書卷與經文分段
+              </button>
+              <button class="tab-button" data-tab="characters">
+                <span class="icon">👥</span>
+                重要人物
+              </button>
+              <button class="tab-button" data-tab="words">
+                <span class="icon">🔤</span>
+                原文難字
+              </button>
+              <button class="tab-button" data-tab="themes">
+                <span class="icon">✨</span>
+                屬靈主題
+              </button>
+            </div>
+
+            <div class="section-label" id="list-label">經文分段</div>
+            <div class="list" id="sidebar-list" aria-label="列表"></div>
+            <div class="hint">
+              <span class="hint-dot"></span>
+              點擊項目即可在右邊顯示詳細內容與經文重點
+            </div>
+          </aside>
+
+          <main class="main-panel">
+            <div class="panel-header">
+              <div class="panel-title-group">
+                <div class="panel-title" id="panel-title">書卷簡介與整體概覽</div>
+                <div class="panel-subtitle" id="panel-subtitle">
+                  路加以歷史眼光與牧養心腸，描述救主如何進入人類歷史，向萬民顯明上主的恩典。
+                </div>
+              </div>
+              <div class="pill">
+                <span class="pill-dot"></span>
+                <span id="pill-text">整卷鳥瞰</span>
+              </div>
+            </div>
+
+            <section class="content-scroll" id="content-scroll" aria-live="polite">
+              <!-- 內容會由 JavaScript 動態載入 -->
+            </section>
+          </main>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="verse-modal" aria-hidden="true">
+      <div class="modal-backdrop" data-modal-close></div>
+      <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="verse-modal-title">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title" id="verse-modal-title">相關經文</div>
+            <div class="modal-ref" id="verse-modal-ref"></div>
+          </div>
+          <button class="modal-close" type="button" title="關閉" data-modal-close>✕</button>
+        </div>
+        <div class="modal-body" id="verse-modal-body"></div>
+        <div class="modal-hint">提示：可配合手上的聖經一同閱讀整段經文。</div>
+      </div>
+    </div>
+
+    <script>
+      const outlineItems = [
+        {
+          id: "intro",
+          title: "序言：有根有據的見證",
+          ref: "路 1:1-4",
+          note: "寫作目的與方法",
+          content: {
+            heading: "寫給提阿非羅的序言：為要叫你知道所學之道都是確實",
+            intro:
+              "作者表明自己細心查考一切事的起頭，盼望讀者在已經所領受的真道上，更被堅固。路加強調：福音不是傳說，而是歷史中可以考證的作為。",
+            structure: [
+              "來源：『許多人提筆作書』，顯示早期已經有關於主的記錄與傳統。",
+              "方法：『從起頭都詳細考查了』，是有見證、有考證的整理。",
+              "對象：『提阿非羅大人』，代表受教者，也象徵每一位願意被教導的信徒。",
+              "目的：『叫你知道所學之道都是確實的』，信仰既是恩典，也是可以被確認的真理。"
+            ],
+            verses: {
+              ref: "路 1:3-4（重點）",
+              text:
+                "『…就定意要按著次序寫給你，…使你知道所學之道都是確實的。』"
+            },
+            popupVerses: [
+              {
+                ref: "路加福音 1:1-4",
+                text:
+                  "1:1 提阿非羅啊，有好些人提起筆來，要按著次序，將在我們中間所成就的事，述說出來；\n" +
+                  "1:2 是照傳道的人，從起初親眼看見，又傳給我們的；\n" +
+                  "1:3 這些事我既從起頭都詳細考察了，就定意要按著次序寫給你；\n" +
+                  "1:4 使你知道所學之道都是確實的。"
+              }
+            ],
+            spiritual: [
+              "信仰不是單憑感覺，而是建立在主在歷史中真實作為之上。",
+              "整理真理、教導後進，是每一代信徒的重要責任。",
+              "上主使用有恩賜又忠心的醫生、作家、同工，把救恩的信息清楚傳遞。"
+            ]
+          }
+        },
+        {
+          id: "parables",
+          title: "比喻精選：天國在失喪人中間",
+          ref: "路 4; 5; 6; 7–8; 10; 11–12; 13–16; 18–19 章",
+          note: "從撒種到失羊失子",
+          content: {
+            heading: "透過故事，顯出上主尋找與翻轉的心",
+            intro:
+              "路加收錄多個只在本卷出現的比喻，例如好撒瑪利亞人、不義的管家、財主與拉撒路、浪子回頭等。這些故事不只是道德教訓，而是向聽眾打開上主的心腸與天國的價值。",
+            structure: [
+              "早期比喻與呼召（路 4–5 章）：\n" +
+                "　• 拒絕先知的拿撒勒人（4:23-27，帶比喻色彩的兩個故事）。\n" +
+                "　• 新布與新酒（5:36-39）：新舊約啟示與生命更新的關係。",
+              "門徒生命與愛仇敵（路 6 章）：\n" +
+                "　• 瞎子領瞎子、木屑與樑木（6:39-42）。\n" +
+                "　• 好樹結好果子、房子建在磐石上（6:43-49）。",
+              "赦罪與饒恕的比喻（路 7–8 章）：\n" +
+                "　• 兩個債主（7:41-43）：愛多，是因蒙赦免多。\n" +
+                "　• 撒種與各樣土壤（8:4-15）：重點在心田如何回應道。",
+              "愛鄰舍與作門徒的代價（路 10; 11–12; 14 章）：\n" +
+                "　• 好撒瑪利亞人（10:25-37）：顛覆『鄰舍』界線的故事。\n" +
+                "　• 半夜求餅與不斷祈求（11:5-13）：禱告中的持續與信靠。\n" +
+                "　• 無知財主（12:13-21）：只為自己積財而不向神富足。\n" +
+                "　• 忠心有見識的管家（12:35-48）：儆醒等候主再來。\n" +
+                "　• 大筵席與推辭的人（14:15-24）：恩典邀請的廣闊與拒絕的嚴重。\n" +
+                "　• 蓋樓與打仗（14:28-33）：計算作門徒的代價。",
+              "失喪與尋回（路 15 章）：\n" +
+                "　• 失羊的比喻（15:1-7）。\n" +
+                "　• 失錢的比喻（15:8-10）。\n" +
+                "　• 失兒子（浪子與在家長子）（15:11-32）：兩種失喪、同一位慈愛的父。",
+              "錢財與忠心（路 16; 18–19 章）：\n" +
+                "　• 不義的管家（16:1-13）：今世錢財如何成為永恆投資的工具。\n" +
+                "　• 財主與拉撒路（16:19-31）：今生與永恆的巨大反差。\n" +
+                "　• 寡婦與不義官（18:1-8）：在不義世界中持續呼求公義的信心。\n" +
+                "　• 法利賽人與稅吏禱告（18:9-14）：義不在於外表敬虔，而在於謙卑倚靠主。\n" +
+                "　• 十錠銀子（19:11-27）：在主再來前忠心使用託付。"
+            ],
+            verses: {
+              ref: "路 8:8；15:7",
+              text:
+                "『有耳可聽的，就應當聽！』／『一個罪人悔改，在天上也要這樣為他歡喜…』"
+            },
+            popupVerses: [
+              {
+                ref: "路加福音 8:8-10",
+                text:
+                  "8:8 …有耳可聽的，就應當聽！\n" +
+                  "8:9 門徒問這比喻是甚麼意思。\n" +
+                  '8:10 他說：神國的奧祕只叫你們知道，至於別人，就用比喻…'
+              },
+              {
+                ref: "路加福音 15:4-7",
+                text:
+                  "15:4 你們中間誰有一百隻羊，失去一隻，不把這九十九隻撇在曠野，去找那失去的羊直到找著呢？\n" +
+                  "15:7 我告訴你們，一個罪人悔改，在天上也要這樣為他歡喜…"
+              }
+            ],
+            spiritual: [
+              "比喻既是審判，也是恩典：願意聽的人，藉此更明白上主的心意；剛硬的人卻停留在表面。",
+              "主特別用生活化的故事接觸普通人，提醒我們傳講真理時也要貼近對方處境。",
+              "在比喻中我們常常可以找到自己的影子，讓聖靈光照我們的心田、愛心與價值觀。"
+            ]
+          }
+        },
+        {
+          id: "miracles",
+          title: "神蹟與醫治：憐憫臨到破碎的人",
+          ref: "路 4–9; 11; 13; 17–18; 22 章",
+          note: "從病者到被鬼附者",
+          content: {
+            heading: "權柄、憐憫與信心的交織",
+            intro:
+              "路加特別留意主如何對待身心靈破碎的人：病者、被鬼附的人、喪子寡婦、長大痲瘋的群體。透過神蹟展現的不單是能力，更是憐憫和赦罪的權柄。",
+            structure: [
+              "權柄的起首（路 4 章）：\n" +
+                "　• 迦百農會堂趕鬼（4:31-37）：一句話就叫污鬼出來。\n" +
+                "　• 醫治西門岳母與許多病人（4:38-41）：醫治伴隨宣講天國。",
+              "醫治與赦罪（路 5–6 章）：\n" +
+                "　• 奇妙打魚（5:1-11）：日常工作中經歷主的能力，帶來呼召。\n" +
+                "　• 潔淨長大痲瘋的人（5:12-16）：觸摸被隔絕的人。\n" +
+                "　• 醫治癱子並宣告赦罪（5:17-26）：顯出赦罪的權柄。\n" +
+                "　• 安息日治好枯乾的手（6:6-11）：表明行善與救命合乎上主心意。",
+              "憐憫臨到外邦人與寡婦（路 7 章）：\n" +
+                "　• 百夫長僕人得醫治（7:1-10）：遠距離一句話就成就的權柄，連結他謙卑的信心。\n" +
+                "　• 拿因城寡婦的兒子復活（7:11-17）：主看見寡婦，就憐憫她。",
+              "風浪、鬼魔與死亡（路 8–9 章）：\n" +
+                "　• 平靜風浪（8:22-25）：門徒問：這到底是誰？\n" +
+                "　• 格拉森被鬼附的人得釋放（8:26-39）：把一個被社區隔離的人帶回人群。\n" +
+                "　• 血漏婦人與睚魯女兒（8:40-56）：暗中的痛苦與公開的絕望同得醫治。\n" +
+                "　• 使五餅二魚餵飽五千人（9:10-17）：看顧群眾的身心需要。",
+              "再一次顯出權能與憐憫（路 11; 13; 17–18; 22 章）：\n" +
+                "　• 趕出啞吧鬼（11:14-23）：引發關於權柄與國度的爭論。\n" +
+                "　• 安息日醫治彎腰的婦人（13:10-17）：稱她為亞伯拉罕的女兒，解除綑綁。\n" +
+                "　• 十個長大痲瘋得潔淨（17:11-19）：只有一個回來感謝，而且是撒瑪利亞人。\n" +
+                "　• 使耶利哥城附近的瞎子看見（18:35-43）：信心的呼喊得到回應。\n" +
+                "　• 在被捉拿時醫好被削掉耳朵的人（22:50-51）：即使面對敵人仍然醫治。"
+            ],
+            verses: {
+              ref: "路 7:13；8:50",
+              text:
+                "『主看見那寡婦，就憐憫她…』／『不要怕，只要信…』"
+            },
+            popupVerses: [
+              {
+                ref: "路加福音 7:13-15",
+                text:
+                  "7:13 主看見那寡婦，就憐憫她，對她說：不要哭！\n" +
+                  "7:14 於是前來按著杠，抬的人就站住了。耶穌說：少年人，我吩咐你起來！\n" +
+                  "7:15 那死人就坐起，並且說話，耶穌便把他交給他母親。"
+              },
+              {
+                ref: "路加福音 8:49-50",
+                text:
+                  "8:49 …有人從管會堂的家裡來說：你的女兒死了，不要勞動夫子。\n" +
+                  "8:50 耶穌聽見就對管會堂的說：不要怕，只要信，你的女兒就必得救。"
+              }
+            ],
+            spiritual: [
+              "主對人的看顧，往往從『看見』開始——看見寡婦、看見被隔絕的病者，也看見信心與恐懼。",
+              "神蹟指向的是那位行神蹟者：讓人更加信靠祂，而不是單單追求經歷。",
+              "我們今天關心病患與弱勢群體，也是回應主在福音中所彰顯的憐憫。"
+            ]
+          }
+        },
+        {
+          id: "prayers",
+          title: "禱告生活：在父面前的兒女",
+          ref: "路 3:21; 4:42; 5:15-16; 6:12; 9:18, 28-29; 10:21-22; 11:1-13; 18:1-14; 22:31-32, 39-46; 23:34, 46",
+          note: "從主自己的禱告到比喻",
+          content: {
+            heading: "在重大決定與日常節奏中的禱告",
+            intro:
+              "路加多次記錄主在重要時刻禱告：受洗、揀選門徒、變像、在客西馬尼等。同時，本卷也透過比喻教導門徒恆切、謙卑地禱告。",
+            structure: [
+              "開展事奉之前（路 3:21-22）：\n" +
+                "　• 主在受洗時禱告，天就開了，聖靈降臨在祂身上，父的聲音作見證。",
+              "日常事奉中的退修（路 4:42; 5:15-16）：\n" +
+                "　• 群眾聚集時，祂卻常退到曠野去禱告，保守與父獨處的時間。",
+              "重大決定與門徒塑造（路 6:12; 9:18, 28-29）：\n" +
+                "　• 整夜禱告之後，揀選十二門徒（6:12-16）。\n" +
+                "　• 在問門徒『你們說我是誰』之前正獨自禱告（9:18）。\n" +
+                "　• 變像時禱告，容貌就改變，衣服潔白放光（9:28-29）。",
+              "讚美與教導中的禱告（路 10:21-22; 11:1-13）：\n" +
+                "　• 被聖靈感動歡樂，向父發出讚美（10:21-22）。\n" +
+                "　• 在門徒請求之後，教導主禱文，並用半夜求餅與不斷叩門的比喻教導恆切禱告（11:1-13）。",
+              "比喻中的禱告操練（路 18:1-14）：\n" +
+                "　• 不義官與寡婦（18:1-8）：在看似遲延中仍然不灰心。\n" +
+                "　• 法利賽人與稅吏禱告（18:9-14）：自義的禱告與謙卑求憐憫的對比。",
+              "面對試探與十字架前（路 22:31-32, 39-46; 23:34, 46）：\n" +
+                "　• 為彼得祈求不至於失了信心（22:31-32）。\n" +
+                "　• 客西馬尼園中掙扎順服父旨意（22:39-46）。\n" +
+                "　• 十字架上的禱告：為仇敵求赦；把靈魂交在父手裡（23:34, 46）。"
+            ],
+            verses: {
+              ref: "路 11:2；18:1",
+              text:
+                "『你們禱告的時候，要說：我們在天上的父…』／『常常禱告，不可灰心。』"
+            },
+            popupVerses: [
+              {
+                ref: "路加福音 11:1-4",
+                text:
+                  "11:1 耶穌在一個地方禱告，禱告完了…有個門徒對他說：求主教導我們禱告…\n" +
+                  "11:2 耶穌說：你們禱告的時候，要說：我們在天上的父…"
+              },
+              {
+                ref: "路加福音 18:1-3",
+                text:
+                  "18:1 耶穌設一個比喻，是要人常常禱告，不可灰心。\n" +
+                  "18:2 …有一個城裡有一個官，不懼怕神，也不尊重世人。\n" +
+                  "18:3 那城裡有個寡婦，常到他那裡，說：我有一個對頭，求你給我伸冤。"
+              }
+            ],
+            spiritual: [
+              "禱告不是臨急抱佛腳，而是主在整個事奉生涯中的生活節奏。",
+              "藉著禱告，信徒學習把焦點從環境與自己，轉向那位聽禱告的父。",
+              "恆切與謙卑是禱告的重要態度：不倚靠自己的義，只單單仰望主的憐憫。"
+            ]
+          }
+        },
+        {
+          id: "births",
+          title: "施洗者與救主的出生預告",
+          ref: "路 1:5-80",
+          note: "約翰與主的童年",
+          content: {
+            heading: "兩個嬰孩的預備：悔改的先鋒與拯救的君王",
+            intro:
+              "在靜默的世代，上主先預備施洗者作先鋒，然後宣告救主降生。兩個家庭的故事，反映恩典臨到不可能的人身上。",
+            structure: [
+              "撒迦利亞與以利沙伯：在年老無子、盡本分事奉之中經歷應許（1:5-25）。",
+              "馬利亞蒙召：在卑微處領受莫大的恩典，學習順服與信靠（1:26-38）。",
+              "馬利亞探望以利沙伯：兩個胎兒都在母腹中因主而歡喜（1:39-56）。",
+              "施洗約翰出生與命名：父親的舌頭被解開，讚美上主（1:57-80）。"
+            ],
+            verses: {
+              ref: "路 1:37；1:38",
+              text:
+                "『因為出於上帝的話，沒有一句不帶能力的。』馬利亞說：『…情願照你的話成就在我身上。』"
+            },
+            popupVerses: [
+              {
+                ref: "路加福音 1:37-38",
+                text:
+                  "1:37 因為出於上帝的話，沒有一句不帶能力的。\n" +
+                  "1:38 馬利亞說：我是主的使女，情願照你的話成就在我身上。"
+              }
+            ],
+            spiritual: [
+              "上主在人看為不可能的光景中成就救恩計劃。",
+              "順服不等於完全明白，但願意讓主的旨意臨到自己身上。",
+              "悔改與赦免（約翰的事奉）與救恩的成全（主的工作）不可分割。"
+            ]
+          }
+        },
+        {
+          id: "childhood",
+          title: "主的降生與成長",
+          ref: "路 2 章",
+          note: "伯利恆與聖殿",
+          content: {
+            heading: "在歷史與卑微中降生的救主",
+            intro:
+              "路加把主的降生放在世界歷史的框架裡，同時刻意強調祂進入最卑微的環境，讓卑微的人最先聽見好消息。",
+            structure: [
+              "報名上冊：在帝國權勢下，上主掌管歷史進程（2:1-7）。",
+              "牧人蒙召：天軍宣告『在至高之處榮耀歸與神，在地上平安歸與他所喜悅的人』（2:8-20）。",
+              "在聖殿的奉獻與預言：西面、亞拿見證救恩臨到（2:21-40）。",
+              "十二歲在聖殿中：主以父的事為念，表明祂自覺的使命（2:41-52）。"
+            ],
+            verses: {
+              ref: "路 2:10-11；2:49",
+              text:
+                "『我報給你們大喜的信息，是關乎萬民的…為你們生了救主，就是主基督。』／『豈不知我應當以我父的事為念嗎？』"
+            },
+            popupVerses: [
+              {
+                ref: "路加福音 2:10-11",
+                text:
+                  "2:10 那天使對他們說：不要懼怕！看哪，我報給你們大喜的信息，是關乎萬民的；\n" +
+                  "2:11 因今天在大衛的城裡，為你們生了救主，就是主基督。"
+              },
+              {
+                ref: "路加福音 2:49",
+                text:
+                  "2:49 耶穌說：為什麼找我呢？豈不知我應當以我父的事為念嗎？"
+              }
+            ],
+            spiritual: [
+              "救恩既普及『萬民』，也具體臨到被忽略的小人物。",
+              "在日常家庭與敬虔生活中，主按著智慧和身量一同增長，成為人生命成長的榜樣。",
+              "敬虔的長者（西面、亞拿）提醒我們，在漫長等候中仍可忠心守望。"
+            ]
+          }
+        },
+        {
+          id: "ministry_start",
+          title: "預備與事工開始",
+          ref: "路 3–4 章",
+          note: "約旦河、曠野、拿撒勒",
+          content: {
+            heading: "悔改的呼召、試探的得勝與使命宣告",
+            intro:
+              "路加把施洗約翰的呼召、主在曠野受試探，以及在拿撒勒會堂的宣告連在一起，展示救恩如何以悔改、得勝與釋放為起點。",
+            structure: [
+              "施洗約翰：呼籲結出與悔改相稱的果子，指出那位要來者（3:1-20）。",
+              "主受洗與家譜：聖靈降臨，父的聲音印證祂是愛子（3:21-38）。",
+              "曠野受試探：用經上的話抵擋仇敵，引證對父完全依靠（4:1-13）。",
+              "拿撒勒宣告使命：宣告主恩年的來到，卻被本鄉的人拒絕（4:14-30）。"
+            ],
+            verses: {
+              ref: "路 4:18-19",
+              text:
+                "『主的靈在我身上，因為他用膏膏我…要傳福音給貧窮的人，差遣我報告：被擄得釋放，瞎眼的得看見，叫那受壓制的得自由，報告上帝悅納人的禧年。』"
+            },
+            popupVerses: [
+              {
+                ref: "路加福音 4:18-19",
+                text:
+                  "4:18 主的靈在我身上，因為他用膏膏我，叫我傳福音給貧穷的人，差遣我報告：被擄得釋放，瞎眼的得看見，叫那受壓制的得自由，\n" +
+                  "4:19 報告上帝悅納人的禧年。"
+              }
+            ],
+            spiritual: [
+              "真悔改不單是情緒激動，而是生命方向與果子被更新。",
+              "救主在曠野為信徒得勝試探，顯出祂是真實的人子，也是完全信靠天父的榜樣。",
+              "救恩帶來的是釋放、醫治與更新，特別向貧窮、被壓制、被忽略的一群敞開。"
+            ]
+          }
+        },
+        {
+          id: "galilee",
+          title: "加利利事工與門徒呼召",
+          ref: "路 4:31–9:50",
+          note: "醫治、比喻與跟隨",
+          content: {
+            heading: "在加利利的教導、醫治與門徒塑造",
+            intro:
+              "主在加利利一帶行神蹟、講道與呼召門徒。祂既關心身體的需要，也觸及人心最深的罪與破碎。",
+            structure: [
+              "呼召門徒：彼得、雅各、約翰在打魚的經歷中被呼召（5:1-11）。",
+              "對罪人的憐憫：潔淨痲瘋病人、赦免癱子的罪（5:12-26）。",
+              "愛仇敵與憐憫：平原講章中顛覆常理的價值觀（6 章）。",
+              "同時醫治與拯救：百夫長僕人、拿因城寡婦的兒子、罪婦與法利賽人（7 章）。",
+              "比喻與風浪：撒種、平靜風浪、趕鬼、醫治血漏婦人與睚魯女兒（8 章）。",
+              "差遣十二門徒：從聽道者成為被差的人（9:1-6, 18-50）。"
+            ],
+            verses: {
+              ref: "路 5:10；路 6:27",
+              text:
+                "『不要怕！從今以後，你要得人了。』／『只是我告訴你們這聽道的人：要愛你們的仇敵，善待恨你們的人。』"
+            },
+            popupVerses: [
+              {
+                ref: "路加福音 5:8-11",
+                text:
+                  "5:8 西門彼得看見，就俯伏在耶穌膝前，說：主啊，離開我，我是個罪人！\n" +
+                  "5:9 他和一切同在的人，都驚訝這一網所打的魚；\n" +
+                  "5:10 他的夥伴西庇太的兒子雅各、約翰也是這樣。耶穌對西門說：不要怕！從今以後，你要得人了。\n" +
+                  "5:11 他們把兩隻船攏了岸，就撇下所有的，跟從了耶穌。"
+              }
+            ],
+            spiritual: [
+              "主先進到門徒日常工作的場景，在他們的軟弱與挫敗中呼召他們。",
+              "赦罪與醫治常常並行，提醒我們人的最大需要在於與上主和好。",
+              "門徒不單是聽道者，更是被主差遣，活出天國價值的人。"
+            ]
+          }
+        },
+        {
+          id: "travel",
+          title: "往耶路撒冷的旅程",
+          ref: "路 9:51–19:27",
+          note: "門徒路上的教導",
+          content: {
+            heading: "定意上耶路撒冷：跟隨主的門徒生命塑造",
+            intro:
+              "『耶穌被接上升的日子將到，他就定意向耶路撒冷去。』之後整個敘事重點，不再是神蹟的壯觀，而是門徒生命的內在更新。",
+            structure: [
+              "門徒身份與代價：差遣七十人、好撒瑪利亞人、馬大與馬利亞（10 章）。",
+              "禱告與倚靠：主禱文、求餅比喻、關於憂慮與錢財的提醒（11–12 章）。",
+              "悔改與救恩的喜樂：失羊、失錢、失兒子的比喻（15 章）。",
+              "錢財與忠心：不義管家、財主與拉撒路（16 章）。",
+              "謙卑與感恩：十個長大痲瘋得潔淨，只有一人回來感謝（17:11-19）。",
+              "禱告與謙卑：不義官與寡婦、法利賽人與稅吏禱告（18 章）。",
+              "稅吏撒該：被藐視的人也能被主尋找拯救（19:1-10）。"
+            ],
+            verses: {
+              ref: "路 15:7；路 19:10",
+              text:
+                "『一個罪人悔改，在天上也要這樣為他歡喜…』／『人子來，為要尋找拯救失喪的人。』"
+            },
+            popupVerses: [
+              {
+                ref: "路加福音 15:4-7",
+                text:
+                  "15:4 你們中間誰有一百隻羊，失去一隻，不把這九十九隻撇在曠野，去找那失去的羊直到找著呢？\n" +
+                  "15:5 找著了，就歡歡喜喜地扛在肩上回來；\n" +
+                  "15:6 到了家裡，就請朋友鄰舍來，對他們說：我失去的羊已經找著了，你們和我一同歡喜吧！\n" +
+                  "15:7 我告訴你們，一個罪人悔改，在天上也要這樣為他歡喜，較比為九十九個不用悔改的義人歡喜更大。"
+              },
+              {
+                ref: "路加福音 19:10",
+                text: "19:10 人子來，為要尋找、拯救失喪的人。"
+              }
+            ],
+            spiritual: [
+              "跟隨主是一條往十字架的路，不是追求外在榮耀，而是學習捨己與順服。",
+              "比喻中的父親、牧人與婦人，呈現出上主主動尋找失喪者的心腸。",
+              "金錢、地位、民族偏見都可能攔阻人親近主，門徒需要被主翻轉眼光。"
+            ]
+          }
+        },
+        {
+          id: "passion",
+          title: "最後一週與受難",
+          ref: "路 19:28–23:56",
+          note: "十字架的道路",
+          content: {
+            heading: "從榮耀進城到十字架：溫柔卻堅定的救主",
+            intro:
+              "主一面因城不認識眷顧的時候而流淚，一面堅定走上十字架的道路。路加特別強調祂在受苦中仍然憐憫與赦免。",
+            structure: [
+              "榮耀進城與為城哀哭（19:28-44）。",
+              "聖殿潔淨與爭論：權柄、稅項、復活、彌賽亞的身份（19:45–21 章）。",
+              "預備逾越節與設立聖餐（22:1-38）。",
+              "客西馬尼：在掙扎中順服父的旨意（22:39-53）。",
+              "彼得三次不認主與主回頭看他（22:54-62）。",
+              "受審與被釘：彼拉多、希律、十字架上的禱告與赦免（23 章）。"
+            ],
+            verses: {
+              ref: "路 23:34；22:42",
+              text:
+                "『父啊！赦免他們，因為他們所做的，他們不曉得。』／『然而不要成就我的意思，只要成就你的意思。』"
+            },
+            popupVerses: [
+              {
+                ref: "路加福音 22:41-42",
+                text:
+                  "22:41 於是離開他們約有扔一塊石頭那麼遠，跪下禱告，\n" +
+                  "22:42 說：父啊，你若願意，就把這杯撤去，然而不要成就我的意思，只要成就你的意思。"
+              },
+              {
+                ref: "路加福音 23:33-34",
+                text:
+                  "23:33 到了一個地方，名叫髑髏地，就在那裡把耶穌釘在十字架上，又釘了兩個犯人，一個在左邊，一個在右邊。\n" +
+                  "23:34 當下耶穌說：父啊，赦免他們，因為他們所做的，他們不曉得。"
+              }
+            ],
+            spiritual: [
+              "主在極痛苦中仍為仇敵代求，顯出赦免的心腸是救恩的核心。",
+              "跟隨主的人也會軟弱跌倒（如彼得），但主的目光與憐憫為他預備回轉之路。",
+              "十字架不是失敗，而是上主救恩計劃的高潮。"
+            ]
+          }
+        },
+        {
+          id: "resurrection",
+          title: "復活與差遣",
+          ref: "路 24 章",
+          note: "心被火熱的門徒",
+          content: {
+            heading: "復活主親自開啟心眼與聖經",
+            intro:
+              "復活的一日裡，主向不同的人顯現，重建他們的信心與使命。路加刻劃主如何解開聖經，使門徒心裡火熱。",
+            structure: [
+              "婦女在清晨尋找主的身體，卻得著天使的信息（24:1-12）。",
+              "往以馬忤斯的兩個門徒：主從摩西和眾先知起，把關於自己的話都給他們講解（24:13-35）。",
+              "向眾門徒顯現：親自吃魚，證明真實復活的身體（24:36-43）。",
+              "開他們的心竅，使他們能明白聖經，並差遣他們作見證（24:44-53）。"
+            ],
+            verses: {
+              ref: "路 24:32，24:45-47",
+              text:
+                "『他們彼此說：「在路上，他和我們說話，給我們講解聖經的時候，我們的心豈不是火熱的嗎？」』／『於是耶穌開他們的心竅，使他們能明白聖經…』"
+            },
+            popupVerses: [
+              {
+                ref: "路加福音 24:30-32",
+                text:
+                  "24:30 到了坐席的時候，耶穌拿起餅來，祝謝了，擘開，遞給他們。\n" +
+                  "24:31 他們的眼睛明亮了，這才認出他來；忽然耶穌不見了。\n" +
+                  "24:32 他們彼此說：在路上，他和我們說話，給我們講解聖經的時候，我們的心豈不是火熱的嗎？"
+              },
+              {
+                ref: "路加福音 24:45-47",
+                text:
+                  "24:45 於是耶穌開他們的心竅，使他們能明白聖經，\n" +
+                  "24:46 又對他們說：照經上所寫的，基督必受害，第三日從死裡復活，\n" +
+                  "24:47 並且人要奉他的名傳悔改赦罪的道，從耶路撒冷起直傳到萬邦。"
+              }
+            ],
+            spiritual: [
+              "復活主不是單單給答案，而是在路上同行，讓門徒在交談中被更新。",
+              "明白聖經與領受差遣是連在一起的：被開啟的心，必然成為見證者。",
+              "復活的信息帶來喜樂、敬拜與盼望，驅散恐懼與失望。"
+            ]
+          }
+        }
+      ];
+
+      const characterItems = [
+        {
+          id: "jesus",
+          title: "耶穌（人子、救主）",
+          ref: "全卷",
+          note: "中心人物",
+          content: {
+            heading: "完全的人子，也是拯救失喪者的主",
+            background:
+              "路加特別以『人子』這稱號強調主的完全人性：祂在母腹成胎、成長、飢餓、疲乏、流淚、受試探。祂同時被見證為救主、主基督，在歷史中成就救恩。",
+            traits: [
+              "憐憫：主特別關心貧窮人、婦女、病者、外邦人與邊緣群體。",
+              "禱告：全卷多次描寫祂在重大決定前獨自禱告（如受洗、揀選門徒、變像前）。",
+              "聖靈充滿：祂在聖靈的能力中開始事工，並應許聖靈臨到門徒。",
+              "順服：對父完全順服，直至十字架上仍說『成就你的意思』。"
+            ],
+            keyStories: [
+              "在拿撒勒宣告主恩年的開始（路 4:16-21）。",
+              "赦免罪婦與病人，顯出赦罪的權柄（路 5–7 章）。",
+              "比喻中顯明上主尋找失喪者的心腸（路 15 章）。",
+              "在十字架上為釘祂的人代求，並應許悔改的強盜與祂同在樂園（路 23 章）。"
+            ],
+            spiritual: [
+              "祂完整經歷人的限制與試探，因而能體恤人的軟弱，成為信徒的大祭司與中保。",
+              "祂以禱告與倚靠聖靈作為事奉的動力，為今日事奉者樹立榜樣。",
+              "祂尋找失喪、醫治破碎、赦免罪人，呼召門徒在世界中延續這樣的服事。"
+            ],
+            popupVerses: [
+              {
+                ref: "路加福音 4:16-21",
+                text:
+                  "4:16 耶穌來到拿撒勒，就是他長大的地方，在安息日照他平常的規矩進了會堂，站起來要念聖經。\n" +
+                  "4:17 有人把先知以賽亞的書交給他，他就打開，找到一處寫著說：\n" +
+                  "4:18 主的靈在我身上，因為他用膏膏我…\n" +
+                  "4:21 耶穌對他們說：今天這經應驗在你們耳中了。"
+              }
+            ]
+          }
+        },
+        {
+          id: "john_baptist",
+          title: "施洗約翰",
+          ref: "路 1; 3; 7 章",
+          note: "悔改的先鋒",
+          content: {
+            heading: "在曠野為主預備道路的人",
+            background:
+              "約翰出身於祭司家庭，卻不是留在聖殿體系裡，而是在曠野呼召人悔改、受洗，為救主預備一群迎接祂的人。主稱他為先知中最大的，卻也是願意讓自己退下的一位。",
+            traits: [
+              "認識自己位置：明白自己只是為主預備道路，不搶奪焦點。",
+              "信息尖銳卻出於愛：直指罪與假冒為善，卻是為要叫人得著赦免。",
+              "軟弱中仍尋求：在監牢中也曾疑惑，卻把問題帶到主面前。"
+            ],
+            keyStories: [
+              "出生的神蹟與父親的預言（路 1:57-80）。",
+              "在曠野傳悔改的洗，呼籲結出果子（路 3:1-18）。",
+              "在監獄中差人去問耶穌是不是那要來的（路 7:18-28）。"
+            ],
+            spiritual: [
+              "事奉最大的危險之一，是忘記自己只是指向主的器皿，而不是中心。",
+              "真正愛人的警戒，往往不討好，但卻為對方永恆的益處而發聲。",
+              "當信心遇上黑暗與困惑時，把問題帶到主面前，比壓抑或裝作堅強更寶貴。"
+            ],
+            popupVerses: [
+              {
+                ref: "路加福音 3:3-6",
+                text:
+                  "3:3 他就來到約但河一帶地方，宣講悔改的洗，叫罪得赦。\n" +
+                  "3:4 正如先知以賽亞書上所記載的說：在曠野有人聲喊著說：預備主的道，修直他的路。"
+              },
+              {
+                ref: "路加福音 7:27-28",
+                text:
+                  "7:27 經上記著說：我要差遣我的使者在你前面，預備道路…\n" +
+                  "7:28 …婦人所生的沒有一個大過約翰的。"
+              }
+            ]
+          }
+        },
+        {
+          id: "zacchaeus",
+          title: "撒該",
+          ref: "路 19:1-10",
+          note: "被尋回的稅吏",
+          content: {
+            heading: "從貪婪到慷慨：被主呼喚的稅吏長",
+            background:
+              "撒該是耶利哥的稅吏長，在同胞眼中是貪婪與不義的代表。因身材矮小，他爬上桑樹只為看一看耶穌，卻被主親自點名，生命因此完全改變。",
+            traits: [
+              "好奇與渴慕摻雜：雖然地位高，仍願意放下面子，爬上樹看主。",
+              "面對真光：在主的愛與接納中，坦然承認過去的不義。",
+              "具體悔改：用金錢與行動顯明真實的回轉。"
+            ],
+            keyStories: [
+              "爬上桑樹，只為看主經過（路 19:1-4）。",
+              "被主點名：『撒該，快下來！』（路 19:5-7）。",
+              "在眾人面前承認與補還，主宣告：今天救恩到了這家（路 19:8-10）。"
+            ],
+            spiritual: [
+              "主先到他家裡坐席，顯明救恩不是等人預備好才臨到，而是先臨到才改變生命。",
+              "真正的悔改必然帶來生活具體層面的更新，特別是在最容易跌倒的地方。",
+              "即使被眾人看為『不可救藥』的人，也在主眼中是可尋回的失喪者。"
+            ],
+            popupVerses: [
+              {
+                ref: "路加福音 19:5-7",
+                text:
+                  "19:5 耶穌到了那裡，抬頭一看，對他說：撒該，快下來！今天我必住在你家裡。\n" +
+                  "19:6 他就急忙下來，歡歡喜喜地接待耶穌。\n" +
+                  "19:7 眾人看見，都私下議論說：他竟到罪人家裡去住宿。"
+              },
+              {
+                ref: "路加福音 19:8-10",
+                text:
+                  "19:8 撒該站著對主說：主啊，我把所有的一半給窮人…\n" +
+                  "19:9 耶穌說：今天救恩到了這家…\n" +
+                  "19:10 人子來，為要尋找、拯救失喪的人。"
+              }
+            ]
+          }
+        },
+        {
+          id: "centurion",
+          title: "百夫長",
+          ref: "路 7:1-10; 23:47",
+          note: "外邦人中的信心與見證",
+          content: {
+            heading: "站在邊界上的人：敬畏、謙卑與認信",
+            background:
+              "路加記載兩位百夫長：一位為僕人求主醫治，顯出謙卑與信心；另一位在十字架下見證主是義人。這些不屬猶太群體的人，卻成為信心與認信的榜樣。",
+            traits: [
+              "為下屬著想：願意為僕人奔走求醫治，顯出仁慈與責任心。",
+              "深知自己有限：宣稱自己不配請主到家裡，卻信主一句話就夠。",
+              "在黑暗時刻作見證：十字架下的百夫長承認主是義人。"
+            ],
+            keyStories: [
+              "為僕人求醫治，主稱讚他在以色列中沒見過如此大的信心（路 7:1-10）。",
+              "在十字架下看見主斷氣，便歸榮耀與神（路 23:47）。"
+            ],
+            spiritual: [
+              "信心與出身、背景無必然關係；願意謙卑倚靠主的人，都可以成為榜樣。",
+              "真正的權柄懂得憐憫與服侍，而不是只懂命令別人。",
+              "在最黑暗的時刻仍然認信，往往對旁人有深遠影響。"
+            ],
+            popupVerses: [
+              {
+                ref: "路加福音 7:6-9",
+                text:
+                  "7:6 …百夫長託朋友去見他說：主啊，不要勞動，因你到我舍下，我不敢當；\n" +
+                  "7:7 我也自以為不配去見你，只要你說一句話，我的僕人就必好了。\n" +
+                  "7:9 耶穌聽見這話，就希奇他…說：我告訴你們，這麼大的信心，就是在以色列中，我也沒有見過。"
+              },
+              {
+                ref: "路加福音 23:47",
+                text:
+                  "23:47 百夫長看見所成的事，就歸榮耀與神說：這真是個義人！"
+              }
+            ]
+          }
+        },
+        {
+          id: "mary",
+          title: "馬利亞（主的母親）",
+          ref: "路 1–2 章",
+          note: "謙卑的使女",
+          content: {
+            heading: "在卑微中領受重托的使女",
+            background:
+              "馬利亞是加利利拿撒勒一位年輕女子，從敬虔的猶太傳統中成長。上主揀選她，在未曾出嫁前因聖靈成孕，成為救主在世上的母親。",
+            traits: [
+              "謙卑：自稱『主的使女』，願意被主使用。",
+              "信心：在未能完全明白的情況下，仍然相信上主的話必然成就。",
+              "存記思想：她把關於主的事存在心裡，反覆思想（路 2:19, 51）。"
+            ],
+            keyStories: [
+              "天使報喜的信息（路 1:26-38）。",
+              "與以利沙伯相遇，同聲讚美主（路 1:39-56）。",
+              "在主童年時經歷不明白，卻仍然守在祂身旁（路 2 章）。"
+            ],
+            spiritual: [
+              "上主樂意使用卑微、『看自己為不足道』的人，叫人看見一切都是出於恩典。",
+              "信心並不等於全然理解，而是在不確定中仍選擇順服。",
+              "把主的作為存在心裡、反覆思想，是信徒靈命成熟的重要操練。"
+            ],
+            popupVerses: [
+              {
+                ref: "路加福音 1:46-49",
+                text:
+                  "1:46 馬利亞說：我心尊主為大；\n" +
+                  "1:47 我靈以神我的救主為樂；\n" +
+                  "1:48 因為他顧念他使女的卑微…\n" +
+                  "1:49 那有權能的為我成就了大事，他的名為聖。"
+              }
+            ]
+          }
+        },
+        {
+          id: "peter",
+          title: "彼得",
+          ref: "路 5; 8–9; 22 章",
+          note: "軟弱卻被堅固的門徒",
+          content: {
+            heading: "從打魚之人到得人的漁夫",
+            background:
+              "彼得原是加利利的漁夫，在主的呼召之下，離開漁船，跟隨主。路加記載他既有大膽的信心，也有軟弱跌倒的一面。",
+            traits: [
+              "熱情：願意放下漁船，立刻跟隨主。",
+              "衝動：常出於情緒說話或行動，如宣稱自己絕不跌倒。",
+              "可被重建：即使三次不認主，仍被主的憐憫回復與堅固。"
+            ],
+            keyStories: [
+              "在打魚的失敗中經歷主的大能，被呼召得人（路 5:1-11）。",
+              "在變像山上看見主的榮耀（路 9:28-36）。",
+              "在大祭司院子裡三次不認主，卻在主回頭一看中痛哭（路 22:54-62）。"
+            ],
+            spiritual: [
+              "主呼召門徒，不是因為他們一開始就完全，而是願意在他們生命中作改變的工作。",
+              "軟弱與失敗不必成為結局，只要願意悔改，就仍能被主重用。",
+              "真正的堅強不是靠自己立志，而是倚靠主的代求與恩典。"
+            ],
+            popupVerses: [
+              {
+                ref: "路加福音 5:8-11",
+                text:
+                  "5:8 西門彼得看見，就俯伏在耶穌膝前，說：主啊，離開我，我是個罪人！\n" +
+                  "5:9 他和一切同在的人，都驚訝這一網所打的魚；\n" +
+                  "5:10 …耶穌對西門說：不要怕！從今以後，你要得人了。\n" +
+                  "5:11 他們把兩隻船攏了岸，就撇下所有的，跟從了耶穌。"
+              }
+            ]
+          }
+        },
+        {
+          id: "sinners",
+          title: "稅吏與罪人（隱藏群體）",
+          ref: "路 5; 7; 15; 18–19 章",
+          note: "被藐視的一群",
+          content: {
+            heading: "被主尋找的失喪者",
+            background:
+              "稅吏被同胞視為貪婪、賣國，『罪人』則是道德上被貼上標籤的一群。路加特別強調主主動接近這些人，與他們同席，帶來赦免與更新。",
+            traits: [
+              "被社會排斥，內心卻常帶著羞愧與孤立感。",
+              "當遇見主的恩典時，往往能作出徹底的改變與回應。",
+              "他們的故事揭露宗教驕傲的危險。"
+            ],
+            keyStories: [
+              "利未（馬太）被主呼召，設筵請同類來見主（路 5:27-32）。",
+              "一個有罪的女人在法利賽人家中流淚抹主腳（路 7:36-50）。",
+              "稅吏與法利賽人禱告的比喻（路 18:9-14）。",
+              "撒該在樹上被主呼喚，生命完全被翻轉（路 19:1-10）。"
+            ],
+            spiritual: [
+              "主來不是召義人，乃是召罪人悔改，顯明救恩是給承認自己有需要的人。",
+              "宗教自義的人，最容易看不見自己的真實光景。",
+              "被主尋回的人，會在生活具體方面（如金錢、人際）作出更新的回應。"
+            ],
+            popupVerses: [
+              {
+                ref: "路加福音 5:31-32",
+                text:
+                  "5:31 耶穌對他們說：無病的人用不著醫生，有病的人才用得著。\n" +
+                  "5:32 我來本不是召義人悔改，乃是召罪人悔改。"
+              },
+              {
+                ref: "路加福音 19:8-10",
+                text:
+                  "19:8 撒該站著對主說：主啊，我把所有的一半給窮人；我若訛詐了誰，就還他四倍。\n" +
+                  "19:9 耶穌說：今天救恩到了這家，因為他也是亞伯拉罕的子孫。\n" +
+                  "19:10 人子來，為要尋找、拯救失喪的人。"
+              }
+            ]
+          }
+        }
+      ];
+
+      const wordItems = [
+        {
+          id: "soteria",
+          title: "σωτηρία（sōtēria）",
+          ref: "救恩，拯救",
+          note: "路 1:69, 77; 2:30 等",
+          content: {
+            meaning:
+              "原意有拯救、釋放、保全之意，在路加筆下不單指身體的拯救，更是罪得赦免、與上主恢復關係。",
+            usage:
+              "在路 1 章，這字與『救主』『救恩的角』等語相連，說明救恩是出於上主的主動作為。",
+            spiritual: [
+              "救恩不只是改變環境，更是更新人心與將人帶回上主面前。",
+              "真正的安全感不在於政治或經濟制度，而在於與主的關係。"
+            ]
+          }
+        },
+        {
+          id: "metanoia",
+          title: "μετάνοια（metanoia）",
+          ref: "悔改，心意轉變",
+          note: "路 3:3, 8; 5:32 等",
+          content: {
+            meaning:
+              "字面有『改變心思、方向』之意，不只是情緒的懊悔，而是整個人生方向從自我中心轉向上主。",
+            usage:
+              "施洗約翰宣講悔改的洗，主也說自己來是召罪人悔改。悔改與赦罪是一個完整的過程。",
+            spiritual: [
+              "真悔改有具體的果子——價值觀、關係與行為會逐步被更新。",
+              "信徒一生都在悔改與被更新的路上，每一次回轉都是恩典的記號。"
+            ]
+          }
+        },
+        {
+          id: "ptochos",
+          title: "πτωχός（ptōchos）",
+          ref: "貧窮、困乏的人",
+          note: "路 4:18; 6:20 等",
+          content: {
+            meaning:
+              "原意指乞丐或一無所有的人，在路加中既指物質貧乏的人，也指在靈裡承認自己需要的人。",
+            usage:
+              "主宣告祂被差遣『傳福音給貧窮的人』，並在福分中說『你們貧窮的人有福了』。",
+            spiritual: [
+              "貧窮成為蒙福的起點，是因為這樣的人更容易承認自己需要恩典。",
+              "信徒也被呼召關心實際的貧窮者，讓救恩的好消息在實際關顧中彰顯。"
+            ]
+          }
+        },
+        {
+          id: "pistis",
+          title: "πίστις（pistis）",
+          ref: "信心，信靠",
+          note: "路 7:9, 50; 8:48 等",
+          content: {
+            meaning:
+              "不只是理性同意，而是把自己交托給主的信靠與忠誠。路加經常把信心與得醫治、得赦免聯在一起。",
+            usage:
+              "主稱讚百夫長的信心、罪婦的信心、血漏婦人的信心，這些人共同點是抓住主的恩典，不倚靠自己。",
+            spiritual: [
+              "信心的價值不在於信心本身多大，而在於所信靠的對象是誰。",
+              "信心常在軟弱、絕望中被操練——越看見自己無能，越學習倚靠主。"
+            ]
+          }
+        },
+        {
+          id: "kurios",
+          title: "κύριος（kyrios）",
+          ref: "主，主人",
+          note: "全卷多處出現",
+          content: {
+            meaning:
+              "在日常語境中可指『主人』或『上主』，在路加裡既指出主的身份，也暗示祂與上主同享榮耀與權柄。",
+            usage:
+              "天使稱祂為『主基督』（路 2:11），門徒也稱祂為主。比喻裡的『主人』往往影射上主的主權。",
+            spiritual: [
+              "稱祂為『主』不只是稱呼，而是承認祂在生命中擁有最終主權。",
+              "跟隨主的生活，就是學習在各方面都向祂說：願你的旨意成就。"
+            ]
+          }
+        }
+      ];
+
+      const themeItems = [
+        {
+          id: "salvation_all",
+          title: "救恩臨到萬民",
+          ref: "路 2:10-11；24:47",
+          note: "普世性",
+          content: {
+            summary:
+              "從天使宣告『關乎萬民』開始，到最後差遣門徒『從耶路撒冷起，直傳到萬邦』，路加不斷顯示救恩打破民族、階級與性別的界線。",
+            points: [
+              "記載外邦人百夫長、撒瑪利亞人、居住在邊緣地帶的人如何被主接納。",
+              "婦女在本卷中多次出現，並在關鍵時刻成為見證者（如在十字架與墳墓前）。",
+              "窮人、被輕視的人常成為比喻與故事的主角，彰顯上主翻轉的恩典。"
+            ],
+            application: [
+              "今日的信徒也被呼召打破偏見與界線，把福音帶到被忽略的一群。",
+              "教會的生命應該成為一個讓不同背景的人都能被接納與更新的群體。"
+            ]
+          }
+        },
+        {
+          id: "spirit_prayer",
+          title: "聖靈工作與禱告生活",
+          ref: "路 3–4；6:12；11:1-13 等",
+          note: "能力與親近",
+          content: {
+            summary:
+              "路加既強調聖靈的能力，也描寫主在關鍵時刻專心禱告，顯出事奉與生活必須同時倚靠聖靈與親近上主。",
+            points: [
+              "主在受洗、曠野受試探、開始事工前，都被聖靈充滿並專心禱告。",
+              "主教門徒禱告，不單給他們禱詞，更鼓勵他們持續祈求、尋找、叩門。",
+              "在比喻中，父樂意把『好東西』、特別是聖靈給求他的人。"
+            ],
+            application: [
+              "事奉不能單靠熱情或恩賜，而是要在禱告與聖靈的引導中前行。",
+              "個人與群體都需要預留空間，學習像主那樣退到曠野禱告、尋求父的心意。"
+            ]
+          }
+        },
+        {
+          id: "money",
+          title: "錢財與真實的富足",
+          ref: "路 12; 16; 18–19 章",
+          note: "財主與拉撒路",
+          content: {
+            summary:
+              "路加多次用錢財的故事提醒讀者：財富既是恩典，也是試探。真正的富足不在於擁有多少，而在於向上主與人的關係如何。",
+            points: [
+              "無知財主只累積財物，卻不『向神富足』（路 12:16-21）。",
+              "不義管家的比喻提醒信徒要用今世的錢財作屬天的投資（路 16:1-13）。",
+              "財主與拉撒路的故事揭露忽略鄰舍的罪（路 16:19-31）。",
+              "撒該遇見主之後，對金錢的態度徹底改變（路 19:1-10）。"
+            ],
+            application: [
+              "信徒不是錢財的奴僕，而是管家，要忠心管理主所託付的一切。",
+              "在慷慨分享、關心貧困者之中，彰顯天國的價值與真實的富足。"
+            ]
+          }
+        }
+      ];
+
+      const tabs = {
+        outline: outlineItems,
+        characters: characterItems,
+        words: wordItems,
+        themes: themeItems
+      };
+
+      const listLabelText = {
+        outline: "經文分段",
+        characters: "重要人物",
+        words: "原文詞彙",
+        themes: "屬靈主題"
+      };
+
+      const pillText = {
+        outline: "分段與重點",
+        characters: "人物背景與屬靈提醒",
+        words: "詞義與應用",
+        themes: "主題與實踐"
+      };
+
+      let currentTab = "outline";
+      let currentId = outlineItems[0].id;
+
+      const tabRow = document.getElementById("tab-row");
+      const sidebarList = document.getElementById("sidebar-list");
+      const listLabel = document.getElementById("list-label");
+      const panelTitle = document.getElementById("panel-title");
+      const panelSubtitle = document.getElementById("panel-subtitle");
+      const pillEl = document.getElementById("pill-text");
+      const contentScroll = document.getElementById("content-scroll");
+
+      function renderSidebar() {
+        const data = tabs[currentTab];
+        sidebarList.innerHTML = "";
+        listLabel.textContent = listLabelText[currentTab];
+
+        data.forEach((item) => {
+          const div = document.createElement("div");
+          div.className = "list-item" + (item.id === currentId ? " active" : "");
+          div.dataset.id = item.id;
+
+          div.innerHTML = `
+            <div class="list-item-title">${item.title}</div>
+            <div class="list-item-ref">${item.ref}</div>
+            ${item.note ? `<div class="list-item-note">${item.note}</div>` : ""}
+          `;
+
+          div.addEventListener("click", () => {
+            currentId = item.id;
+            renderSidebar();
+            renderContent();
+          });
+
+          sidebarList.appendChild(div);
+        });
+      }
+
+      function renderContent() {
+        const data = tabs[currentTab];
+        const item = data.find((x) => x.id === currentId) ?? data[0];
+
+        panelTitle.textContent = item.title;
+        panelSubtitle.textContent = item.ref + (item.note ? " ｜ " + item.note : "");
+        pillEl.textContent = pillText[currentTab];
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "fade-enter";
+
+        if (currentTab === "outline") {
+          const c = item.content;
+          wrapper.innerHTML = `
+            <h2>${c.heading}</h2>
+            <p>${c.intro}</p>
+            <div class="chips">
+              <span class="chip">分段重點</span>
+              <span class="chip">經文觀察</span>
+              <span class="chip">生命回應</span>
+            </div>
+            <hr class="section-divider" />
+            <div class="grid-2">
+              <div>
+                <div class="label">結構與重點</div>
+                ${c.structure
+                  .map(
+                    (line) => `
+                  <p>• ${line}</p>
+                `
+                  )
+                  .join("")}
+              </div>
+              <div>
+                <div class="card soft">
+                  <h4>關鍵經文</h4>
+                  <div class="verse-box">
+                    <div class="verse-ref">${c.verses.ref}</div>
+                    <div>${c.verses.text}</div>
+                  </div>
+                  <button class="verse-btn" type="button" data-verse-kind="outline">
+                    <span class="icon">🔍</span>
+                    閱讀相關經文
+                  </button>
+                  <p class="small">
+                    建議：可打開紙本聖經或電子版，把整段經文細讀，
+                    用螢光筆標記重複字詞與轉折，幫助掌握段落焦點。
+                  </p>
+                </div>
+              </div>
+            </div>
+            <hr class="section-divider" />
+            <div class="label">屬靈反思</div>
+            ${c.spiritual
+              .map(
+                (line) => `
+              <p>◆ ${line}</p>
+            `
+              )
+              .join("")}
+          `;
+        } else if (currentTab === "characters") {
+          const c = item.content;
+          wrapper.innerHTML = `
+            <h2>${c.heading}</h2>
+            <p>${c.background}</p>
+            <div class="chips">
+              <span class="chip">人物背景</span>
+              <span class="chip">性格與學習</span>
+              <span class="chip">屬靈提醒</span>
+            </div>
+            <hr class="section-divider" />
+            <div class="grid-2">
+              <div>
+                <div class="card">
+                  <h4>人物特色</h4>
+                  ${c.traits
+                    .map(
+                      (t) => `
+                    <p>• ${t}</p>
+                  `
+                    )
+                    .join("")}
+                </div>
+                <div class="card soft" style="margin-top:6px;">
+                  <h4>出現重點經文</h4>
+                  ${c.keyStories
+                    .map(
+                      (s) => `
+                    <p>• ${s}</p>
+                  `
+                    )
+                    .join("")}
+                  <button class="verse-btn" type="button" data-verse-kind="character">
+                    <span class="icon">📖</span>
+                    選讀人物相關經文
+                  </button>
+                </div>
+              </div>
+              <div>
+                <div class="label">屬靈反思與應用</div>
+                ${c.spiritual
+                  .map(
+                    (line) => `
+                  <p>◆ ${line}</p>
+                `
+                  )
+                  .join("")}
+                <p class="small">
+                  小建議：可以嘗試把自己代入此人處境，寫下一段禱告回應，
+                  思考若你在他的光景裡，會如何回應主的呼召與提醒。
+                </p>
+              </div>
+            </div>
+          `;
+        } else if (currentTab === "words") {
+          const c = item.content;
+          wrapper.innerHTML = `
+            <h2>${item.title}</h2>
+            <p class="monospace">${item.ref}</p>
+            <div class="chips">
+              <span class="chip">原文詞義</span>
+              <span class="chip">在路加中的用法</span>
+              <span class="chip">生命應用</span>
+            </div>
+            <hr class="section-divider" />
+            <div class="grid-2">
+              <div>
+                <div class="card">
+                  <h4>詞義說明</h4>
+                  <p>${c.meaning}</p>
+                  <p>${c.usage}</p>
+                </div>
+              </div>
+              <div>
+                <div class="card soft">
+                  <h4>靈修反思</h4>
+                  ${c.spiritual
+                    .map(
+                      (line) => `
+                    <p>◆ ${line}</p>
+                  `
+                    )
+                    .join("")}
+                  <p class="small">
+                    可以在讀經時用筆記紀錄每次出現這個字的上下文與重點，
+                    幫助我們更整全地理解經文的用詞與信息。
+                  </p>
+                </div>
+              </div>
+            </div>
+          `;
+        } else if (currentTab === "themes") {
+          const c = item.content;
+          wrapper.innerHTML = `
+            <h2>${item.title}</h2>
+            <p>${c.summary}</p>
+            <div class="chips">
+              <span class="chip">整卷主題</span>
+              <span class="chip">神人關係</span>
+              <span class="chip">生活應用</span>
+            </div>
+            <hr class="section-divider" />
+            <div class="grid-2">
+              <div>
+                <div class="card">
+                  <h4>經文重點</h4>
+                  ${c.points
+                    .map(
+                      (line) => `
+                    <p>• ${line}</p>
+                  `
+                    )
+                    .join("")}
+                </div>
+              </div>
+              <div>
+                <div class="card soft">
+                  <h4>實際應用</h4>
+                  ${c.application
+                    .map(
+                      (line) => `
+                    <p>◆ ${line}</p>
+                  `
+                    )
+                    .join("")}
+                  <p class="small">
+                    可嘗試為此主題設計一個簡短分享或小組聚會，
+                    讓經文從查考走向彼此勉勵與實際行動。
+                  </p>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        contentScroll.innerHTML = "";
+        contentScroll.appendChild(wrapper);
+
+        const verseBtn = wrapper.querySelector(".verse-btn");
+        if (verseBtn) {
+          verseBtn.addEventListener("click", () => {
+            if (currentTab === "outline") {
+              const c = item.content;
+              const list = c.popupVerses || (c.verses ? [c.verses] : []);
+              openVerseModal(item.title, list);
+            } else if (currentTab === "characters") {
+              const c = item.content;
+              const list = c.popupVerses || [];
+              openVerseModal(item.title, list);
+            } else if (currentTab === "words") {
+              const c = item.content;
+              const list = [{ ref: item.ref, text: c.meaning + "\n\n" + c.usage }];
+              openVerseModal(item.title, list);
+            } else if (currentTab === "themes") {
+              const c = item.content;
+              const list = [{ ref: item.ref, text: c.summary }];
+              openVerseModal(item.title, list);
+            }
+          });
+        }
+
+        requestAnimationFrame(() => {
+          wrapper.classList.add("fade-enter-active");
+        });
+      }
+
+      const verseModal = document.getElementById("verse-modal");
+      const verseModalRef = document.getElementById("verse-modal-ref");
+      const verseModalBody = document.getElementById("verse-modal-body");
+
+      function openVerseModal(title, verseList) {
+        if (!Array.isArray(verseList) || verseList.length === 0) return;
+        const lines = [];
+        const refs = [];
+        verseList.forEach((v) => {
+          if (v.ref) refs.push(v.ref);
+          if (v.text) {
+            const parts = String(v.text).split("\n");
+            parts.forEach((p) => {
+              if (p.trim()) lines.push(`<p>${p}</p>`);
+            });
+          }
+        });
+        document.getElementById("verse-modal-title").textContent = title + "｜相關經文";
+        verseModalRef.textContent = refs.join("；");
+        verseModalBody.innerHTML = lines.join("");
+        verseModal.classList.add("visible");
+        verseModal.setAttribute("aria-hidden", "false");
+      }
+
+      function closeVerseModal() {
+        verseModal.classList.remove("visible");
+        verseModal.setAttribute("aria-hidden", "true");
+      }
+
+      verseModal.addEventListener("click", (event) => {
+        const target = event.target;
+        if (target.matches("[data-modal-close]")) {
+          closeVerseModal();
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          closeVerseModal();
+        }
+      });
+
+      tabRow.addEventListener("click", (event) => {
+        const btn = event.target.closest(".tab-button");
+        if (!btn) return;
+        const tab = btn.dataset.tab;
+        if (!tab || tab === currentTab) return;
+
+        currentTab = tab;
+        const data = tabs[currentTab];
+        currentId = data[0]?.id;
+
+        document.querySelectorAll(".tab-button").forEach((el) => {
+          el.classList.toggle("active", el.dataset.tab === currentTab);
+        });
+
+        renderSidebar();
+        renderContent();
+      });
+
+      renderSidebar();
+      renderContent();
+    </script>
+  </body>
+</html>
+
+
