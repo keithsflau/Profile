@@ -1,0 +1,146 @@
+.lifelines {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.lifelines-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  text-align: center;
+  color: #ffd700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.lifeline-item {
+  position: relative;
+}
+
+.lifeline-button {
+  width: 100%;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lifeline-button:hover:not(:disabled) {
+  background: rgba(255, 215, 0, 0.2);
+  border-color: #ffd700;
+  transform: scale(1.05);
+}
+
+.lifeline-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.lifeline-button.used {
+  background: rgba(128, 128, 128, 0.3);
+  border-color: #888;
+  opacity: 0.6;
+}
+
+.lifeline-icon {
+  font-size: 2rem;
+}
+
+.lifeline-label {
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.used-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  font-weight: bold;
+  pointer-events: none;
+}
+
+.lifeline-result {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(255, 215, 0, 0.2);
+  border: 2px solid #ffd700;
+  border-radius: 10px;
+  animation: slideDown 0.3s ease;
+}
+
+.result-title {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #ffd700;
+}
+
+.result-content {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.audience-poll {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.poll-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.poll-label {
+  font-weight: bold;
+  width: 30px;
+  color: #ffd700;
+}
+
+.poll-bar-container {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  height: 25px;
+  position: relative;
+  overflow: hidden;
+}
+
+.poll-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #ffd700, #ffed4e);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 0.5rem;
+  color: #333;
+  font-weight: bold;
+  font-size: 0.9rem;
+  transition: width 1s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

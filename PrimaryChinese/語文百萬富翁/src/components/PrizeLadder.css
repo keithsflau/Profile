@@ -1,0 +1,80 @@
+.prize-ladder {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.ladder-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  text-align: center;
+  color: #ffd700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.ladder-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ladder-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.ladder-item.passed {
+  background: rgba(0, 255, 0, 0.2);
+  border-color: #00ff00;
+  opacity: 0.7;
+}
+
+.ladder-item.current {
+  background: rgba(255, 215, 0, 0.4);
+  border-color: #ffd700;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+  transform: scale(1.05);
+  animation: glow 2s ease-in-out infinite;
+}
+
+.ladder-item.safe {
+  border-left: 4px solid #00ff00;
+}
+
+.level-number {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #ffd700;
+  min-width: 30px;
+}
+
+.prize-amount {
+  flex: 1;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.safe-marker {
+  font-size: 0.7rem;
+  color: #00ff00;
+  font-weight: bold;
+  margin-left: 0.5rem;
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+  }
+}
+
