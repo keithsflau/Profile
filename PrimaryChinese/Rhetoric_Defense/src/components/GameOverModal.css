@@ -1,0 +1,91 @@
+.game-over-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.game-over-modal {
+  background: linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(15, 52, 96, 0.95) 100%);
+  padding: 40px 60px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.game-over-title {
+  font-size: 48px;
+  color: #fff;
+  margin-bottom: 30px;
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+  font-weight: 700;
+}
+
+.final-stats {
+  margin-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.final-score {
+  font-size: 32px;
+  color: #fff;
+}
+
+.score-label {
+  margin-right: 15px;
+}
+
+.score-value {
+  font-size: 48px;
+  font-weight: 700;
+  color: #FFD700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.final-level {
+  font-size: 28px;
+  color: #fff;
+}
+
+.final-level .level-label {
+  margin-right: 15px;
+}
+
+.final-level .level-value {
+  font-size: 40px;
+  font-weight: 700;
+  color: #00CED1;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  padding: 5px 15px;
+  background: rgba(0, 206, 209, 0.2);
+  border-radius: 8px;
+  border: 2px solid rgba(0, 206, 209, 0.5);
+}
+
+.restart-button {
+  padding: 15px 40px;
+  font-size: 24px;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  font-family: 'Microsoft JhengHei', 'PingFang TC', 'Heiti TC', sans-serif;
+  transition: all 0.3s ease;
+}
+
+.restart-button:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+}

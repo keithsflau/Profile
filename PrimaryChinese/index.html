@@ -1,234 +1,276 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>小學中文 | Pri-Chi - Education Engineering Portfolio</title>
-  <meta name="description" content="中文學習遊戲與資源 | Chinese Language Learning Resources">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    }
-    .gradient-bg {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 20% 20%, rgba(251, 191, 36, 0.15), transparent 35%),
-                  radial-gradient(circle at 80% 0%, rgba(249, 115, 22, 0.15), transparent 30%),
-                  radial-gradient(circle at 50% 80%, rgba(239, 68, 68, 0.12), transparent 30%);
-      filter: blur(60px);
-      opacity: 0.9;
-      animation: gradientShift 8s ease-in-out infinite;
-    }
-    @keyframes gradientShift {
-      0%, 100% { 
-        background: radial-gradient(circle at 20% 20%, rgba(251, 191, 36, 0.15), transparent 35%),
-                    radial-gradient(circle at 80% 0%, rgba(249, 115, 22, 0.15), transparent 30%),
-                    radial-gradient(circle at 50% 80%, rgba(239, 68, 68, 0.12), transparent 30%);
-      }
-      50% { 
-        background: radial-gradient(circle at 80% 80%, rgba(251, 191, 36, 0.2), transparent 35%),
-                    radial-gradient(circle at 20% 0%, rgba(249, 115, 22, 0.2), transparent 30%),
-                    radial-gradient(circle at 50% 20%, rgba(239, 68, 68, 0.15), transparent 30%);
-      }
-    }
-    @keyframes float {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      50% { transform: translateY(-15px) rotate(3deg); }
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.8; transform: scale(1.1); }
-    }
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-    @keyframes sparkle {
-      0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
-      50% { opacity: 1; transform: scale(1) rotate(180deg); }
-    }
-    @keyframes cardEntrance {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .glass-card {
-      backdrop-filter: blur(10px);
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      transition: all 0.3s ease;
-      animation: cardEntrance 0.6s ease-out forwards;
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    .glass-card:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(251, 191, 36, 0.4);
-      transform: translateY(-4px) scale(1.02);
-      box-shadow: 0 10px 30px rgba(251, 191, 36, 0.3);
-    }
-    .float-animation {
-      animation: float 4s ease-in-out infinite;
-    }
-    .pulse-animation {
-      animation: pulse 2s ease-in-out infinite;
-    }
-    .bounce-animation {
-      animation: bounce 2s ease-in-out infinite;
-    }
-    .sparkle {
-      position: absolute;
-      width: 4px;
-      height: 4px;
-      background: white;
-      border-radius: 50%;
-      opacity: 0;
-      animation: sparkle 3s ease-in-out infinite;
-    }
-    .hover-glow {
-      transition: all 0.3s ease;
-    }
-    .hover-glow:hover {
-      box-shadow: 0 0 30px rgba(251, 191, 36, 0.5);
-      transform: scale(1.05);
-    }
-    .glass-card:nth-child(1) { animation-delay: 0.1s; }
-    .glass-card:nth-child(2) { animation-delay: 0.3s; }
-    .glass-card:nth-child(3) { animation-delay: 0.5s; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小學中文 | Primary Chinese</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.9; transform: scale(1.05); }
+        }
+        .float-animation {
+            animation: float 5s ease-in-out infinite;
+        }
+        .pulse-animation {
+            animation: pulse 3s ease-in-out infinite;
+        }
+        .glass-card {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(251, 146, 60, 0.3);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 10px 30px rgba(251, 146, 60, 0.15);
+        }
+    </style>
 </head>
-<body class="antialiased text-white bg-slate-950 min-h-screen overflow-x-hidden">
-  <div class="relative min-h-screen overflow-hidden">
-    <div aria-hidden="true" class="gradient-bg pointer-events-none"></div>
-    
-    <!-- Sparkles -->
-    <div class="sparkle" style="top: 20%; left: 15%; animation-delay: 0s;"></div>
-    <div class="sparkle" style="top: 50%; left: 80%; animation-delay: 1s;"></div>
-    <div class="sparkle" style="top: 70%; left: 25%; animation-delay: 2s;"></div>
-    
-    <div class="relative z-10">
-      
-      <!-- Header -->
-      <header class="px-6 py-8 sm:py-12">
-        <div class="mx-auto max-w-7xl">
-          <div class="flex items-center justify-between mb-8">
-            <a href="../index.html" class="text-white/70 hover:text-white transition-all duration-300 flex items-center gap-2 group hover:scale-110">
-              <svg class="w-5 h-5 group-hover:-translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-              </svg>
-              <span class="text-sm">返回主頁</span>
-            </a>
-          </div>
-          <div class="text-center space-y-6">
-            <div class="relative mx-auto w-24 h-24">
-              <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-amber-400 via-orange-500 to-red-600 flex items-center justify-center float-animation shadow-2xl shadow-amber-500/50 hover-glow">
-                <svg class="w-12 h-12 text-white pulse-animation" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15.5A2.5 2.5 0 0 1 17.5 21H6.5A2.5 2.5 0 0 1 4 18.5V5.5z"/>
+<body class="bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 min-h-screen">
+    <div class="container mx-auto px-4 py-12">
+        <!-- Header -->
+        <header class="text-center mb-12">
+            <div class="relative mx-auto w-24 h-24 mb-6">
+                <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-amber-400 via-orange-500 to-red-600 flex items-center justify-center float-animation shadow-2xl shadow-amber-500/50">
+                    <svg class="w-12 h-12 text-white pulse-animation" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15.5A2.5 2.5 0 0 1 17.5 21H6.5A2.5 2.5 0 0 1 4 18.5V5.5z"/>
+                    </svg>
+                </div>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 mb-4">
+                小學中文學習資源
+            </h1>
+            <p class="text-lg text-slate-600">Primary Chinese Learning Resources</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-6xl mx-auto">
+            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <!-- 語文大富翁 Game Card -->
+                <a href="chinesemonopoly/index.html" class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
+                    <div class="space-y-4">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 via-orange-500 to-red-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                            <span class="text-2xl">🎲</span>
+                        </div>
+                        <div class="text-center">
+                            <h3 class="text-xl font-semibold mb-1 group-hover:text-amber-600 transition-colors text-slate-900">語文大富翁</h3>
+                            <p class="text-xs text-slate-600 mb-1">中一中文學習遊戲</p>
+                            <p class="text-xs text-slate-500">Chinese Language Monopoly</p>
+                        </div>
+                        <div class="pt-2 space-y-2">
+                            <p class="text-xs text-slate-700 text-center">
+                                通過大富翁遊戲學習中文詞彙、成語、語法和閱讀理解。
+                            </p>
+                            <div class="flex flex-wrap gap-1 justify-center">
+                                <span class="text-xs px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full">詞彙</span>
+                                <span class="text-xs px-2 py-0.5 bg-orange-100 text-orange-700 rounded-full">成語</span>
+                                <span class="text-xs px-2 py-0.5 bg-red-100 text-red-700 rounded-full">語法</span>
+                                <span class="text-xs px-2 py-0.5 bg-pink-100 text-pink-700 rounded-full">閱讀</span>
+                            </div>
+                        </div>
+                        <div class="pt-2 text-center">
+                            <span class="text-xs text-amber-600 group-hover:text-amber-700 font-semibold">開始遊戲 →</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 語文百萬富翁 Game Card -->
+                <a href="millionaire/index.html" class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
+                    <div class="space-y-4">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-400 via-purple-500 to-indigo-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                            <span class="text-2xl">💰</span>
+                        </div>
+                        <div class="text-center">
+                            <h3 class="text-xl font-semibold mb-1 group-hover:text-blue-600 transition-colors text-slate-900">語文百萬富翁</h3>
+                            <p class="text-xs text-slate-600 mb-1">中一中文學習遊戲</p>
+                            <p class="text-xs text-slate-500">Chinese Millionaire</p>
+                        </div>
+                        <div class="pt-2 space-y-2">
+                            <p class="text-xs text-slate-700 text-center">
+                                經典的「誰想成為百萬富翁」遊戲玩法，15道中文題目，最高獎金 $1,000,000。
+                            </p>
+                            <div class="flex flex-wrap gap-1 justify-center">
+                                <span class="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full">問答</span>
+                                <span class="text-xs px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full">生命線</span>
+                                <span class="text-xs px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded-full">3D效果</span>
+                            </div>
+                        </div>
+                        <div class="pt-2 text-center">
+                            <span class="text-xs text-blue-600 group-hover:text-blue-700 font-semibold">開始遊戲 →</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 修辭防衛戰 Game Card -->
+                <a href="Rhetoric_Defense/index.html" class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
+                    <div class="space-y-4">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-400 via-emerald-500 to-teal-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                            <span class="text-2xl">🛡️</span>
+                        </div>
+                        <div class="text-center">
+                            <h3 class="text-xl font-semibold mb-1 group-hover:text-green-600 transition-colors text-slate-900">修辭防衛戰</h3>
+                            <p class="text-xs text-slate-600 mb-1">中一中文學習遊戲</p>
+                            <p class="text-xs text-slate-500">Rhetoric Defense</p>
+                        </div>
+                        <div class="pt-2 space-y-2">
+                            <p class="text-xs text-slate-700 text-center">
+                                塔防風格遊戲，學習修辭手法：擬人、比喻、誇張、排比。
+                            </p>
+                            <div class="flex flex-wrap gap-1 justify-center">
+                                <span class="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded-full">擬人</span>
+                                <span class="text-xs px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full">比喻</span>
+                                <span class="text-xs px-2 py-0.5 bg-teal-100 text-teal-700 rounded-full">誇張</span>
+                                <span class="text-xs px-2 py-0.5 bg-cyan-100 text-cyan-700 rounded-full">排比</span>
+                            </div>
+                        </div>
+                        <div class="pt-2 text-center">
+                            <span class="text-xs text-green-600 group-hover:text-green-700 font-semibold">開始遊戲 →</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 故事骰子生成器 Game Card -->
+                <a href="story_dice/index.html" class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
+                    <div class="space-y-4">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-400 via-rose-500 to-red-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                            <span class="text-2xl">🎲</span>
+                        </div>
+                        <div class="text-center">
+                            <h3 class="text-xl font-semibold mb-1 group-hover:text-pink-600 transition-colors text-slate-900">故事骰子生成器</h3>
+                            <p class="text-xs text-slate-600 mb-1">創意寫作工具</p>
+                            <p class="text-xs text-slate-500">Story Dice Generator</p>
+                        </div>
+                        <div class="pt-2 space-y-2">
+                            <p class="text-xs text-slate-700 text-center">
+                                通過隨機生成的故事元素（人物、地點、物品、衝突）來激發創作靈感。
+                            </p>
+                            <div class="flex flex-wrap gap-1 justify-center">
+                                <span class="text-xs px-2 py-0.5 bg-pink-100 text-pink-700 rounded-full">人物</span>
+                                <span class="text-xs px-2 py-0.5 bg-rose-100 text-rose-700 rounded-full">地點</span>
+                                <span class="text-xs px-2 py-0.5 bg-red-100 text-red-700 rounded-full">物品</span>
+                                <span class="text-xs px-2 py-0.5 bg-fuchsia-100 text-fuchsia-700 rounded-full">衝突</span>
+                            </div>
+                        </div>
+                        <div class="pt-2 text-center">
+                            <span class="text-xs text-pink-600 group-hover:text-pink-700 font-semibold">開始使用 →</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 錯別字手術室 Game Card -->
+                <a href="typo_surgeon/index.html" class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
+                    <div class="space-y-4">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-400 via-blue-500 to-indigo-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                            <span class="text-2xl">⚕️</span>
+                        </div>
+                        <div class="text-center">
+                            <h3 class="text-xl font-semibold mb-1 group-hover:text-cyan-600 transition-colors text-slate-900">錯別字手術室</h3>
+                            <p class="text-xs text-slate-600 mb-1">中一中文學習遊戲</p>
+                            <p class="text-xs text-slate-500">Typo Surgeon</p>
+                        </div>
+                        <div class="pt-2 space-y-2">
+                            <p class="text-xs text-slate-700 text-center">
+                                扮演「文字醫生」，找出文章中的錯別字並進行修正。
+                            </p>
+                            <div class="flex flex-wrap gap-1 justify-center">
+                                <span class="text-xs px-2 py-0.5 bg-cyan-100 text-cyan-700 rounded-full">錯別字</span>
+                                <span class="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full">修正</span>
+                                <span class="text-xs px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded-full">學習</span>
+                            </div>
+                        </div>
+                        <div class="pt-2 text-center">
+                            <span class="text-xs text-cyan-600 group-hover:text-cyan-700 font-semibold">開始遊戲 →</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 虛詞大搜查 Game Card -->
+                <a href="ac_particle_fill_in/index.html" class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
+                    <div class="space-y-4">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-yellow-400 via-amber-500 to-orange-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                            <span class="text-2xl">🔍</span>
+                        </div>
+                        <div class="text-center">
+                            <h3 class="text-xl font-semibold mb-1 group-hover:text-yellow-600 transition-colors text-slate-900">虛詞大搜查</h3>
+                            <p class="text-xs text-slate-600 mb-1">古文虛詞學習</p>
+                            <p class="text-xs text-slate-500">Ancient Chinese Particle</p>
+                        </div>
+                        <div class="pt-2 space-y-2">
+                            <p class="text-xs text-slate-700 text-center">
+                                通過拖放遊戲學習古文虛詞的用法，提升古文閱讀能力。
+                            </p>
+                            <div class="flex flex-wrap gap-1 justify-center">
+                                <span class="text-xs px-2 py-0.5 bg-yellow-100 text-yellow-700 rounded-full">虛詞</span>
+                                <span class="text-xs px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full">古文</span>
+                                <span class="text-xs px-2 py-0.5 bg-orange-100 text-orange-700 rounded-full">拖放</span>
+                            </div>
+                        </div>
+                        <div class="pt-2 text-center">
+                            <span class="text-xs text-yellow-600 group-hover:text-yellow-700 font-semibold">開始遊戲 →</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 成語動物園競賽 Game Card -->
+                <a href="idiom-zoo-race/index.html" class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
+                    <div class="space-y-4">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-400 via-purple-500 to-fuchsia-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                            <span class="text-2xl">🏁</span>
+                        </div>
+                        <div class="text-center">
+                            <h3 class="text-xl font-semibold mb-1 group-hover:text-violet-600 transition-colors text-slate-900">成語動物園競賽</h3>
+                            <p class="text-xs text-slate-600 mb-1">成語學習遊戲</p>
+                            <p class="text-xs text-slate-500">Idiom Zoo Race</p>
+                        </div>
+                        <div class="pt-2 space-y-2">
+                            <p class="text-xs text-slate-700 text-center">
+                                通過競賽遊戲學習成語，寓教於樂。
+                            </p>
+                            <div class="flex flex-wrap gap-1 justify-center">
+                                <span class="text-xs px-2 py-0.5 bg-violet-100 text-violet-700 rounded-full">成語</span>
+                                <span class="text-xs px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full">競賽</span>
+                                <span class="text-xs px-2 py-0.5 bg-fuchsia-100 text-fuchsia-700 rounded-full">學習</span>
+                            </div>
+                        </div>
+                        <div class="pt-2 text-center">
+                            <span class="text-xs text-violet-600 group-hover:text-violet-700 font-semibold">開始遊戲 →</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </main>
+
+        <!-- Back to Home -->
+        <div class="text-center mt-12">
+            <a href="../index.html" class="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                 </svg>
-              </div>
-            </div>
-            <div>
-              <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
-                <span class="bg-gradient-to-r from-amber-400 via-orange-400 to-red-400 bg-clip-text text-transparent pulse-animation inline-block">
-                  小學中文 | Pri-Chi
-                </span>
-              </h1>
-              <div class="mt-6 flex items-center justify-center gap-4 text-sm text-white/60 flex-wrap">
-                <span class="px-3 py-1 bg-amber-500/10 rounded-lg hover:bg-amber-500/20 transition-all duration-300 hover:scale-110 cursor-default bounce-animation" style="animation-delay: 0s;">學習</span>
-                <span class="px-3 py-1 bg-orange-500/10 rounded-lg hover:bg-orange-500/20 transition-all duration-300 hover:scale-110 cursor-default bounce-animation" style="animation-delay: 0.2s;">遊戲</span>
-                <span class="px-3 py-1 bg-red-500/10 rounded-lg hover:bg-red-500/20 transition-all duration-300 hover:scale-110 cursor-default bounce-animation" style="animation-delay: 0.4s;">探索</span>
-              </div>
-            </div>
-            <p class="text-lg sm:text-xl text-white/70 max-w-2xl mx-auto pulse-animation">
-              中文學習遊戲與資源 | Chinese Language Learning Resources
-            </p>
-          </div>
+                返回主頁
+            </a>
         </div>
-      </header>
-
-      <!-- Main Content -->
-      <main class="px-6 pb-16">
-        <div class="mx-auto max-w-7xl space-y-12">
-          
-          <!-- Portal -->
-          <section>
-            <div class="mb-6">
-              <h2 class="text-2xl sm:text-3xl font-semibold mb-2">學習入口 | Learning Portal</h2>
-              <p class="text-white/60">Interactive Chinese language learning resources</p>
-            </div>
-            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              
-              <a href="portal/language_monopoly/webapp/index.html" class="glass-card rounded-2xl p-6 hover:bg-white/10 transition-all duration-300 group">
-                <div class="space-y-3">
-                  <div class="w-12 h-12 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 flex items-center justify-center">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15.5A2.5 2.5 0 0 1 17.5 21H6.5A2.5 2.5 0 0 1 4 18.5V5.5z"/>
-                    </svg>
-                  </div>
-                  <h3 class="text-lg font-semibold group-hover:text-cyan-300 transition-colors">Language Monopoly</h3>
-                  <p class="text-sm text-white/70">Gamified Chinese literacy portal</p>
-                  <p class="text-xs text-white/60">遊戲化中文識字入口</p>
-                </div>
-              </a>
-
-              <a href="portal/chinesegame2/index.html" class="glass-card rounded-2xl p-6 hover:bg-white/10 transition-all duration-300 group">
-                <div class="space-y-3">
-                  <div class="w-12 h-12 rounded-xl bg-gradient-to-r from-purple-400 to-pink-500 flex items-center justify-center">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/>
-                    </svg>
-                  </div>
-                  <h3 class="text-lg font-semibold group-hover:text-cyan-300 transition-colors">Chinese Game 2</h3>
-                  <p class="text-sm text-white/70">Interactive Chinese learning game</p>
-                  <p class="text-xs text-white/60">互動中文學習遊戲</p>
-                </div>
-              </a>
-
-            </div>
-          </section>
-
-          <!-- Documentation -->
-          <section>
-            <div class="mb-6">
-              <h2 class="text-2xl sm:text-3xl font-semibold mb-2">文件 | Documentation</h2>
-              <p class="text-white/60">Documentation and resources</p>
-            </div>
-            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              
-              <a href="docs/index.html" class="glass-card rounded-xl p-5 hover:bg-white/10 transition-all duration-300 group">
-                <h3 class="font-semibold mb-2 group-hover:text-cyan-300 transition-colors">Pri-Chi Docs</h3>
-                <p class="text-xs text-white/60">主要文件</p>
-              </a>
-
-              <a href="docs/portal/language_monopoly/index.html" class="glass-card rounded-xl p-5 hover:bg-white/10 transition-all duration-300 group">
-                <h3 class="font-semibold mb-2 group-hover:text-cyan-300 transition-colors">Language Monopoly (Docs)</h3>
-                <p class="text-xs text-white/60">語言大富翁文件</p>
-              </a>
-
-              <a href="docs/portal.html" class="glass-card rounded-xl p-5 hover:bg-white/10 transition-all duration-300 group">
-                <h3 class="font-semibold mb-2 group-hover:text-cyan-300 transition-colors">Portal Documentation</h3>
-                <p class="text-xs text-white/60">入口文件</p>
-              </a>
-
-            </div>
-          </section>
-
-        </div>
-      </main>
-
-              <!-- Footer -->
-    <footer style="text-align: center; padding: 1rem; color: #707070; font-size: 0.875rem;">
-        <p style="font-style: italic; margin-bottom: 0.25rem;">But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his understanding. Jeremiah 10:12</p>
-        <p style="font-size: 0.75rem; margin-bottom: 0.25rem; margin-top: 0.5rem;">「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12</p>
-        <p style="font-size: 0.75rem; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #d1d5db;">@ 2025 Generated by Gemini Pro 3.0  Prepared by SF Lau</p>
-    </footer>
-
     </div>
-  </div>
+
+    <!-- Footer -->
+    <footer class="text-center py-4 text-slate-500 text-sm mt-12">
+        <p class="italic mb-1">
+            But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his understanding. Jeremiah 10:12
+        </p>
+        <p class="text-xs mb-1 mt-2">
+            「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
+        </p>
+        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
+            @ 2025 Primary Chinese Learning Resources | Prepared by SF Lau
+        </p>
+    </footer>
 </body>
 </html>
-
 
