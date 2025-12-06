@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: process.env.NODE_ENV === 'production' ? '/Profile/PrimaryChinese/typo_surgeon/' : '/',
+  base: './',
   server: {
     port: 3002,
     open: true
