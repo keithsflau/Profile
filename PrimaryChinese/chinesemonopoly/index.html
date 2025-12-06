@@ -229,6 +229,31 @@
         </div>
     </div>
 
+    <!-- Setup Modal -->
+    <div id="setupModal" class="fixed inset-0 bg-black bg-opacity-50 modal-overlay flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 p-6 md:p-8 text-center">
+            <h2 class="text-3xl font-bold text-gray-800 mb-2">
+                <i class="fas fa-landmark text-yellow-300"></i> 語文大富翁
+            </h2>
+            <p class="text-gray-600 mb-6">請選擇玩家數量</p>
+            <div class="grid grid-cols-3 gap-4 mb-6">
+                <button class="player-count-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 px-6 rounded-lg transition-all transform hover:scale-105 shadow-lg" data-count="2">
+                    <div class="text-2xl mb-2">👥</div>
+                    <div class="text-lg">2 人</div>
+                </button>
+                <button class="player-count-btn bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-6 rounded-lg transition-all transform hover:scale-105 shadow-lg" data-count="3">
+                    <div class="text-2xl mb-2">👥</div>
+                    <div class="text-lg">3 人</div>
+                </button>
+                <button class="player-count-btn bg-purple-500 hover:bg-purple-600 text-white font-bold py-4 px-6 rounded-lg transition-all transform hover:scale-105 shadow-lg" data-count="4">
+                    <div class="text-2xl mb-2">👥</div>
+                    <div class="text-lg">4 人</div>
+                </button>
+            </div>
+            <p class="text-sm text-gray-500">答對中文問題才能買地！</p>
+        </div>
+    </div>
+
     <script>
         // Game Configuration
         const STARTING_MONEY = 1500;
@@ -394,8 +419,7 @@
         };
 
         // Initialize Game
-        function initGame() {
-            const numPlayers = prompt("請輸入玩家數量 (2-4):", "2");
+        function initGame(numPlayers = 2) {
             gameState.numPlayers = Math.min(Math.max(parseInt(numPlayers) || 2, 2), 4);
             
             // Create players
@@ -423,6 +447,13 @@
             gameState.currentPlayerIndex = 0;
             gameState.gameStarted = true;
             gameState.gameOver = false;
+
+            // Hide setup modal
+            const setupModal = document.getElementById('setupModal');
+            if (setupModal) {
+                setupModal.classList.add('hidden');
+                setupModal.classList.remove('flex');
+            }
 
             renderBoard();
             renderPlayersInfo();
@@ -1013,7 +1044,9 @@
         document.getElementById('restartGameBtn').addEventListener('click', () => {
             document.getElementById('gameOverModal').classList.add('hidden');
             document.getElementById('gameOverModal').classList.remove('flex');
-            initGame();
+            // Show setup modal again
+            document.getElementById('setupModal').classList.remove('hidden');
+            document.getElementById('setupModal').classList.add('flex');
         });
 
         // Close modal when clicking outside
@@ -1023,8 +1056,23 @@
             }
         });
 
-        // Initialize game on load
-        window.addEventListener('load', initGame);
+        // Setup modal - player count buttons
+        document.querySelectorAll('.player-count-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const numPlayers = parseInt(this.dataset.count);
+                initGame(numPlayers);
+            });
+        });
+
+        // Initialize - show setup modal on load
+        window.addEventListener('load', function() {
+            // Show setup modal instead of prompt
+            const setupModal = document.getElementById('setupModal');
+            if (setupModal) {
+                setupModal.classList.remove('hidden');
+                setupModal.classList.add('flex');
+            }
+        });
     </script>
 </body>
 </html>
