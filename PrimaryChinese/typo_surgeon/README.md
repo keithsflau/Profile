@@ -29,6 +29,35 @@ npm run build
 npm run preview
 ```
 
+## 部署到 GitHub Pages
+
+### 自動部署（推薦）
+
+1. **啟用 GitHub Pages**
+   - 進入 GitHub 倉庫的 Settings > Pages
+   - Source 選擇 **"GitHub Actions"**
+   - 保存設置
+
+2. **推送代碼**
+   - 當你推送代碼到 `main` 或 `master` 分支時
+   - GitHub Actions 會自動構建和部署
+   - 可以在 Actions 標籤頁查看部署進度
+
+3. **訪問網站**
+   - 部署完成後，訪問：`https://YOUR_USERNAME.github.io/Profile/PrimaryChinese/typo_surgeon/`
+
+### 手動部署
+
+如果需要手動構建和部署：
+
+```bash
+# 構建專案
+npm run build
+
+# dist 文件夾會包含構建後的文件
+# 將 dist 文件夾的內容部署到 GitHub Pages
+```
+
 ## 遊戲特色
 
 - 🏥 醫療主題界面設計

@@ -38,6 +38,10 @@ jobs:
         working-directory: PrimaryChinese/millionaire
         run: npm run build
 
+      - name: Disable Jekyll
+        working-directory: PrimaryChinese/millionaire
+        run: touch dist/.nojekyll
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 

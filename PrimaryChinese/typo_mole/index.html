@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>打錯別字地鼠 - Typo Whack-a-Mole</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft JhengHei', 'Microsoft YaHei', 'SimHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #8B4513 0%, #A0522D 50%, #CD853F 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        #root {
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .game-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        .game-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .game-title {
+            font-size: 2.5em;
+            color: #8B4513;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .prompt {
+            font-size: 1.8em;
+            color: #DC143C;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+        
+        .prompt-en {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .score-board {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+        }
+        
+        .score-item {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .canvas-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        canvas {
+            display: block;
+            border: 4px solid #8B4513;
+            border-radius: 15px;
+            background: linear-gradient(180deg, #D2B48C 0%, #DEB887 100%);
+            cursor: pointer;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.3);
+            margin: 0 auto;
+        }
+        
+        .instructions {
+            text-align: center;
+            color: #666;
+            font-size: 1em;
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(139, 69, 19, 0.1);
+            border-radius: 10px;
+        }
+        
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .back-link a {
+            color: #8B4513;
+            text-decoration: none;
+            font-size: 1.1em;
+            transition: color 0.3s;
+        }
+        
+        .back-link a:hover {
+            color: #A0522D;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Chinese typo pairs - [correct, typo]
+        const TYPO_PAIRS = [
+            ['必須', '必需'],  // Must (correct) vs Need (typo)
+            ['已經', '以經'],  // Already vs typo
+            ['已經', '己經'],  // Already vs typo
+            ['因為', '因位'],  // Because vs typo
+            ['所以', '所已'],  // Therefore vs typo
+            ['時候', '時侯'],  // Time vs typo
+            ['時候', '時後'],  // Time vs typo
+            ['知道', '知到'],  // Know vs typo
+            ['知道', '知導'],  // Know vs typo
+            ['應該', '應改'],  // Should vs typo
+            ['應該', '應概'],  // Should vs typo
+            ['問題', '問提'],  // Question vs typo
+            ['學習', '學息'],  // Study vs typo
+            ['重要', '重藥'],  // Important vs typo
+            ['開始', '開使'],  // Start vs typo
+            ['完成', '完程'],  // Complete vs typo
+            ['幫助', '幫住'],  // Help vs typo
+            ['準備', '準被'],  // Prepare vs typo
+            ['發現', '發見'],  // Discover vs typo
+            ['決定', '決訂'],  // Decide vs typo
+            ['繼續', '繼績'],  // Continue vs typo
+            ['選擇', '選澤'],  // Choose vs typo
+            ['成功', '成攻'],  // Success vs typo
+            ['努力', '努立'],  // Effort vs typo
+            ['清楚', '清礎'],  // Clear vs typo
+            ['正確', '正碓'],  // Correct vs typo
+            ['認真', '認眞'],  // Serious vs typo
+            ['經驗', '經験'],  // Experience vs typo
+            ['理解', '理觧'],  // Understand vs typo
+            ['進步', '進歩'],  // Progress vs typo
+            ['辦法', '辦発'],  // Method vs typo
+            ['方法', '方發'],  // Way vs typo
+            ['方向', '方嚮'],  // Direction vs typo
+            ['機會', '機会'],  // Opportunity vs typo
+            ['研究', '硏究'],  // Research vs typo
+            ['特別', '特列'],  // Special vs typo
+            ['態度', '態渡'],  // Attitude vs typo
+            ['注意', '注義'],  // Attention vs typo
+            ['影響', '影嚮'],  // Influence vs typo
+            ['環境', '環竟'],  // Environment vs typo
+            ['發展', '発展'],  // Development vs typo
+            ['能力', '能立'],  // Ability vs typo
+            ['克服', '刻服'],  // Overcome vs typo
+            ['形式', '型式'],  // Form vs typo
+            ['原則', '原側'],  // Principle vs typo
+            ['安慰', '安尉'],  // Comfort vs typo
+            ['妨礙', '防礙'],  // Hinder vs typo
+            ['創造', '創做'],  // Create vs typo
+            ['獎勵', '奬勵'],  // Reward vs typo
+            ['精彩', '精采'],  // Wonderful vs typo
+            ['凋零', '彫零'],  // Wither vs typo
+            ['讚美', '贊美'],  // Praise vs typo
+        ];
+
+        const GRID_SIZE = 3;
+        const HOLE_RADIUS = 60;
+        const MOLE_RADIUS = 50;
+        const MOLE_POP_HEIGHT = 40;
+        const ANIMATION_SPEED = 0.15;
+
+        function TypoWhackAMole() {
+            const canvasRef = useRef(null);
+            const animationFrameRef = useRef(null);
+            const [score, setScore] = useState(0);
+            const [misses, setMisses] = useState(0);
+            const [currentPrompt, setCurrentPrompt] = useState(null);
+            const [gameState, setGameState] = useState('playing'); // 'playing', 'paused'
+            
+            const holesRef = useRef([]);
+            const activeMolesRef = useRef([]);
+            const currentPairRef = useRef(null);
+            const lastSpawnTimeRef = useRef(0);
+            const spawnIntervalRef = useRef(2000); // 2 seconds
+
+            // Initialize holes in a 3x3 grid
+            useEffect(() => {
+                const canvas = canvasRef.current;
+                if (!canvas) return;
+
+                const ctx = canvas.getContext('2d');
+                const padding = 40;
+                const spacing = (canvas.width - padding * 2) / GRID_SIZE;
+                
+                holesRef.current = [];
+                for (let row = 0; row < GRID_SIZE; row++) {
+                    for (let col = 0; col < GRID_SIZE; col++) {
+                        holesRef.current.push({
+                            x: padding + col * spacing + spacing / 2,
+                            y: padding + row * spacing + spacing / 2,
+                            radius: HOLE_RADIUS,
+                            hasMole: false
+                        });
+                    }
+                }
+            }, []);
+
+            // Select a random typo pair
+            const selectRandomPair = () => {
+                const pair = TYPO_PAIRS[Math.floor(Math.random() * TYPO_PAIRS.length)];
+                const correctWord = pair[0];
+                const typoWord = pair[1];
+                
+                // Always look for the typo (wrong one)
+                currentPairRef.current = {
+                    correct: correctWord,
+                    typo: typoWord,
+                    targetIsTypo: true // Always find the typo
+                };
+                
+                setCurrentPrompt({
+                    correct: correctWord,
+                    typo: typoWord,
+                    targetIsTypo: true
+                });
+            };
+
+            // Spawn a mole at a random hole
+            const spawnMole = () => {
+                if (!currentPairRef.current) selectRandomPair();
+                
+                const availableHoles = holesRef.current.filter(h => !h.hasMole);
+                if (availableHoles.length === 0) return;
+
+                const randomHole = availableHoles[Math.floor(Math.random() * availableHoles.length)];
+                const isTypo = Math.random() > 0.5;
+                const word = isTypo ? currentPairRef.current.typo : currentPairRef.current.correct;
+                
+                randomHole.hasMole = true;
+                activeMolesRef.current.push({
+                    holeIndex: holesRef.current.indexOf(randomHole),
+                    x: randomHole.x,
+                    y: randomHole.y,
+                    word: word,
+                    isTypo: isTypo,
+                    popProgress: 0, // 0 = hidden, 1 = fully popped
+                    state: 'popping', // 'popping', 'visible', 'hitting', 'hiding'
+                    hitResult: null, // 'success', 'fail', null
+                    animationTimer: 0
+                });
+            };
+
+            // Handle canvas click
+            const handleCanvasClick = (e) => {
+                if (gameState !== 'playing') return;
+                
+                const canvas = canvasRef.current;
+                const rect = canvas.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const clickY = e.clientY - rect.top;
+
+                // Check if click is on any mole
+                for (let i = activeMolesRef.current.length - 1; i >= 0; i--) {
+                    const mole = activeMolesRef.current[i];
+                    if (mole.state !== 'visible') continue;
+
+                    const dx = clickX - mole.x;
+                    const dy = clickY - (mole.y - MOLE_POP_HEIGHT * mole.popProgress);
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < MOLE_RADIUS) {
+                        // Mole hit! Check if it's a typo (wrong one)
+                        const isCorrect = mole.isTypo; // Success if clicked on typo
+                        
+                        mole.state = 'hitting';
+                        mole.hitResult = isCorrect ? 'success' : 'fail';
+                        mole.animationTimer = 60; // 1 second at 60fps
+
+                        if (isCorrect) {
+                            setScore(prev => prev + 10);
+                        } else {
+                            setMisses(prev => prev + 1);
+                        }
+
+                        // Select new pair for next round
+                        setTimeout(() => {
+                            selectRandomPair();
+                        }, 1000);
+                        break;
+                    }
+                }
+            };
+
+            // Animation loop
+            useEffect(() => {
+                const canvas = canvasRef.current;
+                if (!canvas) return;
+
+                const ctx = canvas.getContext('2d');
+                
+                const animate = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Draw holes
+                    holesRef.current.forEach((hole, index) => {
+                        // Draw hole (dark circle)
+                        ctx.fillStyle = '#654321';
+                        ctx.beginPath();
+                        ctx.arc(hole.x, hole.y, hole.radius, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        // Draw hole rim
+                        ctx.strokeStyle = '#8B4513';
+                        ctx.lineWidth = 3;
+                        ctx.stroke();
+                        
+                        // Draw grass/dirt texture
+                        ctx.fillStyle = '#3D2817';
+                        ctx.beginPath();
+                        ctx.arc(hole.x, hole.y, hole.radius - 5, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+
+                    // Update and draw moles
+                    const now = Date.now();
+                    if (now - lastSpawnTimeRef.current > spawnIntervalRef.current) {
+                        spawnMole();
+                        lastSpawnTimeRef.current = now;
+                        // Gradually decrease spawn interval (increase difficulty)
+                        spawnIntervalRef.current = Math.max(800, spawnIntervalRef.current - 50);
+                    }
+
+                    activeMolesRef.current.forEach((mole, index) => {
+                        const hole = holesRef.current[mole.holeIndex];
+                        
+                        if (mole.state === 'popping') {
+                            mole.popProgress += ANIMATION_SPEED;
+                            if (mole.popProgress >= 1) {
+                                mole.popProgress = 1;
+                                mole.state = 'visible';
+                                // Start hiding after 2 seconds
+                                setTimeout(() => {
+                                    if (mole.state === 'visible') {
+                                        mole.state = 'hiding';
+                                    }
+                                }, 2000);
+                            }
+                        } else if (mole.state === 'hiding') {
+                            mole.popProgress -= ANIMATION_SPEED;
+                            if (mole.popProgress <= 0) {
+                                mole.popProgress = 0;
+                                hole.hasMole = false;
+                                activeMolesRef.current.splice(index, 1);
+                                return;
+                            }
+                        } else if (mole.state === 'hitting') {
+                            mole.animationTimer--;
+                            if (mole.animationTimer <= 0) {
+                                mole.state = 'hiding';
+                            }
+                        }
+
+                        // Draw mole
+                        const moleY = hole.y - MOLE_POP_HEIGHT * mole.popProgress;
+                        
+                        // Mole body (brown circle)
+                        ctx.fillStyle = mole.hitResult === 'success' ? '#90EE90' : 
+                                       mole.hitResult === 'fail' ? '#FFB6C1' : '#D2691E';
+                        ctx.beginPath();
+                        ctx.arc(mole.x, moleY, MOLE_RADIUS, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        // Mole outline
+                        ctx.strokeStyle = '#8B4513';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                        
+                        // Mole face
+                        if (mole.hitResult === 'success') {
+                            // Dizzy eyes (X marks)
+                            ctx.strokeStyle = '#000';
+                            ctx.lineWidth = 3;
+                            ctx.beginPath();
+                            ctx.moveTo(mole.x - 15, moleY - 10);
+                            ctx.lineTo(mole.x - 5, moleY);
+                            ctx.moveTo(mole.x - 5, moleY - 10);
+                            ctx.lineTo(mole.x - 15, moleY);
+                            ctx.moveTo(mole.x + 5, moleY - 10);
+                            ctx.lineTo(mole.x + 15, moleY);
+                            ctx.moveTo(mole.x + 15, moleY - 10);
+                            ctx.lineTo(mole.x + 5, moleY);
+                            ctx.stroke();
+                            
+                            // Spinning stars around head
+                            const stars = 8;
+                            for (let i = 0; i < stars; i++) {
+                                const angle = (Date.now() / 50 + i * Math.PI * 2 / stars) % (Math.PI * 2);
+                                const starX = mole.x + Math.cos(angle) * (MOLE_RADIUS + 15);
+                                const starY = moleY + Math.sin(angle) * (MOLE_RADIUS + 15);
+                                ctx.fillStyle = '#FFD700';
+                                ctx.beginPath();
+                                ctx.arc(starX, starY, 3, 0, Math.PI * 2);
+                                ctx.fill();
+                            }
+                        } else if (mole.hitResult === 'fail') {
+                            // Laughing face
+                            ctx.fillStyle = '#000';
+                            // Eyes (closed, curved)
+                            ctx.beginPath();
+                            ctx.arc(mole.x - 12, moleY - 5, 4, 0, Math.PI);
+                            ctx.stroke();
+                            ctx.beginPath();
+                            ctx.arc(mole.x + 12, moleY - 5, 4, 0, Math.PI);
+                            ctx.stroke();
+                            // Big laughing mouth
+                            ctx.beginPath();
+                            ctx.arc(mole.x, moleY + 10, 15, 0, Math.PI);
+                            ctx.stroke();
+                        } else {
+                            // Normal eyes
+                            ctx.fillStyle = '#000';
+                            ctx.beginPath();
+                            ctx.arc(mole.x - 12, moleY - 5, 3, 0, Math.PI * 2);
+                            ctx.fill();
+                            ctx.beginPath();
+                            ctx.arc(mole.x + 12, moleY - 5, 3, 0, Math.PI * 2);
+                            ctx.fill();
+                            // Nose
+                            ctx.beginPath();
+                            ctx.arc(mole.x, moleY + 2, 2, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                        
+                        // Word sign
+                        ctx.fillStyle = '#FFF';
+                        ctx.fillRect(mole.x - 35, moleY - MOLE_RADIUS - 25, 70, 20);
+                        ctx.strokeStyle = '#000';
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(mole.x - 35, moleY - MOLE_RADIUS - 25, 70, 20);
+                        
+                        // Word text
+                        ctx.fillStyle = '#000';
+                        ctx.font = 'bold 18px "Microsoft JhengHei", "Microsoft YaHei", "SimHei", Arial';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(mole.word, mole.x, moleY - MOLE_RADIUS - 15);
+                    });
+
+                    animationFrameRef.current = requestAnimationFrame(animate);
+                };
+
+                animate();
+
+                return () => {
+                    if (animationFrameRef.current) {
+                        cancelAnimationFrame(animationFrameRef.current);
+                    }
+                };
+            }, [gameState]);
+
+            // Initialize first pair
+            useEffect(() => {
+                selectRandomPair();
+            }, []);
+
+            // Set canvas size
+            useEffect(() => {
+                const canvas = canvasRef.current;
+                if (canvas) {
+                    canvas.width = 600;
+                    canvas.height = 600;
+                }
+            }, []);
+
+            return (
+                <div className="game-container">
+                    <div className="game-header">
+                        <h1 className="game-title">打錯別字地鼠</h1>
+                        <div className="prompt">
+                                    {currentPrompt && (
+                                <>
+                                    找出錯別字！
+                                    <div className="prompt-en">
+                                        Find the WRONG one! (Find the typo)
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                        <div className="score-board">
+                            <div className="score-item">
+                                分數 Score: {score}
+                            </div>
+                            <div className="score-item">
+                                錯誤 Misses: {misses}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="canvas-container">
+                        <canvas 
+                            ref={canvasRef}
+                            onClick={handleCanvasClick}
+                        />
+                    </div>
+                    <div className="instructions">
+                        <p>點擊地鼠來找出錯別字！正確點擊得10分，錯誤點擊會增加錯誤次數。</p>
+                        <p>Click on moles to find typos! Correct hits score 10 points, wrong hits increase misses.</p>
+                    </div>
+                    <div className="back-link">
+                        <a href="../index.html">← 返回主頁 Back to Home</a>
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<TypoWhackAMole />, document.getElementById('root'));
+    </script>
+</body>
+</html>
+
