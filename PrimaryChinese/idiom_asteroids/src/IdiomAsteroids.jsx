@@ -1,0 +1,555 @@
+import React, { useRef, useEffect, useState, useCallback } from 'react';
+
+// Chinese Idioms data with missing characters
+const IDIOMS = [
+  { idiom: '畫蛇添__', answer: '足', decoys: ['腳', '腿', '手', '頭'] },
+  { idiom: '守株待__', answer: '兔', decoys: ['鳥', '雞', '狗', '貓'] },
+  { idiom: '亡羊補__', answer: '牢', decoys: ['洞', '牆', '門', '窗'] },
+  { idiom: '掩耳盜__', answer: '鈴', decoys: ['鐘', '鼓', '鑼', '鈸'] },
+  { idiom: '刻舟求__', answer: '劍', decoys: ['刀', '槍', '箭', '矛'] },
+  { idiom: '井底之__', answer: '蛙', decoys: ['魚', '蝦', '蟹', '龜'] },
+  { idiom: '對牛彈__', answer: '琴', decoys: ['瑟', '箏', '笛', '簫'] },
+  { idiom: '畫龍點__', answer: '睛', decoys: ['目', '眼', '珠', '瞳'] },
+  { idiom: '葉公好__', answer: '龍', decoys: ['鳳', '虎', '豹', '獅'] },
+  { idiom: '杯弓蛇__', answer: '影', decoys: ['形', '像', '貌', '狀'] },
+];
+
+// Game constants
+const CANVAS_WIDTH = 1200;
+const CANVAS_HEIGHT = 800;
+const SHIP_SIZE = 20;
+const SHIP_SPEED = 4; // Slightly faster
+const BULLET_SPEED = 8; // Slightly faster
+const BULLET_RADIUS = 4;
+const ASTEROID_MIN_RADIUS = 30;
+const ASTEROID_MAX_RADIUS = 50;
+const ASTEROID_SPEED = 1.5; // Slightly faster
+const ASTEROID_ROTATION_SPEED = 0.02;
+const SPAWN_INTERVAL = 1500; // More frequent spawning - denser asteroids
+const PARTICLE_COUNT = 15;
+const PARTICLE_LIFETIME = 30;
+
+class Ship {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    // Ship stays at bottom, only moves horizontally
+    this.vx = 0;
+  }
+
+  update() {
+    // Move horizontally
+    this.x += this.vx;
+
+    // Keep ship within bounds
+    if (this.x < SHIP_SIZE) this.x = SHIP_SIZE;
+    if (this.x > CANVAS_WIDTH - SHIP_SIZE) this.x = CANVAS_WIDTH - SHIP_SIZE;
+  }
+
+  draw(ctx) {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    // Draw ship pointing upward (vertical scrolling game)
+    ctx.beginPath();
+    ctx.moveTo(0, -SHIP_SIZE); // Top point
+    ctx.lineTo(-SHIP_SIZE / 2, SHIP_SIZE / 2); // Bottom left
+    ctx.lineTo(SHIP_SIZE / 2, SHIP_SIZE / 2); // Bottom right
+    ctx.closePath();
+    ctx.fillStyle = '#60a5fa';
+    ctx.fill();
+    ctx.strokeStyle = '#3b82f6';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+class Bullet {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    // Bullets always go straight up in vertical scrolling game
+    this.vx = 0;
+    this.vy = -BULLET_SPEED; // Negative Y means upward
+    this.radius = BULLET_RADIUS;
+  }
+
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+  }
+
+  isOffScreen() {
+    // Bullet is off screen if it goes above the canvas
+    return this.y < -this.radius;
+  }
+
+  draw(ctx) {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fillStyle = '#fbbf24';
+    ctx.fill();
+    ctx.strokeStyle = '#f59e0b';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+}
+
+class Asteroid {
+  constructor(x, y, character, isCorrect) {
+    this.x = x;
+    this.y = y;
+    this.radius = ASTEROID_MIN_RADIUS + Math.random() * (ASTEROID_MAX_RADIUS - ASTEROID_MIN_RADIUS);
+    this.rotation = 0;
+    this.rotationSpeed = (Math.random() - 0.5) * ASTEROID_ROTATION_SPEED;
+    // Asteroids move straight down in vertical scrolling game
+    this.vx = (Math.random() - 0.5) * 0.5; // Slight horizontal drift
+    this.vy = ASTEROID_SPEED; // Move downward
+    this.character = character;
+    this.isCorrect = isCorrect;
+  }
+
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.rotation += this.rotationSpeed;
+
+    // Keep asteroids within horizontal bounds (slight bounce)
+    if (this.x < this.radius) {
+      this.x = this.radius;
+      this.vx *= -1;
+    }
+    if (this.x > CANVAS_WIDTH - this.radius) {
+      this.x = CANVAS_WIDTH - this.radius;
+      this.vx *= -1;
+    }
+  }
+
+  isOffScreen() {
+    // Asteroid is off screen if it goes below the canvas
+    return this.y > CANVAS_HEIGHT + this.radius;
+  }
+
+  draw(ctx) {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rotation);
+
+    // Draw asteroid shape (irregular polygon)
+    ctx.beginPath();
+    const points = 8;
+    for (let i = 0; i < points; i++) {
+      const angle = (i / points) * Math.PI * 2;
+      const radius = this.radius + (Math.random() - 0.5) * 10;
+      const x = Math.cos(angle) * radius;
+      const y = Math.sin(angle) * radius;
+      if (i === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+    }
+    ctx.closePath();
+    ctx.fillStyle = this.isCorrect ? '#34d399' : '#94a3b8';
+    ctx.fill();
+    ctx.strokeStyle = this.isCorrect ? '#10b981' : '#64748b';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Draw character
+    ctx.restore();
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.fillStyle = '#1e293b';
+    ctx.font = `bold ${this.radius}px 'Noto Sans TC', sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(this.character, 0, 0);
+    ctx.restore();
+  }
+}
+
+class Particle {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.vx = (Math.random() - 0.5) * 8;
+    this.vy = (Math.random() - 0.5) * 8;
+    this.life = PARTICLE_LIFETIME;
+    this.maxLife = PARTICLE_LIFETIME;
+    this.size = 3 + Math.random() * 4;
+  }
+
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.life--;
+  }
+
+  isDead() {
+    return this.life <= 0;
+  }
+
+  draw(ctx) {
+    const alpha = this.life / this.maxLife;
+    ctx.fillStyle = `rgba(251, 191, 36, ${alpha})`;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+function IdiomAsteroids() {
+  const canvasRef = useRef(null);
+  const [gameState, setGameState] = useState('menu'); // 'menu', 'playing', 'gameOver'
+  const [score, setScore] = useState(0);
+  const [currentIdiom, setCurrentIdiom] = useState(null);
+  const [lives, setLives] = useState(3);
+  const [gameOverMessage, setGameOverMessage] = useState('');
+
+  const shipRef = useRef(null);
+  const bulletsRef = useRef([]);
+  const asteroidsRef = useRef([]);
+  const particlesRef = useRef([]);
+  const keysRef = useRef({});
+  const lastSpawnRef = useRef(0);
+  const animationFrameRef = useRef(null);
+
+  // Initialize game
+  const startGame = useCallback(() => {
+    const randomIdiom = IDIOMS[Math.floor(Math.random() * IDIOMS.length)];
+    setCurrentIdiom(randomIdiom);
+    setScore(0);
+    setLives(3);
+    setGameState('playing');
+
+    // Reset game objects - ship at bottom center
+    shipRef.current = new Ship(CANVAS_WIDTH / 2, CANVAS_HEIGHT - 80);
+    bulletsRef.current = [];
+    asteroidsRef.current = [];
+    particlesRef.current = [];
+    lastSpawnRef.current = Date.now();
+  }, []);
+
+  // Handle keyboard input
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      keysRef.current[e.key.toLowerCase()] = true;
+      keysRef.current[e.code] = true;
+
+      if (e.code === 'Space' && gameState === 'playing') {
+        e.preventDefault();
+        const ship = shipRef.current;
+        if (ship) {
+          // Bullet shoots straight up from ship position
+          const bullet = new Bullet(ship.x, ship.y - SHIP_SIZE);
+          bulletsRef.current.push(bullet);
+        }
+      }
+    };
+
+    const handleKeyUp = (e) => {
+      keysRef.current[e.key.toLowerCase()] = false;
+      keysRef.current[e.code] = false;
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [gameState]);
+
+  // Collision detection (circle-circle)
+  const checkCollision = (x1, y1, r1, x2, y2, r2) => {
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    return distance < r1 + r2;
+  };
+
+  // Spawn asteroid from top of screen (vertical scrolling)
+  const spawnAsteroid = useCallback(() => {
+    if (!currentIdiom) return;
+
+    // Spawn from top, random X position
+    const x = ASTEROID_MAX_RADIUS + Math.random() * (CANVAS_WIDTH - ASTEROID_MAX_RADIUS * 2);
+    const y = -ASTEROID_MAX_RADIUS;
+    
+    const characters = [currentIdiom.answer, ...currentIdiom.decoys];
+    const randomChar = characters[Math.floor(Math.random() * characters.length)];
+    const isCorrect = randomChar === currentIdiom.answer;
+
+    const asteroid = new Asteroid(x, y, randomChar, isCorrect);
+    asteroidsRef.current.push(asteroid);
+  }, [currentIdiom]);
+
+  // Create particle explosion
+  const createExplosion = (x, y) => {
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      particlesRef.current.push(new Particle(x, y));
+    }
+  };
+
+  // Game loop
+  useEffect(() => {
+    if (gameState !== 'playing') return;
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+
+    // Set canvas size for high DPI
+    canvas.width = CANVAS_WIDTH * dpr;
+    canvas.height = CANVAS_HEIGHT * dpr;
+    canvas.style.width = `${CANVAS_WIDTH}px`;
+    canvas.style.height = `${CANVAS_HEIGHT}px`;
+    ctx.scale(dpr, dpr);
+
+    const gameLoop = () => {
+      // Clear canvas
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+      // Draw stars background
+      ctx.fillStyle = '#ffffff';
+      for (let i = 0; i < 100; i++) {
+        const x = (i * 37) % CANVAS_WIDTH;
+        const y = (i * 53) % CANVAS_HEIGHT;
+        ctx.fillRect(x, y, 1, 1);
+      }
+
+      const ship = shipRef.current;
+      if (!ship) return;
+
+      // Handle input - only horizontal movement in vertical scrolling game
+      ship.vx = 0; // Reset velocity
+      if (keysRef.current['arrowleft'] || keysRef.current['a']) {
+        ship.vx = -SHIP_SPEED; // Move left
+      }
+      if (keysRef.current['arrowright'] || keysRef.current['d']) {
+        ship.vx = SHIP_SPEED; // Move right
+      }
+
+      // Update ship
+      ship.update();
+      ship.draw(ctx);
+
+      // Spawn asteroids
+      const now = Date.now();
+      if (now - lastSpawnRef.current > SPAWN_INTERVAL) {
+        spawnAsteroid();
+        lastSpawnRef.current = now;
+      }
+
+      // Update and draw bullets
+      bulletsRef.current = bulletsRef.current.filter((bullet) => {
+        bullet.update();
+        if (bullet.isOffScreen()) return false;
+        bullet.draw(ctx);
+        return true;
+      });
+
+      // Update and draw asteroids
+      asteroidsRef.current = asteroidsRef.current.filter((asteroid) => {
+        asteroid.update();
+        
+        // Remove asteroids that go off screen
+        if (asteroid.isOffScreen()) {
+          return false;
+        }
+        
+        asteroid.draw(ctx);
+
+        // Check collision with bullets
+        for (let i = bulletsRef.current.length - 1; i >= 0; i--) {
+          const bullet = bulletsRef.current[i];
+          if (
+            checkCollision(
+              asteroid.x,
+              asteroid.y,
+              asteroid.radius,
+              bullet.x,
+              bullet.y,
+              bullet.radius
+            )
+          ) {
+            // Create explosion
+            createExplosion(asteroid.x, asteroid.y);
+
+            // Check if correct answer
+            if (asteroid.isCorrect) {
+              setScore((prev) => prev + 10);
+              // Get new idiom - change idiom when correct rock is hit
+              const remainingIdioms = IDIOMS.filter(idiom => idiom.idiom !== currentIdiom.idiom);
+              const randomIdiom = remainingIdioms.length > 0 
+                ? remainingIdioms[Math.floor(Math.random() * remainingIdioms.length)]
+                : IDIOMS[Math.floor(Math.random() * IDIOMS.length)];
+              setCurrentIdiom(randomIdiom);
+              // Clear all asteroids and bullets
+              asteroidsRef.current = [];
+              bulletsRef.current = [];
+            } else {
+              setLives((prev) => {
+                const newLives = prev - 1;
+                if (newLives <= 0) {
+                  setGameOverMessage('遊戲結束！你擊中了錯誤的答案。');
+                  setGameState('gameOver');
+                  return 0;
+                }
+                return newLives;
+              });
+            }
+
+            bulletsRef.current.splice(i, 1);
+            return false; // Remove asteroid
+          }
+        }
+
+        // Check collision with ship
+        if (
+          checkCollision(
+            asteroid.x,
+            asteroid.y,
+            asteroid.radius,
+            ship.x,
+            ship.y,
+            SHIP_SIZE
+          )
+        ) {
+          setLives((prev) => {
+            const newLives = prev - 1;
+            if (newLives <= 0) {
+              setGameOverMessage('遊戲結束！你被小行星撞到了。');
+              setGameState('gameOver');
+              return 0;
+            }
+            return newLives;
+          });
+          // Remove asteroid
+          createExplosion(asteroid.x, asteroid.y);
+          return false;
+        }
+
+        return true;
+      });
+
+      // Update and draw particles
+      particlesRef.current = particlesRef.current.filter((particle) => {
+        particle.update();
+        if (particle.isDead()) return false;
+        particle.draw(ctx);
+        return true;
+      });
+
+      animationFrameRef.current = requestAnimationFrame(gameLoop);
+    };
+
+    gameLoop();
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [gameState, spawnAsteroid]);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col items-center justify-center p-4">
+      <div className="w-full max-w-6xl">
+        {/* Header */}
+        <div className="text-center mb-6">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
+            成語太空戰機
+          </h1>
+          <p className="text-lg text-slate-300">Idiom Asteroids</p>
+        </div>
+
+        {/* Game UI Overlay */}
+        {gameState === 'playing' && currentIdiom && (
+          <div className="bg-black/50 backdrop-blur-sm rounded-lg p-4 mb-4 border border-slate-700">
+            <div className="flex justify-between items-center flex-wrap gap-4">
+              <div className="flex-1">
+                <p className="text-slate-300 text-sm mb-1">目標成語：</p>
+                <p className="text-3xl font-bold text-white">
+                  {currentIdiom.idiom}
+                </p>
+              </div>
+              <div className="flex gap-6">
+                <div className="text-center">
+                  <p className="text-slate-300 text-sm">分數</p>
+                  <p className="text-2xl font-bold text-yellow-400">{score}</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-slate-300 text-sm">生命</p>
+                  <p className="text-2xl font-bold text-red-400">{lives}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Canvas */}
+        <div className="relative bg-slate-900 rounded-lg border-2 border-slate-700 overflow-hidden shadow-2xl">
+          <canvas
+            ref={canvasRef}
+            className="w-full"
+            style={{ display: 'block' }}
+          />
+
+          {/* Menu Screen */}
+          {gameState === 'menu' && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+              <div className="text-center p-8">
+                <h2 className="text-3xl font-bold text-white mb-4">成語太空戰機</h2>
+                <p className="text-slate-300 mb-6 max-w-md">
+                  射擊帶有正確答案的小行星！使用左右方向鍵或 A/D 鍵移動，空格鍵射擊。
+                </p>
+                <button
+                  onClick={startGame}
+                  className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors shadow-lg"
+                >
+                  開始遊戲
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Game Over Screen */}
+          {gameState === 'gameOver' && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+              <div className="text-center p-8">
+                <h2 className="text-3xl font-bold text-white mb-4">遊戲結束</h2>
+                <p className="text-slate-300 mb-2">{gameOverMessage}</p>
+                <p className="text-xl text-yellow-400 mb-6">最終分數: {score}</p>
+                <button
+                  onClick={startGame}
+                  className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors shadow-lg"
+                >
+                  再玩一次
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Controls Info */}
+        {gameState === 'playing' && (
+          <div className="mt-4 text-center text-slate-400 text-sm">
+            <p>左右方向鍵 / A/D: 左右移動 | 空格鍵: 射擊</p>
+            <p className="mt-1">
+              綠色小行星 = 正確答案 | 灰色小行星 = 錯誤答案
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default IdiomAsteroids;
+
