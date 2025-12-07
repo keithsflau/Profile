@@ -1,0 +1,670 @@
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { RefreshCw, ArrowRight, Trophy, HelpCircle, BookOpen, Shuffle } from 'lucide-react';
+
+// --- Constants ---
+const CELL_SIZE = 60;
+const GRID_SIZE = 5;
+const CANVAS_SIZE = CELL_SIZE * GRID_SIZE;
+
+// --- Idiom Data Bank (Traditional Chinese) ---
+const IDIOM_BANK = [
+  { text: "坐井觀天", hint: "Sitting in a well viewing the sky (Narrow minded)" },
+  { text: "緣木求魚", hint: "Climbing a tree to catch fish (Fruitless approach)" },
+  { text: "自相矛盾", hint: "Self-contradictory (Spears and Shields)" },
+  { text: "杯弓蛇影", hint: "Mistaking a bow's shadow for a snake (Paranoia)" },
+  { text: "刻舟求劍", hint: "Marking the boat to find the sword (Rigid thinking)" },
+  { text: "鷸蚌相爭", hint: "Snipe and clam grapple (Third party profits)" },
+  { text: "濫竽充數", hint: "Pretending to play the flute (Freeloading)" },
+  { text: "按圖索驥", hint: "Looking for a steed from a picture (Dogmatic)" },
+  { text: "狐假虎威", hint: "Fox exploiting the tiger's might (Bullying by proxy)" },
+  { text: "杞人憂天", hint: "Man of Qi worries about the sky (Baseless anxiety)" },
+  { text: "愚公移山", hint: "The old man moves mountains (Perseverance)" },
+  { text: "邯鄲學步", hint: "Learning to walk in Handan (Losing one's own identity)" },
+  { text: "東施效顰", hint: "Dong Shi imitates a frown (Blind imitation)" },
+  { text: "金蟬脫殼", hint: "Cicada sheds its shell (Strategic escape)" },
+  { text: "拋磚引玉", hint: "Tossing a brick to attract jade (Inviting better opinions)" },
+  { text: "入鄉隨俗", hint: "Enter village, follow customs (When in Rome)" },
+  { text: "覆水難收", hint: "Spilt water is hard to retrieve (Irreversible)" },
+  { text: "唇亡齒寒", hint: "Lips gone, teeth cold (Interdependence)" },
+  { text: "青出於藍", hint: "Indigo comes from blue (Student surpasses master)" },
+  { text: "三人成虎", hint: "Three men make a tiger (Rumors become truth)" },
+  { text: "指鹿為馬", hint: "Calling a deer a horse (Deliberate falsehood)" },
+  { text: "臥薪嘗膽", hint: "Sleeping on brushwood, tasting gall (Enduring hardship for revenge)" },
+  { text: "破釜沉舟", hint: "Breaking cauldrons, sinking boats (Point of no return)" },
+  { text: "聞雞起舞", hint: "Rising at cockcrow to practice sword (Diligent)" },
+  { text: "畫餅充飢", hint: "Drawing a cake to satisfy hunger (Self-deception)" },
+  { text: "驚弓之鳥", hint: "Bird startled by a bowstring (Once bitten, twice shy)" },
+  { text: "南轅北轍", hint: "South shafts, North tracks (Actions opposite to goals)" },
+  { text: "買櫝還珠", hint: "Keeping the box, returning the pearl (Lack of judgment)" },
+  { text: "拔苗助長", hint: "Pulling seedlings to help them grow (Haste makes waste)" },
+  { text: "囫圇吞棗", hint: "Swallowing a date whole (Reading without understanding)" },
+  { text: "望梅止渴", hint: "Gazing at plums to quench thirst (False hope)" },
+  { text: "四面楚歌", hint: "Chu songs on four sides (Surrounded by enemies)" },
+  { text: "借刀殺人", hint: "Borrowing a knife to kill (Using others to do dirty work)" },
+  { text: "趁火打劫", hint: "Looting a burning house (Exploiting chaos)" },
+  { text: "聲東擊西", hint: "Noise in the East, strike in the West (Diversion)" },
+  { text: "無中生有", hint: "Creating something from nothing (Fabrication)" },
+  { text: "暗度陳倉", hint: "Secretly crossing Chencang (Secret movement)" },
+  { text: "笑裏藏刀", hint: "Dagger hidden in a smile (Treachery)" },
+  { text: "李代桃僵", hint: "Plum dies for the peach (Sacrifice for another)" },
+  { text: "順手牽羊", hint: "Leading away a goat in passing (Opportunistic theft)" },
+  { text: "借屍還魂", hint: "Borrowing a corpse to resurrect (Reviving old ideas)" },
+  { text: "調虎離山", hint: "Luring the tiger from the mountain (Vulnerable position)" },
+  { text: "欲擒故縱", hint: "To catch, first let go (Strategic release)" },
+  { text: "釜底抽薪", hint: "Removing firewood from under the pot (Root solution)" },
+  { text: "混水摸魚", hint: "Fishing in troubled waters (Profiting from chaos)" },
+];
+
+// --- Static Intro Levels ---
+const INTRO_LEVELS = [
+  {
+    id: 1,
+    idiom: "一心一意", 
+    hint: "Wholeheartedly (One Heart, One Mind)",
+    targets: [{ char: "一", x: 1, y: 1 }, { char: "心", x: 3, y: 1 }, { char: "一", x: 3, y: 3 }, { char: "意", x: 1, y: 3 }],
+    source: { x: -1, y: 1, dir: { x: 1, y: 0 } }, 
+    inventory: 6, // Buffed
+    obstacles: []
+  },
+  {
+    id: 2,
+    idiom: "井底之蛙",
+    hint: "Frog at the bottom of the well (Narrow View)",
+    targets: [{ char: "井", x: 2, y: 0 }, { char: "底", x: 4, y: 2 }, { char: "之", x: 2, y: 4 }, { char: "蛙", x: 0, y: 2 }],
+    source: { x: 2, y: -1, dir: { x: 0, y: 1 } },
+    inventory: 6,
+    obstacles: [{x: 2, y: 2}]
+  },
+  {
+    id: 3,
+    idiom: "畫蛇添足", 
+    hint: "Drawing a snake and adding feet (Superfluous)",
+    targets: [{ char: "畫", x: 1, y: 0 }, { char: "蛇", x: 4, y: 1 }, { char: "添", x: 3, y: 4 }, { char: "足", x: 0, y: 3 }],
+    source: { x: -1, y: 0, dir: { x: 1, y: 0 } },
+    inventory: 8,
+    obstacles: [{x: 2, y: 2}]
+  },
+  {
+    id: 4,
+    idiom: "守株待兔",
+    hint: "Waiting by a stump for a rabbit (Relying on luck)",
+    targets: [{ char: "守", x: 1, y: 4 }, { char: "株", x: 1, y: 2 }, { char: "待", x: 3, y: 2 }, { char: "兔", x: 3, y: 0 }],
+    source: { x: 1, y: 5, dir: { x: 0, y: -1 } },
+    inventory: 6,
+    obstacles: [{x: 2, y: 2}]
+  },
+  {
+    id: 5,
+    idiom: "對牛彈琴",
+    hint: "Playing the lute to a cow (Casting pearls before swine)",
+    targets: [{ char: "對", x: 0, y: 2 }, { char: "牛", x: 2, y: 0 }, { char: "彈", x: 4, y: 2 }, { char: "琴", x: 2, y: 4 }],
+    source: { x: -1, y: 2, dir: { x: 1, y: 0 } },
+    inventory: 8,
+    obstacles: [{x: 2, y: 2}]
+  }
+];
+
+// --- Level Generator Logic ---
+
+const generateRandomLevel = (levelId, idiomData) => {
+  // 1. Pick a random Source on the edge
+  const edges = [
+    { x: -1, y: Math.floor(Math.random() * 5), dir: { x: 1, y: 0 } }, // Left
+    { x: 5, y: Math.floor(Math.random() * 5), dir: { x: -1, y: 0 } }, // Right
+    { x: Math.floor(Math.random() * 5), y: -1, dir: { x: 0, y: 1 } }, // Top
+    { x: Math.floor(Math.random() * 5), y: 5, dir: { x: 0, y: -1 } }, // Bottom
+  ];
+  let source = edges[Math.floor(Math.random() * edges.length)];
+
+  // 2. Generate a valid path (Random Walk with turns)
+  let path = [];
+  let current = { x: source.x + source.dir.x, y: source.y + source.dir.y };
+  let dir = { ...source.dir };
+  let attempts = 0;
+  let success = false;
+  let turns = 0;
+  let usedGrid = new Set(); 
+  
+  while (!success && attempts < 200) {
+    attempts++;
+    path = [];
+    current = { x: source.x + source.dir.x, y: source.y + source.dir.y };
+    dir = { ...source.dir };
+    turns = 0;
+    usedGrid = new Set();
+    
+    let stepCount = 0;
+    let validPath = true;
+
+    while (stepCount < 18) { 
+      if (current.x < 0 || current.x >= GRID_SIZE || current.y < 0 || current.y >= GRID_SIZE) {
+        break; // Out of bounds
+      }
+      
+      const key = `${current.x},${current.y}`;
+      if (usedGrid.has(key)) {
+        validPath = false; 
+        break; 
+      }
+      usedGrid.add(key);
+      path.push({ ...current });
+
+      // Decide next move: Continue or Turn?
+      if (Math.random() < 0.35 && stepCount > 0) { 
+        turns++;
+        const turnDir = Math.random() > 0.5 ? 1 : -1;
+        const oldDx = dir.x;
+        const oldDy = dir.y;
+        if (turnDir === 1) { // 90 deg
+           dir.x = -oldDy;
+           dir.y = oldDx;
+        } else { // -90 deg
+           dir.x = oldDy;
+           dir.y = -oldDx;
+        }
+      }
+
+      current.x += dir.x;
+      current.y += dir.y;
+      stepCount++;
+    }
+
+    if (validPath && path.length >= 5 && turns >= 1) {
+       success = true;
+    }
+  }
+
+  // FAILSAFE
+  if (!success) {
+    source = { x: -1, y: 0, dir: { x: 1, y: 0 } }; 
+    path = [
+      {x:0, y:0}, {x:1, y:0}, {x:2, y:0},
+      {x:2, y:1}, {x:2, y:2},             
+      {x:3, y:2}, {x:4, y:2}              
+    ];
+    turns = 2;
+  }
+
+  // 3. Place Idiom Characters
+  const indices = new Set();
+  let safetyLoop = 0;
+  while(indices.size < 4 && safetyLoop < 100) {
+    indices.add(Math.floor(Math.random() * path.length));
+    safetyLoop++;
+  }
+  if (indices.size < 4) {
+      indices.clear();
+      for(let i=0; i<Math.min(4, path.length); i++) indices.add(i);
+  }
+
+  const sortedIndices = Array.from(indices).sort((a, b) => a - b);
+  const targets = sortedIndices.map((idx, i) => ({
+    char: idiomData.text[i],
+    x: path[idx]?.x || 0,
+    y: path[idx]?.y || 0
+  }));
+
+  // 4. Determine Inventory - BUFFED to minimum 6
+  const inventory = Math.max(turns + 4, 6);
+
+  // 5. Add Random Obstacles
+  const obstacles = [];
+  const numObstacles = Math.floor(Math.random() * 2) + 1;
+  let obsSafety = 0;
+  while(obstacles.length < numObstacles && obsSafety < 50) {
+    obsSafety++;
+    let ox = Math.floor(Math.random() * 5);
+    let oy = Math.floor(Math.random() * 5);
+    
+    const inPath = path.some(p => p.x === ox && p.y === oy);
+    const isSourceBlock = (ox === source.x + source.dir.x) && (oy === source.y + source.dir.y);
+    
+    if (!inPath && !isSourceBlock) {
+      obstacles.push({ x: ox, y: oy });
+    }
+  }
+
+  return {
+    id: levelId,
+    idiom: idiomData.text,
+    hint: idiomData.hint,
+    targets,
+    source,
+    inventory,
+    obstacles
+  };
+};
+
+
+export default function IdiomLaserMaze() {
+  const [currentLevelIdx, setCurrentLevelIdx] = useState(0);
+  const [mirrors, setMirrors] = useState([]); 
+  const [inventoryCount, setInventoryCount] = useState(0);
+  const [laserPath, setLaserPath] = useState([]);
+  const [hitSequence, setHitSequence] = useState([]);
+  const [isWon, setIsWon] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(true);
+  const canvasRef = useRef(null);
+
+  // Generate Levels
+  const allLevels = useMemo(() => {
+    const generatedLevels = IDIOM_BANK.map((idiom, index) => 
+      generateRandomLevel(index + 6, idiom)
+    );
+    return [...INTRO_LEVELS, ...generatedLevels];
+  }, []);
+
+  const level = allLevels[currentLevelIdx];
+
+  // Initialize Level
+  useEffect(() => {
+    setMirrors([]);
+    setInventoryCount(level.inventory);
+    setIsWon(false);
+    setHitSequence([]);
+    setLaserPath([]); 
+  }, [currentLevelIdx, level]);
+
+  // Recalculate laser
+  useEffect(() => {
+    if(level) calculateLaser(mirrors);
+  }, [mirrors, level]);
+
+
+  // --- Laser Logic ---
+  const calculateLaser = (currentMirrors) => {
+    if (!level) return;
+
+    const path = [];
+    const hits = [];
+    
+    let cx = level.source.x;
+    let cy = level.source.y;
+    let dx = level.source.dir.x;
+    let dy = level.source.dir.y;
+
+    let px = (cx * CELL_SIZE) + (CELL_SIZE / 2);
+    let py = (cy * CELL_SIZE) + (CELL_SIZE / 2);
+    
+    path.push({ x: px, y: py });
+
+    let safety = 0;
+    const maxSteps = 60; 
+
+    while (safety < maxSteps) {
+      safety++;
+      cx += dx;
+      cy += dy;
+
+      px = (cx * CELL_SIZE) + (CELL_SIZE / 2);
+      py = (cy * CELL_SIZE) + (CELL_SIZE / 2);
+      path.push({ x: px, y: py });
+
+      if (cx < 0 || cx >= GRID_SIZE || cy < 0 || cy >= GRID_SIZE) break; 
+
+      const isObstacle = level.obstacles?.some(o => o.x === cx && o.y === cy);
+      if (isObstacle) break; 
+
+      const mirror = currentMirrors.find(m => m.x === cx && m.y === cy);
+      if (mirror) {
+        const oldDx = dx;
+        const oldDy = dy;
+        if (mirror.type === '/') {
+          if (oldDx === 1) { dx = 0; dy = -1; }
+          else if (oldDx === -1) { dx = 0; dy = 1; }
+          else if (oldDy === 1) { dx = -1; dy = 0; }
+          else if (oldDy === -1) { dx = 1; dy = 0; }
+        } else { // type '\'
+          if (oldDx === 1) { dx = 0; dy = 1; }
+          else if (oldDx === -1) { dx = 0; dy = -1; }
+          else if (oldDy === 1) { dx = 1; dy = 0; }
+          else if (oldDy === -1) { dx = -1; dy = 0; }
+        }
+      }
+
+      const target = level.targets.find(t => t.x === cx && t.y === cy);
+      if (target) hits.push(target.char);
+    }
+
+    setLaserPath(path);
+    setHitSequence(hits);
+
+    const hitString = hits.join('');
+    if (hitString === level.idiom) setIsWon(true);
+    else setIsWon(false);
+  };
+
+
+  // --- Interaction Handlers ---
+  const getGridPos = (e) => {
+    const rect = canvasRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    return { 
+      gridX: Math.floor(x / CELL_SIZE), 
+      gridY: Math.floor(y / CELL_SIZE) 
+    };
+  };
+
+  const handleMouseDown = (e) => {
+    if (isWon) return;
+    const pos = getGridPos(e);
+    const clickedMirrorIndex = mirrors.findIndex(m => m.x === pos.gridX && m.y === pos.gridY);
+
+    if (clickedMirrorIndex >= 0) {
+      if (e.button === 2) {
+        // Right click: Remove
+        const newMirrors = [...mirrors];
+        newMirrors.splice(clickedMirrorIndex, 1);
+        setMirrors(newMirrors);
+        setInventoryCount(c => c + 1);
+      } else {
+        // Left click: Rotate
+        const newMirrors = [...mirrors];
+        newMirrors[clickedMirrorIndex].type = newMirrors[clickedMirrorIndex].type === '/' ? '\\' : '/';
+        setMirrors(newMirrors);
+      }
+    }
+  };
+
+  const handleDragStart = (e) => {
+     if (inventoryCount > 0) e.dataTransfer.setData("type", "/"); 
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    if (isWon) return;
+    const pos = getGridPos(e);
+    
+    if (pos.gridX < 0 || pos.gridX >= GRID_SIZE || pos.gridY < 0 || pos.gridY >= GRID_SIZE) return;
+
+    // FIX: Allow dropping mirrors on characters (!hasChar removed)
+    const hasMirror = mirrors.some(m => m.x === pos.gridX && m.y === pos.gridY);
+    const hasObs = level.obstacles?.some(o => o.x === pos.gridX && o.y === pos.gridY);
+
+    if (!hasMirror && !hasObs && inventoryCount > 0) {
+      setMirrors([...mirrors, { x: pos.gridX, y: pos.gridY, type: '/', id: Date.now() }]);
+      setInventoryCount(c => c - 1);
+    }
+  };
+
+
+  // --- Rendering ---
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !level) return;
+    const ctx = canvas.getContext('2d');
+    
+    // Clear
+    ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+
+    // 1. Grid
+    ctx.strokeStyle = '#e5e7eb';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= GRID_SIZE; i++) {
+      ctx.beginPath();
+      ctx.moveTo(i * CELL_SIZE, 0);
+      ctx.lineTo(i * CELL_SIZE, CANVAS_SIZE);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(0, i * CELL_SIZE);
+      ctx.lineTo(CANVAS_SIZE, i * CELL_SIZE);
+      ctx.stroke();
+    }
+
+    // 2. Obstacles
+    ctx.fillStyle = '#374151'; 
+    level.obstacles?.forEach(obs => {
+      ctx.fillRect(obs.x * CELL_SIZE, obs.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+    });
+
+    // 3. Mirror Backgrounds (Layer 1)
+    // Draw this BEFORE targets so targets sit on top of the box
+    mirrors.forEach(m => {
+      const cx = m.x * CELL_SIZE;
+      const cy = m.y * CELL_SIZE;
+      ctx.fillStyle = '#eff6ff'; // Light blue bg
+      ctx.fillRect(cx + 4, cy + 4, CELL_SIZE - 8, CELL_SIZE - 8);
+    });
+
+    // 4. Targets
+    ctx.font = '24px "Noto Serif TC", "Noto Serif SC", serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    level.targets.forEach(t => {
+      const isHit = hitSequence.includes(t.char); 
+      // If target is hit, yellow; else gray. 
+      // This might overwrite Mirror BG, which is fine (text is readable).
+      ctx.fillStyle = isHit ? '#fef3c7' : '#f3f4f6';
+      // Use slightly smaller rect to check overlapping visual
+      ctx.fillRect(t.x * CELL_SIZE + 4, t.y * CELL_SIZE + 4, CELL_SIZE - 8, CELL_SIZE - 8);
+
+      ctx.fillStyle = isHit ? '#d97706' : '#1f2937';
+      ctx.fillText(t.char, (t.x * CELL_SIZE) + (CELL_SIZE/2), (t.y * CELL_SIZE) + (CELL_SIZE/2));
+    });
+
+    // 5. Mirror Lines (Layer 2)
+    // Draw this AFTER targets so the mirror line is visible over the text
+    ctx.lineWidth = 4;
+    mirrors.forEach(m => {
+      const cx = m.x * CELL_SIZE;
+      const cy = m.y * CELL_SIZE;
+      
+      ctx.strokeStyle = '#2563eb'; 
+      ctx.beginPath();
+      if (m.type === '/') {
+        ctx.moveTo(cx + 10, cy + CELL_SIZE - 10);
+        ctx.lineTo(cx + CELL_SIZE - 10, cy + 10);
+      } else {
+        ctx.moveTo(cx + 10, cy + 10);
+        ctx.lineTo(cx + CELL_SIZE - 10, cy + CELL_SIZE - 10);
+      }
+      ctx.stroke();
+      ctx.fillStyle = '#2563eb';
+      ctx.beginPath();
+      ctx.arc(cx + CELL_SIZE/2, cy + CELL_SIZE/2, 3, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // 6. Source
+    const sx = level.source.x;
+    const sy = level.source.y;
+    ctx.fillStyle = '#ef4444';
+    ctx.beginPath();
+    let triX = (sx * CELL_SIZE) + (CELL_SIZE/2);
+    let triY = (sy * CELL_SIZE) + (CELL_SIZE/2);
+    triX += level.source.dir.x * 20;
+    triY += level.source.dir.y * 20;
+    ctx.arc(triX, triY, 6, 0, Math.PI*2);
+    ctx.fill();
+
+    // 7. Laser
+    if (laserPath.length > 1) {
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.shadowBlur = isWon ? 15 : 5;
+      ctx.shadowColor = isWon ? '#fbbf24' : '#ef4444';
+      ctx.strokeStyle = isWon ? '#fbbf24' : '#ef4444'; 
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(laserPath[0].x, laserPath[0].y);
+      for (let i = 1; i < laserPath.length; i++) {
+        ctx.lineTo(laserPath[i].x, laserPath[i].y);
+      }
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+  }, [mirrors, laserPath, hitSequence, isWon, level]);
+
+
+  // --- UI Handlers ---
+  const resetLevel = () => {
+    setMirrors([]);
+    setInventoryCount(level.inventory);
+  };
+
+  const nextLevel = () => {
+    if (currentLevelIdx < allLevels.length - 1) {
+      setCurrentLevelIdx(c => c + 1);
+    }
+  };
+
+  const prevLevel = () => {
+    if (currentLevelIdx > 0) {
+      setCurrentLevelIdx(c => c - 1);
+    }
+  };
+
+  if (!level) return <div className="p-10 text-center">Loading Puzzles...</div>;
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 font-sans p-4 text-slate-800">
+      
+      {/* Header */}
+      <div className="mb-6 text-center">
+        <h1 className="text-3xl font-bold text-slate-900 mb-2 flex items-center justify-center gap-2">
+          <span className="text-red-500">Laser</span> Idioms <span className="text-xs bg-slate-200 px-2 py-1 rounded text-slate-600">50 Levels</span>
+        </h1>
+        <p className="text-slate-600">Level {currentLevelIdx + 1}/{allLevels.length}: <span className="font-semibold text-slate-800">{level.hint}</span></p>
+      </div>
+
+      <div className="flex flex-col md:flex-row gap-8 items-start mb-8">
+        
+        {/* Game Board Container */}
+        <div className="relative p-4 bg-white rounded-xl shadow-xl border border-slate-200">
+          
+          <canvas
+            ref={canvasRef}
+            width={CANVAS_SIZE}
+            height={CANVAS_SIZE}
+            onMouseDown={handleMouseDown}
+            onContextMenu={(e) => { e.preventDefault(); }} 
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={handleDrop}
+            className="cursor-pointer touch-none bg-slate-50 rounded"
+            style={{ width: CANVAS_SIZE, height: CANVAS_SIZE }}
+          />
+
+          {/* Victory Overlay */}
+          {isWon && (
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center rounded-xl text-white animate-in fade-in duration-300 z-10">
+              <Trophy size={48} className="text-yellow-400 mb-2 animate-bounce" />
+              <h2 className="text-3xl font-bold mb-2">{level.idiom}</h2>
+              <p className="text-slate-200 mb-6">Excellent!</p>
+              {currentLevelIdx < allLevels.length - 1 ? (
+                <button 
+                  onClick={nextLevel}
+                  className="px-6 py-2 bg-yellow-500 hover:bg-yellow-600 text-black font-semibold rounded-full flex items-center gap-2 transition-transform hover:scale-105"
+                >
+                  Next Level <ArrowRight size={18} />
+                </button>
+              ) : (
+                <div className="text-yellow-200 font-semibold">Game Complete!</div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Sidebar / Controls */}
+        <div className="flex flex-col gap-6 w-full md:w-64">
+          
+          {/* Target Status */}
+          <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+            <h3 className="text-xs uppercase font-bold text-slate-400 mb-3 tracking-wider">Sequence Progress</h3>
+            <div className="flex justify-between items-center bg-slate-100 p-3 rounded-lg">
+              {level.idiom.split('').map((char, idx) => {
+                const sequenceSoFar = hitSequence.slice(0, idx + 1).join('');
+                const targetSequence = level.idiom.substring(0, idx + 1);
+                const isHit = sequenceSoFar === targetSequence;
+                return (
+                  <div key={idx} className="flex flex-col items-center">
+                    <div className={`w-8 h-8 flex items-center justify-center rounded font-serif font-bold text-lg transition-colors duration-300 ${isHit ? 'bg-green-500 text-white shadow-green-200 shadow-lg' : 'bg-white text-slate-300'}`}>
+                      {isHit ? char : '?'}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Inventory */}
+          <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+            <h3 className="text-xs uppercase font-bold text-slate-400 mb-3 tracking-wider">Mirrors Available</h3>
+            <div className="flex gap-4 items-center">
+              <div 
+                draggable={inventoryCount > 0}
+                onDragStart={handleDragStart}
+                className={`w-16 h-16 flex items-center justify-center rounded-lg border-2 border-dashed transition-all
+                  ${inventoryCount > 0 
+                    ? 'border-blue-300 bg-blue-50 cursor-grab active:cursor-grabbing hover:border-blue-500' 
+                    : 'border-slate-200 bg-slate-50 opacity-50 cursor-not-allowed'
+                  }`}
+              >
+                <div className="w-full h-full relative flex items-center justify-center">
+                  <div className="w-8 h-8 border-r-4 border-blue-500 transform rotate-45"></div>
+                  <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs w-6 h-6 flex items-center justify-center rounded-full font-bold">
+                    {inventoryCount}
+                  </span>
+                </div>
+              </div>
+              <div className="text-sm text-slate-500 flex-1">
+                Drag mirror to grid.
+              </div>
+            </div>
+          </div>
+
+          {/* Controls */}
+          <div className="grid grid-cols-2 gap-3">
+             <button 
+              onClick={resetLevel}
+              className="px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-600 rounded-lg flex items-center justify-center gap-2 transition-colors"
+            >
+              <RefreshCw size={16} /> Reset
+            </button>
+             <button 
+              onClick={() => setShowTutorial(true)}
+              className="px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-600 rounded-lg flex items-center justify-center gap-2 transition-colors"
+            >
+              <HelpCircle size={16} /> Help
+            </button>
+          </div>
+          
+           {/* Level Nav */}
+           <div className="flex justify-between items-center text-sm text-slate-400">
+              <button disabled={currentLevelIdx === 0} onClick={prevLevel} className="hover:text-slate-600 disabled:opacity-30"> Prev </button>
+              <span>Level {currentLevelIdx + 1}</span>
+              <button disabled={currentLevelIdx === allLevels.length - 1} onClick={nextLevel} className="hover:text-slate-600 disabled:opacity-30"> Next </button>
+           </div>
+
+          {/* Instructions */}
+          {showTutorial && (
+            <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 text-sm text-blue-800 space-y-2 relative animate-in slide-in-from-top-2">
+              <button onClick={() => setShowTutorial(false)} className="absolute top-2 right-2 text-blue-400 hover:text-blue-600">×</button>
+              <p className="flex items-center gap-2"><span className="font-bold">1.</span> Drag mirrors onto empty cells.</p>
+              <p className="flex items-center gap-2"><span className="font-bold">2.</span> <span className="bg-blue-200 px-1 rounded text-xs uppercase">Click</span> mirror to rotate.</p>
+              <p className="flex items-center gap-2"><span className="font-bold">3.</span> <span className="bg-blue-200 px-1 rounded text-xs uppercase">Right Click</span> to remove.</p>
+            </div>
+          )}
+
+        </div>
+      </div>
+      
+      {/* Footer */}
+      <footer className="w-full max-w-3xl mt-8 pt-8 border-t border-slate-200 text-slate-500 text-sm">
+        <div className="flex items-start gap-3">
+          <BookOpen className="shrink-0 mt-1" size={20} />
+          <div>
+            <h4 className="font-bold text-slate-700 mb-2">About Idiom Laser Maze</h4>
+            <p className="leading-relaxed">
+              This interactive puzzle game combines classical Chinese idioms (Chengyu) with optical logic puzzles. 
+              The game now features 5 handcrafted introductory levels and 45 procedurally generated levels, offering 
+              a unique challenge every time. Navigate the laser through characters in the correct order to solve the idiom.
+            </p>
+          </div>
+        </div>
+      </footer>
+
+    </div>
+  );
+}
