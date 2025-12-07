@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +14,7 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Microsoft JhengHei', 'Microsoft YaHei', 'SimHei', Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -23,7 +24,7 @@
             min-height: 100vh;
             overflow: hidden;
         }
-        
+
         #root {
             width: 100%;
             height: 100vh;
@@ -31,7 +32,7 @@
             justify-content: center;
             align-items: center;
         }
-        
+
         .game-container {
             background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
@@ -41,19 +42,19 @@
             width: 100%;
             margin: 20px;
         }
-        
+
         .game-header {
             text-align: center;
             margin-bottom: 20px;
         }
-        
+
         .game-title {
             font-size: 2.5em;
             color: #333;
             margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
         }
-        
+
         .score-board {
             display: flex;
             justify-content: space-around;
@@ -61,7 +62,7 @@
             font-size: 1.2em;
             color: #555;
         }
-        
+
         .score-item {
             padding: 10px 20px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -69,14 +70,14 @@
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        
+
         .instructions {
             text-align: center;
             color: #666;
             font-size: 0.9em;
             margin-bottom: 10px;
         }
-        
+
         canvas {
             display: block;
             border: 3px solid #667eea;
@@ -85,19 +86,19 @@
             cursor: crosshair;
             box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-        
+
         .next-radical {
             text-align: center;
             margin-top: 15px;
             font-size: 1.1em;
             color: #555;
         }
-        
+
         .next-radical-label {
             font-weight: bold;
             margin-right: 10px;
         }
-        
+
         .next-radical-char {
             display: inline-block;
             width: 50px;
@@ -111,6 +112,7 @@
         }
     </style>
 </head>
+
 <body>
     <div id="root"></div>
 
@@ -210,6 +212,7 @@
                 this.radical = radical;
                 this.isPlayerBubble = isPlayerBubble;
                 this.active = true;
+                this.isMerging = false;
                 this.mergeAnimation = null;
                 this.alpha = 1;
                 this.rotation = 0; // Rotation angle in radians
@@ -266,7 +269,7 @@
             }
 
             checkBubbleCollision(other) {
-                if (!this.active || !other.active) return false;
+                if (!this.active || !other.active || this.isMerging || other.isMerging) return false;
 
                 const dist = this.pos.distance(other.pos);
                 const minDist = this.radius + other.radius;
@@ -382,6 +385,7 @@
             const [score, setScore] = useState(0);
             const [combo, setCombo] = useState(0);
             const [nextRadical, setNextRadical] = useState(ALL_RADICALS[0]);
+            const nextRadicalRef = useRef(ALL_RADICALS[0]);
             const [gameState, setGameState] = useState('ready'); // ready, playing, paused
 
             const bubblesRef = useRef([]);
@@ -440,20 +444,20 @@
 
             const initializeBubbles = (width, height) => {
                 bubblesRef.current = [];
-                
+
                 // Create random bubbles in the field
                 for (let i = 0; i < 12; i++) {
                     const x = Math.random() * (width - 100) + 50;
                     const y = Math.random() * (height - 200) + 150;
                     const part = ALL_PARTS[Math.floor(Math.random() * ALL_PARTS.length)];
                     const bubble = new Bubble(x, y, part, false);
-                    
+
                     // Give them some initial random velocity
                     bubble.vel = new Vector2(
                         (Math.random() - 0.5) * 2,
                         (Math.random() - 0.5) * 2
                     );
-                    
+
                     bubblesRef.current.push(bubble);
                 }
             };
@@ -463,18 +467,20 @@
 
                 const shooter = shooterPosRef.current;
                 const angle = aimAngleRef.current;
-                
-                const bubble = new Bubble(shooter.x, shooter.y, nextRadical, true);
+
+                const bubble = new Bubble(shooter.x, shooter.y, nextRadicalRef.current, true);
                 bubble.vel = new Vector2(
                     Math.cos(angle) * SHOOTER_SPEED,
                     Math.sin(angle) * SHOOTER_SPEED
                 );
-                
+
                 bubblesRef.current.push(bubble);
                 canShootRef.current = false;
 
                 // Set next radical
-                setNextRadical(ALL_RADICALS[Math.floor(Math.random() * ALL_RADICALS.length)]);
+                const newRadical = ALL_RADICALS[Math.floor(Math.random() * ALL_RADICALS.length)];
+                setNextRadical(newRadical);
+                nextRadicalRef.current = newRadical;
 
                 // Allow shooting again after a delay
                 setTimeout(() => {
@@ -484,39 +490,42 @@
 
             const checkMerges = () => {
                 const bubbles = bubblesRef.current;
-                
+
                 for (let i = 0; i < bubbles.length; i++) {
                     const bubble = bubbles[i];
-                    if (!bubble.active || !bubble.isPlayerBubble) continue;
+                    if (!bubble.active || !bubble.isPlayerBubble || bubble.isMerging) continue;
 
                     for (let j = 0; j < bubbles.length; j++) {
                         const other = bubbles[j];
-                        if (i === j || !other.active || other.isPlayerBubble) continue;
+                        if (i === j || !other.active || other.isPlayerBubble || other.isMerging) continue;
 
                         const dist = bubble.pos.distance(other.pos);
                         const minDist = bubble.radius + other.radius;
 
-                        if (dist < minDist) {
+                        // Allow a small overlap buffer for easier merging
+                        if (dist < minDist + 5) {
                             // Check if they can merge
                             const radical = bubble.radical;
                             const part = other.radical;
-                            
+
                             if (RADICAL_MAP[radical] && RADICAL_MAP[radical].includes(part)) {
                                 // Merge!
                                 const mergeKey = radical + part;
                                 const character = CHARACTER_RESULTS[mergeKey] || '?';
-                                
+
+                                bubble.isMerging = true;
+                                other.active = false; // Immediately remove the part bubble
+
                                 // Create merge animation
                                 bubble.mergeAnimation = {
                                     character: character,
                                     timer: 30,
                                     duration: 30
                                 };
-                                
-                                // Remove both bubbles
+
+                                // Remove player bubble after animation
                                 setTimeout(() => {
                                     bubble.active = false;
-                                    other.active = false;
                                 }, 500);
 
                                 // Update score
@@ -557,15 +566,15 @@
                     bubble.checkWallCollision(width, height);
                 });
 
+                // Check for merges first!
+                checkMerges();
+
                 // Check bubble-to-bubble collisions
                 for (let i = 0; i < bubbles.length; i++) {
                     for (let j = i + 1; j < bubbles.length; j++) {
                         bubbles[i].checkBubbleCollision(bubbles[j]);
                     }
                 }
-
-                // Check for merges
-                checkMerges();
 
                 // Remove inactive bubbles
                 bubblesRef.current = bubbles.filter(b => b.active || b.mergeAnimation);
@@ -618,7 +627,7 @@
 
                 // Draw next bubble preview
                 if (canShootRef.current && gameState === 'playing') {
-                    const previewBubble = new Bubble(shooter.x, shooter.y, nextRadical, true);
+                    const previewBubble = new Bubble(shooter.x, shooter.y, nextRadicalRef.current, true);
                     previewBubble.radius = BUBBLE_RADIUS * 0.7;
                     previewBubble.draw(ctx);
                 }
@@ -691,16 +700,19 @@
 
         ReactDOM.render(<RadicalBubbleChemistry />, document.getElementById('root'));
     </script>
-    <footer style="text-align: center; padding: 16px; color: #64748b; font-size: 12px; font-family: 'Microsoft JhengHei', 'Microsoft YaHei', sans-serif; background: rgba(255,255,255,0.8); margin-top: 20px;">
-      <p style="font-style: italic; margin-bottom: 4px;">
-        But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his understanding. Jeremiah 10:12
-      </p>
-      <p style="font-size: 11px; margin-bottom: 4px; margin-top: 8px;">
-        「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-      </p>
-      <p style="font-size: 11px; margin-top: 8px; padding-top: 8px; border-top: 1px solid #cbd5e1;">
-        @ 2025 Primary Chinese Learning Resources | Prepared by SF Lau
-      </p>
+    <footer
+        style="text-align: center; padding: 16px; color: #64748b; font-size: 12px; font-family: 'Microsoft JhengHei', 'Microsoft YaHei', sans-serif; background: rgba(255,255,255,0.8); margin-top: 20px;">
+        <p style="font-style: italic; margin-bottom: 4px;">
+            But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
+            understanding. Jeremiah 10:12
+        </p>
+        <p style="font-size: 11px; margin-bottom: 4px; margin-top: 8px;">
+            「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
+        </p>
+        <p style="font-size: 11px; margin-top: 8px; padding-top: 8px; border-top: 1px solid #cbd5e1;">
+            @ 2025 Primary Chinese Learning Resources | Prepared by SF Lau
+        </p>
     </footer>
 </body>
+
 </html>
