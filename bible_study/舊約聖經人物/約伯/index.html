@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-HK">
 <head>
   <meta charset="UTF-8" />
@@ -515,7 +515,10 @@
             </div>
           </section>
         </div>
-      </main>
+      
+    <!-- Visit Counter -->
+    <div id="visit-counter-container" class="text-center my-4"></div>
+</main>
       <footer style="text-align:center;padding:1rem;color:#e5e7eb;font-size:0.875rem;">
         <p style="font-style:italic;margin-bottom:0.25rem;">But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his understanding. Jeremiah 10:12</p>
         <p style="font-size:0.75rem;margin-bottom:0.25rem;margin-top:0.5rem;">「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12</p>
@@ -666,5 +669,15 @@
       });
     });
   </script>
+
+    <!-- Visit Counter Script -->
+    <script src="/visit-counter.js"></script>
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
+        VisitCounter.init('c-/users/keith/onedrive/desktop/profile/bible-study/------/--', {
+            scriptUrl: SCRIPT_URL,
+            containerId: 'visit-counter-container'
+        });
+    </script>
 </body>
 </html>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,25 +8,46 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
         }
+
         @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.9; transform: scale(1.05); }
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.9;
+                transform: scale(1.05);
+            }
         }
+
         .float-animation {
             animation: float 5s ease-in-out infinite;
         }
+
         .pulse-animation {
             animation: pulse 3s ease-in-out infinite;
         }
+
         .glass-card {
             backdrop-filter: blur(10px);
             background: rgba(255, 255, 255, 0.7);
             border: 1px solid rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
         }
+
         .glass-card:hover {
             background: rgba(255, 255, 255, 0.9);
             border-color: rgba(251, 146, 60, 0.3);
@@ -34,21 +56,28 @@
         }
     </style>
 </head>
+
 <body class="bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 min-h-screen">
     <div class="container mx-auto px-4 py-12">
         <!-- Header -->
         <header class="text-center mb-12">
             <div class="relative mx-auto w-24 h-24 mb-6">
-                <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-amber-400 via-orange-500 to-red-600 flex items-center justify-center float-animation shadow-2xl shadow-amber-500/50">
-                    <svg class="w-12 h-12 text-white pulse-animation" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15.5A2.5 2.5 0 0 1 17.5 21H6.5A2.5 2.5 0 0 1 4 18.5V5.5z"/>
+                <div
+                    class="absolute inset-0 rounded-2xl bg-gradient-to-br from-amber-400 via-orange-500 to-red-600 flex items-center justify-center float-animation shadow-2xl shadow-amber-500/50">
+                    <svg class="w-12 h-12 text-white pulse-animation" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15.5A2.5 2.5 0 0 1 17.5 21H6.5A2.5 2.5 0 0 1 4 18.5V5.5z" />
                     </svg>
                 </div>
             </div>
-            <h1 class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 mb-4">
+            <h1
+                class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 mb-4">
                 小學中文學習資源
             </h1>
             <p class="text-lg text-slate-600">Primary Chinese Learning Resources</p>
+            <!-- Visit Counter -->
+            <div id="visit-counter-container" class="mt-4"></div>
         </header>
 
         <!-- Main Content -->
@@ -61,11 +90,14 @@
                 <!-- 成語情緒卡 Game Card -->
                 <a href="idiom_mood_board/index.html" class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
                     <div class="space-y-4">
-                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-400 via-pink-500 to-orange-500 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-400 via-pink-500 to-orange-500 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                             <span class="text-2xl">🎴</span>
                         </div>
                         <div class="text-center">
-                            <h3 class="text-xl font-semibold mb-1 group-hover:text-purple-600 transition-colors text-slate-900">成語情緒卡</h3>
+                            <h3
+                                class="text-xl font-semibold mb-1 group-hover:text-purple-600 transition-colors text-slate-900">
+                                成語情緒卡</h3>
                             <p class="text-xs text-slate-600 mb-1">中一成語情境學習</p>
                             <p class="text-xs text-slate-500">Idiom Mood Board</p>
                         </div>
@@ -80,7 +112,8 @@
                             </div>
                         </div>
                         <div class="pt-2 text-center">
-                            <span class="text-xs text-purple-600 group-hover:text-purple-700 font-semibold">開始遊戲 →</span>
+                            <span class="text-xs text-purple-600 group-hover:text-purple-700 font-semibold">開始遊戲
+                                →</span>
                         </div>
                     </div>
                 </a>
@@ -88,11 +121,14 @@
                 <!-- 成語太空戰機 Game Card -->
                 <a href="idiom_asteroids/index.html" class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
                     <div class="space-y-4">
-                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-400 via-blue-500 to-cyan-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-400 via-blue-500 to-cyan-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                             <span class="text-2xl">🚀</span>
                         </div>
                         <div class="text-center">
-                            <h3 class="text-xl font-semibold mb-1 group-hover:text-indigo-600 transition-colors text-slate-900">成語太空戰機</h3>
+                            <h3
+                                class="text-xl font-semibold mb-1 group-hover:text-indigo-600 transition-colors text-slate-900">
+                                成語太空戰機</h3>
                             <p class="text-xs text-slate-600 mb-1">成語學習射擊遊戲</p>
                             <p class="text-xs text-slate-500">Idiom Asteroids</p>
                         </div>
@@ -107,7 +143,8 @@
                             </div>
                         </div>
                         <div class="pt-2 text-center">
-                            <span class="text-xs text-indigo-600 group-hover:text-indigo-700 font-semibold">開始遊戲 →</span>
+                            <span class="text-xs text-indigo-600 group-hover:text-indigo-700 font-semibold">開始遊戲
+                                →</span>
                         </div>
                     </div>
                 </a>
@@ -115,11 +152,14 @@
                 <!-- 成語激光迷宮 Game Card -->
                 <a href="idiom-laser-maze/index.html" class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
                     <div class="space-y-4">
-                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-400 via-orange-500 to-yellow-500 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-400 via-orange-500 to-yellow-500 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                             <span class="text-2xl">🔦</span>
                         </div>
                         <div class="text-center">
-                            <h3 class="text-xl font-semibold mb-1 group-hover:text-red-600 transition-colors text-slate-900">成語激光迷宮</h3>
+                            <h3
+                                class="text-xl font-semibold mb-1 group-hover:text-red-600 transition-colors text-slate-900">
+                                成語激光迷宮</h3>
                             <p class="text-xs text-slate-600 mb-1">成語配對遊戲</p>
                             <p class="text-xs text-slate-500">Idiom Laser Maze</p>
                         </div>
@@ -148,11 +188,14 @@
                 <!-- 詩詞捉迷藏 Game Card -->
                 <a href="poetry_royale/index.html" class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
                     <div class="space-y-4">
-                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                             <span class="text-2xl">🎭</span>
                         </div>
                         <div class="text-center">
-                            <h3 class="text-xl font-semibold mb-1 group-hover:text-emerald-600 transition-colors text-slate-900">詩詞捉迷藏</h3>
+                            <h3
+                                class="text-xl font-semibold mb-1 group-hover:text-emerald-600 transition-colors text-slate-900">
+                                詩詞捉迷藏</h3>
                             <p class="text-xs text-slate-600 mb-1">詩詞學習遊戲</p>
                             <p class="text-xs text-slate-500">Poetry Hide and Seek</p>
                         </div>
@@ -167,19 +210,24 @@
                             </div>
                         </div>
                         <div class="pt-2 text-center">
-                            <span class="text-xs text-emerald-600 group-hover:text-emerald-700 font-semibold">開始遊戲 →</span>
+                            <span class="text-xs text-emerald-600 group-hover:text-emerald-700 font-semibold">開始遊戲
+                                →</span>
                         </div>
                     </div>
                 </a>
 
                 <!-- 唐詩貪食蛇 Game Card -->
-                <a href="Tang Poetry Snake/Tang Poetry Snake.html" class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
+                <a href="Tang Poetry Snake/Tang Poetry Snake.html"
+                    class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
                     <div class="space-y-4">
-                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-400 via-emerald-500 to-teal-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-400 via-emerald-500 to-teal-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                             <span class="text-2xl">🐍</span>
                         </div>
                         <div class="text-center">
-                            <h3 class="text-xl font-semibold mb-1 group-hover:text-green-600 transition-colors text-slate-900">唐詩貪食蛇</h3>
+                            <h3
+                                class="text-xl font-semibold mb-1 group-hover:text-green-600 transition-colors text-slate-900">
+                                唐詩貪食蛇</h3>
                             <p class="text-xs text-slate-600 mb-1">詩詞學習遊戲</p>
                             <p class="text-xs text-slate-500">Tang Poetry Snake</p>
                         </div>
@@ -208,11 +256,14 @@
                 <!-- 修辭防衛戰 Game Card -->
                 <a href="Rhetoric_Defense/index.html" class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
                     <div class="space-y-4">
-                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-400 via-emerald-500 to-teal-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-400 via-emerald-500 to-teal-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                             <span class="text-2xl">🛡️</span>
                         </div>
                         <div class="text-center">
-                            <h3 class="text-xl font-semibold mb-1 group-hover:text-green-600 transition-colors text-slate-900">修辭防衛戰</h3>
+                            <h3
+                                class="text-xl font-semibold mb-1 group-hover:text-green-600 transition-colors text-slate-900">
+                                修辭防衛戰</h3>
                             <p class="text-xs text-slate-600 mb-1">中一中文學習遊戲</p>
                             <p class="text-xs text-slate-500">Rhetoric Defense</p>
                         </div>
@@ -236,11 +287,14 @@
                 <!-- 修辭工廠流水線 Game Card -->
                 <a href="rhetoric_factory/index.html" class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
                     <div class="space-y-4">
-                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-slate-400 via-gray-500 to-zinc-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-gradient-to-br from-slate-400 via-gray-500 to-zinc-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                             <span class="text-2xl">🏭</span>
                         </div>
                         <div class="text-center">
-                            <h3 class="text-xl font-semibold mb-1 group-hover:text-slate-600 transition-colors text-slate-900">修辭工廠流水線</h3>
+                            <h3
+                                class="text-xl font-semibold mb-1 group-hover:text-slate-600 transition-colors text-slate-900">
+                                修辭工廠流水線</h3>
                             <p class="text-xs text-slate-600 mb-1">修辭分類遊戲</p>
                             <p class="text-xs text-slate-500">Rhetoric Factory</p>
                         </div>
@@ -263,11 +317,14 @@
                 <!-- 修辭忍者 Game Card -->
                 <a href="rhetoric_ninja/index.html" class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
                     <div class="space-y-4">
-                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-500 via-rose-600 to-pink-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-500 via-rose-600 to-pink-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                             <span class="text-2xl">🥷</span>
                         </div>
                         <div class="text-center">
-                            <h3 class="text-xl font-semibold mb-1 group-hover:text-red-600 transition-colors text-slate-900">修辭忍者</h3>
+                            <h3
+                                class="text-xl font-semibold mb-1 group-hover:text-red-600 transition-colors text-slate-900">
+                                修辭忍者</h3>
                             <p class="text-xs text-slate-600 mb-1">修辭切割遊戲</p>
                             <p class="text-xs text-slate-500">Rhetoric Ninja</p>
                         </div>
@@ -294,13 +351,17 @@
             </h2>
             <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
                 <!-- 語法過山車 Game Card -->
-                <a href="grammar-coaster/grammar-coaster.html" class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
+                <a href="grammar-coaster/grammar-coaster.html"
+                    class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
                     <div class="space-y-4">
-                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-400 via-purple-500 to-fuchsia-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-400 via-purple-500 to-fuchsia-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                             <span class="text-2xl">🎢</span>
                         </div>
                         <div class="text-center">
-                            <h3 class="text-xl font-semibold mb-1 group-hover:text-violet-600 transition-colors text-slate-900">語法過山車</h3>
+                            <h3
+                                class="text-xl font-semibold mb-1 group-hover:text-violet-600 transition-colors text-slate-900">
+                                語法過山車</h3>
                             <p class="text-xs text-slate-600 mb-1">3D 關聯詞填空遊戲</p>
                             <p class="text-xs text-slate-500">Grammar Coaster</p>
                         </div>
@@ -315,7 +376,8 @@
                             </div>
                         </div>
                         <div class="pt-2 text-center">
-                            <span class="text-xs text-violet-600 group-hover:text-violet-700 font-semibold">開始遊戲 →</span>
+                            <span class="text-xs text-violet-600 group-hover:text-violet-700 font-semibold">開始遊戲
+                                →</span>
                         </div>
                     </div>
                 </a>
@@ -323,11 +385,14 @@
                 <!-- 語法飛車 Game Card -->
                 <a href="railshooter/index.html" class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
                     <div class="space-y-4">
-                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-400 via-sky-500 to-blue-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-400 via-sky-500 to-blue-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                             <span class="text-2xl">🚗</span>
                         </div>
                         <div class="text-center">
-                            <h3 class="text-xl font-semibold mb-1 group-hover:text-cyan-600 transition-colors text-slate-900">語法飛車</h3>
+                            <h3
+                                class="text-xl font-semibold mb-1 group-hover:text-cyan-600 transition-colors text-slate-900">
+                                語法飛車</h3>
                             <p class="text-xs text-slate-600 mb-1">3D 軌道射擊遊戲</p>
                             <p class="text-xs text-slate-500">Grammar Rail Shooter</p>
                         </div>
@@ -350,11 +415,14 @@
                 <!-- 神筆馬良邏輯橋樑 Game Card -->
                 <a href="particle-bridge-game/index.html" class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
                     <div class="space-y-4">
-                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 via-yellow-500 to-orange-500 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 via-yellow-500 to-orange-500 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                             <span class="text-2xl">🖌️</span>
                         </div>
                         <div class="text-center">
-                            <h3 class="text-xl font-semibold mb-1 group-hover:text-amber-600 transition-colors text-slate-900">神筆馬良邏輯橋樑</h3>
+                            <h3
+                                class="text-xl font-semibold mb-1 group-hover:text-amber-600 transition-colors text-slate-900">
+                                神筆馬良邏輯橋樑</h3>
                             <p class="text-xs text-slate-600 mb-1">50關邏輯填空遊戲</p>
                             <p class="text-xs text-slate-500">Logic Bridge Game</p>
                         </div>
@@ -377,11 +445,14 @@
                 <!-- 虛詞大搜查 Game Card -->
                 <a href="ac_particle_fill_in/index.html" class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
                     <div class="space-y-4">
-                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-yellow-400 via-amber-500 to-orange-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-gradient-to-br from-yellow-400 via-amber-500 to-orange-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                             <span class="text-2xl">🔍</span>
                         </div>
                         <div class="text-center">
-                            <h3 class="text-xl font-semibold mb-1 group-hover:text-yellow-600 transition-colors text-slate-900">虛詞大搜查</h3>
+                            <h3
+                                class="text-xl font-semibold mb-1 group-hover:text-yellow-600 transition-colors text-slate-900">
+                                虛詞大搜查</h3>
                             <p class="text-xs text-slate-600 mb-1">古文虛詞學習</p>
                             <p class="text-xs text-slate-500">Ancient Chinese Particle</p>
                         </div>
@@ -396,7 +467,8 @@
                             </div>
                         </div>
                         <div class="pt-2 text-center">
-                            <span class="text-xs text-yellow-600 group-hover:text-yellow-700 font-semibold">開始遊戲 →</span>
+                            <span class="text-xs text-yellow-600 group-hover:text-yellow-700 font-semibold">開始遊戲
+                                →</span>
                         </div>
                     </div>
                 </a>
@@ -410,11 +482,14 @@
                 <!-- 漢字煙火 Game Card -->
                 <a href="character_fireworks/index.html" class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
                     <div class="space-y-4">
-                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-400 via-red-500 to-orange-500 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-400 via-red-500 to-orange-500 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                             <span class="text-2xl">🎆</span>
                         </div>
                         <div class="text-center">
-                            <h3 class="text-xl font-semibold mb-1 group-hover:text-pink-600 transition-colors text-slate-900">漢字煙火</h3>
+                            <h3
+                                class="text-xl font-semibold mb-1 group-hover:text-pink-600 transition-colors text-slate-900">
+                                漢字煙火</h3>
                             <p class="text-xs text-slate-600 mb-1">部首合成遊戲</p>
                             <p class="text-xs text-slate-500">Character Fireworks</p>
                         </div>
@@ -437,11 +512,14 @@
                 <!-- 部首魔方 Game Card -->
                 <a href="The Radical Cube/index.html" class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
                     <div class="space-y-4">
-                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-400 via-indigo-500 to-purple-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-400 via-indigo-500 to-purple-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                             <span class="text-2xl">🧊</span>
                         </div>
                         <div class="text-center">
-                            <h3 class="text-xl font-semibold mb-1 group-hover:text-blue-600 transition-colors text-slate-900">部首魔方</h3>
+                            <h3
+                                class="text-xl font-semibold mb-1 group-hover:text-blue-600 transition-colors text-slate-900">
+                                部首魔方</h3>
                             <p class="text-xs text-slate-600 mb-1">3D 部首配對遊戲</p>
                             <p class="text-xs text-slate-500">The Radical Cube</p>
                         </div>
@@ -462,13 +540,17 @@
                 </a>
 
                 <!-- 部首碰碰球 Game Card -->
-                <a href="radical_bubble_chemistry/index.html" class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
+                <a href="radical_bubble_chemistry/index.html"
+                    class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
                     <div class="space-y-4">
-                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-400 via-purple-500 to-fuchsia-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-400 via-purple-500 to-fuchsia-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                             <span class="text-2xl">🫧</span>
                         </div>
                         <div class="text-center">
-                            <h3 class="text-xl font-semibold mb-1 group-hover:text-violet-600 transition-colors text-slate-900">部首碰碰球</h3>
+                            <h3
+                                class="text-xl font-semibold mb-1 group-hover:text-violet-600 transition-colors text-slate-900">
+                                部首碰碰球</h3>
                             <p class="text-xs text-slate-600 mb-1">部首合成遊戲</p>
                             <p class="text-xs text-slate-500">Radical Bubble Chemistry</p>
                         </div>
@@ -483,7 +565,8 @@
                             </div>
                         </div>
                         <div class="pt-2 text-center">
-                            <span class="text-xs text-violet-600 group-hover:text-violet-700 font-semibold">開始遊戲 →</span>
+                            <span class="text-xs text-violet-600 group-hover:text-violet-700 font-semibold">開始遊戲
+                                →</span>
                         </div>
                     </div>
                 </a>
@@ -497,11 +580,14 @@
                 <!-- 錯別字手術室 Game Card -->
                 <a href="typo_surgeon/index.html" class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
                     <div class="space-y-4">
-                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-400 via-blue-500 to-indigo-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-400 via-blue-500 to-indigo-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                             <span class="text-2xl">⚕️</span>
                         </div>
                         <div class="text-center">
-                            <h3 class="text-xl font-semibold mb-1 group-hover:text-cyan-600 transition-colors text-slate-900">錯別字手術室</h3>
+                            <h3
+                                class="text-xl font-semibold mb-1 group-hover:text-cyan-600 transition-colors text-slate-900">
+                                錯別字手術室</h3>
                             <p class="text-xs text-slate-600 mb-1">中一中文學習遊戲</p>
                             <p class="text-xs text-slate-500">Typo Surgeon</p>
                         </div>
@@ -524,11 +610,14 @@
                 <!-- 打錯別字地鼠 Game Card -->
                 <a href="typo_mole/index.html" class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
                     <div class="space-y-4">
-                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 via-orange-500 to-red-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 via-orange-500 to-red-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                             <span class="text-2xl">🐹</span>
                         </div>
                         <div class="text-center">
-                            <h3 class="text-xl font-semibold mb-1 group-hover:text-amber-600 transition-colors text-slate-900">打錯別字地鼠</h3>
+                            <h3
+                                class="text-xl font-semibold mb-1 group-hover:text-amber-600 transition-colors text-slate-900">
+                                打錯別字地鼠</h3>
                             <p class="text-xs text-slate-600 mb-1">中一中文學習遊戲</p>
                             <p class="text-xs text-slate-500">Typo Whack-a-Mole</p>
                         </div>
@@ -557,11 +646,14 @@
                 <!-- 褒貶詞 Word Rain Game Card -->
                 <a href="word_rain/index.html" class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
                     <div class="space-y-4">
-                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                             <span class="text-2xl">🌧️</span>
                         </div>
                         <div class="text-center">
-                            <h3 class="text-xl font-semibold mb-1 group-hover:text-sky-600 transition-colors text-slate-900">褒貶詞 Word Rain</h3>
+                            <h3
+                                class="text-xl font-semibold mb-1 group-hover:text-sky-600 transition-colors text-slate-900">
+                                褒貶詞 Word Rain</h3>
                             <p class="text-xs text-slate-600 mb-1">褒義詞 vs 貶義詞反應遊戲</p>
                             <p class="text-xs text-slate-500">Catch the good, dodge the bad</p>
                         </div>
@@ -582,13 +674,17 @@
                 </a>
 
                 <!-- 暗室文字尋寶 Game Card -->
-                <a href="Flashlight Discovery/Flashlight Discovery.html" class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
+                <a href="Flashlight Discovery/Flashlight Discovery.html"
+                    class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
                     <div class="space-y-4">
-                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-slate-600 via-gray-700 to-zinc-800 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-gradient-to-br from-slate-600 via-gray-700 to-zinc-800 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                             <span class="text-2xl">🔦</span>
                         </div>
                         <div class="text-center">
-                            <h3 class="text-xl font-semibold mb-1 group-hover:text-slate-600 transition-colors text-slate-900">暗室文字尋寶</h3>
+                            <h3
+                                class="text-xl font-semibold mb-1 group-hover:text-slate-600 transition-colors text-slate-900">
+                                暗室文字尋寶</h3>
                             <p class="text-xs text-slate-600 mb-1">文字搜索遊戲</p>
                             <p class="text-xs text-slate-500">Text Scavenger Hunt</p>
                         </div>
@@ -617,11 +713,14 @@
                 <!-- 語文大富翁 Game Card -->
                 <a href="chinesemonopoly/index.html" class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
                     <div class="space-y-4">
-                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 via-orange-500 to-red-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 via-orange-500 to-red-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                             <span class="text-2xl">🎲</span>
                         </div>
                         <div class="text-center">
-                            <h3 class="text-xl font-semibold mb-1 group-hover:text-amber-600 transition-colors text-slate-900">語文大富翁</h3>
+                            <h3
+                                class="text-xl font-semibold mb-1 group-hover:text-amber-600 transition-colors text-slate-900">
+                                語文大富翁</h3>
                             <p class="text-xs text-slate-600 mb-1">中一中文學習遊戲</p>
                             <p class="text-xs text-slate-500">Chinese Language Monopoly</p>
                         </div>
@@ -645,11 +744,14 @@
                 <!-- 語文百萬富翁 Game Card -->
                 <a href="millionaire/index.html" class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
                     <div class="space-y-4">
-                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-400 via-purple-500 to-indigo-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-400 via-purple-500 to-indigo-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                             <span class="text-2xl">💰</span>
                         </div>
                         <div class="text-center">
-                            <h3 class="text-xl font-semibold mb-1 group-hover:text-blue-600 transition-colors text-slate-900">語文百萬富翁</h3>
+                            <h3
+                                class="text-xl font-semibold mb-1 group-hover:text-blue-600 transition-colors text-slate-900">
+                                語文百萬富翁</h3>
                             <p class="text-xs text-slate-600 mb-1">中一中文學習遊戲</p>
                             <p class="text-xs text-slate-500">Chinese Millionaire</p>
                         </div>
@@ -672,11 +774,14 @@
                 <!-- 故事骰子生成器 Game Card -->
                 <a href="story_dice/index.html" class="glass-card rounded-2xl p-6 hover:bg-white/90 group">
                     <div class="space-y-4">
-                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-400 via-rose-500 to-red-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-400 via-rose-500 to-red-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                             <span class="text-2xl">🎲</span>
                         </div>
                         <div class="text-center">
-                            <h3 class="text-xl font-semibold mb-1 group-hover:text-pink-600 transition-colors text-slate-900">故事骰子生成器</h3>
+                            <h3
+                                class="text-xl font-semibold mb-1 group-hover:text-pink-600 transition-colors text-slate-900">
+                                故事骰子生成器</h3>
                             <p class="text-xs text-slate-600 mb-1">創意寫作工具</p>
                             <p class="text-xs text-slate-500">Story Dice Generator</p>
                         </div>
@@ -701,9 +806,11 @@
 
         <!-- Back to Home -->
         <div class="text-center mt-12">
-            <a href="../index.html" class="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors">
+            <a href="../index.html"
+                class="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
                 返回主頁
             </a>
@@ -713,7 +820,8 @@
     <!-- Footer -->
     <footer class="text-center py-4 text-slate-500 text-sm mt-12">
         <p class="italic mb-1">
-            But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his understanding. Jeremiah 10:12
+            But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
+            understanding. Jeremiah 10:12
         </p>
         <p class="text-xs mb-1 mt-2">
             「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
@@ -722,5 +830,17 @@
             @ 2025 Primary Chinese Learning Resources | Prepared by SF Lau
         </p>
     </footer>
+
+    <!-- Visit Counter Script -->
+    <script src="../visit-counter.js"></script>
+    <script>
+        // TODO: Replace with your Google Apps Script deployment URL
+        const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+        VisitCounter.init('primarychinese-portal', {
+            scriptUrl: SCRIPT_URL,
+            containerId: 'visit-counter-container'
+        });
+    </script>
 </body>
+
 </html>

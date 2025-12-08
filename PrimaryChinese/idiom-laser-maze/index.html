@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
@@ -715,6 +715,19 @@
 
         const root = createRoot(document.getElementById('root'));
         root.render(<IdiomLaserMaze />);
+    </script>
+
+    <!-- Visit Counter -->
+    <div id="visit-counter-container" class="text-center my-4"></div>
+
+    <!-- Visit Counter Script -->
+    <script src="/visit-counter.js"></script>
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
+        VisitCounter.init('c-/users/keith/onedrive/desktop/profile/primarychinese/idiom-laser-maze', {
+            scriptUrl: SCRIPT_URL,
+            containerId: 'visit-counter-container'
+        });
     </script>
 </body>
 </html>

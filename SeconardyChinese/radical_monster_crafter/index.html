@@ -1,0 +1,545 @@
+﻿<!DOCTYPE html>
+<html lang="zh-HK">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>部首合成獸 Radical Monster Crafter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Sans+TC:wght@400;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            overflow: hidden;
+        }
+
+        .ink-font {
+            font-family: 'Ma Shan Zheng', cursive;
+        }
+
+        .radical-box {
+            cursor: grab;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .radical-box:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+        }
+
+        .radical-box.dragging {
+            cursor: grabbing;
+            opacity: 0.5;
+        }
+
+        .drop-zone {
+            border: 3px dashed #4ade80;
+            background: rgba(74, 222, 128, 0.05);
+        }
+
+        .drop-zone.drag-over {
+            background: rgba(74, 222, 128, 0.2);
+            border-color: #22c55e;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .monster {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        .hit {
+            animation: shake 0.3s;
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+        }
+
+        .defeated {
+            animation: fadeOut 0.5s forwards;
+        }
+
+        .glow-red {
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.8), 0 0 20px rgba(239, 68, 68, 0.5);
+        }
+
+        .glow-green {
+            text-shadow: 0 0 10px rgba(74, 222, 128, 0.8), 0 0 20px rgba(74, 222, 128, 0.5);
+        }
+
+        .glow-blue {
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.8), 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+    </style>
+</head>
+
+<body class="text-white overflow-hidden">
+
+    <div id="app" class="min-h-screen p-4 md:p-8">
+
+        <!-- Start Screen -->
+        <div id="start-screen"
+            class="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 to-purple-900 z-50">
+            <h1 class="text-7xl md:text-9xl ink-font mb-6 glow-red text-red-500">部首合成獸</h1>
+            <p class="text-2xl text-purple-300 mb-8 tracking-widest">Radical Monster Crafter</p>
+            <p class="text-gray-300 mb-8 max-w-md text-center">
+                將部首拖曳到合成區，組合成正確的漢字來攻擊怪獸！<br>
+                <span class="text-sm text-gray-400">Drag radicals to craft characters and defeat monsters!</span>
+            </p>
+            <button id="btn-start"
+                class="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 px-8 py-4 rounded-xl text-2xl font-bold shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all">
+                開始冒險 START
+            </button>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="hidden">
+            <div class="max-w-7xl mx-auto">
+
+                <!-- Header -->
+                <div class="flex justify-between items-center mb-6">
+                    <div class="bg-slate-800/80 backdrop-blur px-6 py-3 rounded-xl border border-red-500/30">
+                        <div class="text-sm text-gray-400">關卡 Stage</div>
+                        <div class="text-3xl font-bold text-red-400" id="stage-display">1</div>
+                    </div>
+                    <div class="bg-slate-800/80 backdrop-blur px-6 py-3 rounded-xl border border-blue-500/30">
+                        <div class="text-sm text-gray-400">得分 Score</div>
+                        <div class="text-3xl font-bold text-blue-400" id="score-display">0</div>
+                    </div>
+                    <div class="bg-slate-800/80 backdrop-blur px-6 py-3 rounded-xl border border-green-500/30">
+                        <div class="text-sm text-gray-400">生命 Lives</div>
+                        <div class="text-3xl font-bold text-green-400" id="lives-display">❤❤❤</div>
+                    </div>
+                </div>
+
+                <!-- Battle Area -->
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+
+                    <!-- Monster Side -->
+                    <div
+                        class="bg-gradient-to-br from-red-900/30 to-purple-900/30 backdrop-blur rounded-2xl p-6 border border-red-500/30">
+                        <h2 class="text-2xl font-bold mb-4 text-center text-red-400">怪獸 Monster</h2>
+
+                        <div class="flex flex-col items-center">
+                            <div id="monster-display" class="monster text-8xl mb-4">👹</div>
+                            <div class="text-xl font-bold mb-2 text-white" id="monster-name">錯字獸</div>
+
+                            <!-- HP Bar -->
+                            <div class="w-full max-w-xs">
+                                <div class="flex justify-between text-sm text-gray-400 mb-1">
+                                    <span>HP</span>
+                                    <span id="hp-text">100/100</span>
+                                </div>
+                                <div class="w-full bg-gray-700 rounded-full h-4 overflow-hidden">
+                                    <div id="hp-bar"
+                                        class="bg-gradient-to-r from-red-500 to-pink-500 h-full transition-all duration-300"
+                                        style="width: 100%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Target Character -->
+                            <div class="mt-6 bg-slate-800/50 px-8 py-4 rounded-xl border border-yellow-500/50">
+                                <div class="text-sm text-yellow-400 mb-2 text-center">目標字 Target</div>
+                                <div class="text-6xl font-bold text-yellow-300 ink-font glow-blue" id="target-char">江
+                                </div>
+                                <div class="text-sm text-gray-400 text-center mt-2" id="target-hint">水 + 工 = ?</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Crafting Side -->
+                    <div
+                        class="bg-gradient-to-br from-blue-900/30 to-green-900/30 backdrop-blur rounded-2xl p-6 border border-blue-500/30">
+                        <h2 class="text-2xl font-bold mb-4 text-center text-blue-400">合成區 Crafting Zone</h2>
+
+                        <!-- Drop Zone -->
+                        <div id="drop-zone"
+                            class="drop-zone min-h-[200px] rounded-xl p-6 flex flex-wrap gap-4 items-center justify-center mb-6">
+                            <div class="text-gray-500 text-center w-full" id="drop-hint">
+                                拖曳部首到此處<br>
+                                <span class="text-sm">Drag radicals here</span>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex gap-4 mb-6">
+                            <button id="btn-attack"
+                                class="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 py-4 rounded-xl font-bold text-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105"
+                                disabled>
+                                ⚔️ 攻擊 ATTACK
+                            </button>
+                            <button id="btn-clear"
+                                class="bg-gray-700 hover:bg-gray-600 px-6 py-4 rounded-xl font-bold transition-all">
+                                🗑️ 清除
+                            </button>
+                        </div>
+
+                        <!-- Feedback -->
+                        <div id="feedback" class="text-center text-xl font-bold h-8"></div>
+                    </div>
+                </div>
+
+                <!-- Radical Inventory -->
+                <div class="bg-slate-800/80 backdrop-blur rounded-2xl p-6 border border-purple-500/30">
+                    <h2 class="text-xl font-bold mb-4 text-purple-400">部首庫 Radical Inventory</h2>
+                    <div id="radical-inventory" class="flex flex-wrap gap-4 justify-center">
+                        <!-- Radicals will be generated here -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Victory Screen -->
+        <div id="victory-screen"
+            class="hidden absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-green-900/95 to-blue-900/95 z-50">
+            <div class="text-9xl mb-4">🏆</div>
+            <h2 class="text-6xl ink-font text-yellow-400 mb-4 glow-green">勝利!</h2>
+            <div class="text-3xl text-white mb-8">最終分數: <span id="final-score"
+                    class="text-yellow-300 font-bold">0</span></div>
+            <button id="btn-restart"
+                class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 px-8 py-4 rounded-xl text-2xl font-bold transition-all transform hover:scale-105">
+                再玩一次 PLAY AGAIN
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // Game State
+        const STATE = {
+            stage: 1,
+            score: 0,
+            lives: 3,
+            currentMonster: null,
+            currentTarget: null,
+            selectedRadicals: [],
+            isPlaying: false,
+            maxStage: 10
+        };
+
+        // Character Database: [target, radical1, radical2, meaning]
+        const CHARACTERS = [
+            { target: '江', radicals: ['氵', '工'], hint: '大河流', emoji: '🌊' },
+            { target: '河', radicals: ['氵', '可'], hint: '水流的通稱', emoji: '🏞️' },
+            { target: '沐', radicals: ['氵', '木'], hint: '洗頭髮', emoji: '🚿' },
+            { target: '清', radicals: ['氵', '青'], hint: '潔淨、純淨', emoji: '💧' },
+            { target: '林', radicals: ['木', '木'], hint: '樹木叢生', emoji: '🌲' },
+            { target: '森', radicals: ['木', '林'], hint: '樹木茂密', emoji: '🌳' },
+            { target: '明', radicals: ['日', '月'], hint: '光亮', emoji: '☀️' },
+            { target: '休', radicals: ['亻', '木'], hint: '停止工作', emoji: '😴' },
+            { target: '想', radicals: ['相', '心'], hint: '思考', emoji: '💭' },
+            { target: '好', radicals: ['女', '子'], hint: '美、善', emoji: '👍' },
+            { target: '安', radicals: ['宀', '女'], hint: '平靜、穩定', emoji: '🏠' },
+            { target: '字', radicals: ['宀', '子'], hint: '文字', emoji: '📝' },
+            { target: '岩', radicals: ['山', '石'], hint: '石頭', emoji: '🪨' },
+            { target: '炎', radicals: ['火', '火'], hint: '火苗上升', emoji: '🔥' },
+            { target: '焚', radicals: ['林', '火'], hint: '燒毀', emoji: '🔥' }
+        ];
+
+        // Extra radicals for confusion
+        const ALL_RADICALS = ['氵', '木', '工', '可', '青', '日', '月', '亻', '心', '女', '子', '宀', '山', '石', '火', '林', '艹', '口', '土', '金', '竹', '相'];
+
+        // Monster types
+        const MONSTERS = [
+            { name: '錯字獸', emoji: '👹', hp: 100 },
+            { name: '倒字怪', emoji: '👺', hp: 150 },
+            { name: '部首魔', emoji: '😈', hp: 200 },
+            { name: '筆畫龍', emoji: '🐉', hp: 250 },
+            { name: '成語王', emoji: '👑', hp: 300 }
+        ];
+
+        let draggedElement = null;
+
+        // Initialize
+        function init() {
+            document.getElementById('btn-start').addEventListener('click', startGame);
+            document.getElementById('btn-restart').addEventListener('click', startGame);
+            document.getElementById('btn-attack').addEventListener('click', attack);
+            document.getElementById('btn-clear').addEventListener('click', clearCrafting);
+
+            setupDropZone();
+        }
+
+        function startGame() {
+            STATE.stage = 1;
+            STATE.score = 0;
+            STATE.lives = 3;
+            STATE.isPlaying = true;
+            STATE.selectedRadicals = [];
+
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('victory-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+
+            updateUI();
+            loadStage();
+        }
+
+        function loadStage() {
+            // Select character for this stage
+            STATE.currentTarget = CHARACTERS[Math.min(STATE.stage - 1, CHARACTERS.length - 1)];
+
+            // Select monster
+            const monsterIndex = Math.min(Math.floor((STATE.stage - 1) / 2), MONSTERS.length - 1);
+            STATE.currentMonster = { ...MONSTERS[monsterIndex], currentHP: MONSTERS[monsterIndex].hp };
+
+            // Display
+            document.getElementById('target-char').textContent = STATE.currentTarget.target;
+            document.getElementById('target-hint').textContent = STATE.currentTarget.radicals.join(' + ') + ' = ?';
+            document.getElementById('monster-display').textContent = STATE.currentMonster.emoji;
+            document.getElementById('monster-name').textContent = STATE.currentMonster.name;
+            updateHP();
+
+            // Generate radical inventory (correct ones + distractors)
+            const inventory = [...STATE.currentTarget.radicals];
+            // Add some distractors
+            const distractors = ALL_RADICALS.filter(r => !inventory.includes(r)).sort(() => 0.5 - Math.random()).slice(0, 6);
+            inventory.push(...distractors);
+            inventory.sort(() => 0.5 - Math.random()); // Shuffle
+
+            renderInventory(inventory);
+            clearCrafting();
+            updateUI();
+        }
+
+        function renderInventory(radicals) {
+            const container = document.getElementById('radical-inventory');
+            container.innerHTML = '';
+
+            radicals.forEach(radical => {
+                const box = document.createElement('div');
+                box.className = 'radical-box bg-gradient-to-br from-purple-600 to-pink-600 w-20 h-20 flex items-center justify-center text-4xl font-bold rounded-xl shadow-lg border-2 border-purple-400';
+                box.textContent = radical;
+                box.draggable = true;
+                box.dataset.radical = radical;
+
+                box.addEventListener('dragstart', handleDragStart);
+                box.addEventListener('dragend', handleDragEnd);
+
+                container.appendChild(box);
+            });
+        }
+
+        function setupDropZone() {
+            const dropZone = document.getElementById('drop-zone');
+
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('drag-over');
+            });
+
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('drag-over');
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('drag-over');
+
+                if (draggedElement) {
+                    const radical = draggedElement.dataset.radical;
+                    STATE.selectedRadicals.push(radical);
+                    updateDropZone();
+
+                    // Disable the dragged element
+                    draggedElement.style.opacity = '0.3';
+                    draggedElement.draggable = false;
+                }
+            });
+        }
+
+        function handleDragStart(e) {
+            draggedElement = e.target;
+            e.target.classList.add('dragging');
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        function updateDropZone() {
+            const dropZone = document.getElementById('drop-zone');
+            const hint = document.getElementById('drop-hint');
+
+            if (STATE.selectedRadicals.length === 0) {
+                hint.classList.remove('hidden');
+                document.getElementById('btn-attack').disabled = true;
+            } else {
+                hint.classList.add('hidden');
+                dropZone.innerHTML = '';
+
+                STATE.selectedRadicals.forEach((radical, index) => {
+                    const box = document.createElement('div');
+                    box.className = 'bg-gradient-to-br from-green-600 to-emerald-600 w-24 h-24 flex items-center justify-center text-5xl font-bold rounded-xl shadow-lg border-2 border-green-400';
+                    box.textContent = radical;
+                    dropZone.appendChild(box);
+                });
+
+                document.getElementById('btn-attack').disabled = false;
+            }
+        }
+
+        function clearCrafting() {
+            STATE.selectedRadicals = [];
+            updateDropZone();
+
+            // Re-enable all inventory items
+            document.querySelectorAll('.radical-box').forEach(box => {
+                box.style.opacity = '1';
+                box.draggable = true;
+            });
+        }
+
+        function attack() {
+            const crafted = STATE.selectedRadicals.join('');
+            const correct = STATE.currentTarget.radicals.join('');
+            const feedback = document.getElementById('feedback');
+
+            // Check if correct (order doesn't matter for simple cases)
+            const isCorrect = arraysEqual(STATE.selectedRadicals.sort(), STATE.currentTarget.radicals.sort());
+
+            if (isCorrect) {
+                // Success!
+                feedback.textContent = `✅ 正確！${STATE.currentTarget.target} (${STATE.currentTarget.hint})`;
+                feedback.className = 'text-center text-2xl font-bold text-green-400 h-8';
+
+                const damage = 50;
+                STATE.currentMonster.currentHP -= damage;
+                updateHP();
+
+                // Shake monster
+                document.getElementById('monster-display').classList.add('hit');
+                setTimeout(() => document.getElementById('monster-display').classList.remove('hit'), 300);
+
+                STATE.score += 100;
+                updateUI();
+
+                if (STATE.currentMonster.currentHP <= 0) {
+                    // Monster defeated
+                    document.getElementById('monster-display').classList.add('defeated');
+                    setTimeout(() => {
+                        document.getElementById('monster-display').classList.remove('defeated');
+                        nextStage();
+                    }, 600);
+                } else {
+                    clearCrafting();
+                }
+
+            } else {
+                // Wrong!
+                feedback.textContent = `❌ 錯誤！正確答案是：${STATE.currentTarget.radicals.join(' + ')}`;
+                feedback.className = 'text-center text-2xl font-bold text-red-400 h-8';
+
+                STATE.lives--;
+                updateUI();
+
+                if (STATE.lives <= 0) {
+                    gameOver();
+                } else {
+                    clearCrafting();
+                }
+            }
+
+            setTimeout(() => {
+                feedback.textContent = '';
+            }, 3000);
+        }
+
+        function arraysEqual(a, b) {
+            return a.length === b.length && a.every((val, index) => val === b[index]);
+        }
+
+        function updateHP() {
+            const percent = (STATE.currentMonster.currentHP / STATE.currentMonster.hp) * 100;
+            document.getElementById('hp-bar').style.width = Math.max(0, percent) + '%';
+            document.getElementById('hp-text').textContent = `${Math.max(0, STATE.currentMonster.currentHP)}/${STATE.currentMonster.hp}`;
+        }
+
+        function nextStage() {
+            STATE.stage++;
+
+            if (STATE.stage > STATE.maxStage) {
+                victory();
+            } else {
+                loadStage();
+            }
+        }
+
+        function victory() {
+            STATE.isPlaying = false;
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('victory-screen').classList.remove('hidden');
+            document.getElementById('final-score').textContent = STATE.score;
+        }
+
+        function gameOver() {
+            STATE.isPlaying = false;
+            alert('遊戲結束！Game Over!\n最終分數 Final Score: ' + STATE.score);
+            startGame();
+        }
+
+        function updateUI() {
+            document.getElementById('stage-display').textContent = STATE.stage;
+            document.getElementById('score-display').textContent = STATE.score;
+            document.getElementById('lives-display').textContent = '❤'.repeat(STATE.lives) + '🖤'.repeat(3 - STATE.lives);
+        }
+
+        // Start
+        init();
+    </script>
+
+
+    <!-- Visit Counter -->
+    <div id="visit-counter-container" class="text-center my-4"></div>
+
+    <!-- Visit Counter Script -->
+    <script src="/visit-counter.js"></script>
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
+        VisitCounter.init('c-/users/keith/onedrive/desktop/profile/seconardychinese/radical-monster-crafter', {
+            scriptUrl: SCRIPT_URL,
+            containerId: 'visit-counter-container'
+        });
+    </script>
+</body>
+
+</html>

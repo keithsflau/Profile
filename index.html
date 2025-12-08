@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-HK">
 <head>
   <meta charset="UTF-8">
@@ -336,7 +336,10 @@
           </section>
 
         </div>
-      </main>
+      
+    <!-- Visit Counter -->
+    <div id="visit-counter-container" class="text-center my-4"></div>
+</main>
 
       <!-- Footer -->
       <footer class="text-center py-4 text-slate-500 text-sm">
@@ -353,5 +356,15 @@
 
     </div>
   </div>
+
+    <!-- Visit Counter Script -->
+    <script src="/visit-counter.js"></script>
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
+        VisitCounter.init('c-/users/keith/onedrive/desktop/profile', {
+            scriptUrl: SCRIPT_URL,
+            containerId: 'visit-counter-container'
+        });
+    </script>
 </body>
 </html>

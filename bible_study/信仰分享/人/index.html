@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
@@ -69,7 +69,10 @@
     <main class="max-w-6xl mx-auto px-4 py-8 md:py-12">
         <div id="content-area" class="space-y-8">
         </div>
-    </main>
+    
+    <!-- Visit Counter -->
+    <div id="visit-counter-container" class="text-center my-4"></div>
+</main>
 
     <footer style="text-align: center; padding: 2rem 1rem; color: #707070; font-size: 0.875rem; background: white; border-top: 1px solid #e5e7eb; margin-top: 4rem;">
         <p style="font-style: italic; margin-bottom: 0.25rem;">But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his understanding. Jeremiah 10:12</p>
@@ -959,6 +962,16 @@
         // 初始化
         renderNav();
         renderContent();
+    </script>
+
+    <!-- Visit Counter Script -->
+    <script src="/visit-counter.js"></script>
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
+        VisitCounter.init('c-/users/keith/onedrive/desktop/profile/bible-study/----/-', {
+            scriptUrl: SCRIPT_URL,
+            containerId: 'visit-counter-container'
+        });
     </script>
 </body>
 </html>

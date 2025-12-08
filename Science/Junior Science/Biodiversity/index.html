@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
@@ -347,6 +347,19 @@
 
         // Add a simple fade-in animation to Tailwind config dynamically (optional)
         // or just use CSS via JS if needed. Tailwind `animate-pulse` is built in.
+    </script>
+
+    <!-- Visit Counter -->
+    <div id="visit-counter-container" class="text-center my-4"></div>
+
+    <!-- Visit Counter Script -->
+    <script src="/visit-counter.js"></script>
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
+        VisitCounter.init('c-/users/keith/onedrive/desktop/profile/science/junior-science/biodiversity', {
+            scriptUrl: SCRIPT_URL,
+            containerId: 'visit-counter-container'
+        });
     </script>
 </body>
 </html>
