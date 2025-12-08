@@ -37,7 +37,8 @@
         },
       };
     </script>
-  </head>
+      <link rel="stylesheet" href="../../../../visit-counter.css">
+</head>
   <body
     class="min-h-screen font-sans bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 text-slate-900"
   >
@@ -958,19 +959,21 @@
         </div>
       
     <!-- Visit Counter -->
-    <div id="visit-counter-container" class="text-center my-4"></div>
+    <div id="visit-counter-container"></div>
 </main>
     </div>
   
     <!-- Visit Counter Script -->
-    <script src="/visit-counter.js"></script>
+    <script src="../../../../visit-counter.js"></script>
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
-        VisitCounter.init('c-/users/keith/onedrive/desktop/profile/bible-study/--/----/----', {
+        VisitCounter.init('bible_study/查經/經文結構/夾心結構/index', {
             scriptUrl: SCRIPT_URL,
             containerId: 'visit-counter-container'
         });
     </script>
 </body>
 </html>
+
+
 

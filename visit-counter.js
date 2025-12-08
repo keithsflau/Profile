@@ -1,102 +1,66 @@
 /**
- * Visit Counter Module v2.0 - Google Sheets Backend
- * Tracks and displays page visit counts using Google Sheets for persistent storage
- * 
- * Usage:
- *   <script src="visit-counter.js"></script>
- *   <script>
- *     VisitCounter.init('mathematics-portal', {
- *       scriptUrl: 'YOUR_GOOGLE_APPS_SCRIPT_URL',
- *       containerId: 'visit-counter-container',
- *       showChart: true
- *     });
- *   </script>
+ * Visit Counter for Static Sites
+ * - Uses Google Sheets as backend
+ * - Local caching with sessionStorage
+ * - Robust error handling
  */
-
 const VisitCounter = (function () {
-    'use strict';
 
     // Configuration
-    let CONFIG = {
-        SCRIPT_URL: '', // Will be set during init
-        FALLBACK_TO_LOCALSTORAGE: true,
-        SESSION_BASED_TRACKING: true,
-        CACHE_DURATION_MS: 5 * 60 * 1000, // 5 minutes
-        RETRY_ATTEMPTS: 3,
-        RETRY_DELAY_MS: 1000
+    const CONFIG = {
+        SCRIPT_URL: 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec',
+        CACHE_DURATION_MS: 30 * 60 * 1000, // 30 minutes
+        RETRY_ATTEMPTS: 2,
+        RETRY_DELAY_MS: 1000,
+        FALLBACK_TO_LOCALSTORAGE: true
     };
 
     /**
-     * Generate or retrieve visitor ID
+     * Generate or retrieve a persistent Visitor ID
      */
     function getVisitorId() {
-        let visitorId = localStorage.getItem('portal_visitor_id');
-
-        if (!visitorId) {
-            // Create fingerprint-based ID (not PII)
-            const fingerprint = [
-                navigator.userAgent,
-                navigator.language,
-                screen.width + 'x' + screen.height,
-                new Date().getTimezoneOffset()
-            ].join('|');
-
-            visitorId = hashCode(fingerprint).toString(36);
-            localStorage.setItem('portal_visitor_id', visitorId);
+        let vid = localStorage.getItem('vc_visitor_id');
+        if (!vid) {
+            vid = 'v_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+            localStorage.setItem('vc_visitor_id', vid);
         }
-
-        return visitorId;
+        return vid;
     }
 
     /**
      * Generate session ID
      */
     function getSessionId() {
-        let sessionId = sessionStorage.getItem('portal_session_id');
-
-        if (!sessionId) {
-            sessionId = Date.now().toString(36) + Math.random().toString(36).substr(2);
-            sessionStorage.setItem('portal_session_id', sessionId);
+        let sid = sessionStorage.getItem('vc_session_id');
+        if (!sid) {
+            sid = 's_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+            sessionStorage.setItem('vc_session_id', sid);
         }
-
-        return sessionId;
+        return sid;
     }
 
     /**
-     * Simple hash function
-     */
-    function hashCode(str) {
-        let hash = 0;
-        for (let i = 0; i < str.length; i++) {
-            const char = str.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
-            hash = hash & hash;
-        }
-        return Math.abs(hash);
-    }
-
-    /**
-     * Check if visit was already recorded this session
+     * Mark visit as recorded locally to prevent duplicate counts on reload
      */
     function isVisitRecorded(pageId) {
-        const key = `visit_recorded_${pageId}`;
-        return sessionStorage.getItem(key) === 'true';
+        const lastVisit = sessionStorage.getItem(`vc_recorded_${pageId}`);
+        if (!lastVisit) return false;
+
+        // Check if within same session timeframe (e.g. 30 mins)
+        // For simplicity, we trust session storage which clears on browser close
+        return true;
     }
 
-    /**
-     * Mark visit as recorded for this session
-     */
     function markVisitRecorded(pageId) {
-        const key = `visit_recorded_${pageId}`;
-        sessionStorage.setItem(key, 'true');
+        sessionStorage.setItem(`vc_recorded_${pageId}`, Date.now().toString());
     }
 
     /**
-     * Record visit to Google Sheets
+     * Main record visit function
      */
     async function recordVisit(pageId) {
-        // Check if already recorded this session
-        if (CONFIG.SESSION_BASED_TRACKING && isVisitRecorded(pageId)) {
+        // First check cache/session to avoid spamming API on refresh
+        if (isVisitRecorded(pageId)) {
             console.log('Visit already recorded this session');
             return await getCachedCount(pageId);
         }
@@ -115,18 +79,21 @@ const VisitCounter = (function () {
             const response = await fetchWithRetry(CONFIG.SCRIPT_URL, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'text/plain;charset=utf-8', // Changed to text/plain to avoid CORS preflight issues with simple requests sometimes
                 },
-                body: JSON.stringify(visitData),
-                mode: 'cors'
+                body: JSON.stringify(visitData)
             });
 
             const data = await response.json();
 
             if (data.success) {
                 markVisitRecorded(pageId);
-                cacheCount(pageId, data.count, data.todayCount);
-                return data;
+                cacheCount(pageId, data.data.totalVisits, data.data.todayVisits);
+                return {
+                    count: data.data.totalVisits,
+                    todayCount: data.data.todayVisits,
+                    cached: false
+                };
             } else {
                 throw new Error(data.error || 'Failed to record visit');
             }
@@ -173,7 +140,7 @@ const VisitCounter = (function () {
 
         return {
             count: count,
-            todayCount: count,
+            todayCount: count, // Local storage doesn't easy track daily without more logic, simplified here
             fallback: true
         };
     }
@@ -207,7 +174,7 @@ const VisitCounter = (function () {
             }
         }
 
-        // If no valid cache, fetch from server
+        // If no valid cache, fetch from server (read-only)
         try {
             const response = await fetch(`${CONFIG.SCRIPT_URL}?portal=${pageId}`);
             const result = await response.json();
@@ -216,32 +183,119 @@ const VisitCounter = (function () {
                 cacheCount(pageId, result.data.totalVisits, result.data.todayVisits);
                 return {
                     count: result.data.totalVisits,
-                    if(!pageId) {
-                        console.error('VisitCounter: pageId is required');
-                        return;
-                    }
+                    todayCount: result.data.todayVisits,
+                    cached: false
+                };
+            }
+        } catch (error) {
+            console.warn('Failed to fetch from server', error);
+        }
 
-        // Update configuration
-        CONFIG.SCRIPT_URL = options.scriptUrl || CONFIG.SCRIPT_URL;
-                    if(!CONFIG.SCRIPT_URL) {
-                    console.error('VisitCounter: scriptUrl is required');
-                    return;
-                }
+        return null;
+    }
 
-                const containerId = options.containerId || 'visit-counter-container';
+    /**
+     * Display the counter
+     */
+    async function displayCounter(pageId, containerId = 'visit-counter-container') {
+        const container = document.getElementById(containerId);
+        if (!container) return; // Silent fail if no container
 
-                // Wait for DOM ready
-                if (document.readyState === 'loading') {
-                    document.addEventListener('DOMContentLoaded', () => {
-                        displayCounter(pageId, containerId);
-                    });
-                } else {
-                    displayCounter(pageId, containerId);
-                }
+        // Add class for styling if not present
+        container.classList.add('visit-counter-container');
+
+        // Initial state
+        container.innerHTML = `
+            <div class="visit-counter-badge loading">
+                <span class="icon">📊</span>
+                <span class="text">讀取中...</span>
+            </div>
+        `;
+
+        try {
+            // Record visit and get data
+            const data = await recordVisit(pageId);
+
+            if (data) {
+                container.innerHTML = `
+                    <div class="visit-counter-badge success">
+                        <span class="icon">✅</span>
+                        <div class="stats">
+                            <span class="total" title="總訪問量: ${data.count}">總: ${formatNumber(data.count)}</span>
+                            <span class="separator">|</span>
+                            <span class="today" title="今日訪問: ${data.todayCount}">日: ${formatNumber(data.todayCount)}</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                throw new Error('No data received');
             }
 
-            // Public API
-            return {
-                init
-            };
-        }) ();
+        } catch (error) {
+            console.error('Visit Counter Error:', error);
+            container.innerHTML = `
+                <div class="visit-counter-badge error" title="無法連接伺服器">
+                    <span class="icon">📴</span>
+                    <span class="text">離線模式</span>
+                </div>
+            `;
+
+            // Try to show local fallback if available
+            const local = recordVisitLocal(pageId);
+            if (local && local.count > 0) {
+                container.innerHTML = `
+                    <div class="visit-counter-badge warning">
+                        <span class="icon">⚠️</span>
+                        <div class="stats">
+                            <span class="total">總: ${formatNumber(local.count)}</span>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+    }
+
+    /**
+     * Helper to format numbers
+     */
+    function formatNumber(num) {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    /**
+     * Initialize
+     */
+    function init(pageId, options = {}) {
+        if (!pageId) {
+            console.error('VisitCounter: pageId is required');
+            return;
+        }
+
+        // Update configuration
+        if (options.scriptUrl) {
+            CONFIG.SCRIPT_URL = options.scriptUrl;
+        }
+
+        if (!CONFIG.SCRIPT_URL) {
+            console.error('VisitCounter: scriptUrl is required');
+            return;
+        }
+
+        const containerId = options.containerId || 'visit-counter-container';
+
+        // Wait for DOM ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                displayCounter(pageId, containerId);
+            });
+        } else {
+            displayCounter(pageId, containerId);
+        }
+    }
+
+    // Public API
+    return {
+        init
+    };
+
+})();

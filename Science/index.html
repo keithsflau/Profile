@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-HK">
 
 <head>
@@ -227,6 +227,7 @@
       transform: scale(1.05);
     }
   </style>
+    <link rel="stylesheet" href="../visit-counter.css">
 </head>
 
 <body
@@ -303,7 +304,7 @@
               初中及高中科學模擬實驗 | Junior & Senior Science Simulations
             </p>
             <!-- Visit Counter -->
-            <div id="visit-counter-container" class="mt-4"></div>
+            <div id="visit-counter-container"></div>
           </div>
         </div>
       </header>
@@ -654,8 +655,8 @@
   <script src="../visit-counter.js"></script>
   <script>
     // TODO: Replace with your Google Apps Script deployment URL
-    const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
-    VisitCounter.init('science-portal', {
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
+    VisitCounter.init('science/index', {
       scriptUrl: SCRIPT_URL,
       containerId: 'visit-counter-container'
     });
@@ -663,3 +664,4 @@
 </body>
 
 </html>
+

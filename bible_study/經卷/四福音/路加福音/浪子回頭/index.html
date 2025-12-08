@@ -116,7 +116,8 @@
         font-family: 'Noto Serif TC', serif;
       }
     </style>
-  </head>
+      <link rel="stylesheet" href="../../../../../visit-counter.css">
+</head>
   <body class="bg-slate-50 min-h-screen">
     <div class="gradient-bg"></div>
     <div class="relative z-10">
@@ -518,7 +519,7 @@
         </section>
       
     <!-- Visit Counter -->
-    <div id="visit-counter-container" class="text-center my-4"></div>
+    <div id="visit-counter-container"></div>
 </main>
 
       <footer class="text-center text-xs text-slate-500 py-10">
@@ -736,14 +737,16 @@
     </script>
   
     <!-- Visit Counter Script -->
-    <script src="/visit-counter.js"></script>
+    <script src="../../../../../visit-counter.js"></script>
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
-        VisitCounter.init('c-/users/keith/onedrive/desktop/profile/bible-study/--/---/----/----', {
+        VisitCounter.init('bible_study/經卷/四福音/路加福音/浪子回頭/index', {
             scriptUrl: SCRIPT_URL,
             containerId: 'visit-counter-container'
         });
     </script>
 </body>
 </html>
+
+
 

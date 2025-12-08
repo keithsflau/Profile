@@ -106,6 +106,7 @@
       color: #f8fafc;
     }
   </style>
+    <link rel="stylesheet" href="../../../visit-counter.css">
 </head>
 <body class="antialiased text-slate-100 bg-slate-950 min-h-screen">
   <div class="relative min-h-screen overflow-hidden">
@@ -350,7 +351,7 @@
         </div>
       
     <!-- Visit Counter -->
-    <div id="visit-counter-container" class="text-center my-4"></div>
+    <div id="visit-counter-container"></div>
 </main>
       <footer style="text-align:center;padding:1rem;color:#e2e8f0;font-size:0.875rem;">
         <p style="font-style:italic;margin-bottom:0.25rem;">But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his understanding. Jeremiah 10:12</p>
@@ -492,14 +493,16 @@
   </script>
 
     <!-- Visit Counter Script -->
-    <script src="/visit-counter.js"></script>
+    <script src="../../../visit-counter.js"></script>
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
-        VisitCounter.init('c-/users/keith/onedrive/desktop/profile/bible-study/------/---', {
+        VisitCounter.init('bible_study/舊約聖經人物/以利亞/index', {
             scriptUrl: SCRIPT_URL,
             containerId: 'visit-counter-container'
         });
     </script>
 </body>
 </html>
+
+
 

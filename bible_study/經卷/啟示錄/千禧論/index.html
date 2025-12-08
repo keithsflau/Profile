@@ -226,6 +226,7 @@
             border-bottom-color: #1d4ed8;
         }
     </style>
+    <link rel="stylesheet" href="../../../../visit-counter.css">
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased">
     <div class="gradient-bg" aria-hidden="true"></div>
@@ -744,7 +745,7 @@
 
         
     <!-- Visit Counter -->
-    <div id="visit-counter-container" class="text-center my-4"></div>
+    <div id="visit-counter-container"></div>
 </main>
 
         <!-- Footer -->
@@ -1110,13 +1111,14 @@
     </script>
 
     <!-- Visit Counter Script -->
-    <script src="/visit-counter.js"></script>
+    <script src="../../../../visit-counter.js"></script>
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
-        VisitCounter.init('c-/users/keith/onedrive/desktop/profile/bible-study/--/---/---', {
+        VisitCounter.init('bible_study/經卷/啟示錄/千禧論/index', {
             scriptUrl: SCRIPT_URL,
             containerId: 'visit-counter-container'
         });
     </script>
 </body>
 </html>
+

@@ -48,6 +48,7 @@
             box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
         }
     </style>
+    <link rel="stylesheet" href="../../visit-counter.css">
 </head>
 
 <body class="ink-bg min-h-screen text-slate-800 font-serif overflow-hidden select-none">
@@ -409,13 +410,13 @@
     </script>
 
     <!-- Visit Counter -->
-    <div id="visit-counter-container" class="text-center my-4"></div>
+    <div id="visit-counter-container"></div>
 
     <!-- Visit Counter Script -->
-    <script src="/visit-counter.js"></script>
+    <script src="../../visit-counter.js"></script>
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
-        VisitCounter.init('c-/users/keith/onedrive/desktop/profile/seconardychinese/couplet-duel', {
+        VisitCounter.init('seconardychinese/couplet_duel/index', {
             scriptUrl: SCRIPT_URL,
             containerId: 'visit-counter-container'
         });
@@ -423,3 +424,4 @@
 </body>
 
 </html>
+

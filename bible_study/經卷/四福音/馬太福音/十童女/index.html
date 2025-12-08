@@ -171,6 +171,7 @@
       cursor: pointer;
     }
   </style>
+    <link rel="stylesheet" href="../../../../../visit-counter.css">
 </head>
 <body class="bg-slate-50 min-h-screen">
   <div class="gradient-bg"></div>
@@ -1082,7 +1083,7 @@
       </section>
     
     <!-- Visit Counter -->
-    <div id="visit-counter-container" class="text-center my-4"></div>
+    <div id="visit-counter-container"></div>
 </main>
 
     <!-- Footer -->
@@ -1409,13 +1410,15 @@
   </script>
 
     <!-- Visit Counter Script -->
-    <script src="/visit-counter.js"></script>
+    <script src="../../../../../visit-counter.js"></script>
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
-        VisitCounter.init('c-/users/keith/onedrive/desktop/profile/bible-study/--/---/----/---', {
+        VisitCounter.init('bible_study/經卷/四福音/馬太福音/十童女/index', {
             scriptUrl: SCRIPT_URL,
             containerId: 'visit-counter-container'
         });
     </script>
 </body>
 </html>
+
+

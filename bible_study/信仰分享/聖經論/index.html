@@ -82,6 +82,7 @@
             background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
         }
     </style>
+    <link rel="stylesheet" href="../../../visit-counter.css">
 </head>
 <body class="text-slate-800">
 
@@ -840,7 +841,7 @@
 
     
     <!-- Visit Counter -->
-    <div id="visit-counter-container" class="text-center my-4"></div>
+    <div id="visit-counter-container"></div>
 </main>
 
     <footer class="text-center py-8 text-slate-600 text-sm">
@@ -1042,13 +1043,15 @@
     </script>
 
     <!-- Visit Counter Script -->
-    <script src="/visit-counter.js"></script>
+    <script src="../../../visit-counter.js"></script>
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
-        VisitCounter.init('c-/users/keith/onedrive/desktop/profile/bible-study/----/---', {
+        VisitCounter.init('bible_study/信仰分享/聖經論/index', {
             scriptUrl: SCRIPT_URL,
             containerId: 'visit-counter-container'
         });
     </script>
 </body>
 </html>
+
+

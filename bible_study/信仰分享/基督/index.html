@@ -25,6 +25,7 @@
         .interactive-text { cursor: help; border-bottom: 2px dotted #d97706; transition: all 0.2s; }
         .interactive-text:hover { background-color: #fef3c7; color: #92400e; }
     </style>
+    <link rel="stylesheet" href="../../../visit-counter.css">
 </head>
 <body class="flex h-screen overflow-hidden">
 
@@ -68,7 +69,7 @@
             </div>
     
     <!-- Visit Counter -->
-    <div id="visit-counter-container" class="text-center my-4"></div>
+    <div id="visit-counter-container"></div>
 </main>
 
     <div id="modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
@@ -378,13 +379,14 @@
     </footer>
 
     <!-- Visit Counter Script -->
-    <script src="/visit-counter.js"></script>
+    <script src="../../../visit-counter.js"></script>
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
-        VisitCounter.init('c-/users/keith/onedrive/desktop/profile/bible-study/----/--', {
+        VisitCounter.init('bible_study/信仰分享/基督/index', {
             scriptUrl: SCRIPT_URL,
             containerId: 'visit-counter-container'
         });
     </script>
 </body>
 </html>
+

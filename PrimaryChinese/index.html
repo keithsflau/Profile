@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-HK">
 
 <head>
@@ -55,6 +55,7 @@
             box-shadow: 0 10px 30px rgba(251, 146, 60, 0.15);
         }
     </style>
+    <link rel="stylesheet" href="../visit-counter.css">
 </head>
 
 <body class="bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 min-h-screen">
@@ -77,7 +78,7 @@
             </h1>
             <p class="text-lg text-slate-600">Primary Chinese Learning Resources</p>
             <!-- Visit Counter -->
-            <div id="visit-counter-container" class="mt-4"></div>
+            <div id="visit-counter-container"></div>
         </header>
 
         <!-- Main Content -->
@@ -835,8 +836,8 @@
     <script src="../visit-counter.js"></script>
     <script>
         // TODO: Replace with your Google Apps Script deployment URL
-        const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
-        VisitCounter.init('primarychinese-portal', {
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
+        VisitCounter.init('primarychinese/index', {
             scriptUrl: SCRIPT_URL,
             containerId: 'visit-counter-container'
         });
@@ -844,3 +845,4 @@
 </body>
 
 </html>
+

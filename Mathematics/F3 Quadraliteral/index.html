@@ -57,6 +57,7 @@
             border-left-color: #007AFF;
         }
     </style>
+    <link rel="stylesheet" href="../../visit-counter.css">
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans selection:bg-hk-blue selection:text-white">
 
@@ -430,7 +431,7 @@
 
     
     <!-- Visit Counter -->
-    <div id="visit-counter-container" class="text-center my-4"></div>
+    <div id="visit-counter-container"></div>
 </main>
 
             <!-- Footer -->
@@ -720,13 +721,14 @@
     </script>
 
     <!-- Visit Counter Script -->
-    <script src="/visit-counter.js"></script>
+    <script src="../../visit-counter.js"></script>
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
-        VisitCounter.init('c-/users/keith/onedrive/desktop/profile/mathematics/f3-quadraliteral', {
+        VisitCounter.init('mathematics/f3 quadraliteral/index', {
             scriptUrl: SCRIPT_URL,
             containerId: 'visit-counter-container'
         });
     </script>
 </body>
 </html>
+

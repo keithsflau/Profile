@@ -7,6 +7,7 @@
     <title>唐詩數據實驗室</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="../../visit-counter.css">
 </head>
 
 <body class="bg-gradient-to-br from-indigo-900 to-purple-900 text-white p-8">
@@ -44,13 +45,13 @@
     </script>
 
     <!-- Visit Counter -->
-    <div id="visit-counter-container" class="text-center my-4"></div>
+    <div id="visit-counter-container"></div>
 
     <!-- Visit Counter Script -->
-    <script src="/visit-counter.js"></script>
+    <script src="../../visit-counter.js"></script>
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
-        VisitCounter.init('c-/users/keith/onedrive/desktop/profile/seconardychinese/tang-poetry-lab', {
+        VisitCounter.init('seconardychinese/tang_poetry_lab/index', {
             scriptUrl: SCRIPT_URL,
             containerId: 'visit-counter-container'
         });
@@ -58,3 +59,4 @@
 </body>
 
 </html>
+

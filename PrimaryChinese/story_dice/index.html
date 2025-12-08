@@ -7,7 +7,8 @@
     <title>故事骰子生成器 - Story Dice Generator</title>
     <script type="module" crossorigin src="./assets/index-BymOCYH7.js"></script>
     <link rel="stylesheet" crossorigin href="./assets/index-B4bfPsQE.css">
-  </head>
+      <link rel="stylesheet" href="../../visit-counter.css">
+</head>
   <body>
     <div id="root"></div>
     <footer style="text-align: center; padding: 16px; color: #64748b; font-size: 12px; font-family: system-ui, sans-serif;">
@@ -24,16 +25,18 @@
 
   
     <!-- Visit Counter -->
-    <div id="visit-counter-container" class="text-center my-4"></div>
+    <div id="visit-counter-container"></div>
 
     <!-- Visit Counter Script -->
-    <script src="/visit-counter.js"></script>
+    <script src="../../visit-counter.js"></script>
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
-        VisitCounter.init('c-/users/keith/onedrive/desktop/profile/primarychinese/story-dice', {
+        VisitCounter.init('primarychinese/story_dice/index', {
             scriptUrl: SCRIPT_URL,
             containerId: 'visit-counter-container'
         });
     </script>
 </body>
 </html>
+
+

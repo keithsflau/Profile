@@ -35,6 +35,7 @@
         .chevron { transition: transform 0.3s; }
         .chevron.rotate { transform: rotate(180deg); }
     </style>
+    <link rel="stylesheet" href="../../../../visit-counter.css">
 </head>
 <body class="h-screen flex flex-col overflow-hidden text-slate-800">
 
@@ -70,7 +71,7 @@
         </div>
     
     <!-- Visit Counter -->
-    <div id="visit-counter-container" class="text-center my-4"></div>
+    <div id="visit-counter-container"></div>
 </main>
 
     <div id="backdrop" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300" onclick="closeDrawer()"></div>
@@ -501,13 +502,14 @@
     </footer>
 
     <!-- Visit Counter Script -->
-    <script src="/visit-counter.js"></script>
+    <script src="../../../../visit-counter.js"></script>
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
-        VisitCounter.init('c-/users/keith/onedrive/desktop/profile/bible-study/--/----/-----', {
+        VisitCounter.init('bible_study/查經/經文結構/字母詩結構/index', {
             scriptUrl: SCRIPT_URL,
             containerId: 'visit-counter-container'
         });
     </script>
 </body>
 </html>
+

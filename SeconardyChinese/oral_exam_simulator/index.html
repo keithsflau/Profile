@@ -339,6 +339,7 @@
             margin-bottom: 1rem;
         }
     </style>
+    <link rel="stylesheet" href="../../visit-counter.css">
 </head>
 
 <body>
@@ -1064,13 +1065,13 @@
     </script>
 
     <!-- Visit Counter -->
-    <div id="visit-counter-container" class="text-center my-4"></div>
+    <div id="visit-counter-container"></div>
 
     <!-- Visit Counter Script -->
-    <script src="/visit-counter.js"></script>
+    <script src="../../visit-counter.js"></script>
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
-        VisitCounter.init('c-/users/keith/onedrive/desktop/profile/seconardychinese/oral-exam-simulator', {
+        VisitCounter.init('seconardychinese/oral_exam_simulator/index', {
             scriptUrl: SCRIPT_URL,
             containerId: 'visit-counter-container'
         });
@@ -1078,3 +1079,4 @@
 </body>
 
 </html>
+

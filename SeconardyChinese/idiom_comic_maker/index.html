@@ -27,6 +27,7 @@
             background-size: 20px 20px;
         }
     </style>
+    <link rel="stylesheet" href="../../visit-counter.css">
 </head>
 
 <body class="bg-gradient-to-br from-amber-50 to-orange-100 min-h-screen p-4 text-slate-800">
@@ -497,13 +498,13 @@
     </script>
 
     <!-- Visit Counter -->
-    <div id="visit-counter-container" class="text-center my-4"></div>
+    <div id="visit-counter-container"></div>
 
     <!-- Visit Counter Script -->
-    <script src="/visit-counter.js"></script>
+    <script src="../../visit-counter.js"></script>
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
-        VisitCounter.init('c-/users/keith/onedrive/desktop/profile/seconardychinese/idiom-comic-maker', {
+        VisitCounter.init('seconardychinese/idiom_comic_maker/index', {
             scriptUrl: SCRIPT_URL,
             containerId: 'visit-counter-container'
         });
@@ -511,3 +512,4 @@
 </body>
 
 </html>
+

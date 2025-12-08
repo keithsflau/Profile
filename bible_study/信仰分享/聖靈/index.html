@@ -26,6 +26,7 @@
 
         html { scroll-behavior: smooth; }
     </style>
+    <link rel="stylesheet" href="../../../visit-counter.css">
 </head>
 <body class="min-h-screen flex flex-col overflow-hidden">
 
@@ -82,7 +83,7 @@
             <div id="content-area" class="max-w-4xl mx-auto p-6 md:p-10 pb-24"></div>
         
     <!-- Visit Counter -->
-    <div id="visit-counter-container" class="text-center my-4"></div>
+    <div id="visit-counter-container"></div>
 </main>
     </div>
 
@@ -839,13 +840,15 @@
 
 
     <!-- Visit Counter Script -->
-    <script src="/visit-counter.js"></script>
+    <script src="../../../visit-counter.js"></script>
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
-        VisitCounter.init('c-/users/keith/onedrive/desktop/profile/bible-study/----/--', {
+        VisitCounter.init('bible_study/信仰分享/聖靈/index', {
             scriptUrl: SCRIPT_URL,
             containerId: 'visit-counter-container'
         });
     </script>
 </body>
 </html>
+
+
