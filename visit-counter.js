@@ -216,127 +216,32 @@ const VisitCounter = (function () {
                 cacheCount(pageId, result.data.totalVisits, result.data.todayVisits);
                 return {
                     count: result.data.totalVisits,
-                    todayCount: result.data.todayVisits
-                };
-            }
-        } catch (error) {
-            console.warn('Failed to fetch count:', error);
-        }
-
-        // Fallback to localStorage
-        const key = `visit_count_${pageId}`;
-        const count = parseInt(localStorage.getItem(key) || '0', 10);
-        return { count, todayCount: count, fallback: true };
-    }
-
-    /**
-     * Create badge element
-     */
-    function createBadge(count, todayCount, isFallback) {
-        const badge = document.createElement('div');
-        badge.className = 'visit-counter-badge';
-
-        const fallbackIndicator = isFallback ? ' <span style="opacity: 0.5;">(offline)</span>' : '';
-
-        badge.innerHTML = `
-      <div style="
-        display: inline-flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 8px;
-        padding: 12px 20px;
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(99, 102, 241, 0.15));
-        border: 1px solid rgba(59, 130, 246, 0.3);
-        border-radius: 12px;
-        backdrop-filter: blur(10px);
-        min-width: 200px;
-      ">
-        <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
-          <svg width="20" height="20" fill="#3b82f6" viewBox="0 0 16 16">
-            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-          </svg>
-          <div style="flex: 1;">
-            <div style="font-size: 0.75rem; color: #64748b; font-weight: 500;">總訪問次數</div>
-            <div style="font-size: 1.5rem; color: #3b82f6; font-weight: 700;">${count.toLocaleString()}${fallbackIndicator}</div>
-          </div>
-        </div>
-        <div style="display: flex; align-items: center; gap: 8px; width: 100%; padding-top: 8px; border-top: 1px solid rgba(59, 130, 246, 0.2);">
-          <svg width="16" height="16" fill="#10b981" viewBox="0 0 16 16">
-            <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
-            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
-          </svg>
-          <div style="flex: 1;">
-            <div style="font-size: 0.7rem; color: #64748b; font-weight: 500;">今日訪問</div>
-            <div style="font-size: 1.125rem; color: #10b981; font-weight: 600;">${todayCount.toLocaleString()}</div>
-          </div>
-        </div>
-      </div>
-    `;
-
-        return badge;
-    }
-
-    /**
-     * Display visit counter
-     */
-    async function displayCounter(pageId, containerId) {
-        const container = document.getElementById(containerId);
-        if (!container) {
-            console.warn(`Container #${containerId} not found`);
-            return;
-        }
-
-        // Show loading state
-        container.innerHTML = '<div style="color: #64748b;">載入中...</div>';
-
-        try {
-            const result = await recordVisit(pageId);
-            const badge = createBadge(
-                result.count || 0,
-                result.todayCount || 0,
-                result.fallback || false
-            );
-
-            container.innerHTML = '';
-            container.appendChild(badge);
-
-        } catch (error) {
-            console.error('Failed to display counter:', error);
-            container.innerHTML = '<div style="color: #ef4444; font-size: 0.875rem;">無法載入訪問計數</div>';
-        }
-    }
-
-    /**
-     * Initialize visit counter
-     */
-    function init(pageId, options = {}) {
-        if (!pageId) {
-            console.error('VisitCounter: pageId is required');
-            return;
-        }
+                    if(!pageId) {
+                        console.error('VisitCounter: pageId is required');
+                        return;
+                    }
 
         // Update configuration
         CONFIG.SCRIPT_URL = options.scriptUrl || CONFIG.SCRIPT_URL;
-        if (!CONFIG.SCRIPT_URL) {
-            console.error('VisitCounter: scriptUrl is required');
-            return;
-        }
+                    if(!CONFIG.SCRIPT_URL) {
+                    console.error('VisitCounter: scriptUrl is required');
+                    return;
+                }
 
-        const containerId = options.containerId || 'visit-counter-container';
+                const containerId = options.containerId || 'visit-counter-container';
 
-        // Wait for DOM ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => {
-                displayCounter(pageId, containerId);
-            });
-        } else {
-            displayCounter(pageId, containerId);
-        }
-    }
+                // Wait for DOM ready
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', () => {
+                        displayCounter(pageId, containerId);
+                    });
+                } else {
+                    displayCounter(pageId, containerId);
+                }
+            }
 
-    // Public API
-    return {
-        init
-    };
-})();
+            // Public API
+            return {
+                init
+            };
+        }) ();
