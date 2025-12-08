@@ -31,7 +31,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: 'PrimaryChinese/idiom_asteroids/package-lock.json'
+    cache-dependency-path: '**/package-lock.json'  # 添加這行
       
       - name: Install dependencies
         working-directory: PrimaryChinese/idiom_asteroids
