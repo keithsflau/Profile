@@ -6,6 +6,12 @@ import path from 'path'
 export default defineConfig({
     plugins: [react()],
     base: './',
+    publicDir: 'public',
+    build: {
+        outDir: 'dist',
+        assetsDir: 'assets',
+        copyPublicDir: true
+    },
     resolve: {
         alias: {
             "@": path.resolve(__dirname, "./src"),
