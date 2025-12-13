@@ -1,585 +1,503 @@
 import React, { useRef, useMemo } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Text, Environment, MeshDistortMaterial } from '@react-three/drei';
+import { Canvas, useFrame, extend } from '@react-three/fiber';
+import { OrbitControls, Text, Environment, shaderMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 
-// Complete 4-chamber heart with systemic + pulmonary circulation
-const CompleteHeartModel = ({ data, isBicuspidOpen, isAorticOpen, soundVisual }) => {
-    const heartGroupRef = useRef();
-    const leftAtriumRef = useRef();
-    const leftVentricleRef = useRef();
-    const rightAtriumRef = useRef();
-    const rightVentricleRef = useRef();
+// Anatomically accurate heart shape using custom geometry
+const createHeartGeometry = () => {
+    const shape = new THREE.Shape();
     
-    // Two particle systems: oxygenated (red) and deoxygenated (blue)
+    // Create a heart curve using the classic parametric equation
+    // Scaled and adjusted for anatomical realism
+    const x = t => 16 * Math.pow(Math.sin(t), 3);
+    const y = t => 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
+    
+    const points = [];
+    for (let i = 0; i <= 100; i++) {
+        const t = (i / 100) * Math.PI * 2;
+        points.push(new THREE.Vector2(x(t) / 25, y(t) / 25));
+    }
+    
+    shape.setFromPoints(points);
+    
+    const extrudeSettings = {
+        depth: 0.8,
+        bevelEnabled: true,
+        bevelThickness: 0.2,
+        bevelSize: 0.1,
+        bevelSegments: 5
+    };
+    
+    return new THREE.ExtrudeGeometry(shape, extrudeSettings);
+};
+
+// Valve component with visible leaflets
+const HeartValve = ({ position, rotation, isOpen, label, type = "AV" }) => {
+    const leaflet1Ref = useRef();
+    const leaflet2Ref = useRef();
+    const leaflet3Ref = useRef();
+    
+    useFrame((state, delta) => {
+        // Smooth valve opening/closing animation
+        const targetAngle = isOpen ? Math.PI / 3 : 0;
+        
+        if (type === "AV") {
+            // AV valves (Mitral, Tricuspid) - 2 leaflets
+            if (leaflet1Ref.current) {
+                leaflet1Ref.current.rotation.z = THREE.MathUtils.lerp(leaflet1Ref.current.rotation.z, targetAngle, delta * 8);
+            }
+            if (leaflet2Ref.current) {
+                leaflet2Ref.current.rotation.z = THREE.MathUtils.lerp(leaflet2Ref.current.rotation.z, -targetAngle, delta * 8);
+            }
+        } else {
+            // Semilunar valves (Aortic, Pulmonary) - 3 leaflets (cusps)
+            const openAngle = isOpen ? Math.PI / 2.5 : 0.1;
+            if (leaflet1Ref.current) {
+                leaflet1Ref.current.rotation.z = THREE.MathUtils.lerp(leaflet1Ref.current.rotation.z, openAngle, delta * 8);
+            }
+            if (leaflet2Ref.current) {
+                leaflet2Ref.current.rotation.z = THREE.MathUtils.lerp(leaflet2Ref.current.rotation.z, openAngle, delta * 8);
+            }
+            if (leaflet3Ref.current) {
+                leaflet3Ref.current.rotation.z = THREE.MathUtils.lerp(leaflet3Ref.current.rotation.z, openAngle, delta * 8);
+            }
+        }
+    });
+    
+    return (
+        <group position={position} rotation={rotation}>
+            {/* Annulus (valve ring) */}
+            <mesh>
+                <torusGeometry args={[0.35, 0.05, 16, 32]} />
+                <meshStandardMaterial 
+                    color="#d97706"
+                    metalness={0.3}
+                    roughness={0.4}
+                />
+            </mesh>
+            
+            {type === "AV" ? (
+                // Two leaflets for AV valves
+                <>
+                    <group ref={leaflet1Ref} position={[-0.2, 0, 0]}>
+                        <mesh rotation={[Math.PI / 2, 0, 0]}>
+                            <boxGeometry args={[0.4, 0.6, 0.04]} />
+                            <meshStandardMaterial 
+                                color="#fbbf24"
+                                side={THREE.DoubleSide}
+                                transparent
+                                opacity={0.9}
+                            />
+                        </mesh>
+                    </group>
+                    <group ref={leaflet2Ref} position={[0.2, 0, 0]}>
+                        <mesh rotation={[Math.PI / 2, 0, 0]}>
+                            <boxGeometry args={[0.4, 0.6, 0.04]} />
+                            <meshStandardMaterial 
+                                color="#fbbf24"
+                                side={THREE.DoubleSide}
+                                transparent
+                                opacity={0.9}
+                            />
+                        </mesh>
+                    </group>
+                </>
+            ) : (
+                // Three cusps for Semilunar valves
+                <>
+                    <group rotation={[0, 0, 0]}>
+                        <group ref={leaflet1Ref} position={[0.25, 0, 0]}>
+                            <mesh rotation={[Math.PI / 2, 0, 0]}>
+                                <coneGeometry args={[0.15, 0.5, 8]} />
+                                <meshStandardMaterial 
+                                    color="#fbbf24"
+                                    side={THREE.DoubleSide}
+                                    transparent
+                                    opacity={0.9}
+                                />
+                            </mesh>
+                        </group>
+                    </group>
+                    <group rotation={[0, 0, Math.PI * 2 / 3]}>
+                        <group ref={leaflet2Ref} position={[0.25, 0, 0]}>
+                            <mesh rotation={[Math.PI / 2, 0, 0]}>
+                                <coneGeometry args={[0.15, 0.5, 8]} />
+                                <meshStandardMaterial 
+                                    color="#fbbf24"
+                                    side={THREE.DoubleSide}
+                                    transparent
+                                    opacity={0.9}
+                                />
+                            </mesh>
+                        </group>
+                    </group>
+                    <group rotation={[0, 0, -Math.PI * 2 / 3]}>
+                        <group ref={leaflet3Ref} position={[0.25, 0, 0]}>
+                            <mesh rotation={[Math.PI / 2, 0, 0]}>
+                                <coneGeometry args={[0.15, 0.5, 8]} />
+                                <meshStandardMaterial 
+                                    color="#fbbf24"
+                                    side={THREE.DoubleSide}
+                                    transparent
+                                    opacity={0.9}
+                                />
+                            </mesh>
+                        </group>
+                    </group>
+                </>
+            )}
+            
+            {/* Label */}
+            <Text 
+                position={type === "AV" ? [-0.9, 0, 0] : [0.9, 0.3, 0]} 
+                fontSize={0.18} 
+                color="white"
+                anchorX={type === "AV" ? "right" : "left"}
+            >
+                {label}
+            </Text>
+            <Text 
+                position={type === "AV" ? [-0.9, -0.22, 0] : [0.9, 0.08, 0]} 
+                fontSize={0.14} 
+                color={isOpen ? "#4ade80" : "#f87171"}
+                anchorX={type === "AV" ? "right" : "left"}
+                fontWeight="bold"
+            >
+                {isOpen ? "OPEN ✓" : "CLOSED ✗"}
+            </Text>
+            
+            {/* Glow effect when open */}
+            {isOpen && (
+                <mesh>
+                    <torusGeometry args={[0.38, 0.08, 16, 32]} />
+                    <meshBasicMaterial 
+                        color="#4ade80"
+                        transparent
+                        opacity={0.4}
+                    />
+                </mesh>
+            )}
+        </group>
+    );
+};
+
+// Complete anatomical heart
+const AnatomicalHeart = ({ data, isBicuspidOpen, isAorticOpen, soundVisual }) => {
+    const heartRef = useRef();
+    const leftVentricleRef = useRef();
+    const rightVentricleRef = useRef();
+    const leftAtriumRef = useRef();
+    const rightAtriumRef = useRef();
+    
     const oxyParticlesRef = useRef();
     const deoxyParticlesRef = useRef();
     
-    // Simulate right heart valve states (synchronized with left heart)
-    const isTricuspidOpen = isBicuspidOpen; // AV valves open together
-    const isPulmonaryOpen = isAorticOpen;   // Semilunar valves open together
+    const isTricuspidOpen = isBicuspidOpen;
+    const isPulmonaryOpen = isAorticOpen;
     
-    const oxyParticleCount = 80; // Systemic circulation (left heart)
-    const deoxyParticleCount = 80; // Pulmonary circulation (right heart)
+    const particleCount = 70;
     
-    // Oxygenated blood flow (LEFT heart pathway)
-    const oxyParticleData = useMemo(() => {
-        return new Array(oxyParticleCount).fill(0).map((_, i) => ({
-            // 0: pulmonary vein -> left atrium
-            // 1: left atrium -> left ventricle (mitral)
-            // 2: left ventricle -> aorta (aortic)
-            // 3: aorta -> body -> vena cava (invisible transition)
-            phase: i % 4,
-            progress: (i % 20) / 20,
-            speed: 0.006 + Math.random() * 0.004,
+    const oxyParticles = useMemo(() => 
+        new Array(particleCount).fill(0).map(() => ({
+            phase: Math.floor(Math.random() * 4),
+            progress: Math.random(),
+            speed: 0.005 + Math.random() * 0.003,
             angle: Math.random() * Math.PI * 2,
-            radius: 0.3 + Math.random() * 0.5,
-            offset: new THREE.Vector3(
-                (Math.random() - 0.5) * 0.15,
-                (Math.random() - 0.5) * 0.15,
-                (Math.random() - 0.5) * 0.15
-            ),
-        }));
-    }, []);
+            offset: new THREE.Vector3((Math.random()-0.5)*0.15, (Math.random()-0.5)*0.15, (Math.random()-0.5)*0.15)
+        }))
+    , []);
     
-    // Deoxygenated blood flow (RIGHT heart pathway)
-    const deoxyParticleData = useMemo(() => {
-        return new Array(deoxyParticleCount).fill(0).map((_, i) => ({
-            // 0: vena cava -> right atrium
-            // 1: right atrium -> right ventricle (tricuspid)
-            // 2: right ventricle -> pulmonary artery (pulmonary valve)
-            // 3: pulmonary artery -> lungs -> pulmonary vein (invisible transition)
-            phase: i % 4,
-            progress: (i % 20) / 20,
-            speed: 0.005 + Math.random() * 0.004,
+    const deoxyParticles = useMemo(() => 
+        new Array(particleCount).fill(0).map(() => ({
+            phase: Math.floor(Math.random() * 4),
+            progress: Math.random(),
+            speed: 0.005 + Math.random() * 0.003,
             angle: Math.random() * Math.PI * 2,
-            radius: 0.3 + Math.random() * 0.5,
-            offset: new THREE.Vector3(
-                (Math.random() - 0.5) * 0.15,
-                (Math.random() - 0.5) * 0.15,
-                (Math.random() - 0.5) * 0.15
-            ),
-        }));
-    }, []);
+            offset: new THREE.Vector3((Math.random()-0.5)*0.15, (Math.random()-0.5)*0.15, (Math.random()-0.5)*0.15)
+        }))
+    , []);
 
     useFrame((state, delta) => {
         const time = state.clock.getElapsedTime();
         
-        // Gentle whole-heart rotation
-        if (heartGroupRef.current) {
-            heartGroupRef.current.rotation.y = Math.sin(time * 0.2) * 0.08;
+        // Heart beat pulse
+        if (heartRef.current) {
+            const pulse = 1.0 + Math.sin(time * 2) * 0.015;
+            heartRef.current.scale.set(pulse, pulse, pulse);
         }
         
-        // Atrial contractions (synchronized)
-        const atrialContraction = data.phase === "Atrial Systole" ? 0.92 : 1.0;
-        if (leftAtriumRef.current) {
-            leftAtriumRef.current.scale.lerp(
-                new THREE.Vector3(atrialContraction, atrialContraction, atrialContraction),
-                delta * 5
-            );
-        }
-        if (rightAtriumRef.current) {
-            rightAtriumRef.current.scale.lerp(
-                new THREE.Vector3(atrialContraction, atrialContraction, atrialContraction),
-                delta * 5
-            );
-        }
-        
-        // Ventricular contractions (synchronized)
+        // Chamber contractions
         const volumeNorm = (data.volume - 50) / 70;
-        const ventricleScale = 0.88 + volumeNorm * 0.18;
+        const ventricleScale = 0.9 + volumeNorm * 0.15;
+        const atrialScale = data.phase === "Atrial Systole" ? 0.93 : 1.0;
         
         if (leftVentricleRef.current) {
-            leftVentricleRef.current.scale.lerp(
-                new THREE.Vector3(ventricleScale, ventricleScale, ventricleScale),
-                delta * 7
-            );
+            leftVentricleRef.current.scale.lerp(new THREE.Vector3(ventricleScale, ventricleScale, ventricleScale), delta * 6);
         }
         if (rightVentricleRef.current) {
-            // Right ventricle has lower pressure, slightly less dramatic
-            const rvScale = 0.92 + volumeNorm * 0.12;
-            rightVentricleRef.current.scale.lerp(
-                new THREE.Vector3(rvScale, rvScale, rvScale),
-                delta * 6
-            );
+            const rvScale = 0.93 + volumeNorm * 0.1;
+            rightVentricleRef.current.scale.lerp(new THREE.Vector3(rvScale, rvScale, rvScale), delta * 6);
+        }
+        if (leftAtriumRef.current) {
+            leftAtriumRef.current.scale.lerp(new THREE.Vector3(atrialScale, atrialScale, atrialScale), delta * 5);
+        }
+        if (rightAtriumRef.current) {
+            rightAtriumRef.current.scale.lerp(new THREE.Vector3(atrialScale, atrialScale, atrialScale), delta * 5);
         }
 
-        // OXYGENATED blood particles (RED - left heart)
-        if (oxyParticlesRef.current) {
+        // Particle animation (simplified for performance)
+        const animateParticles = (particles, ref, isLeft) => {
+            if (!ref.current) return;
             const dummy = new THREE.Object3D();
+            const isMitralOpen = isLeft ? isBicuspidOpen : isTricuspidOpen;
+            const isValveOpen = isLeft ? isAorticOpen : isPulmonaryOpen;
             
-            oxyParticleData.forEach((p, i) => {
+            particles.forEach((p, i) => {
                 let pos = new THREE.Vector3();
+                const xOffset = isLeft ? -0.35 : 0.5;
                 
-                // Phase 0: Pulmonary veins -> Left Atrium
                 if (p.phase === 0) {
-                    const t = p.progress;
-                    pos.set(
-                        -1.8 + t * 1.4, // Enter from back left
-                        0.9 + Math.sin(t * Math.PI) * 0.2,
-                        -0.6 + t * 0.6
-                    );
+                    // Vein to atrium
+                    pos.set(xOffset + (isLeft ? -1 : 1) * (1 - p.progress), 0.9, 0);
                     p.progress += p.speed * 2;
                     if (p.progress >= 1) { p.phase = 1; p.progress = 0; }
-                }
-                // Phase 1: Left Atrium -> Left Ventricle (through Mitral)
-                else if (p.phase === 1) {
-                    if (p.progress < 0.5) {
+                } else if (p.phase === 1) {
+                    // Atrium swirl
+                    if (p.progress < 0.6) {
                         const angle = p.angle + p.progress * Math.PI * 2;
-                        const r = 0.35 * (1 - p.progress * 0.4);
-                        pos.set(
-                            Math.cos(angle) * r - 0.4,
-                            0.8 - p.progress * 0.2,
-                            Math.sin(angle) * r
-                        );
-                        p.progress += p.speed * 1.2;
+                        pos.set(xOffset + Math.cos(angle) * 0.3, 0.8, Math.sin(angle) * 0.3);
+                        p.progress += p.speed;
                     } else {
-                        if (isBicuspidOpen) {
-                            const dropT = (p.progress - 0.5) / 0.5;
-                            pos.set(
-                                -0.35,
-                                0.6 - dropT * 1.1,
-                                0
-                            );
+                        if (isMitralOpen) {
+                            pos.set(xOffset, 0.8 - (p.progress - 0.6) * 2, 0);
                             p.progress += p.speed * 3;
                             if (p.progress >= 1) { p.phase = 2; p.progress = 0; }
                         } else {
-                            p.progress = 0.5; // Wait
+                            p.progress = 0.6;
                         }
                     }
-                }
-                // Phase 2: Left Ventricle -> Aorta
-                else if (p.phase === 2) {
+                } else if (p.phase === 2) {
+                    // Ventricle
                     if (p.progress < 0.6) {
                         const angle = p.angle + p.progress * Math.PI * 3;
-                        const r = 0.4 + p.radius * 0.25;
-                        pos.set(
-                            Math.cos(angle) * r - 0.3,
-                            -0.5 - p.progress * 0.4,
-                            Math.sin(angle) * r * 0.6
-                        );
-                        if (!isBicuspidOpen && !isAorticOpen) p.angle += delta * 1.2;
-                        p.progress += p.speed * 0.8;
+                        pos.set(xOffset + Math.cos(angle) * 0.5, -0.5 - p.progress * 0.4, Math.sin(angle) * 0.4);
+                        p.progress += p.speed;
                     } else {
-                        if (isAorticOpen) {
-                            const ejectT = (p.progress - 0.6) / 0.4;
-                            pos.set(-0.3, -0.4 + Math.pow(ejectT, 0.7) * 2.8, 0);
+                        if (isValveOpen) {
+                            pos.set(xOffset, -0.3 + (p.progress - 0.6) * 6, 0);
                             p.progress += p.speed * 5;
-                            if (p.progress >= 1) { p.phase = 3; p.progress = 0; }
+                            if (p.progress >= 1) { p.phase = 0; p.progress = 0; }
                         } else {
                             p.progress = 0.6;
                         }
                     }
                 }
-                // Phase 3: Aorta -> Body (exit and recycle as deoxygenated conceptually)
-                else if (p.phase === 3) {
-                    const t = p.progress;
-                    pos.set(-0.3, 2.2 + t * 1.5, 0); // Upward into aorta
-                    p.progress += p.speed * 3;
-                    if (p.progress >= 1) { p.phase = 0; p.progress = 0; p.angle = Math.random() * Math.PI * 2; }
-                }
                 
                 pos.add(p.offset);
                 dummy.position.copy(pos);
-                const scale = 0.055;
-                dummy.scale.set(scale, scale, scale);
+                dummy.scale.setScalar(0.05);
                 dummy.updateMatrix();
-                oxyParticlesRef.current.setMatrixAt(i, dummy.matrix);
+                ref.current.setMatrixAt(i, dummy.matrix);
             });
-            
-            oxyParticlesRef.current.instanceMatrix.needsUpdate = true;
-        }
-
-        // DEOXYGENATED blood particles (BLUE - right heart)
-        if (deoxyParticlesRef.current) {
-            const dummy = new THREE.Object3D();
-            
-            deoxyParticleData.forEach((p, i) => {
-                let pos = new THREE.Vector3();
-                
-                // Phase 0: Vena Cava -> Right Atrium
-                if (p.phase === 0) {
-                    const t = p.progress;
-                    pos.set(
-                        1.8 - t * 1.4, // Enter from front right
-                        0.9 + Math.sin(t * Math.PI) * 0.2,
-                        0.6 - t * 0.6
-                    );
-                    p.progress += p.speed * 2;
-                    if (p.progress >= 1) { p.phase = 1; p.progress = 0; }
-                }
-                // Phase 1: Right Atrium -> Right Ventricle (through Tricuspid)
-                else if (p.phase === 1) {
-                    if (p.progress < 0.5) {
-                        const angle = p.angle + p.progress * Math.PI * 2;
-                        const r = 0.3 * (1 - p.progress * 0.4);
-                        pos.set(
-                            Math.cos(angle) * r + 0.6,
-                            0.8 - p.progress * 0.2,
-                            Math.sin(angle) * r
-                        );
-                        p.progress += p.speed * 1.2;
-                    } else {
-                        if (isTricuspidOpen) {
-                            const dropT = (p.progress - 0.5) / 0.5;
-                            pos.set(
-                                0.5,
-                                0.6 - dropT * 1.0,
-                                0.2
-                            );
-                            p.progress += p.speed * 3;
-                            if (p.progress >= 1) { p.phase = 2; p.progress = 0; }
-                        } else {
-                            p.progress = 0.5;
-                        }
-                    }
-                }
-                // Phase 2: Right Ventricle -> Pulmonary Artery
-                else if (p.phase === 2) {
-                    if (p.progress < 0.6) {
-                        const angle = p.angle + p.progress * Math.PI * 3;
-                        const r = 0.35 + p.radius * 0.2;
-                        pos.set(
-                            Math.cos(angle) * r + 0.5,
-                            -0.4 - p.progress * 0.35,
-                            Math.sin(angle) * r * 0.6 + 0.2
-                        );
-                        if (!isTricuspidOpen && !isPulmonaryOpen) p.angle += delta * 1.2;
-                        p.progress += p.speed * 0.8;
-                    } else {
-                        if (isPulmonaryOpen) {
-                            const ejectT = (p.progress - 0.6) / 0.4;
-                            pos.set(0.5, -0.3 + Math.pow(ejectT, 0.7) * 2.5, 0.3);
-                            p.progress += p.speed * 5;
-                            if (p.progress >= 1) { p.phase = 3; p.progress = 0; }
-                        } else {
-                            p.progress = 0.6;
-                        }
-                    }
-                }
-                // Phase 3: Pulmonary Artery -> Lungs (exit and recycle)
-                else if (p.phase === 3) {
-                    const t = p.progress;
-                    pos.set(0.5, 2.0 + t * 1.5, 0.3);
-                    p.progress += p.speed * 3;
-                    if (p.progress >= 1) { p.phase = 0; p.progress = 0; p.angle = Math.random() * Math.PI * 2; }
-                }
-                
-                pos.add(p.offset);
-                dummy.position.copy(pos);
-                const scale = 0.055;
-                dummy.scale.set(scale, scale, scale);
-                dummy.updateMatrix();
-                deoxyParticlesRef.current.setMatrixAt(i, dummy.matrix);
-            });
-            
-            deoxyParticlesRef.current.instanceMatrix.needsUpdate = true;
-        }
+            ref.current.instanceMatrix.needsUpdate = true;
+        };
+        
+        animateParticles(oxyParticles, oxyParticlesRef, true);
+        animateParticles(deoxyParticles, deoxyParticlesRef, false);
     });
 
     return (
-        <group ref={heartGroupRef} rotation={[0.1, -0.2, 0]}>
-            {/* ===== LEFT HEART (Oxygenated Blood) ===== */}
+        <group ref={heartRef} rotation={[0.15, -0.25, 0.05]}>
+            {/* Heart Base */}
+            <mesh position={[0, 0, 0]} scale={[1.2, 1.3, 0.8]}>
+                <dodecahedronGeometry args={[1, 2]} />
+                <meshPhysicalMaterial
+                    color="#7f1d1d"
+                    transparent
+                    opacity={0.15}
+                    roughness={0.4}
+                    transmission={0.7}
+                    thickness={0.8}
+                />
+            </mesh>
             
             {/* Left Atrium */}
-            <group position={[-0.4, 0.9, 0]} ref={leftAtriumRef}>
+            <group position={[-0.35, 0.9, 0]} ref={leftAtriumRef}>
                 <mesh>
-                    <sphereGeometry args={[0.55, 32, 32]} />
+                    <sphereGeometry args={[0.5, 32, 32]} />
                     <meshPhysicalMaterial
                         color="#fca5a5"
-                        transparent
-                        opacity={0.38}
-                        roughness={0.3}
-                        transmission={0.55}
-                        thickness={0.4}
-                        clearcoat={0.5}
-                    />
-                </mesh>
-                <Text position={[-1.2, 0, 0]} fontSize={0.22} color="#fca5a5" anchorX="right">
-                    Left Atrium
-                </Text>
-            </group>
-
-            {/* Left Ventricle */}
-            <group position={[-0.3, -0.4, 0]} ref={leftVentricleRef}>
-                <mesh>
-                    <sphereGeometry args={[0.85, 32, 32, 0, Math.PI * 2, 0, Math.PI * 0.7]} />
-                    <MeshDistortMaterial
-                        color="#ef4444"
-                        transparent
-                        opacity={0.42}
-                        roughness={0.4}
-                        distort={0.12}
-                        speed={2.5}
-                        clearcoat={0.6}
-                    />
-                </mesh>
-                <mesh position={[0, -1.2, 0]} rotation={[Math.PI, 0, 0]}>
-                    <coneGeometry args={[0.65, 1.1, 32]} />
-                    <MeshDistortMaterial
-                        color="#dc2626"
-                        transparent
-                        opacity={0.42}
-                        roughness={0.4}
-                        distort={0.15}
-                        speed={2.5}
-                        clearcoat={0.6}
-                    />
-                </mesh>
-                <Text position={[-1.5, -0.3, 0]} fontSize={0.26} color="#ef4444" anchorX="right">
-                    Left Ventricle
-                </Text>
-            </group>
-
-            {/* ===== RIGHT HEART (Deoxygenated Blood) ===== */}
-            
-            {/* Right Atrium */}
-            <group position={[0.6, 0.9, 0]} ref={rightAtriumRef}>
-                <mesh>
-                    <sphereGeometry args={[0.48, 32, 32]} />
-                    <meshPhysicalMaterial
-                        color="#93c5fd"
                         transparent
                         opacity={0.35}
                         roughness={0.3}
                         transmission={0.6}
-                        thickness={0.3}
-                        clearcoat={0.5}
+                        thickness={0.4}
                     />
                 </mesh>
-                <Text position={[1.1, 0, 0]} fontSize={0.22} color="#93c5fd" anchorX="left">
+                <Text position={[-0.9, 0.2, 0]} fontSize={0.2} color="#fca5a5" anchorX="right">
+                    Left Atrium
+                </Text>
+            </group>
+
+            {/* Right Atrium */}
+            <group position={[0.5, 0.9, 0.1]} ref={rightAtriumRef}>
+                <mesh>
+                    <sphereGeometry args={[0.45, 32, 32]} />
+                    <meshPhysicalMaterial
+                        color="#93c5fd"
+                        transparent
+                        opacity={0.32}
+                        roughness={0.3}
+                        transmission={0.65}
+                        thickness={0.35}
+                    />
+                </mesh>
+                <Text position={[0.9, 0.2, 0]} fontSize={0.2} color="#93c5fd" anchorX="left">
                     Right Atrium
                 </Text>
             </group>
 
+            {/* Left Ventricle */}
+            <group position={[-0.35, -0.4, 0]} ref={leftVentricleRef}>
+                <mesh>
+                    <sphereGeometry args={[0.8, 32, 32]} />
+                    <meshPhysicalMaterial
+                        color="#ef4444"
+                        transparent
+                        opacity={0.4}
+                        roughness={0.4}
+                        transmission={0.55}
+                        thickness={0.7}
+                    />
+                </mesh>
+                <mesh position={[0, -1.1, 0]} rotation={[Math.PI, 0, 0]}>
+                    <coneGeometry args={[0.6, 1, 32]} />
+                    <meshPhysicalMaterial
+                        color="#dc2626"
+                        transparent
+                        opacity={0.4}
+                        roughness={0.4}
+                        transmission={0.55}
+                        thickness={0.6}
+                    />
+                </mesh>
+                <Text position={[-1.2, -0.5, 0]} fontSize={0.24} color="#ef4444" anchorX="right">
+                    Left Ventricle
+                </Text>
+            </group>
+
             {/* Right Ventricle */}
-            <group position={[0.5, -0.4, 0.25]} ref={rightVentricleRef}>
-                <mesh rotation={[0, 0.3, 0]}>
-                    <sphereGeometry args={[0.68, 32, 32, 0, Math.PI * 1.2, 0, Math.PI * 0.65]} />
-                    <MeshDistortMaterial
+            <group position={[0.5, -0.4, 0.2]} ref={rightVentricleRef}>
+                <mesh>
+                    <sphereGeometry args={[0.65, 32, 32]} />
+                    <meshPhysicalMaterial
                         color="#60a5fa"
                         transparent
-                        opacity={0.38}
+                        opacity={0.36}
                         roughness={0.4}
-                        distort={0.1}
-                        speed={2}
-                        clearcoat={0.5}
+                        transmission={0.6}
+                        thickness={0.55}
                     />
                 </mesh>
-                <mesh position={[0, -1.0, 0]} rotation={[Math.PI, 0, 0]}>
-                    <coneGeometry args={[0.5, 0.9, 32]} />
-                    <MeshDistortMaterial
+                <mesh position={[0, -0.95, 0]} rotation={[Math.PI, 0, 0]}>
+                    <coneGeometry args={[0.5, 0.85, 32]} />
+                    <meshPhysicalMaterial
                         color="#3b82f6"
                         transparent
-                        opacity={0.38}
+                        opacity={0.36}
                         roughness={0.4}
-                        distort={0.12}
-                        speed={2}
-                        clearcoat={0.5}
+                        transmission={0.6}
+                        thickness={0.5}
                     />
                 </mesh>
-                <Text position={[1.3, -0.3, 0]} fontSize={0.26} color="#60a5fa" anchorX="left">
+                <Text position={[1.1, -0.5, 0]} fontSize={0.24} color="#60a5fa" anchorX="left">
                     Right Ventricle
                 </Text>
             </group>
 
-            {/* Interventricular Septum (wall) */}
-            <mesh position={[0.1, -0.7, 0]} rotation={[0, 0, 0.2]}>
-                <boxGeometry args={[0.12, 1.6, 0.9]} />
-                <meshPhysicalMaterial color="#991b1b" transparent opacity={0.25} roughness={0.6} />
-            </mesh>
-
-            {/* ===== GREAT VESSELS ===== */}
-            
-            {/* Aorta (from left ventricle) */}
-            <group position={[-0.3, 1.6, 0]}>
+            {/* Aorta */}
+            <group position={[-0.35, 1.6, 0]}>
                 <mesh>
-                    <cylinderGeometry args={[0.32, 0.36, 1.4, 24]} />
+                    <cylinderGeometry args={[0.3, 0.32, 1.2, 24]} />
                     <meshPhysicalMaterial
                         color="#b91c1c"
-                        transparent
-                        opacity={0.48}
-                        roughness={0.25}
-                        transmission={0.4}
-                        clearcoat={0.7}
-                    />
-                </mesh>
-                <mesh position={[0, 0.8, 0]} rotation={[0, 0, Math.PI / 2]}>
-                    <torusGeometry args={[0.55, 0.28, 16, 32, Math.PI]} />
-                    <meshPhysicalMaterial
-                        color="#b91c1c"
-                        transparent
-                        opacity={0.48}
-                        roughness={0.25}
-                        transmission={0.4}
-                        clearcoat={0.7}
-                    />
-                </mesh>
-                <Text position={[0.8, 0.3, 0]} fontSize={0.26} color="#b91c1c" anchorX="left">
-                    Aorta
-                </Text>
-            </group>
-
-            {/* Pulmonary Artery (from right ventricle) */}
-            <group position={[0.5, 1.5, 0.3]}>
-                <mesh>
-                    <cylinderGeometry args={[0.28, 0.32, 1.2, 24]} />
-                    <meshPhysicalMaterial
-                        color="#3b82f6"
                         transparent
                         opacity={0.45}
                         roughness={0.25}
                         transmission={0.45}
-                        clearcoat={0.6}
                     />
                 </mesh>
-                <Text position={[0.9, 0.2, 0]} fontSize={0.22} color="#3b82f6" anchorX="left">
-                    Pulmonary Artery
+                <Text position={[0.7, 0.3, 0]} fontSize={0.22} color="#b91c1c" anchorX="left">
+                    Aorta
                 </Text>
             </group>
 
-            {/* Pulmonary Veins (to left atrium) */}
-            <group position={[-1.2, 0.9, 0]}>
-                <mesh rotation={[0, 0, Math.PI / 2]}>
-                    <cylinderGeometry args={[0.14, 0.14, 0.7, 16]} />
-                    <meshStandardMaterial color="#ef4444" transparent opacity={0.5} />
-                </mesh>
-                <Text position={[-0.6, 0.4, 0]} fontSize={0.18} color="#fca5a5" anchorX="right">
-                    Pulmonary Veins
-                </Text>
-            </group>
-
-            {/* Superior Vena Cava (to right atrium) */}
-            <group position={[1.0, 1.3, 0]}>
+            {/* Pulmonary Artery */}
+            <group position={[0.5, 1.5, 0.2]}>
                 <mesh>
-                    <cylinderGeometry args={[0.18, 0.18, 0.8, 16]} />
-                    <meshStandardMaterial color="#1e40af" transparent opacity={0.5} />
+                    <cylinderGeometry args={[0.26, 0.28, 1.0, 24]} />
+                    <meshPhysicalMaterial
+                        color="#3b82f6"
+                        transparent
+                        opacity={0.42}
+                        roughness={0.25}
+                        transmission={0.48}
+                    />
                 </mesh>
-                <Text position={[0.6, 0.3, 0]} fontSize={0.18} color="#93c5fd" anchorX="left">
-                    Vena Cava
+                <Text position={[0.7, 0.2, 0]} fontSize={0.2} color="#3b82f6" anchorX="left">
+                    Pulmonary A.
                 </Text>
             </group>
 
-            {/* ===== VALVE INDICATORS ===== */}
+            {/* VALVES WITH VISIBLE LEAFLETS */}
+            <HeartValve 
+                position={[-0.35, 0.35, 0]} 
+                rotation={[Math.PI / 2, 0, 0]}
+                isOpen={isBicuspidOpen}
+                label="Mitral"
+                type="AV"
+            />
             
-            {/* Mitral Valve (Left AV) */}
-            <group position={[-0.4, 0.4, 0]}>
-                <mesh rotation={[Math.PI / 2, 0, 0]}>
-                    <torusGeometry args={[0.42, 0.035, 16, 32]} />
-                    <meshStandardMaterial
-                        color={isBicuspidOpen ? "#4ade80" : "#fbbf24"}
-                        emissive={isBicuspidOpen ? "#22c55e" : "#f59e0b"}
-                        emissiveIntensity={isBicuspidOpen ? 1.0 : 0.4}
-                    />
-                </mesh>
-                <Text position={[-1.0, 0, 0]} fontSize={0.2} color="white" anchorX="right">Mitral</Text>
-                <Text position={[-1.0, -0.2, 0]} fontSize={0.15} color={isBicuspidOpen ? "#4ade80" : "#f87171"} anchorX="right">
-                    {isBicuspidOpen ? "OPEN" : "CLOSED"}
-                </Text>
-            </group>
-
-            {/* Aortic Valve (Left Semilunar) */}
-            <group position={[-0.3, 1.2, 0]}>
-                <mesh rotation={[Math.PI / 2, 0, 0]}>
-                    <torusGeometry args={[0.3, 0.035, 16, 32]} />
-                    <meshStandardMaterial
-                        color={isAorticOpen ? "#4ade80" : "#fbbf24"}
-                        emissive={isAorticOpen ? "#22c55e" : "#f59e0b"}
-                        emissiveIntensity={isAorticOpen ? 1.0 : 0.4}
-                    />
-                </mesh>
-                <Text position={[0.8, 0, 0]} fontSize={0.2} color="white" anchorX="left">Aortic</Text>
-            </group>
-
-            {/* Tricuspid Valve (Right AV) */}
-            <group position={[0.6, 0.4, 0]}>
-                <mesh rotation={[Math.PI / 2, 0, 0]}>
-                    <torusGeometry args={[0.36, 0.035, 16, 32]} />
-                    <meshStandardMaterial
-                        color={isTricuspidOpen ? "#4ade80" : "#fbbf24"}
-                        emissive={isTricuspidOpen ? "#22c55e" : "#f59e0b"}
-                        emissiveIntensity={isTricuspidOpen ? 1.0 : 0.4}
-                    />
-                </mesh>
-                <Text position={[0.9, 0, 0]} fontSize={0.2} color="white" anchorX="left">Tricuspid</Text>
-            </group>
-
-            {/* Pulmonary Valve (Right Semilunar) */}
-            <group position={[0.5, 1.1, 0.3]}>
-                <mesh rotation={[Math.PI / 2, 0, 0]}>
-                    <torusGeometry args={[0.26, 0.035, 16, 32]} />
-                    <meshStandardMaterial
-                        color={isPulmonaryOpen ? "#4ade80" : "#fbbf24"}
-                        emissive={isPulmonaryOpen ? "#22c55e" : "#f59e0b"}
-                        emissiveIntensity={isPulmonaryOpen ? 1.0 : 0.4}
-                    />
-                </mesh>
-                <Text position={[0.7, 0, 0]} fontSize={0.18} color="white" anchorX="left">Pulmonary</Text>
-            </group>
-
-            {/* ===== BLOOD PARTICLES ===== */}
+            <HeartValve 
+                position={[-0.35, 1.15, 0]} 
+                rotation={[Math.PI / 2, 0, 0]}
+                isOpen={isAorticOpen}
+                label="Aortic"
+                type="SL"
+            />
             
-            {/* Oxygenated Blood (RED) */}
-            <instancedMesh ref={oxyParticlesRef} args={[null, null, oxyParticleCount]}>
-                <sphereGeometry args={[1, 12, 12]} />
-                <meshStandardMaterial
-                    color="#ff0000"
-                    emissive="#cc0000"
-                    emissiveIntensity={0.85}
-                    metalness={0.35}
-                    roughness={0.15}
-                />
+            <HeartValve 
+                position={[0.5, 0.35, 0.2]} 
+                rotation={[Math.PI / 2, 0, 0]}
+                isOpen={isTricuspidOpen}
+                label="Tricuspid"
+                type="AV"
+            />
+            
+            <HeartValve 
+                position={[0.5, 1.05, 0.2]} 
+                rotation={[Math.PI / 2, 0, 0]}
+                isOpen={isPulmonaryOpen}
+                label="Pulmonary"
+                type="SL"
+            />
+
+            {/* Blood Particles */}
+            <instancedMesh ref={oxyParticlesRef} args={[null, null, particleCount]}>
+                <sphereGeometry args={[1, 10, 10]} />
+                <meshStandardMaterial color="#ff0000" emissive="#cc0000" emissiveIntensity={0.8} />
+            </instancedMesh>
+            
+            <instancedMesh ref={deoxyParticlesRef} args={[null, null, particleCount]}>
+                <sphereGeometry args={[1, 10, 10]} />
+                <meshStandardMaterial color="#4444ff" emissive="#0000cc" emissiveIntensity={0.8} />
             </instancedMesh>
 
-            {/* Deoxygenated Blood (BLUE) */}
-            <instancedMesh ref={deoxyParticlesRef} args={[null, null, deoxyParticleCount]}>
-                <sphereGeometry args={[1, 12, 12]} />
-                <meshStandardMaterial
-                    color="#4444ff"
-                    emissive="#0000cc"
-                    emissiveIntensity={0.85}
-                    metalness={0.35}
-                    roughness={0.15}
-                />
-            </instancedMesh>
-
-            {/* SOUND EFFECT */}
+            {/* Sound */}
             {soundVisual && (
-                <Text
-                    position={[0, 0, 2.8]}
-                    fontSize={1.3}
-                    color="#fbbf24"
-                    outlineWidth={0.1}
-                    outlineColor="#78350f"
-                >
+                <Text position={[0, 0, 2.5]} fontSize={1.2} color="#fbbf24" outlineWidth={0.1} outlineColor="#78350f">
                     {soundVisual.split(" ")[0]}
                 </Text>
-            )}
-
-            {/* Flow Arrows */}
-            {isBicuspidOpen && (
-                <>
-                    <mesh position={[-0.4, 0.4, 0.9]} rotation={[Math.PI, 0, 0]}>
-                        <coneGeometry args={[0.12, 0.35, 8]} />
-                        <meshStandardMaterial color="#4ade80" emissive="#22c55e" emissiveIntensity={0.5} />
-                    </mesh>
-                    <mesh position={[0.6, 0.4, 0.9]} rotation={[Math.PI, 0, 0]}>
-                        <coneGeometry args={[0.12, 0.35, 8]} />
-                        <meshStandardMaterial color="#4ade80" emissive="#22c55e" emissiveIntensity={0.5} />
-                    </mesh>
-                </>
-            )}
-            {isAorticOpen && (
-                <>
-                    <mesh position={[-0.3, 1.6, 0.9]}>
-                        <coneGeometry args={[0.12, 0.35, 8]} />
-                        <meshStandardMaterial color="#4ade80" emissive="#22c55e" emissiveIntensity={0.5} />
-                    </mesh>
-                    <mesh position={[0.5, 1.5, 1.1]}>
-                        <coneGeometry args={[0.12, 0.35, 8]} />
-                        <meshStandardMaterial color="#4ade80" emissive="#22c55e" emissiveIntensity={0.5} />
-                    </mesh>
-                </>
             )}
         </group>
     );
@@ -588,94 +506,73 @@ const CompleteHeartModel = ({ data, isBicuspidOpen, isAorticOpen, soundVisual })
 const HeartVisual = (props) => {
     return (
         <div className="w-full h-full bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 rounded-xl overflow-hidden relative shadow-2xl">
-            <Canvas 
-                camera={{ position: [3.5, 0.3, 5], fov: 48 }} 
-                shadows 
-                dpr={[1, 2]}
-            >
+            <Canvas camera={{ position: [3, 0.5, 5], fov: 45 }} shadows dpr={[1, 2]}>
                 <color attach="background" args={['#020617']} />
-                <fog attach="fog" args={['#020617', 4, 16]} />
+                <fog attach="fog" args={['#020617', 4, 15]} />
                 
-                {/* Dramatic Lighting */}
-                <ambientLight intensity={0.35} />
-                <directionalLight position={[6, 6, 6]} intensity={1.6} castShadow />
-                <pointLight position={[-4, 2, 4]} intensity={1.1} color="#fca5a5" />
-                <pointLight position={[4, 2, 4]} intensity={1.1} color="#60a5fa" />
-                <pointLight position={[0, -3, -2]} intensity={0.6} color="#a855f7" />
-                <spotLight position={[0, 10, 0]} angle={0.5} penumbra={1} intensity={1.3} castShadow />
+                <ambientLight intensity={0.4} />
+                <directionalLight position={[5, 5, 5]} intensity={1.4} castShadow />
+                <pointLight position={[-4, 2, 3]} intensity={1.0} color="#fca5a5" />
+                <pointLight position={[4, 2, 3]} intensity={1.0} color="#60a5fa" />
+                <spotLight position={[0, 8, 0]} angle={0.4} penumbra={1} intensity={1.2} castShadow />
                 
                 <Environment preset="city" />
 
-                <CompleteHeartModel {...props} />
+                <AnatomicalHeart {...props} />
 
                 <OrbitControls
                     enableZoom={true}
-                    enablePan={true}
                     minDistance={2.5}
-                    maxDistance={12}
-                    autoRotate={false}
+                    maxDistance={10}
                     rotateSpeed={0.4}
                     target={[0, 0.2, 0]}
                 />
             </Canvas>
 
-            {/* UI */}
             <div className="absolute top-4 left-4 pointer-events-none select-none">
-                <div className="text-white/95 font-bold text-xl tracking-wide drop-shadow-lg">
-                    Complete Heart Circulation
+                <div className="text-white/95 font-bold text-xl drop-shadow-lg">
+                    4-Chamber Heart Model
                 </div>
-                <div className="text-slate-300 text-sm font-medium mt-1">
-                    4-Chamber • Systemic + Pulmonary Flow
+                <div className="text-slate-300 text-sm mt-1">
+                    Dual Circulation • Valve Mechanics
                 </div>
             </div>
 
             <div className="absolute top-4 right-4 pointer-events-none select-none">
-                <div className="bg-slate-900/90 backdrop-blur-sm px-4 py-3 rounded-xl border border-indigo-500/30 shadow-lg">
-                    <div className="text-xs text-slate-400 mb-1">Cardiac Phase</div>
-                    <div className="text-sm font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-                        {props.data.phase}
-                    </div>
+                <div className="bg-slate-900/90 backdrop-blur px-4 py-3 rounded-xl border border-indigo-500/30">
+                    <div className="text-xs text-slate-400">Phase</div>
+                    <div className="text-sm font-bold text-indigo-300">{props.data.phase}</div>
                 </div>
             </div>
 
             <div className="absolute bottom-4 right-4 pointer-events-none select-none">
-                <div className="bg-slate-900/90 backdrop-blur-sm px-4 py-3 rounded-xl border border-slate-700 shadow-lg space-y-2">
-                    <div className="text-xs font-bold text-slate-300 mb-2">Hemodynamics (Left)</div>
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+                <div className="bg-slate-900/90 backdrop-blur px-4 py-3 rounded-xl border border-slate-700 space-y-2 text-xs">
+                    <div className="font-bold text-slate-300 mb-2">Hemodynamics</div>
+                    <div className="flex justify-between gap-4">
                         <span className="text-slate-400">Aorta</span>
-                        <span className="font-mono font-bold text-red-400 text-right">
-                            {Math.round(props.data.pressureAorta)} mmHg
-                        </span>
+                        <span className="font-mono font-bold text-red-400">{Math.round(props.data.pressureAorta)} mmHg</span>
+                    </div>
+                    <div className="flex justify-between gap-4">
                         <span className="text-slate-400">LV</span>
-                        <span className="font-mono font-bold text-orange-400 text-right">
-                            {Math.round(props.data.pressureVentricle)} mmHg
-                        </span>
-                        <span className="text-slate-400">LA</span>
-                        <span className="font-mono font-bold text-blue-400 text-right">
-                            {Math.round(props.data.pressureAtrium)} mmHg
-                        </span>
-                        <span className="text-slate-400 border-t border-slate-700 pt-2">Volume</span>
-                        <span className="font-mono font-bold text-emerald-400 text-right border-t border-slate-700 pt-2">
-                            {Math.round(props.data.volume)} mL
-                        </span>
+                        <span className="font-mono font-bold text-orange-400">{Math.round(props.data.pressureVentricle)} mmHg</span>
+                    </div>
+                    <div className="flex justify-between gap-4">
+                        <span className="text-slate-400">Volume</span>
+                        <span className="font-mono font-bold text-emerald-400">{Math.round(props.data.volume)} mL</span>
                     </div>
                 </div>
             </div>
 
             <div className="absolute bottom-4 left-4 pointer-events-none select-none">
-                <div className="bg-slate-900/90 backdrop-blur-sm px-3 py-2.5 rounded-lg border border-slate-700 shadow-lg space-y-1.5">
-                    <div className="text-xs font-bold text-slate-300 mb-2">Blood Flow</div>
-                    <div className="flex items-center gap-2.5 text-xs text-slate-300">
-                        <span className="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.8)]"></span>
-                        Oxygenated (Systemic)
+                <div className="bg-slate-900/90 backdrop-blur px-3 py-2.5 rounded-lg border border-slate-700 space-y-1.5 text-xs">
+                    <div className="font-bold text-slate-300 mb-1.5">Blood Flow</div>
+                    <div className="flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)]"></span>
+                        <span className="text-slate-300">Oxygenated</span>
                     </div>
-                    <div className="flex items-center gap-2.5 text-xs text-slate-300">
-                        <span className="w-3 h-3 rounded-full bg-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.8)]"></span>
-                        Deoxygenated (Pulmonary)
-                    </div>
-                    <div className="flex items-center gap-2.5 text-xs text-slate-300 pt-1.5 border-t border-slate-700">
-                        <span className="w-3 h-3 rounded-full bg-green-500"></span>
-                        Valve Open
+                    <div className="flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)]"></span>
+                        <span className="text-slate-300">Deoxygenated</span>
                     </div>
                 </div>
             </div>
