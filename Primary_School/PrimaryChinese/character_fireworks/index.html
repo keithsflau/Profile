@@ -30,3 +30,13 @@ void Shoot()
     
     // 如果你的花受重力影響會下墜，你可能需要稍微把目標點抬高一點點，或者增加 shootForce (速度)
 }
+    <!-- Visit Counter -->
+    <div id="visit-counter-container"></div>
+    <script src="../../../visit-counter.js"></script>
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
+        VisitCounter.init('primary_school/primarychinese/character_fireworks', {
+            scriptUrl: SCRIPT_URL,
+            containerId: 'visit-counter-container'
+        });
+    </script>
