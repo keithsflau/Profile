@@ -55,7 +55,7 @@ const MuscleFiberMaterial = ({ color }) => (
     />
 );
 
-const Valve = ({ position, rotation, isOpen, label, scale = 1 }) => {
+const Valve = ({ position, rotation, isOpen, label, scale = 1, labelOffset = [1, 0.5, 0] }) => {
     // 3-leaflet valve simulation
     const color = "#fbbf24"; // Yellowish tissue
     
@@ -70,38 +70,41 @@ const Valve = ({ position, rotation, isOpen, label, scale = 1 }) => {
     const angle = isOpen ? 1 : 0.2; // Radians to open
 
     return (
-        <group position={position} rotation={rotation} scale={scale}>
-            <group ref={groupRef}>
-                 {/* Leaflet 1 */}
-                 <group rotation={[0, 0, 0]}>
-                    <mesh position={[0.4, 0, 0]} rotation={[0, 0, isOpen ? 1.2 : 0.1]}>
-                        <coneGeometry args={[0.05, 0.8, 8]} />
-                        <meshStandardMaterial color={color} />
-                    </mesh>
-                 </group>
-                 {/* Leaflet 2 */}
-                 <group rotation={[0, 0, 2.1]}>
-                    <mesh position={[0.4, 0, 0]} rotation={[0, 0, isOpen ? 1.2 : 0.1]}>
-                        <coneGeometry args={[0.05, 0.8, 8]} />
-                        <meshStandardMaterial color={color} />
-                    </mesh>
-                 </group>
-                 {/* Leaflet 3 */}
-                 <group rotation={[0, 0, -2.1]}>
-                    <mesh position={[0.4, 0, 0]} rotation={[0, 0, isOpen ? 1.2 : 0.1]}>
-                        <coneGeometry args={[0.05, 0.8, 8]} />
-                        <meshStandardMaterial color={color} />
-                    </mesh>
-                 </group>
+        <>
+            <group position={position} rotation={rotation} scale={scale}>
+                <group ref={groupRef}>
+                     {/* Leaflet 1 */}
+                     <group rotation={[0, 0, 0]}>
+                        <mesh position={[0.4, 0, 0]} rotation={[0, 0, isOpen ? 1.2 : 0.1]}>
+                            <coneGeometry args={[0.05, 0.8, 8]} />
+                            <meshStandardMaterial color={color} />
+                        </mesh>
+                     </group>
+                     {/* Leaflet 2 */}
+                     <group rotation={[0, 0, 2.1]}>
+                        <mesh position={[0.4, 0, 0]} rotation={[0, 0, isOpen ? 1.2 : 0.1]}>
+                            <coneGeometry args={[0.05, 0.8, 8]} />
+                            <meshStandardMaterial color={color} />
+                        </mesh>
+                     </group>
+                     {/* Leaflet 3 */}
+                     <group rotation={[0, 0, -2.1]}>
+                        <mesh position={[0.4, 0, 0]} rotation={[0, 0, isOpen ? 1.2 : 0.1]}>
+                            <coneGeometry args={[0.05, 0.8, 8]} />
+                            <meshStandardMaterial color={color} />
+                        </mesh>
+                     </group>
+                </group>
+                 {/* Ring */}
+                <mesh rotation={[Math.PI/2, 0, 0]}>
+                    <torusGeometry args={[0.5, 0.05, 16, 32]} />
+                    <meshStandardMaterial color="#b45309" />
+                </mesh>
             </group>
-             {/* Ring */}
-            <mesh rotation={[Math.PI/2, 0, 0]}>
-                <torusGeometry args={[0.5, 0.05, 16, 32]} />
-                <meshStandardMaterial color="#b45309" />
-            </mesh>
             
-             <HtmlLabel position={[1, 0.5, 0]} label={label} isOpen={isOpen} />
-        </group>
+            {/* Label outside rotation to avoid flipping */}
+            <HtmlLabel position={[position[0] + labelOffset[0], position[1] + labelOffset[1], position[2] + labelOffset[2]]} label={label} isOpen={isOpen} />
+        </>
     );
 };
 
@@ -326,29 +329,33 @@ const HeartModel = ({ data, isBicuspidOpen, isAorticOpen, soundVisual }) => {
             </group>
 
             {/* Pulmonary Veins (Visual Only) */}
-            <mesh position={[-1.2, 2.2, 0]} rotation={[0, 0, 1]}>
-                <cylinderGeometry args={[0.2, 0.2, 1, 16]} />
-                <meshStandardMaterial color="#3b82f6" />
-                <Text position={[-0.8, 0, 0]} rotation={[0,0,-1]} fontSize={0.2} color="#93c5fd">Pulmonary Vein</Text>
-            </mesh>
+            <group position={[-1.2, 2.2, 0]}>
+                <mesh rotation={[0, 0, 1]}>
+                    <cylinderGeometry args={[0.2, 0.2, 1, 16]} />
+                    <meshStandardMaterial color="#3b82f6" />
+                </mesh>
+                <Text position={[-0.8, 0, 0]} fontSize={0.2} color="#93c5fd" anchorX="right">Pulmonary Vein</Text>
+            </group>
 
 
             {/* --- VALVES --- */}
             {/* Mitral Valve: Between Atrium (1.8y) and Ventricle (0y). Approx at 0.9y */}
             <Valve 
                 position={[0, 0.9, 0]} 
-                rotation={[0, 0, Math.PI]} // Downward flow
+                rotation={[0, 0, 0]} 
                 isOpen={isBicuspidOpen} 
                 label="Bicuspid (Mitral)" 
                 scale={1.2}
+                labelOffset={[-1.5, 0, 0]}
             />
 
             {/* Aortic Valve: Entrance to Aorta. At approx [0.5, 1.2, 0] based on curve */}
             <Valve 
                 position={[0.5, 1.2, 0]} 
-                rotation={[0, 0, -0.5]} 
+                rotation={[0, 0, 0]} 
                 isOpen={isAorticOpen} 
-                label="Aortic Valve" 
+                label="Aortic Valve"
+                labelOffset={[1.2, 0.3, 0]}
             />
 
             {/* --- SYSTEMS --- */}
