@@ -91,64 +91,26 @@ function App() {
         </div>
       </header>
 
-      <main className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <main className="flex-1 flex flex-col gap-6">
 
-        {/* Left Column: Visual & Info */}
-        <div className="flex flex-col gap-4">
-
-          {/* Heart Container */}
-          <div className="relative aspect-[4/5] bg-slate-900 rounded-2xl shadow-xl overflow-hidden border border-slate-800 ring-1 ring-white/10">
-            <HeartVisual
-              data={heartState}
-              isBicuspidOpen={heartState.isBicuspidOpen}
-              isAorticOpen={heartState.isAorticOpen}
-              soundVisual={soundVisual}
-            />
-
-            {/* Phase Indicator Overlay */}
-            <div className="absolute top-4 right-4 bg-slate-900/90 backdrop-blur px-3 py-1 rounded-full text-sm font-bold border border-slate-700 shadow-sm text-blue-200">
-              Phase: {heartState.phase}
-            </div>
-          </div>
-
-          {/* Educational Sidebar / Context */}
-          <div className="bg-slate-900 border border-indigo-900/50 p-4 rounded-xl">
-            <div className="flex items-start gap-3">
-              <Info className="text-indigo-400 mt-1 shrink-0" size={20} />
-              <div>
-                <h3 className="font-bold text-indigo-300 mb-1">Current Mechanics</h3>
-                <p className="text-slate-300 text-sm leading-relaxed">
-                  {heartState.phase === "Atrial Systole" && "Atria contract, pushing remaining blood into ventricles. Bicuspid valve is open."}
-                  {heartState.phase === "Isovolumetric Contraction" && "Ventricles contract. Pressure rises sharply. Valves CLOSED. Volume constant (Iso-volumetric)."}
-                  {heartState.phase === "Ventricular Ejection" && "Ventricle P > Aortic P. Semilunar triggers open. Blood ejects rapidly."}
-                  {heartState.phase === "Isovolumetric Relaxation" && "Ventricles relax. Pressure drops. Valves CLOSED. Volume constant."}
-                  {heartState.phase === "Ventricular Diastole" && "Ventricle P < Atrium P. Mitral Valve opens. Passive filling occurs."}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* DSE Specific Note */}
-          {(heartState.time > 0.45 || heartState.time < 0.1) && (
-            <div className="bg-yellow-950/30 border border-yellow-900/50 p-4 rounded-xl">
-              <h4 className="font-bold text-yellow-500 text-sm mb-1">DSE Key Point: Elastic Recoil</h4>
-              <p className="text-yellow-200/80 text-sm">
-                Validating Aortic Pressure floor: Notice Aortic Pressure holds at ~80 mmHg even during diastole. This is due to the
-                <strong className="text-yellow-400"> elastic recoil</strong> of the aortic wall maintaining blood flow.
-              </p>
-            </div>
-          )}
-
+        {/* 3D Heart Visualization */}
+        <div className="relative h-[500px] bg-slate-900 rounded-2xl shadow-xl overflow-hidden border border-slate-800 ring-1 ring-white/10">
+          <HeartVisual
+            data={heartState}
+            isBicuspidOpen={heartState.isBicuspidOpen}
+            isAorticOpen={heartState.isAorticOpen}
+            soundVisual={soundVisual}
+          />
         </div>
 
-        {/* Right Column: Graph */}
-        <div className="bg-slate-900 p-6 rounded-2xl shadow-lg border border-slate-800 flex flex-col">
+        {/* Pressure Changes Graph */}
+        <div className="bg-slate-900 p-6 rounded-2xl shadow-lg border border-slate-800">
           <div className="mb-4">
             <h2 className="text-xl font-bold text-white">Pressure Changes (Left Heart)</h2>
             <p className="text-sm text-slate-400">Hover over the graph to scrub time.</p>
           </div>
 
-          <div className="flex-1 w-full min-h-[400px]">
+          <div className="w-full h-[350px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
                 data={cardiacData}
