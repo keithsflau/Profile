@@ -40,7 +40,7 @@ const playHeartSound = (type) => {
             filter.type = 'lowpass';
             filter.frequency.setValueAtTime(180, now);
             
-            gainNode.gain.setValueAtTime(0.8, now);
+            gainNode.gain.setValueAtTime(1.5, now);
             gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
             
             oscillator.start(now);
@@ -54,7 +54,7 @@ const playHeartSound = (type) => {
             filter.type = 'lowpass';
             filter.frequency.setValueAtTime(220, now);
             
-            gainNode.gain.setValueAtTime(0.6, now);
+            gainNode.gain.setValueAtTime(1.2, now);
             gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
             
             oscillator.start(now);
@@ -320,7 +320,7 @@ const RealisticHeart = ({ data, isBicuspidOpen, isAorticOpen, soundVisual }) => 
                         transmission={0.5}
                     />
                 </mesh>
-                <Html position={[-0.95, 0.35, 0]} center>
+                <Html position={[-1.15, 0.7, 0]} center>
                     <div style={{
                         background: 'rgba(15, 23, 42, 0.92)',
                         padding: '5px 10px',
@@ -348,7 +348,7 @@ const RealisticHeart = ({ data, isBicuspidOpen, isAorticOpen, soundVisual }) => 
                         thickness={0.35}
                     />
                 </mesh>
-                <Html position={[1.05, 0.35, 0]} center>
+                <Html position={[1.4, 0.7, 0]} center>
                     <div style={{
                         background: 'rgba(15, 23, 42, 0.92)',
                         padding: '5px 10px',
@@ -390,7 +390,7 @@ const RealisticHeart = ({ data, isBicuspidOpen, isAorticOpen, soundVisual }) => 
                         thickness={0.7}
                     />
                 </mesh>
-                <Html position={[-1.2, -0.6, 0]} center>
+                <Html position={[-1.15, -1.3, 0]} center>
                     <div style={{
                         background: 'rgba(15, 23, 42, 0.92)',
                         padding: '6px 12px',
@@ -428,7 +428,7 @@ const RealisticHeart = ({ data, isBicuspidOpen, isAorticOpen, soundVisual }) => 
                         transmission={0.58}
                     />
                 </mesh>
-                <Html position={[1.25, -0.55, 0]} center>
+                <Html position={[1.5, -1.1, 0]} center>
                     <div style={{
                         background: 'rgba(15, 23, 42, 0.92)',
                         padding: '6px 12px',
@@ -456,7 +456,7 @@ const RealisticHeart = ({ data, isBicuspidOpen, isAorticOpen, soundVisual }) => 
                         clearcoat={0.7}
                     />
                 </mesh>
-                <Html position={[-0.85, 2.5, 0]} center>
+                <Html position={[-1.1, 2.6, 0]} center>
                     <div style={{
                         background: 'rgba(15, 23, 42, 0.92)',
                         padding: '5px 10px',
@@ -483,7 +483,7 @@ const RealisticHeart = ({ data, isBicuspidOpen, isAorticOpen, soundVisual }) => 
                         transmission={0.45}
                     />
                 </mesh>
-                <Html position={[1.15, 2.3, 0]} center>
+                <Html position={[1.45, 2.45, 0]} center>
                     <div style={{
                         background: 'rgba(15, 23, 42, 0.92)',
                         padding: '5px 10px',
