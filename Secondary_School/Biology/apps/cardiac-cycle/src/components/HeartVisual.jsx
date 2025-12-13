@@ -106,19 +106,29 @@ const Valve = ({ position, rotation, isOpen, label, scale = 1 }) => {
 };
 
 const HtmlLabel = ({ position, label, isOpen }) => (
-    <Text
-        position={position}
-        fontSize={0.2}
-        color="white"
-        outlineWidth={0.02}
-        outlineColor="black"
-        anchorX="left"
-    >
-        {label}
-        <tspan dy={-0.15} fontSize={0.15} fill={isOpen ? "#4ade80" : "#f87171"}>
-            {'\n' + (isOpen ? "OPEN" : "CLOSED")}
-        </tspan>
-    </Text>
+    <group position={position}>
+        <Text
+            fontSize={0.2}
+            color="white"
+            outlineWidth={0.02}
+            outlineColor="black"
+            anchorX="left"
+            anchorY="bottom"
+        >
+            {label}
+        </Text>
+        <Text
+            position={[0, -0.25, 0]}
+            fontSize={0.15}
+            color={isOpen ? "#4ade80" : "#f87171"}
+            outlineWidth={0.02}
+            outlineColor="black"
+            anchorX="left"
+            anchorY="top"
+        >
+            {isOpen ? "OPEN" : "CLOSED"}
+        </Text>
+    </group>
 );
 
 const BloodParticles = ({ isBicuspidOpen, isAorticOpen, heartPhase }) => {
