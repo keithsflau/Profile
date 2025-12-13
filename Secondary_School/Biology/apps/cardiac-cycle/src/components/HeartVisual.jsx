@@ -1,394 +1,317 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const HeartVisual = (props) => {
-    const canvasRef = useRef(null);
-    const [imageLoaded, setImageLoaded] = useState(false);
-    const heartImageRef = useRef(null);
-    
     const { data, isBicuspidOpen, isAorticOpen, soundVisual } = props;
     const isTricuspidOpen = isBicuspidOpen;
     const isPulmonaryOpen = isAorticOpen;
+    
+    const [bloodParticles, setBloodParticles] = useState([]);
 
-    // Load the heart anatomy image
+    // Initialize blood particles
     useEffect(() => {
-        const img = new Image();
-        img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='; // Will be replaced with actual diagram
-        img.onload = () => {
-            heartImageRef.current = img;
-            setImageLoaded(true);
-        };
+        const particles = [];
+        
+        // Oxygenated blood (left side - red)
+        for (let i = 0; i < 20; i++) {
+            particles.push({
+                id: `oxy-${i}`,
+                phase: Math.random() * 4,
+                speed: 0.01 + Math.random() * 0.005,
+                color: '#ef4444',
+                side: 'left'
+            });
+        }
+        
+        // Deoxygenated blood (right side - blue)
+        for (let i = 0; i < 20; i++) {
+            particles.push({
+                id: `deoxy-${i}`,
+                phase: Math.random() * 4,
+                speed: 0.01 + Math.random() * 0.005,
+                color: '#3b82f6',
+                side: 'right'
+            });
+        }
+        
+        setBloodParticles(particles);
     }, []);
 
-    // Animation loop
+    // Update particle positions
     useEffect(() => {
-        if (!imageLoaded || !canvasRef.current) return;
-
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d');
-        const width = canvas.width;
-        const height = canvas.height;
-
-        let animationId;
-        let bloodParticles = initializeBloodParticles();
-
-        function initializeBloodParticles() {
-            const particles = [];
-            
-            // Oxygenated blood (red) - left side
-            for (let i = 0; i < 25; i++) {
-                particles.push({
-                    x: width * 0.3,
-                    y: height * 0.3,
-                    phase: Math.random(),
-                    color: '#ef4444',
-                    side: 'left',
-                    speed: 0.8 + Math.random() * 0.4
-                });
-            }
-            
-            // Deoxygenated blood (blue) - right side
-            for (let i = 0; i < 25; i++) {
-                particles.push({
-                    x: width * 0.7,
-                    y: height * 0.3,
-                    phase: Math.random(),
-                    color: '#3b82f6',
-                    side: 'right',
-                    speed: 0.8 + Math.random() * 0.4
-                });
-            }
-            
-            return particles;
-        }
-
-        function drawBloodFlow() {
-            bloodParticles.forEach(particle => {
+        const interval = setInterval(() => {
+            setBloodParticles(prev => prev.map(particle => {
+                let newPhase = particle.phase + particle.speed;
+                
                 if (particle.side === 'left') {
-                    // Left heart circulation path
-                    const paths = [
-                        // Phase 0: Pulmonary vein to left atrium
-                        { x: width * 0.2, y: height * 0.25 },
-                        // Phase 1: Left atrium
-                        { x: width * 0.25, y: height * 0.35 },
-                        // Phase 2: Through mitral valve (if open)
-                        { x: width * 0.29, y: height * 0.5 },
-                        // Phase 3: Left ventricle
-                        { x: width * 0.32, y: height * 0.65 },
-                        // Phase 4: Through aortic valve (if open)
-                        { x: width * 0.35, y: height * 0.4 },
-                        // Phase 5: Aorta
-                        { x: width * 0.4, y: height * 0.2 }
-                    ];
-                    
-                    updateParticle(particle, paths, isBicuspidOpen, isAorticOpen);
+                    // Check mitral valve
+                    if (newPhase > 1 && newPhase < 2 && !isBicuspidOpen) {
+                        newPhase = 1.95;
+                    }
+                    // Check aortic valve
+                    if (newPhase > 3 && newPhase < 4 && !isAorticOpen) {
+                        newPhase = 3.95;
+                    }
                 } else {
-                    // Right heart circulation path
-                    const paths = [
-                        // Phase 0: Vena cava to right atrium
-                        { x: width * 0.8, y: height * 0.2 },
-                        // Phase 1: Right atrium
-                        { x: width * 0.75, y: height * 0.35 },
-                        // Phase 2: Through tricuspid valve (if open)
-                        { x: width * 0.71, y: height * 0.5 },
-                        // Phase 3: Right ventricle
-                        { x: width * 0.68, y: height * 0.65 },
-                        // Phase 4: Through pulmonary valve (if open)
-                        { x: width * 0.65, y: height * 0.4 },
-                        // Phase 5: Pulmonary artery
-                        { x: width * 0.6, y: height * 0.2 }
-                    ];
-                    
-                    updateParticle(particle, paths, isTricuspidOpen, isPulmonaryOpen);
+                    // Check tricuspid valve
+                    if (newPhase > 1 && newPhase < 2 && !isTricuspidOpen) {
+                        newPhase = 1.95;
+                    }
+                    // Check pulmonary valve
+                    if (newPhase > 3 && newPhase < 4 && !isPulmonaryOpen) {
+                        newPhase = 3.95;
+                    }
                 }
                 
-                // Draw particle with glow
-                ctx.save();
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = particle.color;
-                ctx.fillStyle = particle.color;
-                ctx.beginPath();
-                ctx.arc(particle.x, particle.y, 6, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
-            });
-        }
+                if (newPhase >= 4) newPhase = 0;
+                
+                return { ...particle, phase: newPhase };
+            }));
+        }, 50);
+        
+        return () => clearInterval(interval);
+    }, [isBicuspidOpen, isAorticOpen, isTricuspidOpen, isPulmonaryOpen]);
 
-        function updateParticle(particle, paths, avValveOpen, slValveOpen) {
-            particle.phase += particle.speed * 0.01;
-            
-            if (particle.phase > 6) particle.phase = 0;
-            
-            const currentIndex = Math.floor(particle.phase);
-            const nextIndex = (currentIndex + 1) % paths.length;
-            const progress = particle.phase - currentIndex;
-            
-            // Check valve states
-            if (currentIndex === 2 && !avValveOpen) {
-                particle.phase = 1.9; // Wait at AV valve
-                return;
+    // Calculate particle position based on phase
+    const getParticlePosition = (particle) => {
+        const phase = particle.phase;
+        
+        if (particle.side === 'left') {
+            // Left heart circulation path (percentages of container)
+            if (phase < 1) {
+                // Pulmonary vein to left atrium
+                return { left: `${15 + phase * 5}%`, top: `${25 - phase * 5}%` };
+            } else if (phase < 2) {
+                // Left atrium to left ventricle (through mitral)
+                const p = phase - 1;
+                return { left: `${20 + p * 5}%`, top: `${20 + p * 30}%` };
+            } else if (phase < 3) {
+                // Left ventricle
+                const p = phase - 2;
+                return { left: `${25 + p * 5}%`, top: `${50 + p * 10}%` };
+            } else {
+                // Left ventricle to aorta (through aortic valve)
+                const p = phase - 3;
+                return { left: `${30 + p * 5}%`, top: `${60 - p * 40}%` };
             }
-            if (currentIndex === 4 && !slValveOpen) {
-                particle.phase = 3.9; // Wait at semilunar valve
-                return;
+        } else {
+            // Right heart circulation path
+            if (phase < 1) {
+                // Vena cava to right atrium
+                return { left: `${80 - phase * 5}%`, top: `${15 + phase * 5}%` };
+            } else if (phase < 2) {
+                // Right atrium to right ventricle (through tricuspid)
+                const p = phase - 1;
+                return { left: `${75 - p * 5}%`, top: `${20 + p * 30}%` };
+            } else if (phase < 3) {
+                // Right ventricle
+                const p = phase - 2;
+                return { left: `${70 - p * 5}%`, top: `${50 + p * 10}%` };
+            } else {
+                // Right ventricle to pulmonary artery (through pulmonary valve)
+                const p = phase - 3;
+                return { left: `${65 - p * 5}%`, top: `${60 - p * 40}%` };
             }
-            
-            // Interpolate position
-            const current = paths[currentIndex];
-            const next = paths[nextIndex];
-            particle.x = current.x + (next.x - current.x) * progress;
-            particle.y = current.y + (next.y - current.y) * progress;
         }
-
-        function drawValveIndicators() {
-            const valves = [
-                { name: 'Mitral', x: width * 0.29, y: height * 0.48, isOpen: isBicuspidOpen, side: 'left' },
-                { name: 'Aortic', x: width * 0.36, y: height * 0.38, isOpen: isAorticOpen, side: 'left' },
-                { name: 'Tricuspid', x: width * 0.71, y: height * 0.48, isOpen: isTricuspidOpen, side: 'right' },
-                { name: 'Pulmonary', x: width * 0.64, y: height * 0.38, isOpen: isPulmonaryOpen, side: 'right' }
-            ];
-
-            valves.forEach(valve => {
-                // Valve indicator
-                ctx.save();
-                
-                // Outer glow
-                if (valve.isOpen) {
-                    ctx.shadowBlur = 20;
-                    ctx.shadowColor = '#4ade80';
-                    ctx.strokeStyle = '#4ade80';
-                    ctx.lineWidth = 4;
-                } else {
-                    ctx.shadowBlur = 15;
-                    ctx.shadowColor = '#ef4444';
-                    ctx.strokeStyle = '#ef4444';
-                    ctx.lineWidth = 3;
-                }
-                
-                // Draw valve ring
-                ctx.beginPath();
-                ctx.arc(valve.x, valve.y, 18, 0, Math.PI * 2);
-                ctx.stroke();
-                
-                // Draw valve leaflets
-                ctx.strokeStyle = valve.isOpen ? '#fbbf24' : '#78350f';
-                ctx.lineWidth = 6;
-                
-                if (valve.isOpen) {
-                    // Open valve - leaflets apart
-                    ctx.beginPath();
-                    ctx.moveTo(valve.x - 12, valve.y - 10);
-                    ctx.lineTo(valve.x - 8, valve.y + 10);
-                    ctx.stroke();
-                    
-                    ctx.beginPath();
-                    ctx.moveTo(valve.x + 12, valve.y - 10);
-                    ctx.lineTo(valve.x + 8, valve.y + 10);
-                    ctx.stroke();
-                } else {
-                    // Closed valve - leaflets together
-                    ctx.beginPath();
-                    ctx.moveTo(valve.x - 2, valve.y - 12);
-                    ctx.lineTo(valve.x - 2, valve.y + 12);
-                    ctx.stroke();
-                    
-                    ctx.beginPath();
-                    ctx.moveTo(valve.x + 2, valve.y - 12);
-                    ctx.lineTo(valve.x + 2, valve.y + 12);
-                    ctx.stroke();
-                }
-                
-                ctx.restore();
-
-                // Label with background
-                ctx.save();
-                ctx.font = 'bold 14px Inter, sans-serif';
-                ctx.textAlign = valve.side === 'left' ? 'right' : 'left';
-                
-                const labelX = valve.side === 'left' ? valve.x - 35 : valve.x + 35;
-                const labelY = valve.y + 5;
-                
-                // Background
-                ctx.fillStyle = 'rgba(15, 23, 42, 0.95)';
-                const textWidth = ctx.measureText(valve.name).width;
-                const padding = 8;
-                const bgX = valve.side === 'left' ? labelX - textWidth - padding : labelX - padding;
-                ctx.fillRect(bgX, labelY - 16, textWidth + padding * 2, 26);
-                
-                // Border
-                ctx.strokeStyle = valve.isOpen ? 'rgba(74, 222, 128, 0.5)' : 'rgba(239, 68, 68, 0.5)';
-                ctx.lineWidth = 1;
-                ctx.strokeRect(bgX, labelY - 16, textWidth + padding * 2, 26);
-                
-                // Text
-                ctx.fillStyle = '#fff';
-                ctx.fillText(valve.name, labelX, labelY);
-                
-                // Status
-                ctx.font = 'bold 11px Inter, sans-serif';
-                ctx.fillStyle = valve.isOpen ? '#4ade80' : '#ef4444';
-                ctx.fillText(valve.isOpen ? '● OPEN' : '● CLOSED', labelX, labelY + 15);
-                
-                ctx.restore();
-            });
-        }
-
-        function drawFlowArrows() {
-            const arrows = [
-                { x: width * 0.18, y: height * 0.25, angle: 0, label: 'From Lungs', color: '#ef4444' },
-                { x: width * 0.42, y: height * 0.18, angle: Math.PI / 2, label: 'To Body', color: '#ef4444' },
-                { x: width * 0.82, y: height * 0.18, angle: Math.PI, label: 'From Body', color: '#3b82f6' },
-                { x: width * 0.58, y: height * 0.18, angle: -Math.PI / 2, label: 'To Lungs', color: '#3b82f6' }
-            ];
-
-            arrows.forEach(arrow => {
-                ctx.save();
-                ctx.translate(arrow.x, arrow.y);
-                ctx.rotate(arrow.angle);
-                
-                // Arrow
-                ctx.fillStyle = arrow.color;
-                ctx.shadowBlur = 12;
-                ctx.shadowColor = arrow.color;
-                
-                ctx.beginPath();
-                ctx.moveTo(0, -8);
-                ctx.lineTo(12, 0);
-                ctx.lineTo(0, 8);
-                ctx.closePath();
-                ctx.fill();
-                
-                ctx.restore();
-            });
-        }
-
-        function animate() {
-            ctx.clearRect(0, 0, width, height);
-            
-            // Background gradient
-            const gradient = ctx.createLinearGradient(0, 0, 0, height);
-            gradient.addColorStop(0, '#0f172a');
-            gradient.addColorStop(1, '#1e293b');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, width, height);
-            
-            // Draw static heart diagram placeholder
-            drawHeartDiagram(ctx, width, height);
-            
-            // Draw animations
-            drawFlowArrows();
-            drawBloodFlow();
-            drawValveIndicators();
-            
-            // Sound effect indicator
-            if (soundVisual) {
-                ctx.save();
-                ctx.font = 'bold 48px Inter, sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillStyle = '#fbbf24';
-                ctx.shadowBlur = 30;
-                ctx.shadowColor = '#fbbf24';
-                ctx.fillText(soundVisual.split(' ')[0], width / 2, height / 2);
-                ctx.restore();
-            }
-            
-            animationId = requestAnimationFrame(animate);
-        }
-
-        function drawHeartDiagram(ctx, w, h) {
-            // Basic anatomical heart shape (simplified)
-            ctx.save();
-            
-            // Left atrium (red/pink)
-            ctx.fillStyle = 'rgba(252, 165, 165, 0.3)';
-            ctx.strokeStyle = '#fca5a5';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.ellipse(w * 0.25, h * 0.35, w * 0.08, h * 0.1, 0, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
-            
-            // Right atrium (blue)
-            ctx.fillStyle = 'rgba(147, 197, 253, 0.3)';
-            ctx.strokeStyle = '#93c5fd';
-            ctx.beginPath();
-            ctx.ellipse(w * 0.75, h * 0.35, w * 0.08, h * 0.1, 0, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
-            
-            // Left ventricle (red)
-            ctx.fillStyle = 'rgba(239, 68, 68, 0.35)';
-            ctx.strokeStyle = '#ef4444';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.ellipse(w * 0.3, h * 0.6, w * 0.12, h * 0.18, 0, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
-            
-            // Right ventricle (blue)
-            ctx.fillStyle = 'rgba(96, 165, 250, 0.35)';
-            ctx.strokeStyle = '#60a5fa';
-            ctx.lineWidth = 2.5;
-            ctx.beginPath();
-            ctx.ellipse(w * 0.7, h * 0.6, w * 0.1, h * 0.15, 0, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
-            
-            // Aorta
-            ctx.strokeStyle = '#b91c1c';
-            ctx.lineWidth = 8;
-            ctx.beginPath();
-            ctx.arc(w * 0.38, h * 0.25, w * 0.08, Math.PI, Math.PI * 1.5);
-            ctx.stroke();
-            
-            // Pulmonary artery
-            ctx.strokeStyle = '#3b82f6';
-            ctx.lineWidth = 7;
-            ctx.beginPath();
-            ctx.arc(w * 0.62, h * 0.25, w * 0.08, Math.PI * 1.5, Math.PI * 2);
-            ctx.stroke();
-            
-            // Labels
-            ctx.font = 'bold 16px Inter, sans-serif';
-            ctx.fillStyle = '#fca5a5';
-            ctx.textAlign = 'right';
-            ctx.fillText('Left Atrium', w * 0.15, h * 0.35);
-            
-            ctx.fillStyle = '#93c5fd';
-            ctx.textAlign = 'left';
-            ctx.fillText('Right Atrium', w * 0.85, h * 0.35);
-            
-            ctx.fillStyle = '#ef4444';
-            ctx.textAlign = 'right';
-            ctx.fillText('Left Ventricle', w * 0.15, h * 0.65);
-            
-            ctx.fillStyle = '#60a5fa';
-            ctx.textAlign = 'left';
-            ctx.fillText('Right Ventricle', w * 0.85, h * 0.65);
-            
-            ctx.restore();
-        }
-
-        animate();
-
-        return () => {
-            if (animationId) {
-                cancelAnimationFrame(animationId);
-            }
-        };
-    }, [imageLoaded, data, isBicuspidOpen, isAorticOpen, soundVisual]);
+    };
 
     return (
         <div className="w-full h-full bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 rounded-xl overflow-hidden relative shadow-2xl">
-            <canvas 
-                ref={canvasRef}
-                width={1200}
-                height={800}
-                className="w-full h-full"
-                style={{ imageRendering: 'crisp-edges' }}
-            />
+            {/* Heart anatomy background image */}
+            <div className="absolute inset-0 flex items-center justify-center">
+                <img 
+                    src="/heart_anatomy.png"
+                    alt="Heart Anatomy" 
+                    className="w-full h-full object-contain opacity-90"
+                    onError={(e) => {
+                        console.error('Heart image failed to load');
+                        e.target.style.display = 'none';
+                    }}
+                />
+            </div>
 
-            {/* Phase indicator */}
-            <div className="absolute top-6 right-6 pointer-events-none select-none">
+            {/* Blood flow particles */}
+            <div className="absolute inset-0">
+                {bloodParticles.map(particle => {
+                    const pos = getParticlePosition(particle);
+                    return (
+                        <div
+                            key={particle.id}
+                            className="absolute w-3 h-3 rounded-full transition-all duration-100 ease-linear"
+                            style={{
+                                left: pos.left,
+                                top: pos.top,
+                                backgroundColor: particle.color,
+                                boxShadow: `0 0 15px ${particle.color}, 0 0 25px ${particle.color}`,
+                                transform: 'translate(-50%, -50%)'
+                            }}
+                        />
+                    );
+                })}
+            </div>
+
+            {/* Valve indicators */}
+            <div className="absolute inset-0">
+                {/* Mitral Valve */}
+                <div className="absolute" style={{ left: '25%', top: '45%', transform: 'translate(-50%, -50%)' }}>
+                    <div className={`w-16 h-16 rounded-full border-4 flex items-center justify-center transition-all duration-300 ${
+                        isBicuspidOpen 
+                            ? 'border-green-400 shadow-[0_0_20px_rgba(74,222,128,0.6)]' 
+                            : 'border-red-400 shadow-[0_0_20px_rgba(239,68,68,0.6)]'
+                    }`}>
+                        <svg width="40" height="40" viewBox="0 0 40 40" className="transition-transform duration-300">
+                            <line 
+                                x1={isBicuspidOpen ? "10" : "19"} 
+                                y1="10" 
+                                x2={isBicuspidOpen ? "15" : "19"} 
+                                y2="30" 
+                                stroke="#fbbf24" 
+                                strokeWidth="4"
+                                strokeLinecap="round"
+                            />
+                            <line 
+                                x1={isBicuspidOpen ? "30" : "21"} 
+                                y1="10" 
+                                x2={isBicuspidOpen ? "25" : "21"} 
+                                y2="30" 
+                                stroke="#fbbf24" 
+                                strokeWidth="4"
+                                strokeLinecap="round"
+                            />
+                        </svg>
+                    </div>
+                    <div className="absolute -left-28 top-1/2 -translate-y-1/2 bg-slate-900/95 px-3 py-2 rounded-lg border border-slate-700 backdrop-blur">
+                        <div className="text-sm font-semibold text-white mb-1">Mitral</div>
+                        <div className={`text-xs font-bold ${isBicuspidOpen ? 'text-green-400' : 'text-red-400'}`}>
+                            {isBicuspidOpen ? '● OPEN' : '● CLOSED'}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Aortic Valve */}
+                <div className="absolute" style={{ left: '35%', top: '25%', transform: 'translate(-50%, -50%)' }}>
+                    <div className={`w-16 h-16 rounded-full border-4 flex items-center justify-center transition-all duration-300 ${
+                        isAorticOpen 
+                            ? 'border-green-400 shadow-[0_0_20px_rgba(74,222,128,0.6)]' 
+                            : 'border-red-400 shadow-[0_0_20px_rgba(239,68,68,0.6)]'
+                    }`}>
+                        <svg width="40" height="40" viewBox="0 0 40 40">
+                            {[0, 120, 240].map((angle, i) => (
+                                <path
+                                    key={i}
+                                    d={isAorticOpen ? "M20,20 L30,10 L35,20 Z" : "M20,20 L20,10 L22,20 Z"}
+                                    fill="#fbbf24"
+                                    opacity="0.9"
+                                    transform={`rotate(${angle} 20 20)`}
+                                />
+                            ))}
+                        </svg>
+                    </div>
+                    <div className="absolute -left-28 top-1/2 -translate-y-1/2 bg-slate-900/95 px-3 py-2 rounded-lg border border-slate-700 backdrop-blur">
+                        <div className="text-sm font-semibold text-white mb-1">Aortic</div>
+                        <div className={`text-xs font-bold ${isAorticOpen ? 'text-green-400' : 'text-red-400'}`}>
+                            {isAorticOpen ? '● OPEN' : '● CLOSED'}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Tricuspid Valve */}
+                <div className="absolute" style={{ left: '75%', top: '45%', transform: 'translate(-50%, -50%)' }}>
+                    <div className={`w-16 h-16 rounded-full border-4 flex items-center justify-center transition-all duration-300 ${
+                        isTricuspidOpen 
+                            ? 'border-green-400 shadow-[0_0_20px_rgba(74,222,128,0.6)]' 
+                            : 'border-red-400 shadow-[0_0_20px_rgba(239,68,68,0.6)]'
+                    }`}>
+                        <svg width="40" height="40" viewBox="0 0 40 40">
+                            <line 
+                                x1={isTricuspidOpen ? "10" : "19"} 
+                                y1="10" 
+                                x2={isTricuspidOpen ? "15" : "19"} 
+                                y2="30" 
+                                stroke="#fbbf24" 
+                                strokeWidth="4"
+                                strokeLinecap="round"
+                            />
+                            <line 
+                                x1={isTricuspidOpen ? "30" : "21"} 
+                                y1="10" 
+                                x2={isTricuspidOpen ? "25" : "21"} 
+                                y2="30" 
+                                stroke="#fbbf24" 
+                                strokeWidth="4"
+                                strokeLinecap="round"
+                            />
+                        </svg>
+                    </div>
+                    <div className="absolute -right-28 top-1/2 -translate-y-1/2 bg-slate-900/95 px-3 py-2 rounded-lg border border-slate-700 backdrop-blur">
+                        <div className="text-sm font-semibold text-white mb-1">Tricuspid</div>
+                        <div className={`text-xs font-bold ${isTricuspidOpen ? 'text-green-400' : 'text-red-400'}`}>
+                            {isTricuspidOpen ? '● OPEN' : '● CLOSED'}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Pulmonary Valve */}
+                <div className="absolute" style={{ left: '65%', top: '25%', transform: 'translate(-50%, -50%)' }}>
+                    <div className={`w-16 h-16 rounded-full border-4 flex items-center justify-center transition-all duration-300 ${
+                        isPulmonaryOpen 
+                            ? 'border-green-400 shadow-[0_0_20px_rgba(74,222,128,0.6)]' 
+                            : 'border-red-400 shadow-[0_0_20px_rgba(239,68,68,0.6)]'
+                    }`}>
+                        <svg width="40" height="40" viewBox="0 0 40 40">
+                            {[0, 120, 240].map((angle, i) => (
+                                <path
+                                    key={i}
+                                    d={isPulmonaryOpen ? "M20,20 L30,10 L35,20 Z" : "M20,20 L20,10 L22,20 Z"}
+                                    fill="#fbbf24"
+                                    opacity="0.9"
+                                    transform={`rotate(${angle} 20 20)`}
+                                />
+                            ))}
+                        </svg>
+                    </div>
+                    <div className="absolute -right-32 top-1/2 -translate-y-1/2 bg-slate-900/95 px-3 py-2 rounded-lg border border-slate-700 backdrop-blur">
+                        <div className="text-sm font-semibold text-white mb-1">Pulmonary</div>
+                        <div className={`text-xs font-bold ${isPulmonaryOpen ? 'text-green-400' : 'text-red-400'}`}>
+                            {isPulmonaryOpen ? '● OPEN' : '● CLOSED'}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Flow direction arrows */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+                {/* From Lungs */}
+                <defs>
+                    <marker id="arrowRed" markerWidth="10" markerHeight="10" refX="5" refY="3" orient="auto" markerUnits="strokeWidth">
+                        <path d="M0,0 L0,6 L9,3 z" fill="#ef4444" />
+                    </marker>
+                    <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="5" refY="3" orient="auto" markerUnits="strokeWidth">
+                        <path d="M0,0 L0,6 L9,3 z" fill="#3b82f6" />
+                    </marker>
+                </defs>
+                
+                {/* Red arrows (oxygenated) */}
+                <line x1="10" y1="15" x2="15" y2="20" stroke="#ef4444" strokeWidth="0.5" markerEnd="url(#arrowRed)" />
+                <line x1="40" y1="15" x2="45" y2="10" stroke="#ef4444" strokeWidth="0.5" markerEnd="url(#arrowRed)" />
+                
+                {/* Blue arrows (deoxygenated) */}
+                <line x1="85" y1="10" x2="80" y2="15" stroke="#3b82f6" strokeWidth="0.5" markerEnd="url(#arrowBlue)" />
+                <line x1="60" y1="15" x2="55" y2="10" stroke="#3b82f6" strokeWidth="0.5" markerEnd="url(#arrowBlue)" />
+            </svg>
+
+            {/* Sound effect */}
+            {soundVisual && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="text-6xl font-black text-yellow-400 animate-pulse" style={{
+                        textShadow: '0 0 30px rgba(251, 191, 36, 0.8), 0 0 60px rgba(251, 191, 36, 0.4)'
+                    }}>
+                        {soundVisual.split(' ')[0]}
+                    </div>
+                </div>
+            )}
+
+            {/* Phase indicator - top right */}
+            <div className="absolute top-6 right-6 pointer-events-none select-none z-10">
                 <div className="bg-slate-900/95 backdrop-blur-md px-6 py-3 rounded-xl border border-indigo-500/40 shadow-xl">
                     <div className="text-xs text-slate-400 font-medium mb-1">Cardiac Phase</div>
                     <div className="text-base font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
@@ -397,8 +320,8 @@ const HeartVisual = (props) => {
                 </div>
             </div>
 
-            {/* Circulation pathways */}
-            <div className="absolute top-6 left-6 pointer-events-none select-none">
+            {/* Circulation pathways - top left */}
+            <div className="absolute top-6 left-6 pointer-events-none select-none z-10">
                 <div className="bg-slate-900/95 backdrop-blur-md px-5 py-4 rounded-xl border border-slate-700 shadow-xl space-y-3 max-w-sm">
                     <div className="text-sm font-bold text-red-400 border-b border-red-900/30 pb-2">
                         🔴 Systemic Circulation
@@ -416,8 +339,8 @@ const HeartVisual = (props) => {
                 </div>
             </div>
 
-            {/* Data display */}
-            <div className="absolute bottom-6 right-6 pointer-events-none select-none">
+            {/* Hemodynamics - bottom right */}
+            <div className="absolute bottom-6 right-6 pointer-events-none select-none z-10">
                 <div className="bg-slate-900/95 backdrop-blur-md px-4 py-3 rounded-xl border border-slate-700 shadow-xl space-y-2 text-xs">
                     <div className="font-bold text-slate-300 mb-2">Hemodynamics</div>
                     <div className="flex justify-between gap-4">
@@ -435,8 +358,8 @@ const HeartVisual = (props) => {
                 </div>
             </div>
 
-            {/* Legend */}
-            <div className="absolute bottom-6 left-6 pointer-events-none select-none">
+            {/* Legend - bottom left */}
+            <div className="absolute bottom-6 left-6 pointer-events-none select-none z-10">
                 <div className="bg-slate-900/95 backdrop-blur-md px-4 py-3 rounded-xl border border-slate-700 shadow-xl space-y-2.5">
                     <div className="text-xs font-bold text-slate-300 mb-2">Blood Flow</div>
                     <div className="flex items-center gap-3">
