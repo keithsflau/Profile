@@ -5,22 +5,24 @@
     <link rel="icon" type="image/svg+xml" href="./vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>glucose-regulation</title>
-    <script type="module" crossorigin src="./assets/index-D3GY0mJA.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-BFcdq7xA.css">
-  <link rel="stylesheet" href="../../../../../visit-counter.css">
-</head>
+  <script type="module" crossorigin src="./assets/index-D3GY0mJA.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-BFcdq7xA.css">
+<link rel="stylesheet" href="../../../../../visit-counter.css"></head>
   <body>
     <div id="root"></div>
-  
+
+
     <!-- Visit Counter -->
     <div id="visit-counter-container"></div>
     <script src="../../../../../visit-counter.js"></script>
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
-        VisitCounter.init('secondary_school/biology/apps/glucose-regulation/dist', {
-            scriptUrl: SCRIPT_URL,
-            containerId: 'visit-counter-container'
-        });
+        if (typeof VisitCounter !== 'undefined') {
+            VisitCounter.init('secondary_school/biology/apps/glucose-regulation', {
+                scriptUrl: SCRIPT_URL,
+                containerId: 'visit-counter-container'
+            });
+        }
     </script>
 </body>
 </html>

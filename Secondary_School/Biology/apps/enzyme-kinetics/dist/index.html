@@ -8,21 +8,23 @@
   <title>Enzyme Kinetics Simulation</title>
   <script type="module" crossorigin src="./assets/index-1fbWq4BL.js"></script>
   <link rel="stylesheet" crossorigin href="./assets/index-B86IMuAR.css">
-<link rel="stylesheet" href="../../../../../visit-counter.css">
-</head>
+<link rel="stylesheet" href="../../../../../visit-counter.css"></head>
 
 <body>
   <div id="root"></div>
+
 
     <!-- Visit Counter -->
     <div id="visit-counter-container"></div>
     <script src="../../../../../visit-counter.js"></script>
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
-        VisitCounter.init('secondary_school/biology/apps/enzyme-kinetics/dist', {
-            scriptUrl: SCRIPT_URL,
-            containerId: 'visit-counter-container'
-        });
+        if (typeof VisitCounter !== 'undefined') {
+            VisitCounter.init('secondary_school/biology/apps/enzyme-kinetics', {
+                scriptUrl: SCRIPT_URL,
+                containerId: 'visit-counter-container'
+            });
+        }
     </script>
 </body>
 
