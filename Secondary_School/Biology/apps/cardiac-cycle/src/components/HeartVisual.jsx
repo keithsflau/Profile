@@ -3,50 +3,65 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Text, Environment, Html } from '@react-three/drei';
 import * as THREE from 'three';
 
-// Heart sound synthesis
-const audioContext = typeof window !== 'undefined' ? new (window.AudioContext || window.webkitAudioContext)() : null;
+// Heart sound synthesis with user interaction requirement
+let audioContext = null;
+let audioInitialized = false;
+
+const initAudio = () => {
+    if (typeof window !== 'undefined' && !audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        audioInitialized = true;
+    }
+};
 
 const playHeartSound = (type) => {
+    if (!audioContext || audioContext.state === 'suspended') {
+        audioContext?.resume();
+    }
     if (!audioContext) return;
     
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    const filter = audioContext.createBiquadFilter();
-    
-    oscillator.connect(filter);
-    filter.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-    
-    const now = audioContext.currentTime;
-    
-    if (type === 'LUB') {
-        // Low frequency thud for AV valve closure
-        oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(45, now);
-        oscillator.frequency.exponentialRampToValueAtTime(25, now + 0.08);
+    try {
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        const filter = audioContext.createBiquadFilter();
         
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(150, now);
+        oscillator.connect(filter);
+        filter.connect(gainNode);
+        gainNode.connect(audioContext.destination);
         
-        gainNode.gain.setValueAtTime(0.6, now);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+        const now = audioContext.currentTime;
         
-        oscillator.start(now);
-        oscillator.stop(now + 0.12);
-    } else if (type === 'DUP') {
-        // Higher frequency snap for semilunar valve closure
-        oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(85, now);
-        oscillator.frequency.exponentialRampToValueAtTime(45, now + 0.06);
-        
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(200, now);
-        
-        gainNode.gain.setValueAtTime(0.45, now);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
-        
-        oscillator.start(now);
-        oscillator.stop(now + 0.08);
+        if (type === 'LUB') {
+            // Low frequency thud for AV valve closure
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(50, now);
+            oscillator.frequency.exponentialRampToValueAtTime(30, now + 0.1);
+            
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(180, now);
+            
+            gainNode.gain.setValueAtTime(0.8, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+            
+            oscillator.start(now);
+            oscillator.stop(now + 0.15);
+        } else if (type === 'DUP') {
+            // Higher frequency snap for semilunar valve closure
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(90, now);
+            oscillator.frequency.exponentialRampToValueAtTime(50, now + 0.08);
+            
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(220, now);
+            
+            gainNode.gain.setValueAtTime(0.6, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            
+            oscillator.start(now);
+            oscillator.stop(now + 0.1);
+        }
+    } catch (e) {
+        console.warn('Audio playback failed:', e);
     }
 };
 
@@ -69,19 +84,20 @@ const HeartValve = ({ position, rotation, isOpen, label, type = "AV", color = "#
     const leaflet3Ref = useRef();
     
     useFrame((state, delta) => {
-        const targetAngle = isOpen ? (type === "AV" ? 1.1 : 1.3) : 0.05;
+        // More dramatic valve opening for visibility
+        const targetAngle = isOpen ? (type === "AV" ? 1.4 : 1.5) : 0.02;
         
         if (type === "AV") {
             if (leaflet1Ref.current) {
-                leaflet1Ref.current.rotation.z = THREE.MathUtils.lerp(leaflet1Ref.current.rotation.z, targetAngle, delta * 10);
+                leaflet1Ref.current.rotation.z = THREE.MathUtils.lerp(leaflet1Ref.current.rotation.z, targetAngle, delta * 12);
             }
             if (leaflet2Ref.current) {
-                leaflet2Ref.current.rotation.z = THREE.MathUtils.lerp(leaflet2Ref.current.rotation.z, -targetAngle, delta * 10);
+                leaflet2Ref.current.rotation.z = THREE.MathUtils.lerp(leaflet2Ref.current.rotation.z, -targetAngle, delta * 12);
             }
         } else {
             [leaflet1Ref, leaflet2Ref, leaflet3Ref].forEach(ref => {
                 if (ref.current) {
-                    ref.current.rotation.z = THREE.MathUtils.lerp(ref.current.rotation.z, targetAngle, delta * 10);
+                    ref.current.rotation.z = THREE.MathUtils.lerp(ref.current.rotation.z, targetAngle, delta * 12);
                 }
             });
         }
@@ -532,9 +548,26 @@ const RealisticHeart = ({ data, isBicuspidOpen, isAorticOpen, soundVisual }) => 
 };
 
 const HeartVisual = (props) => {
+    // Initialize audio on first interaction
+    useEffect(() => {
+        const handleInteraction = () => {
+            initAudio();
+            document.removeEventListener('click', handleInteraction);
+            document.removeEventListener('keydown', handleInteraction);
+        };
+        
+        document.addEventListener('click', handleInteraction);
+        document.addEventListener('keydown', handleInteraction);
+        
+        return () => {
+            document.removeEventListener('click', handleInteraction);
+            document.removeEventListener('keydown', handleInteraction);
+        };
+    }, []);
+    
     // Play heart sounds when they occur
     useEffect(() => {
-        if (props.soundVisual) {
+        if (props.soundVisual && audioInitialized) {
             const soundType = props.soundVisual.includes('LUB') ? 'LUB' : 'DUP';
             playHeartSound(soundType);
         }

@@ -93,8 +93,8 @@ function App() {
 
       <main className="flex-1 flex flex-col gap-6">
 
-        {/* 3D Heart Visualization */}
-        <div className="relative h-[500px] bg-slate-900 rounded-2xl shadow-xl overflow-hidden border border-slate-800 ring-1 ring-white/10">
+        {/* 3D Heart Visualization - ENLARGED */}
+        <div className="relative h-[700px] bg-slate-900 rounded-2xl shadow-xl overflow-hidden border border-slate-800 ring-1 ring-white/10">
           <HeartVisual
             data={heartState}
             isBicuspidOpen={heartState.isBicuspidOpen}
@@ -103,14 +103,14 @@ function App() {
           />
         </div>
 
-        {/* Pressure Changes Graph */}
+        {/* Pressure Changes Graph - REDUCED */}
         <div className="bg-slate-900 p-6 rounded-2xl shadow-lg border border-slate-800">
           <div className="mb-4">
             <h2 className="text-xl font-bold text-white">Pressure Changes (Left Heart)</h2>
             <p className="text-sm text-slate-400">Hover over the graph to scrub time.</p>
           </div>
 
-          <div className="w-full h-[350px]">
+          <div className="w-full h-[280px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
                 data={cardiacData}
