@@ -72,19 +72,19 @@ const HeartValve = ({ position, rotation, isOpen, label, type = "AV", labelPos =
     const leaflet3Ref = useRef();
     
     useFrame((state, delta) => {
-        const targetAngle = isOpen ? (type === "AV" ? 1.5 : 1.6) : 0.01;
+        const targetAngle = isOpen ? (type === "AV" ? 1.5 : 1.6) : 0; // Fully closed = 0 degrees = sealed
         
         if (type === "AV") {
             if (leaflet1Ref.current) {
-                leaflet1Ref.current.rotation.z = THREE.MathUtils.lerp(leaflet1Ref.current.rotation.z, targetAngle, delta * 14);
+                leaflet1Ref.current.rotation.z = THREE.MathUtils.lerp(leaflet1Ref.current.rotation.z, targetAngle, delta * 16);
             }
             if (leaflet2Ref.current) {
-                leaflet2Ref.current.rotation.z = THREE.MathUtils.lerp(leaflet2Ref.current.rotation.z, -targetAngle, delta * 14);
+                leaflet2Ref.current.rotation.z = THREE.MathUtils.lerp(leaflet2Ref.current.rotation.z, -targetAngle, delta * 16);
             }
         } else {
             [leaflet1Ref, leaflet2Ref, leaflet3Ref].forEach(ref => {
                 if (ref.current) {
-                    ref.current.rotation.z = THREE.MathUtils.lerp(ref.current.rotation.z, targetAngle, delta * 14);
+                    ref.current.rotation.z = THREE.MathUtils.lerp(ref.current.rotation.z, targetAngle, delta * 16);
                 }
             });
         }
@@ -754,50 +754,50 @@ const AnatomicalHeart = ({ data, isBicuspidOpen, isAorticOpen }) => {
                 </Html>
             </group>
 
-            {/* CIRCULATION PATHWAY SUMMARY (Top indicators) */}
-            <Html position={[0, 3.5, 0]} center>
+            {/* CIRCULATION PATHWAY SUMMARY (Left side) */}
+            <Html position={[-2.8, 1.5, 0]} center>
                 <div style={{
                     background: 'rgba(15, 23, 42, 0.95)',
-                    padding: '8px 14px',
+                    padding: '10px 16px',
                     borderRadius: '10px',
                     border: '1px solid rgba(148, 163, 184, 0.4)',
                     backdropFilter: 'blur(10px)',
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '6px',
-                    minWidth: '280px'
+                    gap: '8px',
+                    minWidth: '300px'
                 }}>
                     <div style={{
-                        fontSize: '12px',
+                        fontSize: '13px',
                         fontWeight: '700',
                         color: '#fca5a5',
                         borderBottom: '1px solid rgba(252, 165, 165, 0.3)',
-                        paddingBottom: '4px'
+                        paddingBottom: '5px'
                     }}>
                         🔴 Systemic Circulation
                     </div>
                     <div style={{
-                        fontSize: '10px',
+                        fontSize: '11px',
                         color: '#cbd5e1',
-                        lineHeight: '1.4'
+                        lineHeight: '1.5'
                     }}>
                         Lungs → Pulm. Veins → LA → Mitral → LV → Aortic → Aorta → Body
                     </div>
                     
                     <div style={{
-                        fontSize: '12px',
+                        fontSize: '13px',
                         fontWeight: '700',
                         color: '#93c5fd',
                         borderBottom: '1px solid rgba(147, 197, 253, 0.3)',
-                        paddingBottom: '4px',
-                        marginTop: '4px'
+                        paddingBottom: '5px',
+                        marginTop: '6px'
                     }}>
                         🔵 Pulmonary Circulation
                     </div>
                     <div style={{
-                        fontSize: '10px',
+                        fontSize: '11px',
                         color: '#cbd5e1',
-                        lineHeight: '1.4'
+                        lineHeight: '1.5'
                     }}>
                         Body → Vena Cava → RA → Tricuspid → RV → Pulm. → Pulm. A. → Lungs
                     </div>
