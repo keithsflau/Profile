@@ -1,9 +1,9 @@
 import React, { useRef, useMemo, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Text, Environment, Html } from '@react-three/drei';
+import { OrbitControls, Environment, Html } from '@react-three/drei';
 import * as THREE from 'three';
 
-// Heart sound synthesis with user interaction requirement
+// Heart sound synthesis - LOUD
 let audioContext = null;
 let audioInitialized = false;
 
@@ -32,82 +32,80 @@ const playHeartSound = (type) => {
         const now = audioContext.currentTime;
         
         if (type === 'LUB') {
-            // Low frequency thud for AV valve closure
             oscillator.type = 'sine';
-            oscillator.frequency.setValueAtTime(50, now);
-            oscillator.frequency.exponentialRampToValueAtTime(30, now + 0.1);
+            oscillator.frequency.setValueAtTime(55, now);
+            oscillator.frequency.exponentialRampToValueAtTime(35, now + 0.12);
             
             filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(180, now);
+            filter.frequency.setValueAtTime(200, now);
             
-            gainNode.gain.setValueAtTime(1.5, now);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+            // VERY LOUD
+            gainNode.gain.setValueAtTime(3.0, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
             
             oscillator.start(now);
-            oscillator.stop(now + 0.15);
+            oscillator.stop(now + 0.18);
         } else if (type === 'DUP') {
-            // Higher frequency snap for semilunar valve closure
             oscillator.type = 'sine';
-            oscillator.frequency.setValueAtTime(90, now);
-            oscillator.frequency.exponentialRampToValueAtTime(50, now + 0.08);
+            oscillator.frequency.setValueAtTime(95, now);
+            oscillator.frequency.exponentialRampToValueAtTime(55, now + 0.1);
             
             filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(220, now);
+            filter.frequency.setValueAtTime(250, now);
             
-            gainNode.gain.setValueAtTime(1.2, now);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            // VERY LOUD
+            gainNode.gain.setValueAtTime(2.5, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
             
             oscillator.start(now);
-            oscillator.stop(now + 0.1);
+            oscillator.stop(now + 0.12);
         }
     } catch (e) {
         console.warn('Audio playback failed:', e);
     }
 };
 
-// Realistic heart shape using merged geometry
-const createRealisticHeartGeometry = () => {
-    // Create a more organic heart shape by merging multiple geometries
-    const heartGroup = new THREE.Group();
-    
-    // Base ventricles (teardrop/cone shapes)
-    const leftVentricleGeo = new THREE.ConeGeometry(0.7, 1.8, 32);
-    const rightVentricleGeo = new THREE.ConeGeometry(0.6, 1.5, 32);
-    
-    return { leftVentricleGeo, rightVentricleGeo };
-};
-
-// Improved valve with visible animation
-const HeartValve = ({ position, rotation, isOpen, label, type = "AV", color = "#fbbf24" }) => {
+// Improved Heart Valve with better positioning
+const HeartValve = ({ position, rotation, isOpen, label, type = "AV", labelPos = "left" }) => {
     const leaflet1Ref = useRef();
     const leaflet2Ref = useRef();
     const leaflet3Ref = useRef();
     
     useFrame((state, delta) => {
-        // More dramatic valve opening for visibility
-        const targetAngle = isOpen ? (type === "AV" ? 1.4 : 1.5) : 0.02;
+        const targetAngle = isOpen ? (type === "AV" ? 1.5 : 1.6) : 0.01;
         
         if (type === "AV") {
             if (leaflet1Ref.current) {
-                leaflet1Ref.current.rotation.z = THREE.MathUtils.lerp(leaflet1Ref.current.rotation.z, targetAngle, delta * 12);
+                leaflet1Ref.current.rotation.z = THREE.MathUtils.lerp(leaflet1Ref.current.rotation.z, targetAngle, delta * 14);
             }
             if (leaflet2Ref.current) {
-                leaflet2Ref.current.rotation.z = THREE.MathUtils.lerp(leaflet2Ref.current.rotation.z, -targetAngle, delta * 12);
+                leaflet2Ref.current.rotation.z = THREE.MathUtils.lerp(leaflet2Ref.current.rotation.z, -targetAngle, delta * 14);
             }
         } else {
             [leaflet1Ref, leaflet2Ref, leaflet3Ref].forEach(ref => {
                 if (ref.current) {
-                    ref.current.rotation.z = THREE.MathUtils.lerp(ref.current.rotation.z, targetAngle, delta * 12);
+                    ref.current.rotation.z = THREE.MathUtils.lerp(ref.current.rotation.z, targetAngle, delta * 14);
                 }
             });
         }
     });
     
+    // Determine label position based on labelPos prop
+    let htmlPosition;
+    if (labelPos === "left") {
+        htmlPosition = [-1.0, 0, 0];
+    } else if (labelPos === "right") {
+        htmlPosition = [1.0, 0, 0];
+    } else if (labelPos === "leftTop") {
+        htmlPosition = [-0.95, 0.35, 0];
+    } else if (labelPos === "rightTop") {
+        htmlPosition = [0.95, 0.35, 0];
+    }
+    
     return (
         <group position={position} rotation={rotation}>
-            {/* Valve ring */}
             <mesh>
-                <torusGeometry args={[0.38, 0.06, 16, 32]} />
+                <torusGeometry args={[0.4, 0.07, 16, 32]} />
                 <meshStandardMaterial color="#b45309" metalness={0.4} roughness={0.3} />
             </mesh>
             
@@ -115,14 +113,14 @@ const HeartValve = ({ position, rotation, isOpen, label, type = "AV", color = "#
                 <>
                     <group ref={leaflet1Ref} position={[-0.25, 0, 0]}>
                         <mesh rotation={[Math.PI/2, 0, 0]}>
-                            <boxGeometry args={[0.5, 0.7, 0.05]} />
-                            <meshStandardMaterial color={color} side={THREE.DoubleSide} transparent opacity={0.95} />
+                            <boxGeometry args={[0.5, 0.75, 0.06]} />
+                            <meshStandardMaterial color="#fbbf24" side={THREE.DoubleSide} transparent opacity={0.95} />
                         </mesh>
                     </group>
                     <group ref={leaflet2Ref} position={[0.25, 0, 0]}>
                         <mesh rotation={[Math.PI/2, 0, 0]}>
-                            <boxGeometry args={[0.5, 0.7, 0.05]} />
-                            <meshStandardMaterial color={color} side={THREE.DoubleSide} transparent opacity={0.95} />
+                            <boxGeometry args={[0.5, 0.75, 0.06]} />
+                            <meshStandardMaterial color="#fbbf24" side={THREE.DoubleSide} transparent opacity={0.95} />
                         </mesh>
                     </group>
                 </>
@@ -130,10 +128,10 @@ const HeartValve = ({ position, rotation, isOpen, label, type = "AV", color = "#
                 <>
                     {[0, 2.094, -2.094].map((angle, i) => (
                         <group key={i} rotation={[0, 0, angle]}>
-                            <group ref={i === 0 ? leaflet1Ref : i === 1 ? leaflet2Ref : leaflet3Ref} position={[0.28, 0, 0]}>
+                            <group ref={i === 0 ? leaflet1Ref : i === 1 ? leaflet2Ref : leaflet3Ref} position={[0.3, 0, 0]}>
                                 <mesh rotation={[Math.PI/2, 0, 0]}>
-                                    <coneGeometry args={[0.18, 0.6, 8]} />
-                                    <meshStandardMaterial color={color} side={THREE.DoubleSide} transparent opacity={0.95} />
+                                    <coneGeometry args={[0.2, 0.65, 8]} />
+                                    <meshStandardMaterial color="#fbbf24" side={THREE.DoubleSide} transparent opacity={0.95} />
                                 </mesh>
                             </group>
                         </group>
@@ -141,35 +139,33 @@ const HeartValve = ({ position, rotation, isOpen, label, type = "AV", color = "#
                 </>
             )}
             
-            {/* Glow when open */}
             {isOpen && (
                 <mesh>
-                    <torusGeometry args={[0.42, 0.1, 16, 32]} />
-                    <meshBasicMaterial color="#4ade80" transparent opacity={0.5} />
+                    <torusGeometry args={[0.45, 0.11, 16, 32]} />
+                    <meshBasicMaterial color="#4ade80" transparent opacity={0.6} />
                 </mesh>
             )}
             
-            {/* Label with background */}
-            <Html position={type === "AV" ? [-0.95, 0, 0] : [0.95, 0.3, 0]} center>
+            <Html position={htmlPosition} center>
                 <div style={{
-                    background: 'rgba(15, 23, 42, 0.92)',
-                    padding: '6px 10px',
+                    background: 'rgba(15, 23, 42, 0.95)',
+                    padding: '6px 11px',
                     borderRadius: '8px',
-                    border: '1px solid rgba(148, 163, 184, 0.3)',
-                    backdropFilter: 'blur(8px)',
-                    textAlign: type === "AV" ? 'right' : 'left',
-                    minWidth: '90px'
+                    border: '1px solid rgba(148, 163, 184, 0.4)',
+                    backdropFilter: 'blur(10px)',
+                    textAlign: labelPos.includes('right') ? 'left' : 'right',
+                    minWidth: '95px'
                 }}>
                     <div style={{ 
                         fontSize: '13px', 
                         fontWeight: '600', 
                         color: '#fff',
-                        marginBottom: '2px'
+                        marginBottom: '3px'
                     }}>
                         {label}
                     </div>
                     <div style={{ 
-                        fontSize: '11px', 
+                        fontSize: '12px', 
                         fontWeight: '700',
                         color: isOpen ? '#4ade80' : '#f87171'
                     }}>
@@ -181,8 +177,8 @@ const HeartValve = ({ position, rotation, isOpen, label, type = "AV", color = "#
     );
 };
 
-// Realistic anatomical heart
-const RealisticHeart = ({ data, isBicuspidOpen, isAorticOpen, soundVisual }) => {
+// Anatomically accurate 4-chamber heart
+const AnatomicalHeart = ({ data, isBicuspidOpen, isAorticOpen }) => {
     const heartRef = useRef();
     const leftVentricleRef = useRef();
     const rightVentricleRef = useRef();
@@ -195,7 +191,7 @@ const RealisticHeart = ({ data, isBicuspidOpen, isAorticOpen, soundVisual }) => 
     const isTricuspidOpen = isBicuspidOpen;
     const isPulmonaryOpen = isAorticOpen;
     
-    const particleCount = 60;
+    const particleCount = 70;
     
     const createParticles = () => new Array(particleCount).fill(0).map(() => ({
         phase: Math.floor(Math.random() * 3),
@@ -212,19 +208,19 @@ const RealisticHeart = ({ data, isBicuspidOpen, isAorticOpen, soundVisual }) => 
         const time = state.clock.getElapsedTime();
         
         if (heartRef.current) {
-            const pulse = 1.0 + Math.sin(time * 2.5) * 0.012;
+            const pulse = 1.0 + Math.sin(time * 2.5) * 0.015;
             heartRef.current.scale.set(pulse, pulse, pulse);
         }
         
         const volumeNorm = (data.volume - 50) / 70;
-        const ventricleScale = 0.88 + volumeNorm * 0.17;
-        const atrialScale = data.phase === "Atrial Systole" ? 0.92 : 1.0;
+        const ventricleScale = 0.87 + volumeNorm * 0.18;
+        const atrialScale = data.phase === "Atrial Systole" ? 0.91 : 1.0;
         
         if (leftVentricleRef.current) {
             leftVentricleRef.current.scale.lerp(new THREE.Vector3(ventricleScale, ventricleScale, ventricleScale), delta * 7);
         }
         if (rightVentricleRef.current) {
-            const rvScale = 0.91 + volumeNorm * 0.12;
+            const rvScale = 0.90 + volumeNorm * 0.13;
             rightVentricleRef.current.scale.lerp(new THREE.Vector3(rvScale, rvScale, rvScale), delta * 6);
         }
         if (leftAtriumRef.current) {
@@ -239,23 +235,23 @@ const RealisticHeart = ({ data, isBicuspidOpen, isAorticOpen, soundVisual }) => 
             const dummy = new THREE.Object3D();
             const isMitralOpen = isLeft ? isBicuspidOpen : isTricuspidOpen;
             const isValveOpen = isLeft ? isAorticOpen : isPulmonaryOpen;
-            const xOffset = isLeft ? -0.4 : 0.55;
+            const xOffset = isLeft ? -0.45 : 0.6;
             
             particles.forEach((p, i) => {
                 let pos = new THREE.Vector3();
                 
                 if (p.phase === 0) {
-                    pos.set(xOffset + (isLeft ? -1 : 1) * (1 - p.progress), 1.0, 0);
+                    pos.set(xOffset + (isLeft ? -1 : 1) * (1 - p.progress), 1.1, 0);
                     p.progress += p.speed * 2.5;
                     if (p.progress >= 1) { p.phase = 1; p.progress = 0; }
                 } else if (p.phase === 1) {
                     if (p.progress < 0.55) {
                         const angle = p.angle + p.progress * Math.PI * 2.5;
-                        pos.set(xOffset + Math.cos(angle) * 0.32, 0.85, Math.sin(angle) * 0.32);
+                        pos.set(xOffset + Math.cos(angle) * 0.34, 0.9, Math.sin(angle) * 0.34);
                         p.progress += p.speed * 1.3;
                     } else {
                         if (isMitralOpen) {
-                            pos.set(xOffset, 0.85 - (p.progress - 0.55) * 2.2, 0);
+                            pos.set(xOffset, 0.9 - (p.progress - 0.55) * 2.4, 0);
                             p.progress += p.speed * 3.5;
                             if (p.progress >= 1) { p.phase = 2; p.progress = 0; }
                         } else {
@@ -265,11 +261,11 @@ const RealisticHeart = ({ data, isBicuspidOpen, isAorticOpen, soundVisual }) => 
                 } else {
                     if (p.progress < 0.65) {
                         const angle = p.angle + p.progress * Math.PI * 4;
-                        pos.set(xOffset + Math.cos(angle) * 0.48, -0.6 - p.progress * 0.5, Math.sin(angle) * 0.38);
+                        pos.set(xOffset + Math.cos(angle) * 0.52, -0.65 - p.progress * 0.55, Math.sin(angle) * 0.42);
                         p.progress += p.speed * 0.9;
                     } else {
                         if (isValveOpen) {
-                            pos.set(xOffset, -0.4 + (p.progress - 0.65) * 7, 0);
+                            pos.set(xOffset, -0.45 + (p.progress - 0.65) * 7.5, 0);
                             p.progress += p.speed * 6;
                             if (p.progress >= 1) { p.phase = 0; p.progress = 0; p.angle = Math.random() * Math.PI * 2; }
                         } else {
@@ -280,7 +276,7 @@ const RealisticHeart = ({ data, isBicuspidOpen, isAorticOpen, soundVisual }) => 
                 
                 pos.add(p.offset);
                 dummy.position.copy(pos);
-                dummy.scale.setScalar(0.05);
+                dummy.scale.setScalar(0.052);
                 dummy.updateMatrix();
                 ref.current.setMatrixAt(i, dummy.matrix);
             });
@@ -292,43 +288,42 @@ const RealisticHeart = ({ data, isBicuspidOpen, isAorticOpen, soundVisual }) => 
     });
 
     return (
-        <group ref={heartRef} rotation={[0.2, -0.3, 0.08]} position={[0, -0.2, 0]}>
+        <group ref={heartRef} rotation={[0.18, -0.28, 0.06]} position={[0, -0.25, 0]}>
             
-            {/* LEFT ATRIUM - rounded organic shape */}
-            <group position={[-0.4, 1.0, -0.15]} ref={leftAtriumRef}>
+            {/* LEFT ATRIUM - anatomically accurate */}
+            <group position={[-0.45, 1.05, -0.2]} ref={leftAtriumRef}>
                 <mesh castShadow>
-                    <sphereGeometry args={[0.52, 32, 32, 0, Math.PI * 2, 0, Math.PI * 0.8]} />
+                    <sphereGeometry args={[0.54, 32, 32, 0, Math.PI * 2, 0, Math.PI * 0.85]} />
                     <meshPhysicalMaterial
                         color="#fca5a5"
                         transparent
-                        opacity={0.42}
-                        roughness={0.35}
-                        metalness={0.1}
-                        transmission={0.55}
-                        thickness={0.4}
-                        clearcoat={0.5}
+                        opacity={0.44}
+                        roughness={0.32}
+                        metalness={0.08}
+                        transmission={0.58}
+                        thickness={0.42}
+                        clearcoat={0.52}
                     />
                 </mesh>
-                {/* Atrial appendage */}
-                <mesh position={[-0.45, 0.15, 0.25]} rotation={[0.3, 0.6, 0.4]} castShadow>
-                    <capsuleGeometry args={[0.18, 0.38, 8, 16]} />
+                <mesh position={[-0.48, 0.18, 0.28]} rotation={[0.32, 0.62, 0.42]} castShadow>
+                    <capsuleGeometry args={[0.19, 0.42, 8, 16]} />
                     <meshPhysicalMaterial
                         color="#f87171"
                         transparent
-                        opacity={0.4}
-                        roughness={0.4}
-                        transmission={0.5}
+                        opacity={0.42}
+                        roughness={0.38}
+                        transmission={0.52}
                     />
                 </mesh>
-                <Html position={[-1.15, 0.7, 0]} center>
+                <Html position={[-1.2, 0.75, 0]} center>
                     <div style={{
-                        background: 'rgba(15, 23, 42, 0.92)',
-                        padding: '5px 10px',
+                        background: 'rgba(15, 23, 42, 0.93)',
+                        padding: '6px 11px',
                         borderRadius: '8px',
-                        border: '1px solid rgba(252, 165, 165, 0.5)',
-                        backdropFilter: 'blur(8px)'
+                        border: '1px solid rgba(252, 165, 165, 0.55)',
+                        backdropFilter: 'blur(10px)'
                     }}>
-                        <div style={{ fontSize: '14px', fontWeight: '600', color: '#fca5a5', whiteSpace: 'nowrap' }}>
+                        <div style={{ fontSize: '14px', fontWeight: '600', color: '#fca5a5' }}>
                             Left Atrium
                         </div>
                     </div>
@@ -336,133 +331,132 @@ const RealisticHeart = ({ data, isBicuspidOpen, isAorticOpen, soundVisual }) => 
             </group>
 
             {/* RIGHT ATRIUM */}
-            <group position={[0.6, 1.0, 0]} ref={rightAtriumRef}>
+            <group position={[0.65, 1.05, 0.05]} ref={rightAtriumRef}>
                 <mesh castShadow>
-                    <sphereGeometry args={[0.46, 32, 32, 0, Math.PI * 2, 0, Math.PI * 0.75]} />
+                    <sphereGeometry args={[0.48, 32, 32, 0, Math.PI * 2, 0, Math.PI * 0.8]} />
                     <meshPhysicalMaterial
                         color="#93c5fd"
                         transparent
-                        opacity={0.38}
-                        roughness={0.35}
-                        transmission={0.6}
-                        thickness={0.35}
+                        opacity={0.40}
+                        roughness={0.32}
+                        transmission={0.62}
+                        thickness={0.37}
                     />
                 </mesh>
-                <Html position={[1.4, 0.7, 0]} center>
+                <Html position={[1.45, 0.75, 0]} center>
                     <div style={{
-                        background: 'rgba(15, 23, 42, 0.92)',
-                        padding: '5px 10px',
+                        background: 'rgba(15, 23, 42, 0.93)',
+                        padding: '6px 11px',
                         borderRadius: '8px',
-                        border: '1px solid rgba(147, 197, 253, 0.5)',
-                        backdropFilter: 'blur(8px)'
+                        border: '1px solid rgba(147, 197, 253, 0.55)',
+                        backdropFilter: 'blur(10px)'
                     }}>
-                        <div style={{ fontSize: '14px', fontWeight: '600', color: '#93c5fd', whiteSpace: 'nowrap' }}>
+                        <div style={{ fontSize: '14px', fontWeight: '600', color: '#93c5fd' }}>
                             Right Atrium
                         </div>
                     </div>
                 </Html>
             </group>
 
-            {/* LEFT VENTRICLE - realistic teardrop shape */}
-            <group position={[-0.4, -0.35, 0]} ref={leftVentricleRef}>
+            {/* LEFT VENTRICLE - thick muscular wall */}
+            <group position={[-0.45, -0.38, 0]} ref={leftVentricleRef}>
                 <mesh castShadow rotation={[Math.PI, 0, 0]}>
-                    <coneGeometry args={[0.75, 1.75, 32, 1, false, 0, Math.PI * 2]} />
+                    <coneGeometry args={[0.78, 1.85, 32, 1, false, 0, Math.PI * 2]} />
                     <meshPhysicalMaterial
                         color="#ef4444"
                         transparent
-                        opacity={0.45}
-                        roughness={0.4}
-                        metalness={0.12}
-                        transmission={0.5}
-                        thickness={0.7}
-                        clearcoat={0.6}
+                        opacity={0.47}
+                        roughness={0.42}
+                        metalness={0.10}
+                        transmission={0.52}
+                        thickness={0.75}
+                        clearcoat={0.62}
                     />
                 </mesh>
-                {/* Rounded top */}
-                <mesh position={[0, 0.85, 0]} castShadow>
-                    <sphereGeometry args={[0.75, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2]} />
+                <mesh position={[0, 0.9, 0]} castShadow>
+                    <sphereGeometry args={[0.78, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2]} />
                     <meshPhysicalMaterial
                         color="#ef4444"
                         transparent
-                        opacity={0.45}
-                        roughness={0.4}
-                        transmission={0.5}
-                        thickness={0.7}
+                        opacity={0.47}
+                        roughness={0.42}
+                        transmission={0.52}
+                        thickness={0.75}
                     />
                 </mesh>
-                <Html position={[-1.15, -1.3, 0]} center>
+                <Html position={[-1.2, -1.35, 0]} center>
                     <div style={{
-                        background: 'rgba(15, 23, 42, 0.92)',
-                        padding: '6px 12px',
+                        background: 'rgba(15, 23, 42, 0.93)',
+                        padding: '7px 13px',
                         borderRadius: '8px',
-                        border: '1px solid rgba(239, 68, 68, 0.6)',
-                        backdropFilter: 'blur(8px)'
+                        border: '1px solid rgba(239, 68, 68, 0.65)',
+                        backdropFilter: 'blur(10px)'
                     }}>
-                        <div style={{ fontSize: '15px', fontWeight: '700', color: '#ef4444', whiteSpace: 'nowrap' }}>
+                        <div style={{ fontSize: '15px', fontWeight: '700', color: '#ef4444' }}>
                             Left Ventricle
                         </div>
                     </div>
                 </Html>
             </group>
 
-            {/* RIGHT VENTRICLE */}
-            <group position={[0.58, -0.32, 0.22]} ref={rightVentricleRef}>
-                <mesh castShadow rotation={[Math.PI, 0, 0.15]}>
-                    <coneGeometry args={[0.62, 1.48, 32]} />
+            {/* RIGHT VENTRICLE - thinner wall */}
+            <group position={[0.63, -0.35, 0.25]} ref={rightVentricleRef}>
+                <mesh castShadow rotation={[Math.PI, 0, 0.18]}>
+                    <coneGeometry args={[0.65, 1.55, 32]} />
                     <meshPhysicalMaterial
                         color="#60a5fa"
                         transparent
-                        opacity={0.4}
-                        roughness={0.4}
-                        transmission={0.58}
-                        thickness={0.55}
+                        opacity={0.42}
+                        roughness={0.42}
+                        transmission={0.60}
+                        thickness={0.58}
                     />
                 </mesh>
-                <mesh position={[0, 0.72, 0]} castShadow>
-                    <sphereGeometry args={[0.62, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2]} />
+                <mesh position={[0, 0.75, 0]} castShadow>
+                    <sphereGeometry args={[0.65, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2]} />
                     <meshPhysicalMaterial
                         color="#60a5fa"
                         transparent
-                        opacity={0.4}
-                        roughness={0.4}
-                        transmission={0.58}
+                        opacity={0.42}
+                        roughness={0.42}
+                        transmission={0.60}
                     />
                 </mesh>
-                <Html position={[1.5, -1.1, 0]} center>
+                <Html position={[1.55, -1.15, 0]} center>
                     <div style={{
-                        background: 'rgba(15, 23, 42, 0.92)',
-                        padding: '6px 12px',
+                        background: 'rgba(15, 23, 42, 0.93)',
+                        padding: '7px 13px',
                         borderRadius: '8px',
-                        border: '1px solid rgba(96, 165, 250, 0.6)',
-                        backdropFilter: 'blur(8px)'
+                        border: '1px solid rgba(96, 165, 250, 0.65)',
+                        backdropFilter: 'blur(10px)'
                     }}>
-                        <div style={{ fontSize: '15px', fontWeight: '700', color: '#60a5fa', whiteSpace: 'nowrap' }}>
+                        <div style={{ fontSize: '15px', fontWeight: '700', color: '#60a5fa' }}>
                             Right Ventricle
                         </div>
                     </div>
                 </Html>
             </group>
 
-            {/* AORTA */}
-            <group position={[-0.4, 1.7, 0]}>
+            {/* AORTA - from LEFT ventricle going UP and RIGHT */}
+            <group position={[-0.45, 1.75, 0]}>
                 <mesh castShadow>
-                    <cylinderGeometry args={[0.32, 0.35, 1.3, 24]} />
+                    <cylinderGeometry args={[0.34, 0.37, 1.4, 24]} />
                     <meshPhysicalMaterial
                         color="#b91c1c"
                         transparent
-                        opacity={0.5}
-                        roughness={0.25}
-                        transmission={0.42}
-                        clearcoat={0.7}
+                        opacity={0.52}
+                        roughness={0.24}
+                        transmission={0.44}
+                        clearcoat={0.72}
                     />
                 </mesh>
-                <Html position={[-1.1, 2.6, 0]} center>
+                <Html position={[-1.15, 2.65, 0]} center>
                     <div style={{
-                        background: 'rgba(15, 23, 42, 0.92)',
-                        padding: '5px 10px',
+                        background: 'rgba(15, 23, 42, 0.93)',
+                        padding: '6px 11px',
                         borderRadius: '8px',
-                        border: '1px solid rgba(185, 28, 28, 0.5)',
-                        backdropFilter: 'blur(8px)'
+                        border: '1px solid rgba(185, 28, 28, 0.55)',
+                        backdropFilter: 'blur(10px)'
                     }}>
                         <div style={{ fontSize: '14px', fontWeight: '600', color: '#b91c1c' }}>
                             Aorta
@@ -471,84 +465,101 @@ const RealisticHeart = ({ data, isBicuspidOpen, isAorticOpen, soundVisual }) => 
                 </Html>
             </group>
 
-            {/* PULMONARY ARTERY */}
-            <group position={[0.58, 1.6, 0.25]}>
+            {/* PULMONARY ARTERY - from RIGHT ventricle going UP and LEFT */}
+            <group position={[0.63, 1.65, 0.28]}>
                 <mesh castShadow>
-                    <cylinderGeometry args={[0.27, 0.3, 1.15, 24]} />
+                    <cylinderGeometry args={[0.29, 0.32, 1.22, 24]} />
                     <meshPhysicalMaterial
                         color="#3b82f6"
                         transparent
-                        opacity={0.45}
-                        roughness={0.25}
-                        transmission={0.45}
+                        opacity={0.48}
+                        roughness={0.24}
+                        transmission={0.48}
                     />
                 </mesh>
-                <Html position={[1.45, 2.45, 0]} center>
+                <Html position={[-1.05, 2.5, 0]} center>
                     <div style={{
-                        background: 'rgba(15, 23, 42, 0.92)',
-                        padding: '5px 10px',
+                        background: 'rgba(15, 23, 42, 0.93)',
+                        padding: '6px 11px',
                         borderRadius: '8px',
-                        border: '1px solid rgba(59, 130, 246, 0.5)',
-                        backdropFilter: 'blur(8px)'
+                        border: '1px solid rgba(59, 130, 246, 0.55)',
+                        backdropFilter: 'blur(10px)'
                     }}>
-                        <div style={{ fontSize: '13px', fontWeight: '600', color: '#60a5fa', whiteSpace: 'nowrap' }}>
+                        <div style={{ fontSize: '13px', fontWeight: '600', color: '#60a5fa' }}>
                             Pulmonary A.
                         </div>
                     </div>
                 </Html>
             </group>
 
-            {/* VALVES */}
+            {/* PULMONARY VEINS - entering LEFT atrium from back */}
+            <group position={[-0.8, 1.05, -0.5]}>
+                <mesh rotation={[0, 0, Math.PI/2]}>
+                    <cylinderGeometry args={[0.15, 0.15, 0.35, 16]} />
+                    <meshStandardMaterial color="#ef4444" transparent opacity={0.55} />
+                </mesh>
+            </group>
+
+            {/* SUPERIOR VENA CAVA - entering RIGHT atrium from top */}
+            <group position={[0.65, 1.6, 0.05]}>
+                <mesh>
+                    <cylinderGeometry args={[0.19, 0.19, 0.55, 16]} />
+                    <meshStandardMaterial color="#1e40af" transparent opacity={0.52} />
+                </mesh>
+            </group>
+
+            {/* VALVES with corrected label positions */}
             <HeartValve 
-                position={[-0.4, 0.45, 0]} 
+                position={[-0.45, 0.50, 0]} 
                 rotation={[Math.PI/2, 0, 0]}
                 isOpen={isBicuspidOpen}
                 label="Mitral"
                 type="AV"
+                labelPos="left"
             />
             
             <HeartValve 
-                position={[-0.4, 1.25, 0]} 
+                position={[-0.45, 1.30, 0]} 
                 rotation={[Math.PI/2, 0, 0]}
                 isOpen={isAorticOpen}
                 label="Aortic"
                 type="SL"
+                labelPos="leftTop"
             />
             
             <HeartValve 
-                position={[0.58, 0.48, 0.22]} 
+                position={[0.63, 0.52, 0.25]} 
                 rotation={[Math.PI/2, 0, 0]}
                 isOpen={isTricuspidOpen}
                 label="Tricuspid"
                 type="AV"
+                labelPos="right"
             />
             
             <HeartValve 
-                position={[0.58, 1.15, 0.25]} 
+                position={[0.63, 1.20, 0.28]} 
                 rotation={[Math.PI/2, 0, 0]}
                 isOpen={isPulmonaryOpen}
                 label="Pulmonary"
                 type="SL"
+                labelPos="rightTop"
             />
 
             {/* Blood Particles */}
             <instancedMesh ref={oxyParticlesRef} args={[null, null, particleCount]} castShadow>
-                <sphereGeometry args={[1, 10, 10]} />
-                <meshStandardMaterial color="#ff0000" emissive="#cc0000" emissiveIntensity={0.85} />
+                <sphereGeometry args={[1, 12, 12]} />
+                <meshStandardMaterial color="#ff0000" emissive="#cc0000" emissiveIntensity={0.88} />
             </instancedMesh>
             
             <instancedMesh ref={deoxyParticlesRef} args={[null, null, particleCount]} castShadow>
-                <sphereGeometry args={[1, 10, 10]} />
-                <meshStandardMaterial color="#4444ff" emissive="#0000cc" emissiveIntensity={0.85} />
+                <sphereGeometry args={[1, 12, 12]} />
+                <meshStandardMaterial color="#4444ff" emissive="#0000cc" emissiveIntensity={0.88} />
             </instancedMesh>
-
-            {/* Sound effects handled by audio synthesis */}
         </group>
     );
 };
 
 const HeartVisual = (props) => {
-    // Initialize audio on first interaction
     useEffect(() => {
         const handleInteraction = () => {
             initAudio();
@@ -565,7 +576,6 @@ const HeartVisual = (props) => {
         };
     }, []);
     
-    // Play heart sounds when they occur
     useEffect(() => {
         if (props.soundVisual && audioInitialized) {
             const soundType = props.soundVisual.includes('LUB') ? 'LUB' : 'DUP';
@@ -576,46 +586,45 @@ const HeartVisual = (props) => {
     return (
         <div className="w-full h-full bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 rounded-xl overflow-hidden relative shadow-2xl">
             <Canvas 
-                camera={{ position: [3.2, 0.4, 4.5], fov: 42 }} 
+                camera={{ position: [3.4, 0.5, 5.0], fov: 44 }} 
                 shadows 
                 dpr={[1, 2]}
             >
                 <color attach="background" args={['#020617']} />
-                <fog attach="fog" args={['#020617', 4, 14]} />
+                <fog attach="fog" args={['#020617', 4.5, 15]} />
                 
-                <ambientLight intensity={0.45} />
+                <ambientLight intensity={0.48} />
                 <directionalLight 
                     position={[6, 6, 6]} 
-                    intensity={1.5} 
+                    intensity={1.6} 
                     castShadow 
                     shadow-mapSize-width={2048}
                     shadow-mapSize-height={2048}
                 />
-                <pointLight position={[-4, 3, 4]} intensity={1.2} color="#fca5a5" />
-                <pointLight position={[4, 3, 4]} intensity={1.2} color="#60a5fa" />
-                <pointLight position={[0, -2, 3]} intensity={0.7} color="#a855f7" />
+                <pointLight position={[-4.5, 3, 4]} intensity={1.3} color="#fca5a5" />
+                <pointLight position={[4.5, 3, 4]} intensity={1.3} color="#60a5fa" />
+                <pointLight position={[0, -2.5, 3.5]} intensity={0.75} color="#a855f7" />
                 <spotLight 
-                    position={[0, 10, 0]} 
-                    angle={0.45} 
+                    position={[0, 11, 0]} 
+                    angle={0.48} 
                     penumbra={1} 
-                    intensity={1.4} 
+                    intensity={1.5} 
                     castShadow 
                 />
                 
                 <Environment preset="city" />
 
-                <RealisticHeart {...props} />
+                <AnatomicalHeart {...props} />
 
                 <OrbitControls
                     enableZoom={true}
-                    minDistance={2.8}
-                    maxDistance={9}
-                    rotateSpeed={0.5}
-                    target={[0, 0.3, 0]}
+                    minDistance={3.0}
+                    maxDistance={10}
+                    rotateSpeed={0.45}
+                    target={[0, 0.25, 0]}
                 />
             </Canvas>
 
-            {/* Phase indicator - top right */}
             <div className="absolute top-6 right-6 pointer-events-none select-none">
                 <div className="bg-slate-900/95 backdrop-blur-md px-6 py-3 rounded-xl border border-indigo-500/40 shadow-xl shadow-indigo-500/20">
                     <div className="text-xs text-slate-400 font-medium mb-1">Cardiac Phase</div>
@@ -625,7 +634,6 @@ const HeartVisual = (props) => {
                 </div>
             </div>
 
-            {/* Legend - bottom left */}
             <div className="absolute bottom-6 left-6 pointer-events-none select-none">
                 <div className="bg-slate-900/95 backdrop-blur-md px-4 py-3 rounded-xl border border-slate-700 shadow-xl space-y-2.5">
                     <div className="text-xs font-bold text-slate-300 mb-2">Blood Flow</div>
