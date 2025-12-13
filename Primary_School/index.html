@@ -29,6 +29,7 @@
             background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
         }
     </style>
+    <link rel="stylesheet" href="../visit-counter.css">
 </head>
 
 <body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
@@ -47,6 +48,8 @@
                     返回主頁 | Back to Home
                 </a>
             </div>
+            <!-- Visit Counter -->
+            <div id="visit-counter-container"></div>
         </header>
 
         <!-- Grid -->
@@ -92,6 +95,15 @@
 
         </div>
     </div>
+    <!-- Visit Counter Script -->
+    <script src="../visit-counter.js"></script>
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
+        VisitCounter.init('primary_school/index', {
+            scriptUrl: SCRIPT_URL,
+            containerId: 'visit-counter-container'
+        });
+    </script>
 </body>
 
 </html>
