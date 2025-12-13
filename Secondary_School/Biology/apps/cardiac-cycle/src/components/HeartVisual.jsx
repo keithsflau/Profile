@@ -555,6 +555,254 @@ const AnatomicalHeart = ({ data, isBicuspidOpen, isAorticOpen }) => {
                 <sphereGeometry args={[1, 12, 12]} />
                 <meshStandardMaterial color="#4444ff" emissive="#0000cc" emissiveIntensity={0.88} />
             </instancedMesh>
+
+            {/* ===== BLOOD FLOW ARROWS AND LABELS ===== */}
+            
+            {/* SYSTEMIC CIRCULATION (LEFT HEART - RED) */}
+            
+            {/* Arrow: Lungs → Pulmonary Veins → Left Atrium */}
+            <group position={[-1.1, 1.05, -0.5]}>
+                <mesh rotation={[0, 0, Math.PI/2]}>
+                    <coneGeometry args={[0.12, 0.35, 8]} />
+                    <meshStandardMaterial color="#ef4444" emissive="#ef4444" emissiveIntensity={0.6} />
+                </mesh>
+                <Html position={[0, 0.45, 0]} center>
+                    <div style={{
+                        background: 'rgba(239, 68, 68, 0.15)',
+                        padding: '3px 7px',
+                        borderRadius: '6px',
+                        border: '1px solid rgba(239, 68, 68, 0.4)',
+                        backdropFilter: 'blur(4px)',
+                        fontSize: '11px',
+                        color: '#fca5a5',
+                        whiteSpace: 'nowrap',
+                        fontWeight: '600'
+                    }}>
+                        From Lungs
+                    </div>
+                </Html>
+            </group>
+
+            {/* Arrow: Left Atrium → Mitral Valve → Left Ventricle */}
+            {isBicuspidOpen && (
+                <group position={[-0.45, 0.5, 0.8]}>
+                    <mesh rotation={[Math.PI, 0, 0]}>
+                        <coneGeometry args={[0.14, 0.4, 8]} />
+                        <meshStandardMaterial color="#4ade80" emissive="#4ade80" emissiveIntensity={0.8} />
+                    </mesh>
+                    <Html position={[0, -0.5, 0]} center>
+                        <div style={{
+                            background: 'rgba(74, 222, 128, 0.15)',
+                            padding: '3px 7px',
+                            borderRadius: '6px',
+                            border: '1px solid rgba(74, 222, 128, 0.4)',
+                            backdropFilter: 'blur(4px)',
+                            fontSize: '10px',
+                            color: '#4ade80',
+                            whiteSpace: 'nowrap',
+                            fontWeight: '700'
+                        }}>
+                            Filling
+                        </div>
+                    </Html>
+                </group>
+            )}
+
+            {/* Arrow: Left Ventricle → Aortic Valve → Aorta */}
+            {isAorticOpen && (
+                <group position={[-0.45, 1.75, 0.8]}>
+                    <mesh>
+                        <coneGeometry args={[0.14, 0.4, 8]} />
+                        <meshStandardMaterial color="#4ade80" emissive="#4ade80" emissiveIntensity={0.8} />
+                    </mesh>
+                    <Html position={[0, 0.5, 0]} center>
+                        <div style={{
+                            background: 'rgba(74, 222, 128, 0.15)',
+                            padding: '3px 7px',
+                            borderRadius: '6px',
+                            border: '1px solid rgba(74, 222, 128, 0.4)',
+                            backdropFilter: 'blur(4px)',
+                            fontSize: '10px',
+                            color: '#4ade80',
+                            whiteSpace: 'nowrap',
+                            fontWeight: '700'
+                        }}>
+                            Ejection
+                        </div>
+                    </Html>
+                </group>
+            )}
+
+            {/* Arrow: Aorta → Body */}
+            <group position={[-0.45, 2.8, 0]}>
+                <mesh>
+                    <coneGeometry args={[0.12, 0.35, 8]} />
+                    <meshStandardMaterial color="#ef4444" emissive="#ef4444" emissiveIntensity={0.6} />
+                </mesh>
+                <Html position={[0, 0.45, 0]} center>
+                    <div style={{
+                        background: 'rgba(239, 68, 68, 0.15)',
+                        padding: '3px 7px',
+                        borderRadius: '6px',
+                        border: '1px solid rgba(239, 68, 68, 0.4)',
+                        backdropFilter: 'blur(4px)',
+                        fontSize: '11px',
+                        color: '#fca5a5',
+                        whiteSpace: 'nowrap',
+                        fontWeight: '600'
+                    }}>
+                        To Body
+                    </div>
+                </Html>
+            </group>
+
+            {/* PULMONARY CIRCULATION (RIGHT HEART - BLUE) */}
+            
+            {/* Arrow: Body → Vena Cava → Right Atrium */}
+            <group position={[0.65, 2.45, 0.05]}>
+                <mesh rotation={[Math.PI, 0, 0]}>
+                    <coneGeometry args={[0.12, 0.35, 8]} />
+                    <meshStandardMaterial color="#3b82f6" emissive="#3b82f6" emissiveIntensity={0.6} />
+                </mesh>
+                <Html position={[0, -0.45, 0]} center>
+                    <div style={{
+                        background: 'rgba(59, 130, 246, 0.15)',
+                        padding: '3px 7px',
+                        borderRadius: '6px',
+                        border: '1px solid rgba(59, 130, 246, 0.4)',
+                        backdropFilter: 'blur(4px)',
+                        fontSize: '11px',
+                        color: '#93c5fd',
+                        whiteSpace: 'nowrap',
+                        fontWeight: '600'
+                    }}>
+                        From Body
+                    </div>
+                </Html>
+            </group>
+
+            {/* Arrow: Right Atrium → Tricuspid Valve → Right Ventricle */}
+            {isTricuspidOpen && (
+                <group position={[0.63, 0.52, 1.0]}>
+                    <mesh rotation={[Math.PI, 0, 0]}>
+                        <coneGeometry args={[0.14, 0.4, 8]} />
+                        <meshStandardMaterial color="#4ade80" emissive="#4ade80" emissiveIntensity={0.8} />
+                    </mesh>
+                    <Html position={[0, -0.5, 0]} center>
+                        <div style={{
+                            background: 'rgba(74, 222, 128, 0.15)',
+                            padding: '3px 7px',
+                            borderRadius: '6px',
+                            border: '1px solid rgba(74, 222, 128, 0.4)',
+                            backdropFilter: 'blur(4px)',
+                            fontSize: '10px',
+                            color: '#4ade80',
+                            whiteSpace: 'nowrap',
+                            fontWeight: '700'
+                        }}>
+                            Filling
+                        </div>
+                    </Html>
+                </group>
+            )}
+
+            {/* Arrow: Right Ventricle → Pulmonary Valve → Pulmonary Artery */}
+            {isPulmonaryOpen && (
+                <group position={[0.63, 1.65, 1.0]}>
+                    <mesh>
+                        <coneGeometry args={[0.14, 0.4, 8]} />
+                        <meshStandardMaterial color="#4ade80" emissive="#4ade80" emissiveIntensity={0.8} />
+                    </mesh>
+                    <Html position={[0, 0.5, 0]} center>
+                        <div style={{
+                            background: 'rgba(74, 222, 128, 0.15)',
+                            padding: '3px 7px',
+                            borderRadius: '6px',
+                            border: '1px solid rgba(74, 222, 128, 0.4)',
+                            backdropFilter: 'blur(4px)',
+                            fontSize: '10px',
+                            color: '#4ade80',
+                            whiteSpace: 'nowrap',
+                            fontWeight: '700'
+                        }}>
+                            Ejection
+                        </div>
+                    </Html>
+                </group>
+            )}
+
+            {/* Arrow: Pulmonary Artery → Lungs */}
+            <group position={[0.63, 2.65, 0.28]}>
+                <mesh>
+                    <coneGeometry args={[0.12, 0.35, 8]} />
+                    <meshStandardMaterial color="#3b82f6" emissive="#3b82f6" emissiveIntensity={0.6} />
+                </mesh>
+                <Html position={[0, 0.45, 0]} center>
+                    <div style={{
+                        background: 'rgba(59, 130, 246, 0.15)',
+                        padding: '3px 7px',
+                        borderRadius: '6px',
+                        border: '1px solid rgba(59, 130, 246, 0.4)',
+                        backdropFilter: 'blur(4px)',
+                        fontSize: '11px',
+                        color: '#93c5fd',
+                        whiteSpace: 'nowrap',
+                        fontWeight: '600'
+                    }}>
+                        To Lungs
+                    </div>
+                </Html>
+            </group>
+
+            {/* CIRCULATION PATHWAY SUMMARY (Top indicators) */}
+            <Html position={[0, 3.5, 0]} center>
+                <div style={{
+                    background: 'rgba(15, 23, 42, 0.95)',
+                    padding: '8px 14px',
+                    borderRadius: '10px',
+                    border: '1px solid rgba(148, 163, 184, 0.4)',
+                    backdropFilter: 'blur(10px)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '6px',
+                    minWidth: '280px'
+                }}>
+                    <div style={{
+                        fontSize: '12px',
+                        fontWeight: '700',
+                        color: '#fca5a5',
+                        borderBottom: '1px solid rgba(252, 165, 165, 0.3)',
+                        paddingBottom: '4px'
+                    }}>
+                        🔴 Systemic Circulation
+                    </div>
+                    <div style={{
+                        fontSize: '10px',
+                        color: '#cbd5e1',
+                        lineHeight: '1.4'
+                    }}>
+                        Lungs → Pulm. Veins → LA → Mitral → LV → Aortic → Aorta → Body
+                    </div>
+                    
+                    <div style={{
+                        fontSize: '12px',
+                        fontWeight: '700',
+                        color: '#93c5fd',
+                        borderBottom: '1px solid rgba(147, 197, 253, 0.3)',
+                        paddingBottom: '4px',
+                        marginTop: '4px'
+                    }}>
+                        🔵 Pulmonary Circulation
+                    </div>
+                    <div style={{
+                        fontSize: '10px',
+                        color: '#cbd5e1',
+                        lineHeight: '1.4'
+                    }}>
+                        Body → Vena Cava → RA → Tricuspid → RV → Pulm. → Pulm. A. → Lungs
+                    </div>
+                </div>
+            </Html>
         </group>
     );
 };
