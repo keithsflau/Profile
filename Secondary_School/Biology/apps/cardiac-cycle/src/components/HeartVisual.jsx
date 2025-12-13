@@ -1,7 +1,54 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Text, Environment, Html } from '@react-three/drei';
 import * as THREE from 'three';
+
+// Heart sound synthesis
+const audioContext = typeof window !== 'undefined' ? new (window.AudioContext || window.webkitAudioContext)() : null;
+
+const playHeartSound = (type) => {
+    if (!audioContext) return;
+    
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    const filter = audioContext.createBiquadFilter();
+    
+    oscillator.connect(filter);
+    filter.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    const now = audioContext.currentTime;
+    
+    if (type === 'LUB') {
+        // Low frequency thud for AV valve closure
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(45, now);
+        oscillator.frequency.exponentialRampToValueAtTime(25, now + 0.08);
+        
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(150, now);
+        
+        gainNode.gain.setValueAtTime(0.6, now);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+        
+        oscillator.start(now);
+        oscillator.stop(now + 0.12);
+    } else if (type === 'DUP') {
+        // Higher frequency snap for semilunar valve closure
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(85, now);
+        oscillator.frequency.exponentialRampToValueAtTime(45, now + 0.06);
+        
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(200, now);
+        
+        gainNode.gain.setValueAtTime(0.45, now);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+        
+        oscillator.start(now);
+        oscillator.stop(now + 0.08);
+    }
+};
 
 // Realistic heart shape using merged geometry
 const createRealisticHeartGeometry = () => {
@@ -257,15 +304,15 @@ const RealisticHeart = ({ data, isBicuspidOpen, isAorticOpen, soundVisual }) => 
                         transmission={0.5}
                     />
                 </mesh>
-                <Html position={[-0.85, 0.15, 0]} center>
+                <Html position={[-0.95, 0.35, 0]} center>
                     <div style={{
-                        background: 'rgba(252, 165, 165, 0.15)',
-                        padding: '4px 8px',
-                        borderRadius: '6px',
-                        border: '1px solid rgba(252, 165, 165, 0.4)',
-                        backdropFilter: 'blur(4px)'
+                        background: 'rgba(15, 23, 42, 0.92)',
+                        padding: '5px 10px',
+                        borderRadius: '8px',
+                        border: '1px solid rgba(252, 165, 165, 0.5)',
+                        backdropFilter: 'blur(8px)'
                     }}>
-                        <div style={{ fontSize: '13px', fontWeight: '600', color: '#fca5a5', whiteSpace: 'nowrap' }}>
+                        <div style={{ fontSize: '14px', fontWeight: '600', color: '#fca5a5', whiteSpace: 'nowrap' }}>
                             Left Atrium
                         </div>
                     </div>
@@ -285,15 +332,15 @@ const RealisticHeart = ({ data, isBicuspidOpen, isAorticOpen, soundVisual }) => 
                         thickness={0.35}
                     />
                 </mesh>
-                <Html position={[0.85, 0.15, 0]} center>
+                <Html position={[1.05, 0.35, 0]} center>
                     <div style={{
-                        background: 'rgba(147, 197, 253, 0.15)',
-                        padding: '4px 8px',
-                        borderRadius: '6px',
-                        border: '1px solid rgba(147, 197, 253, 0.4)',
-                        backdropFilter: 'blur(4px)'
+                        background: 'rgba(15, 23, 42, 0.92)',
+                        padding: '5px 10px',
+                        borderRadius: '8px',
+                        border: '1px solid rgba(147, 197, 253, 0.5)',
+                        backdropFilter: 'blur(8px)'
                     }}>
-                        <div style={{ fontSize: '13px', fontWeight: '600', color: '#93c5fd', whiteSpace: 'nowrap' }}>
+                        <div style={{ fontSize: '14px', fontWeight: '600', color: '#93c5fd', whiteSpace: 'nowrap' }}>
                             Right Atrium
                         </div>
                     </div>
@@ -327,15 +374,15 @@ const RealisticHeart = ({ data, isBicuspidOpen, isAorticOpen, soundVisual }) => 
                         thickness={0.7}
                     />
                 </mesh>
-                <Html position={[-1.05, -0.4, 0]} center>
+                <Html position={[-1.2, -0.6, 0]} center>
                     <div style={{
-                        background: 'rgba(239, 68, 68, 0.18)',
-                        padding: '5px 10px',
-                        borderRadius: '6px',
-                        border: '1px solid rgba(239, 68, 68, 0.5)',
-                        backdropFilter: 'blur(4px)'
+                        background: 'rgba(15, 23, 42, 0.92)',
+                        padding: '6px 12px',
+                        borderRadius: '8px',
+                        border: '1px solid rgba(239, 68, 68, 0.6)',
+                        backdropFilter: 'blur(8px)'
                     }}>
-                        <div style={{ fontSize: '14px', fontWeight: '700', color: '#ef4444', whiteSpace: 'nowrap' }}>
+                        <div style={{ fontSize: '15px', fontWeight: '700', color: '#ef4444', whiteSpace: 'nowrap' }}>
                             Left Ventricle
                         </div>
                     </div>
@@ -365,15 +412,15 @@ const RealisticHeart = ({ data, isBicuspidOpen, isAorticOpen, soundVisual }) => 
                         transmission={0.58}
                     />
                 </mesh>
-                <Html position={[1.05, -0.35, 0]} center>
+                <Html position={[1.25, -0.55, 0]} center>
                     <div style={{
-                        background: 'rgba(96, 165, 250, 0.18)',
-                        padding: '5px 10px',
-                        borderRadius: '6px',
-                        border: '1px solid rgba(96, 165, 250, 0.5)',
-                        backdropFilter: 'blur(4px)'
+                        background: 'rgba(15, 23, 42, 0.92)',
+                        padding: '6px 12px',
+                        borderRadius: '8px',
+                        border: '1px solid rgba(96, 165, 250, 0.6)',
+                        backdropFilter: 'blur(8px)'
                     }}>
-                        <div style={{ fontSize: '14px', fontWeight: '700', color: '#60a5fa', whiteSpace: 'nowrap' }}>
+                        <div style={{ fontSize: '15px', fontWeight: '700', color: '#60a5fa', whiteSpace: 'nowrap' }}>
                             Right Ventricle
                         </div>
                     </div>
@@ -393,15 +440,15 @@ const RealisticHeart = ({ data, isBicuspidOpen, isAorticOpen, soundVisual }) => 
                         clearcoat={0.7}
                     />
                 </mesh>
-                <Html position={[0.7, 0.4, 0]} center>
+                <Html position={[-0.85, 2.5, 0]} center>
                     <div style={{
-                        background: 'rgba(185, 28, 28, 0.15)',
-                        padding: '4px 8px',
-                        borderRadius: '6px',
-                        border: '1px solid rgba(185, 28, 28, 0.4)',
-                        backdropFilter: 'blur(4px)'
+                        background: 'rgba(15, 23, 42, 0.92)',
+                        padding: '5px 10px',
+                        borderRadius: '8px',
+                        border: '1px solid rgba(185, 28, 28, 0.5)',
+                        backdropFilter: 'blur(8px)'
                     }}>
-                        <div style={{ fontSize: '13px', fontWeight: '600', color: '#b91c1c' }}>
+                        <div style={{ fontSize: '14px', fontWeight: '600', color: '#b91c1c' }}>
                             Aorta
                         </div>
                     </div>
@@ -420,15 +467,15 @@ const RealisticHeart = ({ data, isBicuspidOpen, isAorticOpen, soundVisual }) => 
                         transmission={0.45}
                     />
                 </mesh>
-                <Html position={[0.7, 0.3, 0]} center>
+                <Html position={[1.15, 2.3, 0]} center>
                     <div style={{
-                        background: 'rgba(59, 130, 246, 0.15)',
-                        padding: '4px 8px',
-                        borderRadius: '6px',
-                        border: '1px solid rgba(59, 130, 246, 0.4)',
-                        backdropFilter: 'blur(4px)'
+                        background: 'rgba(15, 23, 42, 0.92)',
+                        padding: '5px 10px',
+                        borderRadius: '8px',
+                        border: '1px solid rgba(59, 130, 246, 0.5)',
+                        backdropFilter: 'blur(8px)'
                     }}>
-                        <div style={{ fontSize: '12px', fontWeight: '600', color: '#60a5fa', whiteSpace: 'nowrap' }}>
+                        <div style={{ fontSize: '13px', fontWeight: '600', color: '#60a5fa', whiteSpace: 'nowrap' }}>
                             Pulmonary A.
                         </div>
                     </div>
@@ -479,25 +526,20 @@ const RealisticHeart = ({ data, isBicuspidOpen, isAorticOpen, soundVisual }) => 
                 <meshStandardMaterial color="#4444ff" emissive="#0000cc" emissiveIntensity={0.85} />
             </instancedMesh>
 
-            {/* Sound */}
-            {soundVisual && (
-                <Html position={[0, 0, 2.8]} center>
-                    <div style={{
-                        fontSize: '48px',
-                        fontWeight: '900',
-                        color: '#fbbf24',
-                        textShadow: '0 0 20px rgba(251, 191, 36, 0.8), 0 0 40px rgba(251, 191, 36, 0.4)',
-                        animation: 'pulse 0.3s ease-out'
-                    }}>
-                        {soundVisual.split(" ")[0]}
-                    </div>
-                </Html>
-            )}
+            {/* Sound effects handled by audio synthesis */}
         </group>
     );
 };
 
 const HeartVisual = (props) => {
+    // Play heart sounds when they occur
+    useEffect(() => {
+        if (props.soundVisual) {
+            const soundType = props.soundVisual.includes('LUB') ? 'LUB' : 'DUP';
+            playHeartSound(soundType);
+        }
+    }, [props.soundVisual]);
+    
     return (
         <div className="w-full h-full bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 rounded-xl overflow-hidden relative shadow-2xl">
             <Canvas 
