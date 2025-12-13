@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-HK">
 <head>
   <meta charset="UTF-8" />
@@ -20,15 +20,12 @@
     .section-title-bar{width:3.5rem;height:.18rem;border-radius:999px;background-image:linear-gradient(to right,#f97316,#fb7185,#6366f1);} 
     .fade-in-up{opacity:0;transform:translateY(18px);transition:all .6s ease-out;} .fade-in-up.show{opacity:1;transform:translateY(0);} 
     .prose-custom p{margin-bottom:.75rem;} .prose-custom ul{margin-bottom:.75rem;padding-left:1.3rem;list-style-type:disc;} 
-    .prose-custom li+li{margin-top:.25rem;}
-    .hebrew{font-family:"Noto Serif","Times New Roman",serif;letter-spacing:.03em;}
     .scripture-pill{cursor:pointer;border-radius:999px;border-width:1px;border-style:solid;border-color:rgba(248,113,113,.6);background:rgba(255,241,242,.9);transition:all .2s ease;}
     .scripture-pill:hover{background:#fee2e2;transform:translateY(-1px);box-shadow:0 8px 18px rgba(248,113,113,.4);}
     .modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;align-items:center;justify-content:center;z-index:40;backdrop-filter:blur(4px);}
     .modal-backdrop.show{display:flex;}
     .modal-card{max-width:40rem;width:90%;max-height:min(80vh,32rem);overflow:auto;border-radius:1.5rem;background:rgba(255,255,255,.96);border:1px solid rgba(248,113,113,.55);box-shadow:0 22px 55px rgba(15,23,42,.4);animation:fadeInUp .3s ease-out;}
   </style>
-    <link rel="stylesheet" href="../../../visit-counter.css">
 </head>
 <body class="antialiased text-slate-900 bg-gradient-to-br from-rose-50 via-white to-sky-50/40 min-h-screen">
   <div class="relative min-h-screen overflow-hidden">
@@ -189,180 +186,33 @@
             </div>
           </section>
 
-          <!-- 經文分段｜可點擊顯示 -->
-          <section class="fade-in-up">
-            <div class="glass-card rounded-3xl p-6 sm:p-8 text-slate-800 leading-relaxed">
-              <div class="mb-5">
-                <h2 class="text-2xl sm:text-3xl font-semibold serif-font mb-1">關鍵經文分段（點擊顯示經文）</h2>
-                <div class="section-title-bar"></div>
-              </div>
-              <p class="text-sm sm:text-base mb-4">
-                以下只選出部分重點經文，幫助快速進入大衞的故事。可按需要細讀整段章節。
-              </p>
-              <div class="flex flex-wrap gap-2 sm:gap-3 text-xs sm:text-sm">
-                <button type="button" class="scripture-pill px-3 py-1.5 sm:px-4 sm:py-2 text-rose-800" data-scripture-id="1sam-17-45-47">撒上 17:45–47｜戰勝歌利亞</button>
-                <button type="button" class="scripture-pill px-3 py-1.5 sm:px-4 sm:py-2 text-rose-800" data-scripture-id="2sam-7-8-16">撒下 7:8–16｜大衞之約</button>
-                <button type="button" class="scripture-pill px-3 py-1.5 sm:px-4 sm:py-2 text-rose-800" data-scripture-id="psalm-51-1-12">詩 51:1–12｜真誠悔改</button>
-                <button type="button" class="scripture-pill px-3 py-1.5 sm:px-4 sm:py-2 text-rose-800" data-scripture-id="2sam-12-1-7">撒下 12:1–7｜拿單責備</button>
-              </div>
-            </div>
-          </section>
-
-          <!-- 一、人物背景（更新為完整結構） -->
-          <section class="fade-in-up">
-            <div class="grid gap-8 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1.1fr)] items-start">
-              <article class="glass-card rounded-3xl p-6 sm:p-8 prose-custom text-slate-800 leading-relaxed">
-                <div class="mb-5">
-                  <h2 class="text-2xl sm:text-3xl font-semibold serif-font mb-1">一、人物背景</h2>
-                  <div class="section-title-bar"></div>
-                </div>
-                <p>
-                  大衞年少在曠野牧羊，學會孤單中依靠神；戰勝歌利亞不在乎兵器，而在乎萬軍之耶和華的名（撒上 17）。
-                  他多次被掃羅追殺，卻不以自己的手伸手殺害受膏者，顯出他敬畏神的心、願意等候神的時間與方式。
-                </p>
-                <p>
-                  許多詩篇出自大衞的生命經歷，從高山到低谷，他把恐懼、憂傷、喜樂、盼望都帶到神面前。
-                  他不是沒有懼怕的人，卻是在懼怕中選擇仰望神的人；他的敬拜不只是外在儀式，而是誠實將心向神傾倒。
-                </p>
-                <p>
-                  大衞在拔示巴事件上嚴重犯罪：奸淫、謀殺、欺騙，帶來沉重後果。神差先知責備他，他沒有為自己辯護，反而深切悔改（詩篇 51 篇）。
-                  這提醒我們：<span class="font-semibold">合神心意不是沒有罪，而是在犯罪後願意光照自己、真誠悔改、接受神的管教與恢復。</span>
-                </p>
-              </article>
-              <aside class="space-y-6">
-                <div class="glass-card rounded-3xl p-5 sm:p-6 text-sm text-slate-800">
-                  <h3 class="text-lg font-semibold serif-font mb-3">快速資料｜大衞</h3>
-                  <dl class="space-y-1.5">
-                    <div class="flex justify-between gap-3">
-                      <dt class="text-slate-500">名字</dt>
-                      <dd class="font-medium">大衞（意：所愛的）</dd>
-                    </div>
-                    <div class="flex justify-between gap-3">
-                      <dt class="text-slate-500">主要經文</dt>
-                      <dd class="font-medium text-right">撒上 16–31 章；撒下全書；代上全書；詩篇</dd>
-                    </div>
-                    <div class="flex justify-between gap-3">
-                      <dt class="text-slate-500">身份</dt>
-                      <dd class="font-medium text-right">牧童、戰士、君王、詩人</dd>
-                    </div>
-                    <div class="flex justify-between gap-3">
-                      <dt class="text-slate-500">關鍵主題</dt>
-                      <dd class="font-medium text-right">合神心意、敬拜、悔改、大衞之約</dd>
-                    </div>
-                  </dl>
-                </div>
-                <div class="glass-card rounded-3xl p-5 sm:p-6 text-xs sm:text-sm text-slate-700">
-                  <h3 class="text-base font-semibold serif-font mb-3">主要成就</h3>
-                  <ul class="list-disc pl-4 space-y-1.5">
-                    <li>戰勝歌利亞（撒上 17）</li>
-                    <li>作猶大王和全以色列王</li>
-                    <li>攻取耶路撒冷為首都</li>
-                    <li>與神立「大衞之約」（撒下 7）</li>
-                    <li>寫下許多詩篇</li>
-                  </ul>
-                </div>
-              </aside>
-            </div>
-          </section>
-
-          <!-- 二、原文重點與難字解釋 -->
+          <!-- 原有研讀段落 -->
           <section class="fade-in-up">
             <div class="glass-card rounded-3xl p-6 sm:p-8 prose-custom text-slate-800 leading-relaxed">
-              <div class="mb-5">
-                <h2 class="text-2xl sm:text-3xl font-semibold serif-font mb-1">二、原文重點與難字解釋</h2>
-                <div class="section-title-bar"></div>
-              </div>
-              <h3 class="text-xl font-semibold serif-font mt-2 mb-2">1. 「合神心意」</h3>
-              <p>
-                徒 13:22 說大衞是「合神心意」的人，這裡「合神心意」的希臘文 <span class="hebrew">κατὰ τὴν καρδίαν</span>（kata ten kardian）有「按照心意」的意思。
-                這不是說大衞沒有犯罪，而是說他願意在神面前誠實、願意悔改、願意順服。
-              </p>
-              <h3 class="text-xl font-semibold serif-font mt-4 mb-2">2. 「大衞之約」</h3>
-              <p>
-                撒下 7 章記載神與大衞立的約，應許他的後裔與國位要永遠堅立。
-                這約預表基督，祂是大衞的子孫，要坐在大衞的寶座上，直到永遠。
-              </p>
-              <h3 class="text-xl font-semibold serif-font mt-4 mb-2">3. 「塗抹我的過犯」</h3>
-              <p>
-                詩 51:1 大衞說「塗抹我的過犯」，希伯來文 <span class="hebrew">מָחָה</span>（machah）有「擦掉、刪除」的意思。
-                大衞求神徹底清除他的罪，顯示他對罪的深刻認識與對神恩典的渴望。
-              </p>
+              <div class="mb-5"><h2 class="text-2xl sm:text-3xl font-semibold serif-font mb-1">一、從牧童到君王</h2><div class="section-title-bar"></div></div>
+              <p>大衞年少在曠野牧羊，學會孤單中依靠神；戰勝歌利亞不在乎兵器，而在乎萬軍之耶和華的名（撒上 17）。</p>
+              <p>他多次被掃羅追殺，卻不以自己的手伸手殺害受膏者，顯出他敬畏神的心、願意等候神的時間與方式。</p>
             </div>
           </section>
 
-          <!-- 三、屬靈意義與今日應用（擴充） -->
           <section class="fade-in-up">
             <div class="glass-card rounded-3xl p-6 sm:p-8 prose-custom text-slate-800 leading-relaxed">
-              <div class="mb-5">
-                <h2 class="text-2xl sm:text-3xl font-semibold serif-font mb-1">三、屬靈意義與今日應用</h2>
-                <div class="section-title-bar"></div>
-              </div>
-              <h3 class="text-xl font-semibold serif-font mt-2 mb-2">1. 從牧童到君王</h3>
-              <p>
-                大衞年少在曠野牧羊，學會孤單中依靠神；戰勝歌利亞不在乎兵器，而在乎萬軍之耶和華的名（撒上 17）。
-                他多次被掃羅追殺，卻不以自己的手伸手殺害受膏者，顯出他敬畏神的心、願意等候神的時間與方式。
-              </p>
-              <p>
-                這提醒我們：<span class="font-semibold">神不輕看卑微的開始，祂使用那些在困難中仍然信靠祂的人。</span>
-                我們也要學習在等候中順服，不靠自己的方法，而是相信神的時間與方式。
-              </p>
-              <h3 class="text-xl font-semibold serif-font mt-4 mb-2">2. 與神同行的敬拜者</h3>
-              <p>
-                許多詩篇出自大衞的生命經歷，從高山到低谷，他把恐懼、憂傷、喜樂、盼望都帶到神面前。
-                他不是沒有懼怕的人，卻是在懼怕中選擇仰望神的人；他的敬拜不只是外在儀式，而是誠實將心向神傾倒。
-              </p>
-              <p>
-                這鼓勵我們：<span class="font-semibold">真正的敬拜是誠實地將我們所有的感受帶到神面前，不論是喜樂還是憂傷，是信心還是懼怕。</span>
-              </p>
-              <h3 class="text-xl font-semibold serif-font mt-4 mb-2">3. 跌倒與真誠悔改</h3>
-              <p>
-                大衞在拔示巴事件上嚴重犯罪，但當神差先知責備他時，他沒有為自己辯護，反而深切悔改。
-                他承認罪首先是得罪神，求神為他造清潔的心、重新有正直的靈。
-              </p>
-              <p>
-                這提醒我們：<span class="font-semibold">合神心意不是沒有罪，而是在犯罪後願意光照自己、真誠悔改、接受神的管教與恢復。</span>
-                我們每個人都會軟弱，但重要的是我們如何回應神的責備與管教。
-              </p>
+              <div class="mb-5"><h2 class="text-2xl sm:text-3xl font-semibold serif-font mb-1">二、與神同行的敬拜者</h2><div class="section-title-bar"></div></div>
+              <p>許多詩篇出自大衞的生命經歷，從高山到低谷，他把恐懼、憂傷、喜樂、盼望都帶到神面前。</p>
+              <p>他不是沒有懼怕的人，卻是在懼怕中選擇仰望神的人；他的敬拜不只是外在儀式，而是誠實將心向神傾倒。</p>
             </div>
           </section>
 
-          <!-- 四、默想與回應 -->
           <section class="fade-in-up">
-            <div class="glass-card rounded-3xl p-6 sm:p-8 text-slate-800 leading-relaxed">
-              <div class="mb-5">
-                <h2 class="text-2xl sm:text-3xl font-semibold serif-font mb-1">四、默想與禱告回應</h2>
-                <div class="section-title-bar"></div>
-              </div>
-              <div class="grid gap-6 md:grid-cols-2">
-                <div class="space-y-3 text-sm sm:text-base">
-                  <h3 class="text-lg font-semibold serif-font mb-2">默想問題</h3>
-                  <ul class="list-disc pl-4 space-y-2">
-                    <li>你如何理解「合神心意」？你認為這是指沒有犯罪，還是指願意在神面前誠實和悔改？</li>
-                    <li>你是否願意像大衞一樣，將所有的感受（包括懼怕和憂傷）都帶到神面前？</li>
-                    <li>當你犯罪後，你如何回應神的責備與管教？你是否願意真誠悔改？</li>
-                    <li>從大衞之約中，你如何理解神對你的應許和計劃？</li>
-                  </ul>
-                </div>
-                <div class="space-y-3 text-sm sm:text-base">
-                  <h3 class="text-lg font-semibold serif-font mb-2">禱告建議</h3>
-                  <p>
-                    親愛的主，感謝你讓我從大衞身上看見「合神心意」的真正意義——不是沒有犯罪，而是願意在你面前誠實和悔改。
-                    求你幫助我，學習像大衞一樣，將所有的感受都帶到你面前。
-                  </p>
-                  <p>
-                    當我犯罪後，求你光照我，幫助我願意真誠悔改，接受你的管教與恢復。
-                    感謝你應許我，在基督裡有永遠的盼望和穩固的約。
-                    奉主耶穌的名祈求，阿們。
-                  </p>
-                </div>
-              </div>
+            <div class="glass-card rounded-3xl p-6 sm:p-8 prose-custom text-slate-800 leading-relaxed">
+              <div class="mb-5"><h2 class="text-2xl sm:text-3xl font-semibold serif-font mb-1">三、跌倒與真誠悔改</h2><div class="section-title-bar"></div></div>
+              <p>大衞在拔示巴事件上嚴重犯罪：奸淫、謀殺、欺騙，帶來沉重後果。神差先知責備他，他沒有為自己辯護，反而深切悔改（詩篇 51 篇）。</p>
+              <p>他承認罪首先是得罪神，求神為他造清潔的心、重新有正直的靈，也求神不要從他收回同在。</p>
+              <p>這提醒信徒：合神心意不是沒有罪，而是在犯罪後願意光照自己、真誠悔改、接受神的管教與恢復。</p>
             </div>
           </section>
         </div>
-      
-    <!-- Visit Counter -->
-    <div id="visit-counter-container"></div>
-</main>
+      </main>
 
       <footer style="text-align:center;padding:1rem;color:#707070;font-size:0.875rem;">
         <p style="font-style:italic;margin-bottom:0.25rem;">But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his understanding. Jeremiah 10:12</p>
@@ -414,31 +264,14 @@
           "16 「你的家和你的國必在我面前永遠堅立；你的國位也必堅定，直到永遠。」"
         ]
       },
-      "psalm-51-1-12":{
-        reference:"詩篇 51:1–12",
+      "ps-51-1-4":{
+        reference:"詩篇 51:1–4",
         title:"為罪痛悔的禱告",
         text:[
           "1 （大衞與拔示巴同室以後，先知拿單來見他。他作這詩，交與伶長。）",
           "   神啊，求你按你的慈愛憐恤我，按你豐盛的慈悲塗抹我的過犯！",
-          "2 求你將我的罪孽洗除淨盡，並潔除我的罪！",
           "3 因為我知道我的過犯；我的罪常在我面前。",
-          "4 我向你犯罪，惟獨得罪了你，在你眼前行了這惡……",
-          "7 求你用牛膝草潔淨我，我就乾淨；求你洗滌我，我就比雪更白。",
-          "10 神啊，求你為我造清潔的心，使我裡面重新有正直的靈。",
-          "11 不要丟棄我，使我離開你的面；不要從我收回你的聖靈。",
-          "12 求你使我仍得救恩之樂，賜我樂意的靈扶持我。"
-        ]
-      },
-      "2sam-12-1-7":{
-        reference:"撒母耳記下 12:1–7",
-        title:"拿單責備大衞",
-        text:[
-          "1 耶和華差遣拿單去見大衞。拿單到了大衞那裡，對他說：「在一座城裡有兩個人：一個是富戶，一個是窮人。」",
-          "2 「富戶有許多牛群羊群；」",
-          "3 「窮人除了所買來養活的一隻小母羊羔之外，別無所有。羊羔在他家裡和他兒女一同長大，吃他所吃的，喝他所喝的，睡在他懷中，在他看來如同女兒一樣。」",
-          "4 「有一客人來到這富戶家裡，富戶捨不得從自己的牛群羊群中取一隻預備給客人吃，卻取了那窮人的羊羔，預備給客人吃。」",
-          "5 大衞就甚惱怒那人，對拿單說：「我指著永生的耶和華起誓，行這事的人該死！」",
-          "7 拿單對大衞說：「你就是那人！……」"
+          "4 我向你犯罪，惟獨得罪了你，在你眼前行了這惡……"
         ]
       }
     };
@@ -501,17 +334,5 @@
       });
     });
   </script>
-
-    <!-- Visit Counter Script -->
-    <script src="../../../visit-counter.js"></script>
-    <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
-        VisitCounter.init('bible_study/舊約聖經人物/大衞/index', {
-            scriptUrl: SCRIPT_URL,
-            containerId: 'visit-counter-container'
-        });
-    </script>
 </body>
 </html>
-
-

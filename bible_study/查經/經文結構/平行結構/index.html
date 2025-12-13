@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
@@ -54,7 +54,6 @@
             font-family: "Noto Serif TC", serif;
         }
     </style>
-    <link rel="stylesheet" href="../../../../visit-counter.css">
 </head>
 <body class="text-gray-800 antialiased min-h-screen flex flex-col">
 
@@ -284,10 +283,7 @@
             </article>
 
         </div>
-    
-    <!-- Visit Counter -->
-    <div id="visit-counter-container"></div>
-</main>
+    </main>
 
             <!-- Footer -->
     <footer style="text-align: center; padding: 1rem; color: #707070; font-size: 0.875rem;">
@@ -300,16 +296,5 @@
         // Initialize Lucide Icons
         lucide.createIcons();
     </script>
-
-    <!-- Visit Counter Script -->
-    <script src="../../../../visit-counter.js"></script>
-    <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
-        VisitCounter.init('bible_study/查經/經文結構/平行結構/index', {
-            scriptUrl: SCRIPT_URL,
-            containerId: 'visit-counter-container'
-        });
-    </script>
 </body>
 </html>
-

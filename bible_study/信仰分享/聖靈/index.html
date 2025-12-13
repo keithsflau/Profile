@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
@@ -26,7 +26,6 @@
 
         html { scroll-behavior: smooth; }
     </style>
-    <link rel="stylesheet" href="../../../visit-counter.css">
 </head>
 <body class="min-h-screen flex flex-col overflow-hidden">
 
@@ -81,10 +80,7 @@
         <!-- Main Content -->
         <main class="flex-1 overflow-y-auto h-full pt-14 md:pt-0 relative" id="main-scroll">
             <div id="content-area" class="max-w-4xl mx-auto p-6 md:p-10 pb-24"></div>
-        
-    <!-- Visit Counter -->
-    <div id="visit-counter-container"></div>
-</main>
+        </main>
     </div>
 
     <script>
@@ -838,17 +834,5 @@
         <p style="font-size: 0.75rem; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #d1d5db;">@ 2025 Prepared for in-church Bible study use</p>
     </footer>
 
-
-    <!-- Visit Counter Script -->
-    <script src="../../../visit-counter.js"></script>
-    <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
-        VisitCounter.init('bible_study/信仰分享/聖靈/index', {
-            scriptUrl: SCRIPT_URL,
-            containerId: 'visit-counter-container'
-        });
-    </script>
 </body>
 </html>
-
-

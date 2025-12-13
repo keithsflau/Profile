@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-HK">
 <head>
   <meta charset="UTF-8" />
@@ -41,7 +41,6 @@
     .prose-custom p{margin-bottom:.75rem;}
     .prose-custom ul{margin-bottom:.75rem;padding-left:1.3rem;list-style-type:disc;}
     .prose-custom li+li{margin-top:.25rem;}
-    .hebrew{font-family:"Noto Serif","Times New Roman",serif;letter-spacing:.03em;}
     .scripture-pill{
       cursor:pointer;border-radius:999px;border:1px solid rgba(16,185,129,.4);
       background:rgba(236,253,245,.95);transition:all .2s ease;
@@ -62,7 +61,6 @@
     }
     @keyframes fadeInUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
   </style>
-    <link rel="stylesheet" href="../../../visit-counter.css">
 </head>
 <body class="antialiased text-slate-900 bg-gradient-to-br from-emerald-50 via-white to-sky-50 min-h-screen">
   <div class="relative min-h-screen overflow-hidden">
@@ -262,41 +260,11 @@
             </div>
           </section>
 
-          <!-- 原文重點與難字解釋 -->
-          <section class="fade-in-up">
-            <div class="glass-card rounded-3xl p-6 sm:p-8 prose-custom text-slate-800 leading-relaxed">
-              <div class="mb-5">
-                <h2 class="text-2xl sm:text-3xl font-semibold serif-font mb-1">二、原文重點與難字解釋</h2>
-                <div class="section-title-bar"></div>
-              </div>
-              <h3 class="text-xl font-semibold serif-font mt-2 mb-2">1. 「基甸」名字的含義</h3>
-              <p>
-                基甸的希伯來文 <span class="hebrew">גִּדְעוֹן</span>（Gidon）意思是「砍下的人」或「破壞者」。這個名字預表了他要拆毀巴力壇的使命。
-                有趣的是，他的名字與他起初的軟弱形成對比，顯出神要在他身上成就的作為。
-              </p>
-              <h3 class="text-xl font-semibold serif-font mt-4 mb-2">2. 「大能的勇士」</h3>
-              <p>
-                當基甸在酒榨中打麥時，耶和華的使者稱他為「大能的勇士」（士 6:12），希伯來文 <span class="hebrew">גִּבּוֹר הֶחָיִל</span>（gibbor ha-chayil），
-                直譯是「力量中的勇士」。這不是因為基甸當時的能力，而是因為神對他的呼召和應許；神看我們，不只是看現在的軟弱，而是看祂要在我們身上成就的。
-              </p>
-              <h3 class="text-xl font-semibold serif-font mt-4 mb-2">3. 「我必與你同在」</h3>
-              <p>
-                當基甸質疑自己時，神說「我必與你同在」（士 6:16），希伯來文 <span class="hebrew">כִּי אֶהְיֶה עִמָּךְ</span>（ki ehyeh immach）。
-                「與你同在」不只是陪伴，更是神親自參與，保證勝利。這應許成為基甸得勝的基礎。
-              </p>
-              <h3 class="text-xl font-semibold serif-font mt-4 mb-2">4. 「以弗得」</h3>
-              <p>
-                基甸製作了一件金以弗得（士 8:27），希伯來文 <span class="hebrew">אֵפוֹד</span>（ephod），這是大祭司所穿的聖衣的一部分。
-                基甸將它放在自己的城裡，成為一個宗教象徵，但卻成為「全以色列和基甸全家的網羅」，因為它取代了神原本設立的敬拜中心，成為人為的宗教工具。
-              </p>
-            </div>
-          </section>
-
           <!-- 今日應用 -->
           <section class="fade-in-up">
             <div class="glass-card p-6 sm:p-8 prose-custom text-slate-800 leading-relaxed">
               <div class="mb-5">
-                <h2 class="text-2xl sm:text-3xl font-semibold serif-font mb-1">三、屬靈意義與今日應用</h2>
+                <h2 class="text-2xl sm:text-3xl font-semibold serif-font mb-1">二、今日應用與反思</h2>
                 <div class="section-title-bar"></div>
               </div>
               <h3 class="text-xl font-semibold serif-font mt-2 mb-2">1. 神在恐懼中呼召，而不是等我們變勇敢才用</h3>
@@ -324,7 +292,7 @@
           <section class="fade-in-up">
             <div class="glass-card p-6 sm:p-8 text-slate-800 leading-relaxed">
               <div class="mb-5">
-                <h2 class="text-2xl sm:text-3xl font-semibold serif-font mb-1">四、默想與禱告回應</h2>
+                <h2 class="text-2xl sm:text-3xl font-semibold serif-font mb-1">三、默想與禱告回應</h2>
                 <div class="section-title-bar"></div>
               </div>
               <div class="grid gap-6 md:grid-cols-2">
@@ -351,10 +319,7 @@
             </div>
           </section>
         </div>
-      
-    <!-- Visit Counter -->
-    <div id="visit-counter-container"></div>
-</main>
+      </main>
 
       <footer style="text-align:center;padding:1rem;color:#707070;font-size:0.875rem;">
         <p style="font-style:italic;margin-bottom:0.25rem;">
@@ -444,19 +409,7 @@
       btn.addEventListener("click",()=>openScriptureModal(btn.getAttribute("data-scripture-id")));
     });
   </script>
-
-    <!-- Visit Counter Script -->
-    <script src="../../../visit-counter.js"></script>
-    <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
-        VisitCounter.init('bible_study/舊約聖經人物/基甸/index', {
-            scriptUrl: SCRIPT_URL,
-            containerId: 'visit-counter-container'
-        });
-    </script>
 </body>
 </html>
-
-
 
 

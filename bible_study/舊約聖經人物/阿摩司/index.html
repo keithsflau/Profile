@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-HK">
 <head>
   <meta charset="UTF-8" />
@@ -75,10 +75,6 @@
     .prose-custom li + li {
       margin-top: 0.25rem;
     }
-    .hebrew {
-      font-family: "Noto Serif", "Times New Roman", serif;
-      letter-spacing: 0.03em;
-    }
     .scripture-pill {
       cursor: pointer;
       border-radius: 999px;
@@ -122,7 +118,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
   </style>
-    <link rel="stylesheet" href="../../../visit-counter.css">
 </head>
 <body class="antialiased text-slate-900 bg-gradient-to-br from-slate-50 via-white to-sky-50 min-h-screen">
   <div class="relative min-h-screen overflow-hidden">
@@ -368,44 +363,11 @@
             </div>
           </section>
 
-          <!-- 原文重點與難字解釋 -->
-          <section class="fade-in-up">
-            <div class="glass-card rounded-3xl p-6 sm:p-8 prose-custom text-slate-800 leading-relaxed">
-              <div class="mb-5">
-                <h2 class="text-2xl sm:text-3xl font-semibold serif-font mb-1">二、原文重點與難字解釋</h2>
-                <div class="section-title-bar"></div>
-              </div>
-              <h3 class="text-xl font-semibold serif-font mt-2 mb-2">1. 「阿摩司」名字的含義</h3>
-              <p>
-                阿摩司的希伯來文 <span class="hebrew">עָמוֹס</span>（Amos）意思是「擔重擔」或「承載」。這個名字與他作為先知的使命相呼應——他要傳達神對以色列罪的審判，這是一個沉重的負擔。
-                同時，他也承載着神對公義的要求，成為社會不公義的提醒者。
-              </p>
-              <h3 class="text-xl font-semibold serif-font mt-4 mb-2">2. 「公平如大水滾滾」</h3>
-              <p>
-                摩 5:24 說「惟願公平如大水滾滾，公義如江河滔滔」，希伯來文 <span class="hebrew">וְיִגַּל כַּמַּיִם מִשְׁפָּט</span>（ve-yiggal ka-mayim mishpat），
-                直譯是「願審判滾動如大水」。這裡的「公平」或「審判」（<span class="hebrew">מִשְׁפָּט</span>，mishpat）不是指報復，而是指正確的秩序和公義的施行。
-              </p>
-              <p>
-                大水滾滾、江河滔滔，強調公義不是偶爾為之，而是持續不斷的，如水流般不可阻擋。神要的不是表面的敬拜，而是生活中真實的公義實踐。
-              </p>
-              <h3 class="text-xl font-semibold serif-font mt-4 mb-2">3. 「我厭惡你們的節期」</h3>
-              <p>
-                摩 5:21 說「我厭惡你們的節期」，希伯來文 <span class="hebrew">שָׂנֵאתִי מָאַסְתִּי</span>（saneti ma'asti），
-                兩個動詞連用，表示極度的厭惡。「厭惡」和「拒絕」同時使用，強調神對虛假敬拜的強烈反對。
-              </p>
-              <h3 class="text-xl font-semibold serif-font mt-4 mb-2">4. 「大衞倒塌的帳幕」</h3>
-              <p>
-                摩 9:11 提到「到那日，我必建立大衞倒塌的帳幕」，希伯來文 <span class="hebrew">אֶת־סֻכַּת דָּוִיד הַנֹּפֶלֶת</span>（et-sukat David ha-nofelet），
-                「帳幕」在這裡指大衛王朝或大衛家。這預言後來在使徒行傳 15 章被引用，表明外邦人也可以歸入神的國度。
-              </p>
-            </div>
-          </section>
-
           <!-- 屬靈應用 -->
           <section class="fade-in-up">
             <div class="glass-card p-6 sm:p-8 prose-custom text-slate-800 leading-relaxed">
               <div class="mb-5">
-                <h2 class="text-2xl sm:text-3xl font-semibold serif-font mb-1">三、屬靈意義與今日應用</h2>
+                <h2 class="text-2xl sm:text-3xl font-semibold serif-font mb-1">二、屬靈意義與今日應用</h2>
                 <div class="section-title-bar"></div>
               </div>
               <h3 class="text-xl font-semibold serif-font mt-2 mb-2">1. 公義與敬拜不能分開</h3>
@@ -436,7 +398,7 @@
           <section class="fade-in-up">
             <div class="glass-card p-6 sm:p-8 text-slate-800 leading-relaxed">
               <div class="mb-5">
-                <h2 class="text-2xl sm:text-3xl font-semibold serif-font mb-1">四、默想與禱告回應</h2>
+                <h2 class="text-2xl sm:text-3xl font-semibold serif-font mb-1">三、默想與禱告回應</h2>
                 <div class="section-title-bar"></div>
               </div>
               <div class="grid gap-6 md:grid-cols-2">
@@ -463,10 +425,7 @@
             </div>
           </section>
         </div>
-      
-    <!-- Visit Counter -->
-    <div id="visit-counter-container"></div>
-</main>
+      </main>
 
       <footer style="text-align:center;padding:1rem;color:#707070;font-size:0.875rem;">
         <p style="font-style:italic;margin-bottom:0.25rem;">
@@ -581,19 +540,7 @@
       btn.addEventListener("click", () => openScriptureModal(btn.getAttribute("data-scripture-id")));
     });
   </script>
-
-    <!-- Visit Counter Script -->
-    <script src="../../../visit-counter.js"></script>
-    <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
-        VisitCounter.init('bible_study/舊約聖經人物/阿摩司/index', {
-            scriptUrl: SCRIPT_URL,
-            containerId: 'visit-counter-container'
-        });
-    </script>
 </body>
 </html>
-
-
 
 
