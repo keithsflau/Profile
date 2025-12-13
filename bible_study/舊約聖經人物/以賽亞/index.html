@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-HK">
 <head>
   <meta charset="UTF-8" />
@@ -111,6 +111,7 @@
       animation: fadeInUp 0.3s ease-out;
     }
   </style>
+    <link rel="stylesheet" href="../../../visit-counter.css">
 </head>
 <body class="antialiased text-slate-900 bg-gradient-to-br from-slate-50 via-white to-indigo-50/40 min-h-screen">
   <div class="relative min-h-screen overflow-hidden">
@@ -406,6 +407,24 @@
             </div>
           </section>
 
+          <!-- 關鍵經文分段 -->
+          <section class="fade-in-up">
+            <div class="glass-card rounded-3xl p-6 sm:p-8 text-slate-900 leading-relaxed">
+              <div class="mb-5">
+                <h2 class="text-2xl sm:text-3xl font-semibold serif-font mb-1">關鍵經文分段（點擊顯示經文）</h2>
+                <div class="section-title-bar"></div>
+              </div>
+              <p class="text-sm sm:text-base mb-4 text-slate-700">
+                以下只選出部分重點經文，幫助快速進入以賽亞的信息。可按需要細讀整段章節。
+              </p>
+              <div class="flex flex-wrap gap-2 sm:gap-3 text-xs sm:text-sm">
+                <button type="button" class="scripture-pill px-3 py-1.5 sm:px-4 sm:py-2" data-scripture-id="isa-6-1-8">賽 6:1–8｜聖潔異象與呼召</button>
+                <button type="button" class="scripture-pill px-3 py-1.5 sm:px-4 sm:py-2" data-scripture-id="isa-53-3-6">賽 53:3–6｜受苦僕人</button>
+                <button type="button" class="scripture-pill px-3 py-1.5 sm:px-4 sm:py-2" data-scripture-id="isa-40-1-11">賽 40:1–11｜安慰我的百姓</button>
+              </div>
+            </div>
+          </section>
+
           <!-- 原文重點與難字解釋 -->
           <section class="fade-in-up">
             <div
@@ -547,7 +566,10 @@
             </div>
           </section>
         </div>
-      </main>
+      
+    <!-- Visit Counter -->
+    <div id="visit-counter-container"></div>
+</main>
 
       <footer
         style="text-align:center;padding:1rem;color:#707070;font-size:0.875rem;"
@@ -702,6 +724,18 @@
       });
     });
   </script>
+
+    <!-- Visit Counter Script -->
+    <script src="../../../visit-counter.js"></script>
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
+        VisitCounter.init('bible_study/舊約聖經人物/以賽亞/index', {
+            scriptUrl: SCRIPT_URL,
+            containerId: 'visit-counter-container'
+        });
+    </script>
 </body>
 </html>
+
+
 

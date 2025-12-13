@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
@@ -73,6 +73,7 @@
       text-transform: uppercase;
     }
   </style>
+    <link rel="stylesheet" href="../../../visit-counter.css">
 </head>
 <body class="antialiased text-slate-900 bg-gradient-to-br from-slate-50 via-white to-sky-50/40 min-h-screen overflow-x-hidden">
   <div class="relative min-h-screen overflow-hidden">
@@ -259,6 +260,21 @@
                     <li>· 已完成：比喻精選、醫治神蹟、禱告主題、人物研讀</li>
                     <li>· 特別適合：福音預工、關懷事工裝備、講章預備</li>
                   </ul>
+                  <div class="mt-3 text-xs text-slate-500 space-y-1">
+                    <p>
+                      全新專題：
+                      <a href="路加福音/浪子回頭/index.html" class="text-sky-600 hover:text-sky-800">
+                        浪子回頭互動頁
+                      </a>
+                    </p>
+                    <p>
+                      建議對讀：
+                      <a href="馬太福音/十童女/index.html" class="text-indigo-600 hover:text-indigo-800">
+                        馬太福音十童女
+                      </a>
+                      （儆醒與恩典的雙向提示）
+                    </p>
+                  </div>
                   <div class="mt-3 inline-flex items-center text-sm text-sky-700">
                     <span>進入路加福音互動研讀</span>
                     <svg class="w-4 h-4 ml-1.5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -303,7 +319,10 @@
             </div>
           </section>
         </div>
-      </main>
+      
+    <!-- Visit Counter -->
+    <div id="visit-counter-container"></div>
+</main>
 
       <footer class="px-6 pb-6 text-center text-xs text-slate-500">
         <p class="mb-1 italic">
@@ -315,8 +334,27 @@
       </footer>
     </div>
   </div>
+
+    <!-- Visit Counter Script -->
+    <script src="../../../visit-counter.js"></script>
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
+        VisitCounter.init('bible_study/經卷/四福音/index', {
+            scriptUrl: SCRIPT_URL,
+            containerId: 'visit-counter-container'
+        });
+    </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
 
 
 

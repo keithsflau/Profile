@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-Hant">
   <head>
     <meta charset="UTF-8" />
@@ -149,7 +149,7 @@
         box-shadow: 0 0 0 1px rgba(14, 165, 233, 0.4);
       }
 
-      .layout {
+        .layout {
         display: flex;
         flex-direction: column;
         gap: 20px;
@@ -398,7 +398,7 @@
       @media (max-width: 992px) {
         .panel-columns {
           grid-template-columns: minmax(0, 1fr);
-        }
+      }
       }
 
       .list-card {
@@ -617,28 +617,29 @@
         color: #0f172a;
       }
     </style>
-  </head>
+      <link rel="stylesheet" href="../../../../visit-counter.css">
+</head>
   <body>
     <div class="page">
       <header class="header">
-        <div class="title-block">
+          <div class="title-block">
           <div class="title-main">
             <h1 class="title">Mark</h1>
             <span class="title-chip">馬可福音</span>
-          </div>
+            </div>
           <p class="subtitle">
             神子以僕人樣式，立刻順服差遣，為多人捨命作贖價（可 10:45）
           </p>
-        </div>
+            </div>
         <div class="header-actions">
           <a href="../index.html" class="pill" style="text-decoration: none;">
             <span class="pill-dot"></span>
             返回四福音目錄
           </a>
-        </div>
-      </header>
+          </div>
+        </header>
 
-      <div class="layout">
+        <div class="layout">
         <!-- Intro Card -->
         <div class="card">
           <div class="card-header">
@@ -649,7 +650,7 @@
             <div class="card-chip">概覽</div>
           </div>
           <div class="intro-body">
-            <div>
+              <div>
               <div class="intro-section-label">THEME</div>
               <div class="intro-heading">神的兒子耶穌基督福音的起頭</div>
               <p class="intro-text">
@@ -686,8 +687,8 @@
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+              </div>
+            </div>
 
         <!-- Tabs Area -->
         <div class="tabs">
@@ -697,7 +698,7 @@
             <button class="tab-button" data-tab="terms">關鍵詞彙 Terms</button>
             <button class="tab-button" data-tab="themes">神學主題 Themes</button>
             <div class="tab-indicator"></div>
-          </div>
+            </div>
 
           <div class="tabs-body">
             <!-- Outline Panel -->
@@ -706,7 +707,7 @@
                 <div class="list-card">
                   <div class="list-header">
                     <span class="list-title">章節分段</span>
-                  </div>
+            </div>
                   <div class="list-body" id="outline-list"></div>
                 </div>
                 <div class="detail-card" id="outline-detail">
@@ -721,9 +722,9 @@
                 <div class="list-card">
                   <div class="list-header">
                     <span class="list-title">人物列表</span>
-                  </div>
-                  <div class="list-body" id="persons-list"></div>
                 </div>
+                  <div class="list-body" id="persons-list"></div>
+              </div>
                 <div class="detail-card" id="persons-detail"></div>
               </div>
             </div>
@@ -734,12 +735,12 @@
                 <div class="list-card">
                   <div class="list-header">
                     <span class="list-title">原文詞彙</span>
-                  </div>
+        </div>
                   <div class="list-body" id="terms-list"></div>
                 </div>
                 <div class="detail-card" id="terms-detail"></div>
-              </div>
-            </div>
+      </div>
+    </div>
 
             <!-- Themes Panel -->
             <div class="panel" id="panel-themes">
@@ -747,9 +748,9 @@
                 <div class="list-card">
                   <div class="list-header">
                     <span class="list-title">主題列表</span>
-                  </div>
+          </div>
                   <div class="list-body" id="themes-list"></div>
-                </div>
+        </div>
                 <div class="detail-card" id="themes-detail"></div>
               </div>
             </div>
@@ -1191,7 +1192,7 @@
           <div class="list-item" onclick="selectItem('themes', '${item.id}')" data-id="${item.id}">
             <div class="item-title">${item.title}</div>
             <div class="item-subtitle">${item.desc}</div>
-          </div>
+            </div>
         `).join('');
       }
 
@@ -1212,7 +1213,7 @@
             <div class="detail-header">
               <h2 class="detail-title">${data.title}</h2>
               <div class="detail-meta">${data.ref}｜${data.desc}</div>
-            </div>
+              </div>
             <div class="detail-content">
               <h3>${data.content.heading}</h3>
               <p>${data.content.intro}</p>
@@ -1223,12 +1224,12 @@
               <div class="verse-block">
                 <div class="verse-text">${data.content.verses.text}</div>
                 <div class="verse-ref">— ${data.content.verses.ref}</div>
-              </div>
+                  </div>
               <h3>屬靈反思</h3>
               <ul>
                 ${data.content.spiritual.map(s => `<li>${s}</li>`).join('')}
               </ul>
-            </div>
+                </div>
           `;
         } else if (type === 'persons') {
           const data = persons.find(x => x.id === id);
@@ -1299,5 +1300,20 @@
       // Initialize
       init();
     </script>
-  </body>
+  
+    <!-- Visit Counter -->
+    <div id="visit-counter-container"></div>
+
+    <!-- Visit Counter Script -->
+    <script src="../../../../visit-counter.js"></script>
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
+        VisitCounter.init('bible_study/經卷/四福音/馬可福音/index', {
+            scriptUrl: SCRIPT_URL,
+            containerId: 'visit-counter-container'
+        });
+    </script>
+</body>
 </html>
+
+

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
@@ -82,6 +82,7 @@
             background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
         }
     </style>
+    <link rel="stylesheet" href="../../../visit-counter.css">
 </head>
 <body class="text-slate-800">
 
@@ -838,7 +839,10 @@
             </div>
         </div>
 
-    </main>
+    
+    <!-- Visit Counter -->
+    <div id="visit-counter-container"></div>
+</main>
 
     <footer class="text-center py-8 text-slate-600 text-sm">
         <p class="italic mb-2">「你的話是我腳前的燈，是我路上的光。」</p>
@@ -1037,5 +1041,17 @@
             switchTab('background');
         });
     </script>
+
+    <!-- Visit Counter Script -->
+    <script src="../../../visit-counter.js"></script>
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
+        VisitCounter.init('bible_study/信仰分享/聖經論/index', {
+            scriptUrl: SCRIPT_URL,
+            containerId: 'visit-counter-container'
+        });
+    </script>
 </body>
 </html>
+
+

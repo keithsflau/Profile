@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-HK">
 <head>
   <meta charset="UTF-8" />
@@ -121,6 +121,7 @@
       animation: fadeInUp 0.3s ease-out;
     }
   </style>
+    <link rel="stylesheet" href="../../../visit-counter.css">
 </head>
 <body class="antialiased text-slate-50 bg-gradient-to-br from-slate-900 via-slate-950 to-black min-h-screen">
   <div class="relative min-h-screen overflow-hidden">
@@ -602,7 +603,10 @@
             </div>
           </section>
         </div>
-      </main>
+      
+    <!-- Visit Counter -->
+    <div id="visit-counter-container"></div>
+</main>
 
       <!-- Footer -->
       <footer style="text-align: center; padding: 1rem; color: #e5e7eb; font-size: 0.875rem;">
@@ -747,5 +751,17 @@
       });
     });
   </script>
+
+    <!-- Visit Counter Script -->
+    <script src="../../../visit-counter.js"></script>
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
+        VisitCounter.init('bible_study/舊約聖經人物/掃羅/index', {
+            scriptUrl: SCRIPT_URL,
+            containerId: 'visit-counter-container'
+        });
+    </script>
 </body>
 </html>
+
+

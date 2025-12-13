@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-HK">
 <head>
   <meta charset="UTF-8" />
@@ -17,12 +17,15 @@
     .section-title-bar{width:3.5rem;height:.18rem;border-radius:999px;background-image:linear-gradient(to right,#38bdf8,#22c55e,#3b82f6);} 
     .fade-in-up{opacity:0;transform:translateY(18px);transition:all .6s ease-out;} .fade-in-up.show{opacity:1;transform:translateY(0);} 
     .prose-custom p{margin-bottom:.75rem;} .prose-custom ul{margin-bottom:.75rem;padding-left:1.3rem;list-style-type:disc;} 
+    .prose-custom li+li{margin-top:.25rem;}
+    .hebrew{font-family:"Noto Serif","Times New Roman",serif;letter-spacing:.03em;}
     .scripture-pill{cursor:pointer;border-radius:999px;border-width:1px;border-style:solid;border-color:rgba(56,189,248,.6);background:rgba(240,249,255,.9);transition:all .2s ease;}
     .scripture-pill:hover{background:#e0f2fe;transform:translateY(-1px);box-shadow:0 8px 18px rgba(56,189,248,.35);}
     .modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;align-items:center;justify-content:center;z-index:40;backdrop-filter:blur(4px);}
     .modal-backdrop.show{display:flex;}
     .modal-card{max-width:40rem;width:90%;max-height:min(80vh,32rem);overflow:auto;border-radius:1.5rem;background:rgba(255,255,255,.96);border:1px solid rgba(56,189,248,.5);box-shadow:0 22px 55px rgba(15,23,42,.4);animation:fadeInUp .3s ease-out;}
   </style>
+    <link rel="stylesheet" href="../../../visit-counter.css">
 </head>
 <body class="antialiased text-slate-900 bg-gradient-to-br from-slate-50 via-white to-sky-50/40 min-h-screen">
   <div class="relative min-h-screen overflow-hidden">
@@ -187,8 +190,190 @@
               <p>在金牛犢事件中，他為百姓代求，甚至願意為他們被塗抹，顯出中保的心腸，也預表將來更完全的中保。</p>
             </div>
           </section>
+
+          <!-- 經文分段｜可點擊顯示 -->
+          <section class="fade-in-up">
+            <div class="glass-card rounded-3xl p-6 sm:p-8 text-slate-800 leading-relaxed">
+              <div class="mb-5">
+                <h2 class="text-2xl sm:text-3xl font-semibold serif-font mb-1">關鍵經文分段（點擊顯示經文）</h2>
+                <div class="section-title-bar"></div>
+              </div>
+              <p class="text-sm sm:text-base mb-4">
+                以下只選出部分重點經文，幫助快速進入摩西的故事。可按需要細讀整段章節。
+              </p>
+              <div class="flex flex-wrap gap-2 sm:gap-3 text-xs sm:text-sm">
+                <button type="button" class="scripture-pill px-3 py-1.5 sm:px-4 sm:py-2 text-sky-800" data-scripture-id="ex-3-7-12">出 3:7–12｜燃燒荊棘的呼召</button>
+                <button type="button" class="scripture-pill px-3 py-1.5 sm:px-4 sm:py-2 text-sky-800" data-scripture-id="ex-12-21-28">出 12:21–28｜逾越節</button>
+                <button type="button" class="scripture-pill px-3 py-1.5 sm:px-4 sm:py-2 text-sky-800" data-scripture-id="ex-14-13-14">出 14:13–14｜過紅海</button>
+                <button type="button" class="scripture-pill px-3 py-1.5 sm:px-4 sm:py-2 text-sky-800" data-scripture-id="ex-32-30-32">出 32:30–32｜為百姓代求</button>
+                <button type="button" class="scripture-pill px-3 py-1.5 sm:px-4 sm:py-2 text-sky-800" data-scripture-id="deut-34-4-7">申 34:4–7｜在尼波山上</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- 一、人物背景（更新為完整結構） -->
+          <section class="fade-in-up">
+            <div class="grid gap-8 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1.1fr)] items-start">
+              <article class="glass-card rounded-3xl p-6 sm:p-8 prose-custom text-slate-800 leading-relaxed">
+                <div class="mb-5">
+                  <h2 class="text-2xl sm:text-3xl font-semibold serif-font mb-1">一、人物背景</h2>
+                  <div class="section-title-bar"></div>
+                </div>
+                <p>
+                  摩西的出生被放在蘆葦箱中漂流，卻被法老女兒收養，在宮中受教育；同時又在曠野學習牧養羊群，這些都成為日後牧養百姓的預備。
+                  在燃燒卻不焚毀的荊棘前，他聽見神自我啟示為「我是自有永有的」，並差遣他去見法老，這呼召不是因他能幹，而是因神與他同在。
+                </p>
+                <p>
+                  他帶領百姓經歷十災、過紅海、曠野供應，又在西乃山代表百姓與神立約，領受十誡與律法。
+                  在金牛犢事件中，他為百姓代求，甚至願意為他們被塗抹，顯出中保的心腸，也預表將來更完全的中保。
+                </p>
+                <p>
+                  摩西被稱為「神人」，在以色列歷史中佔有極重要的地位，是律法的頒布者、百姓的領袖，也是預表基督的僕人。
+                  然而，他也因在米利巴水事件中沒有尊神為聖，以致不能進入應許地（民 20:12），顯出即使是最偉大的領袖，也需要完全順服神。
+                </p>
+              </article>
+              <aside class="space-y-6">
+                <div class="glass-card rounded-3xl p-5 sm:p-6 text-sm text-slate-800">
+                  <h3 class="text-lg font-semibold serif-font mb-3">快速資料｜摩西</h3>
+                  <dl class="space-y-1.5">
+                    <div class="flex justify-between gap-3">
+                      <dt class="text-slate-500">名字</dt>
+                      <dd class="font-medium">摩西（意：從水裡拉上來）</dd>
+                    </div>
+                    <div class="flex justify-between gap-3">
+                      <dt class="text-slate-500">主要經文</dt>
+                      <dd class="font-medium text-right">
+                        出埃及記、利未記、民數記、申命記
+                      </dd>
+                    </div>
+                    <div class="flex justify-between gap-3">
+                      <dt class="text-slate-500">身份</dt>
+                      <dd class="font-medium text-right">以色列的領袖、律法的頒布者、中保</dd>
+                    </div>
+                    <div class="flex justify-between gap-3">
+                      <dt class="text-slate-500">關鍵主題</dt>
+                      <dd class="font-medium text-right">呼召、中保、律法、代求</dd>
+                    </div>
+                  </dl>
+                </div>
+                <div class="glass-card rounded-3xl p-5 sm:p-6 text-xs sm:text-sm text-slate-700">
+                  <h3 class="text-base font-semibold serif-font mb-3">主要成就</h3>
+                  <ul class="list-disc pl-4 space-y-1.5">
+                    <li>帶領以色列人出埃及</li>
+                    <li>在西乃山領受律法與十誡</li>
+                    <li>在曠野四十年作百姓的領袖</li>
+                    <li>寫下摩西五經</li>
+                    <li>在尼波山上望見應許地</li>
+                  </ul>
+                </div>
+              </aside>
+            </div>
+          </section>
+
+          <!-- 二、原文重點與難字解釋 -->
+          <section class="fade-in-up">
+            <div class="glass-card rounded-3xl p-6 sm:p-8 prose-custom text-slate-800 leading-relaxed">
+              <div class="mb-5">
+                <h2 class="text-2xl sm:text-3xl font-semibold serif-font mb-1">二、原文重點與難字解釋</h2>
+                <div class="section-title-bar"></div>
+              </div>
+              <h3 class="text-xl font-semibold serif-font mt-2 mb-2">1. 「我是自有永有的」</h3>
+              <p>
+                出 3:14 神對摩西說「我是自有永有的」，希伯來文 <span class="hebrew">אֶהְיֶה אֲשֶׁר אֶהְיֶה</span>（ehyeh asher ehyeh），
+                直譯是「我是我將要是的」或「我是那我是的」，強調神的永恆存在與自存性。
+              </p>
+              <p>
+                這表明神不需要依賴任何外在事物而存在，祂本身就是存在的根源，也是我們可以完全信靠的對象。
+              </p>
+              <h3 class="text-xl font-semibold serif-font mt-4 mb-2">2. 「中保」</h3>
+              <p>
+                摩西在神與百姓之間作「中保」，希伯來文 <span class="hebrew">מֵלִיץ</span>（melitz）有「翻譯者、代求者、中間人」的意思。
+                這表明摩西代表百姓來到神面前，也代表神向百姓說話。
+              </p>
+              <p>
+                這預表基督，祂是更完全的中保（提前 2:5），一次獻上自己，就成就了永遠的救贖。
+              </p>
+              <h3 class="text-xl font-semibold serif-font mt-4 mb-2">3. 「被塗抹」</h3>
+              <p>
+                出 32:32 摩西說「求你從你所寫的冊上把我塗抹」，這裡「塗抹」的希伯來文 <span class="hebrew">מָחָה</span>（machah）有「擦掉、刪除」的意思。
+                摩西願意為了百姓的緣故，放棄自己在神面前的地位，顯出他中保的心腸。
+              </p>
+            </div>
+          </section>
+
+          <!-- 三、屬靈意義與今日應用（擴充） -->
+          <section class="fade-in-up">
+            <div class="glass-card rounded-3xl p-6 sm:p-8 prose-custom text-slate-800 leading-relaxed">
+              <div class="mb-5">
+                <h2 class="text-2xl sm:text-3xl font-semibold serif-font mb-1">三、屬靈意義與今日應用</h2>
+                <div class="section-title-bar"></div>
+              </div>
+              <h3 class="text-xl font-semibold serif-font mt-2 mb-2">1. 神主權的預備與呼召</h3>
+              <p>
+                摩西的出生、被收養、在宮中受教育、在曠野牧羊，這一切都是神主權的預備，為要使他成為合用的器皿。
+                在燃燒卻不焚毀的荊棘前，他聽見神的呼召，這呼召不是因他能幹，而是因神與他同在。
+              </p>
+              <p>
+                這提醒我們：<span class="font-semibold">神在我們生命中的預備都是有意義的，即使我們覺得自己不配或不能，只要神呼召我們，祂就必與我們同在。</span>
+              </p>
+              <h3 class="text-xl font-semibold serif-font mt-4 mb-2">2. 作百姓與神之間的中保</h3>
+              <p>
+                摩西在神與百姓之間作中保，代表百姓來到神面前，也代表神向百姓說話。
+                在金牛犢事件中，他為百姓代求，甚至願意為他們被塗抹，顯出中保的心腸。
+              </p>
+              <p>
+                這預表基督，祂是更完全的中保（提前 2:5）。
+                今天，我們可以靠著基督直接來到神面前，不再需要地上的中保。
+                同時，我們也要學習像摩西一樣，為他人代求，成為別人的祝福。
+              </p>
+              <h3 class="text-xl font-semibold serif-font mt-4 mb-2">3. 在軟弱中仍需完全順服</h3>
+              <p>
+                摩西雖然是偉大的領袖，但因在米利巴水事件中沒有尊神為聖，以致不能進入應許地（民 20:12）。
+                這提醒我們：即使是最偉大的領袖，也需要完全順服神，不能輕視神的命令。
+              </p>
+              <p>
+                這也讓我們看見：<span class="font-semibold">神的標準是完美的，我們都需要靠著基督的恩典，才能進入真正的應許地。</span>
+              </p>
+            </div>
+          </section>
+
+          <!-- 四、默想與回應 -->
+          <section class="fade-in-up">
+            <div class="glass-card rounded-3xl p-6 sm:p-8 text-slate-800 leading-relaxed">
+              <div class="mb-5">
+                <h2 class="text-2xl sm:text-3xl font-semibold serif-font mb-1">四、默想與禱告回應</h2>
+                <div class="section-title-bar"></div>
+              </div>
+              <div class="grid gap-6 md:grid-cols-2">
+                <div class="space-y-3 text-sm sm:text-base">
+                  <h3 class="text-lg font-semibold serif-font mb-2">默想問題</h3>
+                  <ul class="list-disc pl-4 space-y-2">
+                    <li>你如何理解「我是自有永有的」？這如何影響你與神的關係？</li>
+                    <li>你是否願意像摩西一樣，為他人代求，成為別人的祝福？</li>
+                    <li>從摩西在米利巴水的事件中，你學到什麼關於順服神的功課？</li>
+                    <li>你如何理解摩西預表基督作為中保？</li>
+                  </ul>
+                </div>
+                <div class="space-y-3 text-sm sm:text-base">
+                  <h3 class="text-lg font-semibold serif-font mb-2">禱告建議</h3>
+                  <p>
+                    親愛的主，感謝你讓我從摩西身上看見神主權的預備與呼召，也看見中保的職分。
+                    求你幫助我，學習完全順服你，不輕視你的命令。
+                  </p>
+                  <p>
+                    感謝你為我們預備了更完全的中保——基督，讓我們可以靠著祂直接來到你面前。
+                    幫助我學習為他人代求，成為別人的祝福。
+                    奉主耶穌的名祈求，阿們。
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
-      </main>
+      
+    <!-- Visit Counter -->
+    <div id="visit-counter-container"></div>
+</main>
       <footer style="text-align:center;padding:1rem;color:#707070;font-size:0.875rem;">
         <p style="font-style:italic;margin-bottom:0.25rem;">But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his understanding. Jeremiah 10:12</p>
         <p style="font-size:0.75rem;margin-bottom:0.25rem;margin-top:0.5rem;">「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12</p>
@@ -220,6 +405,14 @@
           "21 於是，摩西召了以色列的眾長老來，對他們說：「你們要按著家口取出羊羔，把這逾越節的羊羔宰了。」",
           "22 「要拿一把牛膝草，蘸盆裡的血……把盆裡的血塗在門楣上和左右的門框上……」",
           "23 「耶和華要巡行擊殺埃及人；他看見血在門楣上和左右的門框上，就必越過那門，不容滅命的進你們的房屋，擊殺你們。」"
+        ]
+      },
+      "ex-14-13-14":{
+        reference:"出埃及記 14:13–14",
+        title:"過紅海前的鼓勵",
+        text:[
+          "13 摩西對百姓說：「不要懼怕，只管站住！看耶和華今天向你們所要施行的救恩。因為，你們今天所看見的埃及人，必永遠不再看見了。」",
+          "14 「耶和華必為你們爭戰；你們只管靜默，不要作聲。」"
         ]
       },
       "ex-19-3-6":{
@@ -311,5 +504,17 @@
       });
     });
   </script>
+
+    <!-- Visit Counter Script -->
+    <script src="../../../visit-counter.js"></script>
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
+        VisitCounter.init('bible_study/舊約聖經人物/摩西/index', {
+            scriptUrl: SCRIPT_URL,
+            containerId: 'visit-counter-container'
+        });
+    </script>
 </body>
 </html>
+
+

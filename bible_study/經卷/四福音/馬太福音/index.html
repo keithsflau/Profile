@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-Hant">
   <head>
     <meta charset="UTF-8" />
@@ -646,7 +646,8 @@
         color: var(--muted);
       }
     </style>
-  </head>
+      <link rel="stylesheet" href="../../../../visit-counter.css">
+</head>
   <body>
     <div class="page">
       <header class="header">
@@ -1326,5 +1327,20 @@
       // Initialize
       init();
     </script>
-  </body>
+  
+    <!-- Visit Counter -->
+    <div id="visit-counter-container"></div>
+
+    <!-- Visit Counter Script -->
+    <script src="../../../../visit-counter.js"></script>
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
+        VisitCounter.init('bible_study/經卷/四福音/馬太福音/index', {
+            scriptUrl: SCRIPT_URL,
+            containerId: 'visit-counter-container'
+        });
+    </script>
+</body>
 </html>
+
+

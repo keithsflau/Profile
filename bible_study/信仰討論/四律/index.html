@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-HK">
 <head>
   <meta charset="UTF-8">
@@ -270,6 +270,7 @@
       }
     }
   </style>
+    <link rel="stylesheet" href="../../../visit-counter.css">
 </head>
 <body class="antialiased text-slate-900 bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 min-h-screen overflow-x-hidden">
   <div class="relative min-h-screen">
@@ -989,7 +990,10 @@
           </section>
 
         </div>
-      </main>
+      
+    <!-- Visit Counter -->
+    <div id="visit-counter-container"></div>
+</main>
 
       <!-- Footer -->
       <footer class="text-center px-6 py-8 text-slate-600 text-sm">
@@ -1080,5 +1084,16 @@
       });
     });
   </script>
+
+    <!-- Visit Counter Script -->
+    <script src="../../../visit-counter.js"></script>
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
+        VisitCounter.init('bible_study/信仰討論/四律/index', {
+            scriptUrl: SCRIPT_URL,
+            containerId: 'visit-counter-container'
+        });
+    </script>
 </body>
 </html>
+
