@@ -1,0 +1,1082 @@
+﻿<!DOCTYPE html>
+<html lang="zh-HK">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>說話技巧模擬器 DELUXE: 辯論逆轉裁判</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@900&family=Noto+Sans+TC:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            background: #1a202c;
+            font-family: 'Noto Sans TC', sans-serif;
+            overflow: hidden;
+            user-select: none;
+            color: white;
+        }
+
+        #app {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Screens */
+        .screen {
+            position: absolute;
+            inset: 0;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* Start Screen */
+        .bg-start {
+            background: linear-gradient(135deg, #1e3a8a 0%, #111827 100%);
+        }
+
+        .title-text {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 4rem;
+            background: linear-gradient(to bottom, #facc15, #b45309);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        /* Court Scene */
+        .bg-court {
+            background: linear-gradient(135deg, #374151 0%, #111827 100%);
+            perspective: 1000px;
+        }
+
+        .bg-intense {
+            background: radial-gradient(circle at center, #7f1d1d 0%, #000000 100%);
+            animation: pulseBg 0.5s infinite alternate;
+        }
+
+        @keyframes pulseBg {
+            from {
+                filter: brightness(1);
+            }
+
+            to {
+                filter: brightness(1.3);
+            }
+        }
+
+        /* Character */
+        #char-container {
+            position: absolute;
+            bottom: -5vh;
+            left: 50%;
+            transform: translateX(-50%);
+            height: 80vh;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            transition: all 0.3s;
+            z-index: 5;
+        }
+
+        .char-emoji {
+            font-size: 18rem;
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .char-shake {
+            animation: shake 0.4s;
+        }
+
+        .char-damage {
+            animation: flashRed 0.5s;
+        }
+
+        @keyframes flashRed {
+
+            0%,
+            100% {
+                filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5)) hue-rotate(0deg);
+                transform: scale(1);
+            }
+
+            50% {
+                filter: drop-shadow(0 0 30px red) hue-rotate(90deg) grayscale(1);
+                transform: scale(0.9);
+            }
+        }
+
+        /* Dialogue Box */
+        .dialogue-box {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 35vh;
+            background: rgba(0, 0, 0, 0.9);
+            border-top: 4px solid #fbbf24;
+            padding: 1.5rem 3rem;
+            box-sizing: border-box;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 -5px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .speaker-tag {
+            background: #fbbf24;
+            color: #000;
+            padding: 0.2rem 1rem;
+            font-weight: 900;
+            font-size: 1.2rem;
+            align-self: flex-start;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+            transform: skewX(-10deg);
+            box-shadow: 3px 3px 0 #b45309;
+        }
+
+        .dialogue-text {
+            font-size: 1.6rem;
+            line-height: 1.6;
+            color: #f3f4f6;
+            font-family: 'Noto Serif TC', serif;
+            white-space: pre-wrap;
+        }
+
+        /* Choice UI */
+        .choice-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            width: 80%;
+            max-width: 800px;
+        }
+
+        .choice-btn {
+            background: linear-gradient(90deg, #1e40af, #3b82f6);
+            border: 2px solid #60a5fa;
+            padding: 1.5rem;
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: white;
+            text-align: left;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .choice-btn:hover {
+            transform: translateX(10px);
+            background: linear-gradient(90deg, #2563eb, #60a5fa);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+        }
+
+        /* HUD - Health Bars */
+        .hud-top {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            z-index: 30;
+        }
+
+        .hp-bar-container {
+            width: 40%;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        .hp-bar {
+            height: 20px;
+            background: #374151;
+            border: 2px solid white;
+            position: relative;
+        }
+
+        .hp-fill {
+            height: 100%;
+            transition: width 0.5s ease-out;
+        }
+
+        .hp-fill.player {
+            background: #22c55e;
+        }
+
+        .hp-fill.opponent {
+            background: #ef4444;
+        }
+
+        /* Timer Bar */
+        .timer-container {
+            position: absolute;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 8px;
+            background: #374151;
+            border-radius: 4px;
+            overflow: hidden;
+            display: none;
+            /* hidden unless making choice */
+            z-index: 30;
+        }
+
+        .timer-fill {
+            height: 100%;
+            background: #facc15;
+            width: 100%;
+            transition: width 1s linear;
+        }
+
+        /* Combo Counter */
+        .combo-counter {
+            position: absolute;
+            top: 100px;
+            right: 50px;
+            text-align: right;
+            z-index: 25;
+            pointer-events: none;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .combo-counter.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .combo-number {
+            font-size: 4rem;
+            font-weight: 900;
+            color: #facc15;
+            text-shadow: 4px 4px 0 #b45309;
+            font-style: italic;
+        }
+
+        .combo-label {
+            font-size: 1.5rem;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Shout visual */
+        .shout-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .shout-text {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 10rem;
+            color: #ef4444;
+            -webkit-text-stroke: 4px white;
+            text-shadow: 10px 10px 0 black;
+            font-weight: 900;
+            opacity: 0;
+            transform: scale(0);
+        }
+
+        .shout-anim {
+            animation: shoutPop 0.8s forwards;
+        }
+
+        @keyframes shoutPop {
+            0% {
+                opacity: 0;
+                transform: scale(0) rotate(-10deg);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.2) rotate(0deg);
+            }
+
+            70% {
+                transform: scale(0.9);
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(3);
+                filter: blur(10px);
+            }
+        }
+
+        /* Result Screen */
+        .rank-grade {
+            font-size: 8rem;
+            font-weight: 900;
+            color: #facc15;
+            text-shadow: 0 0 50px rgba(250, 204, 21, 0.5);
+            margin-bottom: 1rem;
+        }
+    </style>
+    <link rel="stylesheet" href="../../visit-counter.css">
+</head>
+
+<body>
+
+    <div id="app">
+        <!-- START SCREEN -->
+        <div id="start-screen" class="screen bg-start active">
+            <h1 class="title-text">辯論逆轉裁判<br><span class="text-3xl text-white">Oral Defense Simulator</span></h1>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl px-4">
+                <!-- Topic Buttons Generated via JS -->
+            </div>
+        </div>
+
+        <!-- GAME SCREEN -->
+        <div id="game-screen" class="screen bg-court">
+            <!-- HUD -->
+            <div class="hud-top">
+                <div class="hp-bar-container">
+                    <div class="text-xs mb-1 text-green-400 font-bold">LOGIC (你)</div>
+                    <div class="hp-bar">
+                        <div id="hp-width-p" class="hp-fill player" style="width: 100%;"></div>
+                    </div>
+                </div>
+                <div class="hp-bar-container text-right">
+                    <div class="text-xs mb-1 text-red-400 font-bold">OPPONENT (對手)</div>
+                    <div class="hp-bar">
+                        <div id="hp-width-o" class="hp-fill opponent" style="width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="timer-bar-container" class="timer-container">
+                <div id="timer-fill" class="timer-fill"></div>
+            </div>
+
+            <div id="combo-display" class="combo-counter">
+                <div class="combo-number" id="combo-num">0</div>
+                <div class="combo-label">Combo!</div>
+            </div>
+
+            <!-- Scene -->
+            <div id="bg-effects" class="absolute inset-0 pointer-events-none"></div>
+
+            <div id="char-container">
+                <div id="char-sprite" class="char-emoji">🧑‍⚖️</div>
+            </div>
+
+            <!-- Dialogue -->
+            <div id="dialogue-panel" class="dialogue-box">
+                <div id="speaker-name" class="speaker-tag">SYSTEM</div>
+                <div id="dialogue-content" class="dialogue-text">...</div>
+
+                <!-- Next Button Indicator -->
+                <div id="next-indicator"
+                    class="absolute bottom-4 right-6 animate-bounce text-yellow-400 text-2xl cursor-pointer">
+                    ▼ 按此繼續
+                </div>
+            </div>
+
+            <!-- Choices Overlay (inside game screen to stack properly) -->
+            <div id="choice-overlay"
+                class="absolute inset-0 bg-black/80 z-40 hidden flex-col items-center justify-center">
+                <h2 class="text-3xl font-bold mb-8 text-yellow-400">輪到你反駁了! (Your Turn)</h2>
+                <div id="choices-list" class="choice-grid"></div>
+            </div>
+
+            <!-- Shout FX -->
+            <div class="shout-overlay">
+                <div id="shout-text-el" class="shout-text">異議！</div>
+            </div>
+        </div>
+
+        <!-- RESULT SCREEN -->
+        <div id="result-screen" class="screen bg-gray-900">
+            <h2 class="text-4xl font-bold text-white mb-4">辯論結束</h2>
+            <div id="final-grade" class="rank-grade">S</div>
+            <div id="final-score" class="text-2xl text-gray-300 mb-8">Score: 0</div>
+            <p id="result-msg" class="text-xl text-center max-w-2xl mb-8 px-4">評價...</p>
+            <button onclick="location.reload()"
+                class="px-8 py-3 bg-blue-600 hover:bg-blue-500 rounded text-xl font-bold transition">返回主選單</button>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA ---
+        const TOPICS = [
+            {
+                id: 'sports',
+                title: '應否增加體育課',
+                desc: '學習壓力 vs 身心健康',
+                difficulty: 'Easy',
+                opponent: '反方同學',
+                avatar: '🙎‍♂️',
+                script: [
+                    { speaker: '反方同學', text: '我也喜歡運動，但增加體育課是不切實際的。', mood: 'normal' },
+                    { speaker: '反方同學', text: '現在課程已經很緊湊，再加體育課，我們的主科時間就會被削減！', mood: 'angry' },
+                    {
+                        type: 'choice', time: 10,
+                        options: [
+                            { text: '同意，學業確實比較重要', type: 'weak', dmg: -20, feedback: '你放棄了立場...' },
+                            { text: '反對！體育課能減壓，反而提升學習效率', type: 'strong', shout: '異議！', dmg: 25, feedback: '精彩的反駁！一針見血！' },
+                            { text: '那不如取消音樂課？', type: 'neutral', dmg: 10, feedback: '轉移話題不是好策略...' }
+                        ]
+                    },
+                    { speaker: '反方同學', text: '減壓...？哼，但如果體育課令身體疲累，上下一堂課時只會打瞌睡吧？', mood: 'thinking' },
+                    {
+                        type: 'choice', time: 10,
+                        options: [
+                            { text: '所以體育課應該安排在放學後', type: 'neutral', dmg: 5, feedback: '這變成了課外活動，偏離了題目。' },
+                            { text: '疲累是因為平時缺乏運動！適量運動能令精神更集中！', type: 'strong', shout: '等等！', dmg: 30, feedback: '強而有力的論證！' },
+                            { text: '我體力很好，不會這樣', type: 'weak', dmg: -10, feedback: '這是個人經驗，欠缺說服力。' }
+                        ]
+                    },
+                    { speaker: '反方同學', text: '......嗚，好像有點道理。', mood: 'sad' }
+                ]
+            },
+            {
+                id: 'ai_learning',
+                title: 'AI對學習利大於弊',
+                desc: '科技與教育的未來之戰',
+                difficulty: 'Hard',
+                opponent: '傳統教師',
+                avatar: '👨‍🏫',
+                script: [
+                    { speaker: '傳統教師', text: 'AI 只會讓學生變懶！你們都不會自己思考了！', mood: 'angry' },
+                    {
+                        type: 'choice', time: 10,
+                        options: [
+                            { text: 'AI 是工具，重點在於如何使用它輔助思考', type: 'strong', shout: '異議！', dmg: 20, feedback: '很好的定義！' },
+                            { text: '我們還是會思考的...', type: 'weak', dmg: -10, feedback: '語氣太弱了。' },
+                            { text: '現在誰還自己查字典啊？', type: 'neutral', dmg: 5, feedback: '有點道理，但略顯輕浮。' }
+                        ]
+                    },
+                    { speaker: '傳統教師', text: '但如果你們依賴 ChatGPT 寫作業，那考試怎麼辦？作弊嗎？', mood: 'thinking' },
+                    {
+                        type: 'choice', time: 8,
+                        options: [
+                            { text: '所以考試形式也應該與時並進，考核運用AI的能力', type: 'strong', shout: '看招！', dmg: 30, feedback: '非常有前瞻性的觀點！' },
+                            { text: '我們可以保證不作弊', type: 'weak', dmg: -10, feedback: '口頭保證是沒有說服力的。' },
+                            { text: '如果不準用AI，那我們將來怎麼工作？', type: 'neutral', dmg: 15, feedback: '實用主義，不錯。' }
+                        ]
+                    },
+                    { speaker: '傳統教師', text: '科技進步太快了... 我怕人類會被取代...', mood: 'sad' },
+                    {
+                        type: 'choice', time: 10,
+                        options: [
+                            { text: '人類的情感和創意是AI無法取代的！', type: 'strong', shout: '沒錯！', dmg: 40, feedback: '溫暖而有力的總結。' },
+                            { text: '這就是進化論啊', type: 'weak', dmg: -15, feedback: '太冷酷了，沒有共鳴。' }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'dating',
+                title: '中學生應否談戀愛',
+                desc: '青春期 vs 學校規定',
+                difficulty: 'BOSS',
+                opponent: '訓導主任',
+                avatar: '😠',
+                script: [
+                    { speaker: "訓導主任", text: "各位中學生，學校是求學的地方，不是談情說愛的地方！", mood: "angry" },
+                    { speaker: "訓導主任", text: "談戀愛會分心，導致成績一落千丈，這是鐵一般的事實！", mood: "angry" },
+                    {
+                        type: "choice", time: 9,
+                        options: [
+                            { text: "主任說得對，我們應該專注學業。", type: "weak", dmg: -20, feedback: "你完全順從了主任..." },
+                            { text: "不一定！互相支持可以成為學習動力！", type: "strong", shout: "異議！", dmg: 20, feedback: "很好的反例！將負面轉化為正面。" },
+                            { text: "只要不被發現就沒問題吧？", type: "weak", dmg: -10, feedback: "這是逃避心態，被扣分！" }
+                        ]
+                    },
+                    { speaker: "訓導主任", text: "動力？哼！那萬一分手受情傷呢？這會造成心理陰影，影響一生！", mood: "smug" },
+                    {
+                        type: "choice", time: 8,
+                        options: [
+                            { text: "這確實是風險...但我無法反駁。", type: "weak", dmg: -15, feedback: "被主任的氣勢壓倒了。" },
+                            { text: "學校應該教導正確戀愛觀，而不是一味禁止！", type: "strong", shout: "突破！", dmg: 30, feedback: "直擊痛點！教育的本質！" },
+                            { text: "我不怕受傷！", type: "neutral", dmg: 5, feedback: "太情緒化了。" }
+                        ]
+                    },
+                    { speaker: "訓導主任", text: "正確觀念...？難道我們現在的禁令不是為了保護你們嗎？", mood: "thinking" },
+                    {
+                        type: "choice", time: 6,
+                        options: [
+                            { text: "過度保護只會令我們在大學時更易受傷！", type: "strong", shout: "接招！", dmg: 40, feedback: "漂亮的長遠目光！" },
+                            { text: "對，謝謝主任保護。", type: "weak", dmg: -30, feedback: "放棄思考..." }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'parttime',
+                title: '中學生應否做兼職',
+                desc: '賺取經驗 vs 專注學業',
+                difficulty: 'Medium',
+                opponent: '生涯規劃老師',
+                avatar: '🧑‍💼',
+                script: [
+                    { speaker: '生涯規劃老師', text: '同學，你的本分是讀書。現在去賺那一點點錢，有什麼意義？', mood: 'normal' },
+                    { speaker: '生涯規劃老師', text: '把時間花在補習和溫習上，將來的回報率不是更高嗎？', mood: 'thinking' },
+                    {
+                        type: 'choice', time: 10,
+                        options: [
+                            { text: '但我希望早點累積社會經驗，學懂待人接物。', type: 'strong', shout: '異議！', dmg: 25, feedback: '很好的觀點！社會大學也是學習。' },
+                            { text: '我想買新款手機嘛...', type: 'weak', dmg: -20, feedback: '太短視了，被老師鄙視。' },
+                            { text: '溫習很悶啊。', type: 'weak', dmg: -10, feedback: '這是逃避心態。' }
+                        ]
+                    },
+                    { speaker: '生涯規劃老師', text: '社會經驗？你去快餐店炸薯條能學到什麼大道理？別自欺欺人了。', mood: 'angry' },
+                    {
+                        type: 'choice', time: 8,
+                        options: [
+                            { text: '每一份工作都有其專業和責任，不應職業歧視！', type: 'strong', shout: '等等！', dmg: 35, feedback: '有力的反駁！捍衛了勞動尊嚴。' },
+                            { text: '至少可以學會守時...', type: 'neutral', dmg: 10, feedback: '論點尚可。' },
+                            { text: '炸薯條也很好吃啊...', type: 'weak', dmg: -15, feedback: '你在開玩笑嗎？' }
+                        ]
+                    },
+                    { speaker: '生涯規劃老師', text: '唉，我是怕你太累，上課睡覺，最後兩頭不到岸。', mood: 'sad' },
+                    {
+                        type: 'choice', time: 10,
+                        options: [
+                            { text: '所以我會學會時間管理，這也是一種成長！', type: 'strong', shout: '突破！', dmg: 30, feedback: '展現了成熟的態度！' },
+                            { text: '睡覺就睡覺唄。', type: 'weak', dmg: -30, feedback: '自暴自棄...' }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'esports',
+                title: '電競應否列為運動',
+                desc: '體力 vs 腦力',
+                difficulty: 'Medium',
+                opponent: '體育教練',
+                avatar: '🏋️‍♂️',
+                script: [
+                    { speaker: '體育教練', text: '運動就是要流汗！坐在冷氣房按滑鼠，算什麼運動員？簡直是笑話！', mood: 'angry' },
+                    {
+                        type: 'choice', time: 9,
+                        options: [
+                            { text: '圍棋和射擊也是運動，難道它們也要流大汗嗎？', type: 'strong', shout: '異議！', dmg: 30, feedback: '精彩的類比！打破了固有定義。' },
+                            { text: '打到緊張時也會流汗的...', type: 'neutral', dmg: 5, feedback: '有點勉強。' },
+                            { text: '你太落伍了。', type: 'weak', dmg: -10, feedback: '人身攻擊是不對的。' }
+                        ]
+                    },
+                    { speaker: '體育教練', text: '但運動的本質是強身健體！打機只會導致近視和脊椎病！', mood: 'angry' },
+                    {
+                        type: 'choice', time: 8,
+                        options: [
+                            { text: '職業電競選手也需要體能訓練來維持專注力！', type: 'strong', shout: '看招！', dmg: 35, feedback: '指出了鮮為人知的事實！' },
+                            { text: '現在科技發達，可以戴眼鏡。', type: 'weak', dmg: -15, feedback: '沒有回應健康問題。' },
+                            { text: '只要好玩就行了。', type: 'weak', dmg: -20, feedback: '完全偏離了「運動」的定義。' }
+                        ]
+                    },
+                    { speaker: '體育教練', text: '我不承認... 奧運會也沒有電競項目！', mood: 'desperate' },
+                    {
+                        type: 'choice', time: 10,
+                        options: [
+                            { text: '亞運已經有了！奧運也在討論中，這是世界趨勢！', type: 'strong', shout: '決勝！', dmg: 40, feedback: '用事實說話，無法反駁！' },
+                            { text: '奧運不重要啦。', type: 'weak', dmg: -10, feedback: '不尊重體育盛事。' }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'homework',
+                title: '應否廢除假期作業',
+                desc: '休息權利 vs 競爭力',
+                difficulty: 'Hard',
+                opponent: '怪獸家長',
+                avatar: '👩‍🎤',
+                script: [
+                    { speaker: '怪獸家長', text: '放假就是用來超車的！如果你休息，別人在努力，你就會輸在起跑線！', mood: 'angry' },
+                    { speaker: '怪獸家長', text: '必須廢除「廢除作業」這種懶惰的想法！我要我的孩子做十本練習！', mood: 'intense' },
+                    {
+                        type: 'choice', time: 8,
+                        options: [
+                            { text: '休息是為了走更長的路，過勞只會減低效率。', type: 'strong', shout: '異議！', dmg: 25, feedback: '強調了可持續發展的重要性。' },
+                            { text: '十本太多了吧...', type: 'neutral', dmg: 5, feedback: '語氣太弱，無法說服家長。' },
+                            { text: '我也想做，但手很累。', type: 'weak', dmg: -15, feedback: '藉口！' }
+                        ]
+                    },
+                    { speaker: '怪獸家長', text: '效率？只要做得夠多，自然就會熟能生巧！這是題海戰術！', mood: 'smug' },
+                    {
+                        type: 'choice', time: 8,
+                        options: [
+                            { text: '假期應該用來發展課外興趣，擴闊眼界，而不只是做題。', type: 'strong', shout: '等等！', dmg: 30, feedback: '提出了更有價值的替代方案。' },
+                            { text: '好吧，我會努力做的。', type: 'weak', dmg: -30, feedback: '你屈服了...' },
+                            { text: '其實我都不懂做。', type: 'weak', dmg: -20, feedback: '這只會令家長更生氣！' }
+                        ]
+                    },
+                    { speaker: '怪獸家長', text: '興趣能當飯吃嗎？考不到大學，你的人生就完蛋了！', mood: 'angry' },
+                    {
+                        type: 'choice', time: 10,
+                        options: [
+                            { text: '多元發展才是未來的致勝關鍵，死讀書已經過時了！', type: 'strong', shout: '突破！', dmg: 45, feedback: '宏大的世界觀！' },
+                            { text: '大學不是唯一的出路。', type: 'neutral', dmg: 15, feedback: '雖然正確，但在家長耳中是歪理。' }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'uniform',
+                title: '應否強制學生穿校服',
+                desc: '傳統vs自由的經典對決',
+                difficulty: 'Easy',
+                opponent: '紀律風紀',
+                avatar: '👮‍♂️',
+                script: [
+                    { speaker: '紀律風紀', text: '校服是紀律的象徵！如果不穿校服，學校還成何體統？', mood: 'angry' },
+                    {
+                        type: 'choice',
+                        time: 10,
+                        options: [
+                            { text: '紀律在於內心，而不在於外表！', type: 'strong', shout: '異議！', dmg: 25, feedback: '漂亮！直擊核心價值！' },
+                            { text: '但校服如果不舒服，會影響學習...', type: 'neutral', dmg: 10, feedback: '論點尚可，但不夠有力。' },
+                            { text: '大家都穿一樣很沉悶耶', type: 'weak', dmg: -10, feedback: '這是主觀感受，不是有力論據。' }
+                        ]
+                    },
+                    { speaker: '紀律風紀', text: '哼，但穿校服能防止學生互相攀比名牌衣物，這是為了保護貧窮學生！', mood: 'smug' },
+                    {
+                        type: 'choice',
+                        time: 8,
+                        options: [
+                            { text: '攀比可以用其他方式解決，例如限制飾物', type: 'neutral', dmg: 10, feedback: '有道理，但未完全反駁。' },
+                            { text: '那是否連鞋子、書包都要統一？這邏輯不攻自破！', type: 'strong', shout: '等等！', dmg: 30, feedback: '精彩的反證法！' },
+                            { text: '有錢人還是會炫耀的啦', type: 'weak', dmg: -5, feedback: '太過口語化了。' }
+                        ]
+                    },
+                    { speaker: '紀律風紀', text: '總之... 這是學校傳統！傳統就是不可挑戰的！', mood: 'desperate' },
+                    {
+                        type: 'choice',
+                        time: 5, // pressure!
+                        options: [
+                            { text: '如果傳統是錯的，就應該改變！', type: 'strong', shout: '突破！', dmg: 45, feedback: '致命一擊！' },
+                            { text: '好吧，傳統也是要尊重的...', type: 'weak', dmg: -20, feedback: '你動搖了嗎？' },
+                            { text: '老師說得對...', type: 'weak', dmg: -30, feedback: '你完全放棄了思考！' }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        // --- SUDDEN DEATH DATA ---
+        const SUDDEN_DEATH_SCRIPT = [
+            {
+                speaker: '對手', text: '你的論點充滿了漏洞！你根本沒有想清楚！', mood: 'angry',
+                type: 'choice', time: 5,
+                options: [
+                    { text: '漏洞在哪裡？請具體指出來，不要含血噴人！', type: 'strong', shout: '反對！', dmg: 30, feedback: '有力的防守！' },
+                    { text: '我...我會再回去想想...', type: 'weak', dmg: -20, feedback: '氣勢上輸了！' },
+                    { text: '你的論點才有漏洞呢！', type: 'neutral', dmg: 10, feedback: '反彈！' }
+                ]
+            },
+            {
+                speaker: '對手', text: '我聽不下去了！你這完全是強詞奪理！', mood: 'angry',
+                type: 'choice', time: 5,
+                options: [
+                    { text: '這叫邏輯推演！如果你聽不明白，我可以再解釋一次！', type: 'strong', shout: '異議！', dmg: 30, feedback: '展現了自信！' },
+                    { text: '對不起...', type: 'weak', dmg: -25, feedback: '居然道歉了？' },
+                    { text: '你才強詞奪理！', type: 'neutral', dmg: 10, feedback: '口舌之爭。' }
+                ]
+            },
+            {
+                speaker: '對手', text: '這一點都不切實際！你有考慮過現實情況嗎？', mood: 'thinking',
+                type: 'choice', time: 6,
+                options: [
+                    { text: '理想雖然遙遠，但如果連想都不敢想，社會如何進步？', type: 'strong', shout: '突破！', dmg: 35, feedback: '昇華了主題！' },
+                    { text: '現實確實很殘酷...', type: 'weak', dmg: -20, feedback: '被現實打敗了。' },
+                    { text: '實際情況我很清楚。', type: 'neutral', dmg: 5, feedback: '平平無奇的回應。' }
+                ]
+            },
+            {
+                speaker: '對手', text: '你說了這麼多，有數據支持嗎？還是隨口說說？', mood: 'smug',
+                type: 'choice', time: 7,
+                options: [
+                    { text: '邏輯本身就是最強的證明！不需要數據也能推導出真理！', type: 'strong', shout: '看招！', dmg: 30, feedback: '雖然有點牽強，但氣勢十足！' },
+                    { text: '數據...我沒有帶來...', type: 'weak', dmg: -30, feedback: '準備不足！' },
+                    { text: '你自己去查吧。', type: 'neutral', dmg: 5, feedback: '太不負責任了。' }
+                ]
+            },
+            {
+                speaker: '對手', text: '我不認同！這對其他人不公平！', mood: 'angry',
+                type: 'choice', time: 6,
+                options: [
+                    { text: '世界本來就沒有絕對的公平，我們追求的是相對的公義！', type: 'strong', shout: '異議！', dmg: 35, feedback: '哲學層次的打擊！' },
+                    { text: '也是呢...', type: 'weak', dmg: -15, feedback: '動搖了。' },
+                    { text: '沒辦法啦。', type: 'neutral', dmg: 5, feedback: '無奈也是一種態度。' }
+                ]
+            }
+        ];
+
+        // --- STATE ---
+        let state = {
+            hpPlayer: 100,
+            hpOpponent: 100,
+            combo: 0,
+            score: 0,
+            timelineIndex: 0,
+            currentTopic: null,
+            timerInterval: null,
+            inSuddenDeath: false
+        };
+
+        // --- DOM ---
+        const els = {
+            screens: document.querySelectorAll('.screen'),
+            startList: document.querySelector('#start-screen .grid'),
+            dialogueBox: document.getElementById('dialogue-panel'),
+            speaker: document.getElementById('speaker-name'),
+            text: document.getElementById('dialogue-content'),
+            nextInd: document.getElementById('next-indicator'),
+            choiceOverlay: document.getElementById('choice-overlay'),
+            choicesList: document.getElementById('choices-list'),
+            timerBar: document.getElementById('timer-bar-container'),
+            timerFill: document.getElementById('timer-fill'),
+            charSprite: document.getElementById('char-sprite'),
+            hpP: document.getElementById('hp-width-p'),
+            hpO: document.getElementById('hp-width-o'),
+            comboCounter: document.getElementById('combo-display'),
+            comboNum: document.getElementById('combo-num'),
+            shoutOverlay: document.querySelector('.shout-overlay'),
+            shoutText: document.getElementById('shout-text-el')
+        };
+
+        // --- INIT ---
+        function init() {
+            // Build Topic List
+            TOPICS.forEach(topic => {
+                const btn = document.createElement('button');
+                btn.className = "flex flex-col items-start p-6 bg-gray-800 hover:bg-gray-700 border-l-4 border-blue-500 rounded shadow-lg transition transform hover:-translate-y-1";
+                btn.innerHTML = `
+                    <h3 class="text-2xl font-bold text-blue-400 mb-1">${topic.title}</h3>
+                    <p class="text-gray-400 text-sm mb-3">${topic.desc}</p>
+                    <span class="px-2 py-1 bg-gray-900 text-xs rounded text-gray-300">Difficulty: ${topic.difficulty}</span>
+                `;
+                btn.onclick = () => startGame(topic);
+                els.startList.appendChild(btn);
+            });
+        }
+
+        function switchScreen(id) {
+            els.screens.forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        // --- GAME LOOP ---
+        function startGame(topic) {
+            state = {
+                hpPlayer: 100,
+                hpOpponent: 100,
+                combo: 0,
+                score: 0,
+                timelineIndex: 0,
+                currentTopic: topic,
+                timerInterval: null,
+                inSuddenDeath: false
+            };
+
+            updateHUD();
+            switchScreen('game-screen');
+            els.charSprite.textContent = topic.avatar;
+            processTimeline();
+        }
+
+        function processTimeline() {
+            let step = state.currentTopic.script[state.timelineIndex];
+
+            // --- SUDDEN DEATH LOGIC ---
+            if (!step) {
+                if (state.hpOpponent > 0) {
+                    if (!state.inSuddenDeath) {
+                        // First time entry warning
+                        state.inSuddenDeath = true;
+                        step = { speaker: "系統", text: "雙方僵持不下... 進入殊死戰模式！(Sudden Death)\n直到一方倒下為止！", mood: 'intense' };
+                    } else {
+                        // Pick random step
+                        const rand = Math.floor(Math.random() * SUDDEN_DEATH_SCRIPT.length);
+                        // Clone to avoid modifying original reference
+                        const template = SUDDEN_DEATH_SCRIPT[rand];
+                        step = JSON.parse(JSON.stringify(template));
+                        step.speaker = state.currentTopic.opponent; // Override speaker name
+                    }
+                } else {
+                    endGame(true); // Win
+                    return;
+                }
+            }
+
+            if (step.type === 'choice') {
+                showChoices(step);
+            } else {
+                showDialogue(step);
+            }
+        }
+
+        function showDialogue(step) {
+            els.dialogueBox.style.display = 'flex';
+            els.choiceOverlay.classList.add('hidden');
+            els.choiceOverlay.classList.remove('flex');
+
+            els.speaker.textContent = step.speaker || state.currentTopic.opponent;
+            els.speaker.style.display = 'block';
+
+            // Mood handling
+            els.charSprite.className = 'char-emoji'; // reset
+            if (step.mood === 'angry' || step.mood === 'intense') {
+                els.charSprite.classList.add('char-shake');
+                document.getElementById('game-screen').classList.add('bg-intense');
+            } else {
+                document.getElementById('game-screen').classList.remove('bg-intense');
+            }
+            if (step.mood === 'sad') els.charSprite.style.filter = "grayscale(1)";
+            else els.charSprite.style.filter = "none";
+
+            // Typing effect
+            els.text.textContent = "";
+            els.nextInd.style.display = 'none';
+
+            let i = 0;
+            const interval = setInterval(() => {
+                els.text.textContent += step.text[i];
+                i++;
+                if (i >= step.text.length) {
+                    clearInterval(interval);
+                    els.nextInd.style.display = 'block';
+                    els.dialogueBox.onclick = nextClick;
+                }
+            }, 30);
+
+            // Handler for skipping type or going next
+            const nextClick = () => {
+                if (i < step.text.length) {
+                    // Skip typing
+                    clearInterval(interval);
+                    els.text.textContent = step.text;
+                    els.nextInd.style.display = 'block';
+                    i = step.text.length;
+                } else {
+                    // Next step
+                    els.dialogueBox.onclick = null;
+                    if (!state.inSuddenDeath || step.speaker === "系統") {
+                        // Only advance index if we are in normal mode OR it was the system announcement
+                        if (!state.inSuddenDeath || step.speaker === "系統") state.timelineIndex++;
+                    }
+                    // In SuddenDeath, we don't advance timelineIndex, we just loop processTimeline to pick random again
+                    processTimeline();
+                }
+            };
+            els.dialogueBox.onclick = nextClick;
+        }
+
+        function showChoices(step) {
+            els.dialogueBox.style.display = 'none'; // hide dialogue to focus
+            els.choiceOverlay.classList.remove('hidden');
+            els.choiceOverlay.classList.add('flex');
+            els.choicesList.innerHTML = '';
+
+            // Timer
+            startTimer(step.time || 10, () => {
+                // Time up punishment
+                handleChoice({ dmg: -20, feedback: '思考時間太久了！被對方抓住了猶豫的機會！', type: 'weak' });
+            });
+
+            // Shuffle options slightly? No, keep logic order for learning.
+            step.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.textContent = opt.text;
+                btn.onclick = () => {
+                    stopTimer();
+                    handleChoice(opt);
+                };
+                els.choicesList.appendChild(btn);
+            });
+        }
+
+        function handleChoice(opt) {
+            // Mechanics
+            if (opt.shout) triggerShout(opt.shout);
+
+            let scoreGain = 0;
+            let dmg = opt.dmg;
+
+            // Sudden Death Damage Multiplier
+            if (state.inSuddenDeath) {
+                dmg = dmg > 0 ? dmg * 1.5 : dmg * 1.2;
+            }
+
+            if (opt.type === 'strong') {
+                state.combo++;
+                scoreGain = 100 * state.combo;
+                state.hpOpponent -= dmg;
+                showCombo();
+                triggerShake('opponent');
+            } else if (opt.type === 'weak') {
+                state.combo = 0;
+                state.hpPlayer += dmg; // dmg is negative here
+                if (dmg > 0) state.hpPlayer -= dmg;
+                triggerShake('player');
+            } else {
+                // Neutral
+                state.combo = 0;
+                scoreGain = 50;
+                state.hpOpponent -= (dmg || 5);
+            }
+
+            // Clamp HP
+            if (state.hpPlayer < 0) state.hpPlayer = 0;
+            if (state.hpOpponent < 0) state.hpOpponent = 0;
+            state.score += scoreGain;
+            updateHUD();
+
+            // Show feedback sequence
+            // We inject a temporary "dummy" dialogue step for feedback
+            els.choiceOverlay.classList.add('hidden');
+            els.choiceOverlay.classList.remove('flex');
+
+            const feedbackStep = {
+                speaker: "系統判定",
+                text: opt.feedback,
+                mood: 'normal'
+            };
+
+            // Hack: manually show this dialogue, then on next click go to next real index
+            els.dialogueBox.style.display = 'flex';
+            els.speaker.textContent = feedbackStep.speaker;
+            els.text.textContent = feedbackStep.text;
+            els.nextInd.style.display = 'block';
+
+            els.dialogueBox.onclick = () => {
+                els.dialogueBox.onclick = null;
+
+                // Check win/loss
+                if (state.hpPlayer <= 0) endGame(false);
+                else if (state.hpOpponent <= 0) endGame(true);
+                else {
+                    if (!state.inSuddenDeath) state.timelineIndex++;
+                    processTimeline();
+                }
+            };
+        }
+
+        // --- MECHANICS ---
+        function startTimer(seconds, onComplete) {
+            els.timerBar.style.display = 'block';
+            els.timerFill.style.width = '100%';
+            els.timerFill.style.transition = `width ${seconds}s linear`;
+
+            // Force reflow
+            void els.timerFill.offsetWidth;
+
+            els.timerFill.style.width = '0%';
+
+            state.timerInterval = setTimeout(() => {
+                onComplete();
+            }, seconds * 1000);
+        }
+
+        function stopTimer() {
+            clearTimeout(state.timerInterval);
+            els.timerBar.style.display = 'none';
+            els.timerFill.style.transition = 'none';
+        }
+
+        function triggerShout(text) {
+            els.shoutText.textContent = text;
+            els.shoutText.classList.remove('shout-anim');
+            void els.shoutText.offsetWidth;
+            els.shoutText.classList.add('shout-anim');
+        }
+
+        function triggerShake(target) {
+            if (target === 'player') {
+                document.body.classList.add('char-shake');
+                setTimeout(() => document.body.classList.remove('char-shake'), 400);
+                els.hpP.parentElement.classList.add('border-red-500'); // flash border
+                setTimeout(() => els.hpP.parentElement.classList.remove('border-red-500'), 400);
+            } else {
+                els.charSprite.classList.add('char-damage');
+                setTimeout(() => els.charSprite.classList.remove('char-damage'), 500);
+            }
+        }
+
+        function showCombo() {
+            if (state.combo > 1) {
+                els.comboNum.textContent = state.combo;
+                els.comboCounter.classList.add('show');
+                setTimeout(() => els.comboCounter.classList.remove('show'), 1500);
+            }
+        }
+
+        function updateHUD() {
+            els.hpP.style.width = state.hpPlayer + '%';
+            els.hpO.style.width = state.hpOpponent + '%';
+        }
+
+        function endGame(victory) {
+            switchScreen('result-screen');
+            const resultMsg = document.getElementById('result-msg');
+            const gradeEl = document.getElementById('final-grade');
+            const scoreEl = document.getElementById('final-score');
+
+            scoreEl.textContent = "Score: " + state.score;
+
+            if (victory) {
+                let grade = 'C';
+                if (state.hpPlayer > 80) grade = 'S';
+                else if (state.hpPlayer > 50) grade = 'A';
+                else if (state.hpPlayer > 20) grade = 'B';
+
+                gradeEl.textContent = grade;
+                gradeEl.style.color = '#facc15';
+                resultMsg.textContent = "恭喜！你的辯論技巧無懈可擊，成功說服了對手！";
+            } else {
+                gradeEl.textContent = 'F';
+                gradeEl.style.color = '#ef4444';
+                resultMsg.textContent = "很遺憾，你的論點被駁倒了。下次請準備更充分的論據吧！";
+            }
+        }
+
+        // Start
+        init();
+
+    </script>
+
+    <!-- Visit Counter -->
+    <div id="visit-counter-container"></div>
+
+    <!-- Visit Counter Script -->
+    <script src="../../visit-counter.js"></script>
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
+        VisitCounter.init('seconardychinese/oral_exam_simulator/index', {
+            scriptUrl: SCRIPT_URL,
+            containerId: 'visit-counter-container'
+        });
+    </script>
+</body>
+
+</html>
+

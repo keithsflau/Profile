@@ -1,0 +1,227 @@
+﻿<!DOCTYPE html>
+<html lang="zh-HK">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>錯別字神探 Typo Detective</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+        }
+
+        .typo {
+            color: #ef4444;
+            text-decoration: underline wavy;
+            cursor: pointer;
+        }
+
+        .typo.found {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .message-bubble {
+            background: white;
+            border-radius: 20px;
+            padding: 12px 16px;
+            max-width: 70%;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .bubble-left {
+            align-self: flex-start;
+            background: #f3f4f6;
+        }
+
+        .bubble-right {
+            align-self: flex-end;
+            background: #dbeafe;
+        }
+    </style>
+    <link rel="stylesheet" href="../../visit-counter.css">
+</head>
+
+<body class="text-white p-4 min-h-screen">
+    <div class="max-w-2xl mx-auto">
+        <div class="text-center mb-6">
+            <h1 class="text-5xl font-bold mb-2 text-yellow-400">🔍 錯別字神探</h1>
+            <p class="text-gray-300">找出對話中的所有錯別字來破案！</p>
+        </div>
+
+        <div class="bg-slate-800/50 backdrop-blur rounded-2xl p-6">
+            <div class="flex justify-between mb-4">
+                <div class="bg-slate-700 px-4 py-2 rounded-lg">
+                    <span class="text-sm">案件進度</span>
+                    <div class="text-2xl font-bold text-yellow-400"><span id="found">0</span> / <span
+                            id="total">0</span></div>
+                </div>
+                <div class="bg-slate-700 px-4 py-2 rounded-lg">
+                    <span class="text-sm">案件</span>
+                    <div class="text-2xl font-bold text-cyan-400" id="case-number">1</div>
+                </div>
+            </div>
+
+            <div id="chat-window"
+                class="bg-slate-900/50 rounded-xl p-4 h-96 overflow-y-auto flex flex-col space-y-2 mb-4">
+                <!-- Messages will be injected here -->
+            </div>
+
+            <button onclick="nextCase()" id="next-btn" disabled
+                class="w-full bg-gradient-to-r from-yellow-600 to-orange-600 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed py-3 rounded-xl font-bold transition-all">
+                下一案件 Next Case
+            </button>
+        </div>
+
+        <div id="victory" class="hidden fixed inset-0 flex items-center justify-center bg-black/90 z-50">
+            <div class="bg-slate-800 p-12 rounded-2xl text-center max-w-md">
+                <div class="text-6xl mb-4">🏆</div>
+                <h2 class="text-4xl font-bold mb-4 text-yellow-400">全部破案！</h2>
+                <p class="text-gray-300 mb-6">你成功找出所有錯別字，成為頂尖神探！</p>
+                <button onclick="location.reload()"
+                    class="bg-gradient-to-r from-purple-600 to-pink-600 px-8 py-3 rounded-xl font-bold">重新挑戰</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CASES = [
+            {
+                id: 1,
+                messages: [
+                    { sender: "小明", text: "我今日去左圖書館，借左幾本書。", side: "left" },
+                    { sender: "小芳", text: "係咩書呀？", side: "right" },
+                    { sender: "小明", text: "有一本關於歷史的，講秦朝統一六國的故事。秦始皇建力萬里長城。", side: "left", typos: [{ wrong: "建力", correct: "建立" }] },
+                    { sender: "小芳", text: "哇，聽起來好有趣！我對古代歷史都好有性趣。", side: "right", typos: [{ wrong: "性趣", correct: "興趣" }] },
+                    { sender: "小明", text: "係呀，而且書入面有好多彩色插圖，令人一目了燃。", side: "left", typos: [{ wrong: "了燃", correct: "了然" }] }
+                ]
+            },
+            {
+                id: 2,
+                messages: [
+                    { sender: "老師", text: "同學們，下星期我們要去郊遊，請大家做好準備。", side: "left" },
+                    { sender: "學生A", text: "老師，我們需要帶什麼東西？", side: "right" },
+                    { sender: "老師", text: "要帶水、零食、防曬用品，還要穿合適的鞋，因為要行山。記得要準時集合，不要遲到。", side: "left" },
+                    { sender: "學生B", text: "明白！我會準時到逹。", side: "right", typos: [{ wrong: "到逹", correct: "到達" }] },
+                    { sender: "學生C", text: "我都好期待！聽說山頂的風景很優美，到時拍照一定很上像。", side: "right", typos: [{ wrong: "上像", correct: "上相" }] }
+                ]
+            },
+            {
+                id: 3,
+                messages: [
+                    { sender: "媽媽", text: "阿仔，你作業做完未？", side: "left" },
+                    { sender: "兒子", text: "做緊呀，不過有啲唔識。", side: "right" },
+                    { sender: "媽媽", text: "唔識咩？我幫你睇下。", side: "left" },
+                    { sender: "兒子", text: "呢題數學題，我計左好多次都唔岩。可能係我粗心大意，經常算錯數。", side: "right", typos: [{ wrong: "粗心大意", correct: "粗心大意" }] }, // This one is actually correct, let me fix
+                    { sender: "媽媽", text: "等我睇下...你呢度寫錯左符號，應該係加號，唔係減號。你要細心點，唔好再掉以輕心。", side: "left", typos: [{ wrong: "掉以輕心", correct: "掉以輕心" }] } // Also correct, let me revise
+                ]
+            }
+        ];
+
+        // REVISE CASES:
+        const CASES_REVISED = [
+            {
+                id: 1,
+                messages: [
+                    { sender: "小明", text: "我今日去左圖書館，借左幾本書。", side: "left" },
+                    { sender: "小芳", text: "係咩書呀？", side: "right" },
+                    { sender: "小明", text: "有一本關於歷史的，講秦朝統一六國的故事。秦始皇<span class='typo' data-correct='建立'>建力</span>萬里長城。", side: "left" },
+                    { sender: "小芳", text: "哇，聽起來好有趣！我對古代歷史都好有<span class='typo' data-correct='興趣'>性趣</span>。", side: "right" },
+                    { sender: "小明", text: "係呀，而且書入面有好多彩色插圖，令人一目<span class='typo' data-correct='了然'>了燃</span>。", side: "left" }
+                ]
+            },
+            {
+                id: 2,
+                messages: [
+                    { sender: "老師", text: "同學們，下星期我們要去郊遊，請大家做好準備。", side: "left" },
+                    { sender: "學生A", text: "老師，我們需要帶什麼東西？", side: "right" },
+                    { sender: "老師", text: "要帶水、零食、防曬用品，還要穿合適的鞋，因為要行山。記得要<span class='typo' data-correct='準時'>準時</span>集合。", side: "left" },
+                    { sender: "學生B", text: "明白！我會準時<span class='typo' data-correct='到達'>到逹</span>。", side: "right" },
+                    { sender: "學生C", text: "我都好期待！聽說山頂的風景很優美，到時拍照一定很<span class='typo' data-correct='上相'>上像</span>。", side: "right" }
+                ]
+            },
+            {
+                id: 3,
+                messages: [
+                    { sender: "警察", text: "你好，我們懷疑這宗失竊案與你有關。", side: "left" },
+                    { sender: "嫌疑人", text: "我真係冇做過！我當時在家中休<span class='typo' data-correct='息'>憩</span>。", side: "right" },
+                    { sender: "警察", text: "有證人看見你出現在現場附近。", side: "left" },
+                    { sender: "嫌疑人", text: "那一定是他們<span class='typo' data-correct='認錯'>認措</span>人了！我絕對清白，沒有任何<span class='typo' data-correct='犯罪'>犯最</span>記錄。", side: "right" }
+                ]
+            }
+        ];
+
+        let currentCase = 0;
+        let foundCount = 0;
+        let totalTypos = 0;
+
+        function loadCase() {
+            if (currentCase >= CASES_REVISED.length) {
+                document.getElementById('victory').classList.remove('hidden');
+                return;
+            }
+
+            const caseData = CASES_REVISED[currentCase];
+            const chatWindow = document.getElementById('chat-window');
+            chatWindow.innerHTML = '';
+
+            foundCount = 0;
+            totalTypos = caseData.messages.reduce((sum, msg) => sum + (msg.text.match(/class='typo'/g) || []).length, 0);
+
+            document.getElementById('case-number').textContent = caseData.id;
+            document.getElementById('total').textContent = totalTypos;
+            document.getElementById('found').textContent = 0;
+            document.getElementById('next-btn').disabled = true;
+
+            caseData.messages.forEach(msg => {
+                const bubble = document.createElement('div');
+                bubble.className = `message-bubble bubble-${msg.side}`;
+                bubble.innerHTML = `<div class="text-xs text-gray-500 mb-1">${msg.sender}</div><div class="text-gray-800">${msg.text}</div>`;
+                chatWindow.appendChild(bubble);
+            });
+
+            // Add click handlers
+            document.querySelectorAll('.typo').forEach(typo => {
+                typo.addEventListener('click', function () {
+                    if (!this.classList.contains('found')) {
+                        this.classList.add('found');
+                        this.textContent = this.dataset.correct;
+                        foundCount++;
+                        document.getElementById('found').textContent = foundCount;
+
+                        if (foundCount === totalTypos) {
+                            document.getElementById('next-btn').disabled = false;
+                        }
+                    }
+                });
+            });
+        }
+
+        function nextCase() {
+            currentCase++;
+            loadCase();
+        }
+
+        loadCase();
+    </script>
+
+    <!-- Visit Counter -->
+    <div id="visit-counter-container"></div>
+
+    <!-- Visit Counter Script -->
+    <script src="../../visit-counter.js"></script>
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
+        VisitCounter.init('seconardychinese/typo_detective/index', {
+            scriptUrl: SCRIPT_URL,
+            containerId: 'visit-counter-container'
+        });
+    </script>
+</body>
+
+</html>
+

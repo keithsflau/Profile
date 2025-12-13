@@ -1,0 +1,32 @@
+void Shoot()
+{
+    // 1. 獲取畫面正中心的射線 (0.5, 0.5 代表螢幕長寬的一半)
+    Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+    
+    RaycastHit hit;
+    Vector3 targetPoint;
+
+    // 2. 檢測射線是否打到了東西
+    if (Physics.Raycast(ray, out hit))
+    {
+        // 如果打到了牆壁或地板，目標就是那個點
+        targetPoint = hit.point;
+    }
+    else
+    {
+        // 如果前面是空的（例如射向天空），目標設為遠處的一個點（例如 1000 米外）
+        targetPoint = ray.GetPoint(1000); 
+    }
+
+    // 3. 計算發射方向：目標點 - 發射點 (你的花生成的位置)
+    Vector3 direction = (targetPoint - spawnPoint.position).normalized;
+
+    // 4. 生成花並施加力
+    GameObject flower = Instantiate(flowerPrefab, spawnPoint.position, Quaternion.identity);
+    
+    // 這裡讓花朝著計算出的 direction 飛去
+    // 如果想要完全直線，不要加向上的力，只加 forward
+    flower.GetComponent<Rigidbody>().velocity = direction * shootForce; 
+    
+    // 如果你的花受重力影響會下墜，你可能需要稍微把目標點抬高一點點，或者增加 shootForce (速度)
+}

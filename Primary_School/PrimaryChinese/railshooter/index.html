@@ -1,0 +1,430 @@
+﻿<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>語法飛車 (Grammar Coaster)</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #050510; font-family: "Microsoft JhengHei", "Heiti TC", sans-serif; }
+        .hud-text { text-shadow: 0 0 10px rgba(0, 255, 255, 0.8); }
+        
+        /* 震動效果 */
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+        .shake-effect { animation: shake 0.5s; }
+        
+        .glitch-overlay { background: rgba(255, 0, 0, 0.3); mix-blend-mode: overlay; }
+        .success-overlay { background: rgba(0, 255, 0, 0.2); mix-blend-mode: overlay; }
+    </style>
+    <link rel="stylesheet" href="../../visit-counter.css">
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- 遊戲平衡設定 ---
+        const INITIAL_SPEED = 0.08;   
+        const SPEED_INCREMENT = 0.005; 
+        const SPEED_DECREMENT = 0.02;  
+        const MIN_SPEED = 0.05;       
+        const MAX_LIVES = 2;          
+        
+        // 閘門間距 (保持長距離)
+        const GATE_SPACING = 120; 
+
+        const QUESTIONS = [
+            { sentence: "_______ 下雨，所以比賽取消。", correct: "因為", wrong: "雖然" },
+            { sentence: "_______ 他很努力，但是考試還是不及格。", correct: "雖然", wrong: "不但" },
+            { sentence: "這本書 _______ 有趣，而且很有教育意義。", correct: "不但", wrong: "只要" },
+            { sentence: "_______ 你肯努力，就一定會成功。", correct: "只要", wrong: "即使" },
+            { sentence: "_______ 天氣很冷，他還是堅持去游泳。", correct: "即使", wrong: "為了" },
+            { sentence: "他 _______ 做完了作業，還預習了明天的功課。", correct: "不僅", wrong: "如果" },
+            { sentence: "_______ 明天不下雨，我們就去野餐。", correct: "如果", wrong: "既然" },
+            { sentence: "_______ 你已經決定了，我就不再多說。", correct: "既然", wrong: "除非" },
+            { sentence: "_______ 沒人反對，我們就這樣決定吧。", correct: "既然", wrong: "要是" },
+            { sentence: "這件衣服 _______ 漂亮，而且價格便宜。", correct: "不但", wrong: "寧可" }
+        ];
+
+        // --- 2D 文字轉貼圖 (巨型化優化) ---
+        function createTextTexture(text, color = '#00ffff') {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            // 加大 Canvas 解析度以確保放大後不模糊
+            canvas.width = 1024;
+            canvas.height = 512;
+            
+            // 背景框
+            ctx.fillStyle = 'rgba(0,0,0,0.8)'; // 更黑一點，對比更高
+            ctx.fillRect(20, 20, 984, 472);
+            
+            // 邊框
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 30; // 邊框加粗
+            ctx.strokeRect(20, 20, 984, 472);
+
+            // 文字 (極大)
+            ctx.font = 'bold 300px "Microsoft JhengHei", "Heiti TC", sans-serif'; // 字體極大化
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(text, 512, 256);
+            
+            // 發光效果
+            ctx.shadowColor = color;
+            ctx.shadowBlur = 50;
+            ctx.fillText(text, 512, 256);
+
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        const Game = () => {
+            const [gameState, setGameState] = useState('START');
+            const [score, setScore] = useState(0);
+            const [lives, setLives] = useState(MAX_LIVES);
+            const [speedDisplay, setSpeedDisplay] = useState(0);
+            const [currentQuestion, setCurrentQuestion] = useState(null);
+            const [feedback, setFeedback] = useState(null); 
+            
+            const mountRef = useRef(null);
+            
+            // Three.js Refs
+            const sceneRef = useRef(null);
+            const cameraRef = useRef(null);
+            const playerRef = useRef(null);
+            const gatesRef = useRef([]);
+            const speedRef = useRef(INITIAL_SPEED);
+            const laneRef = useRef(0); 
+            const scoreRef = useRef(0);
+            const livesRef = useRef(MAX_LIVES);
+            const questionIndexRef = useRef(0);
+
+            useEffect(() => {
+                if (!mountRef.current) return;
+
+                // 1. 初始化場景
+                const scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x050510);
+                // [修改] 霧氣變得極淡，為了能在遠處看清大字
+                scene.fog = new THREE.FogExp2(0x050510, 0.008); 
+                sceneRef.current = scene;
+
+                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                // 相機稍微拉高一點，避免被巨大的閘門遮擋視線
+                camera.position.set(0, 4, 7); 
+                cameraRef.current = camera;
+
+                const renderer = new THREE.WebGLRenderer({ antialias: true });
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                mountRef.current.appendChild(renderer.domElement);
+
+                // 2. 燈光
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+                scene.add(ambientLight);
+                const dirLight = new THREE.DirectionalLight(0xff00ff, 1.2);
+                dirLight.position.set(0, 20, 10);
+                scene.add(dirLight);
+
+                // 3. 地面與跑道線
+                const gridHelper = new THREE.GridHelper(200, 100, 0x555555, 0x111111);
+                gridHelper.position.y = -1;
+                scene.add(gridHelper);
+                
+                const lineGeo = new THREE.PlaneGeometry(0.15, 200); // 線稍微加粗
+                const lineMat = new THREE.MeshBasicMaterial({ color: 0x444444 });
+                
+                const leftLine = new THREE.Mesh(lineGeo, lineMat);
+                leftLine.rotation.x = -Math.PI / 2;
+                leftLine.position.set(-1, -0.98, -50);
+                scene.add(leftLine);
+
+                const rightLine = new THREE.Mesh(lineGeo, lineMat);
+                rightLine.rotation.x = -Math.PI / 2;
+                rightLine.position.set(1, -0.98, -50);
+                scene.add(rightLine);
+
+                // 4. 玩家
+                const geometry = new THREE.ConeGeometry(0.5, 1.5, 4); 
+                const material = new THREE.MeshPhongMaterial({ color: 0x00ffff, emissive: 0x002266, flatShading: true });
+                const player = new THREE.Mesh(geometry, material);
+                player.rotation.x = -Math.PI / 2;
+                player.rotation.y = Math.PI / 4; 
+                scene.add(player);
+                playerRef.current = player;
+                
+                const engine = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.4), new THREE.MeshBasicMaterial({ color: 0x00ffff }));
+                engine.position.y = -0.5;
+                player.add(engine);
+
+                // 5. 閘門生成 (巨型化)
+                const spawnGate = (zPos, qIndex) => {
+                    const question = QUESTIONS[qIndex % QUESTIONS.length];
+                    const isLeftCorrect = Math.random() > 0.5;
+                    const leftText = isLeftCorrect ? question.correct : question.wrong;
+                    const rightText = isLeftCorrect ? question.wrong : question.correct;
+                    const correctLane = isLeftCorrect ? -1 : 1;
+
+                    const gateGroup = new THREE.Group();
+                    gateGroup.position.z = zPos;
+                    gateGroup.userData = { type: 'gate', correctLane: correctLane, processed: false, questionIndex: qIndex };
+
+                    // [修改] 支柱: 加高加粗
+                    const poleGeo = new THREE.BoxGeometry(0.3, 10, 0.3); // 高度由 5 -> 10
+                    const poleMat = new THREE.MeshBasicMaterial({ color: 0xff00ff, wireframe: true });
+                    
+                    // 為了讓車子通過，支柱需要往兩側移開一點點
+                    const lPole1 = new THREE.Mesh(poleGeo, poleMat); lPole1.position.set(-3.5, 4, 0);
+                    const lPole2 = new THREE.Mesh(poleGeo, poleMat); lPole2.position.set(-0.5, 4, 0);
+                    
+                    const rPole1 = new THREE.Mesh(poleGeo, poleMat); rPole1.position.set(0.5, 4, 0);
+                    const rPole2 = new THREE.Mesh(poleGeo, poleMat); rPole2.position.set(3.5, 4, 0);
+                    
+                    // [修改] 文字板: 巨型化
+                    // 原本 2.2 x 1.1 -> 現在 3.0 x 1.8，非常大
+                    const planeGeo = new THREE.PlaneGeometry(3.0, 1.8); 
+                    
+                    const lSign = new THREE.Mesh(planeGeo, new THREE.MeshBasicMaterial({ map: createTextTexture(leftText, '#00ffff'), transparent: true }));
+                    lSign.position.set(-2, 4.5, 0); // 位置拉高，對應支柱
+                    
+                    const rSign = new THREE.Mesh(planeGeo, new THREE.MeshBasicMaterial({ map: createTextTexture(rightText, '#00ffff'), transparent: true }));
+                    rSign.position.set(2, 4.5, 0); 
+
+                    // 頂部裝飾條
+                    const topBarGeo = new THREE.BoxGeometry(3.2, 0.2, 0.2);
+                    const topBarMat = new THREE.MeshBasicMaterial({ color: 0x00ffff });
+                    const lTop = new THREE.Mesh(topBarGeo, topBarMat); lTop.position.set(-2, 9, 0);
+                    const rTop = new THREE.Mesh(topBarGeo, topBarMat); rTop.position.set(2, 9, 0);
+
+                    gateGroup.add(lPole1, lPole2, rPole1, rPole2, lSign, rSign, lTop, rTop);
+                    scene.add(gateGroup);
+                    gatesRef.current.push(gateGroup);
+                };
+
+                // 初始生成
+                for(let i=0; i<3; i++) {
+                    spawnGate(-60 - (i * GATE_SPACING), i); 
+                }
+                setCurrentQuestion(QUESTIONS[0]);
+
+                // --- 動畫循環 ---
+                let animationId;
+                const animate = () => {
+                    animationId = requestAnimationFrame(animate);
+
+                    if (gameState !== 'PLAYING') return;
+
+                    const currentSpeed = speedRef.current;
+                    setSpeedDisplay(Math.floor(currentSpeed * 300)); 
+
+                    // 1. 前進
+                    player.position.z -= currentSpeed;
+                    
+                    // 2. 鏡頭跟隨
+                    camera.position.z = player.position.z + 7; // 跟隨距離
+                    camera.position.x = player.position.x * 0.4;
+
+                    // 網格移動
+                    const gridZ = Math.floor(player.position.z / 10) * 10;
+                    gridHelper.position.z = gridZ;
+                    leftLine.position.z = player.position.z - 50; 
+                    rightLine.position.z = player.position.z - 50;
+
+                    // 3. 玩家左右移動
+                    const targetX = laneRef.current * 2; 
+                    player.position.x += (targetX - player.position.x) * 0.1; 
+                    player.rotation.z = -(player.position.x - targetX) * 0.3; 
+
+                    // 4. 閘門判定
+                    gatesRef.current.forEach((gate, index) => {
+                        const distZ = gate.position.z - player.position.z;
+                        
+                        if (Math.abs(distZ) < 0.5 && !gate.userData.processed) {
+                            gate.userData.processed = true;
+                            
+                            let playerLane = 0;
+                            if (player.position.x < -1) playerLane = -1;
+                            else if (player.position.x > 1) playerLane = 1;
+
+                            if (playerLane === gate.userData.correctLane) {
+                                scoreRef.current += 100;
+                                speedRef.current += SPEED_INCREMENT;
+                                setScore(scoreRef.current);
+                                setFeedback('HIT');
+                                setTimeout(() => setFeedback(null), 500);
+                            } else {
+                                livesRef.current -= 1;
+                                setLives(livesRef.current);
+                                speedRef.current = Math.max(MIN_SPEED, speedRef.current - SPEED_DECREMENT);
+                                
+                                setFeedback('MISS');
+                                setTimeout(() => setFeedback(null), 500);
+
+                                if (livesRef.current <= 0) {
+                                    setGameState('GAME_OVER');
+                                }
+                            }
+
+                            const nextQIndex = gate.userData.questionIndex + 1;
+                            const nextQ = QUESTIONS[nextQIndex % QUESTIONS.length];
+                            setCurrentQuestion(nextQ);
+                        }
+
+                        // 回收
+                        if (distZ > 20) { // 稍微晚一點移除，因為閘門很大
+                            scene.remove(gate);
+                            gatesRef.current.splice(index, 1);
+                            
+                            const lastGateZ = gatesRef.current[gatesRef.current.length-1].position.z;
+                            spawnGate(lastGateZ - GATE_SPACING, questionIndexRef.current + 3); 
+                            questionIndexRef.current++;
+                        }
+                    });
+
+                    renderer.render(scene, camera);
+                };
+
+                animate();
+
+                const handleResize = () => {
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                };
+                window.addEventListener('resize', handleResize);
+
+                return () => {
+                    cancelAnimationFrame(animationId);
+                    window.removeEventListener('resize', handleResize);
+                    mountRef.current.removeChild(renderer.domElement);
+                };
+            }, [gameState]);
+
+            useEffect(() => {
+                const handleKeyDown = (e) => {
+                    if (gameState !== 'PLAYING') return;
+                    if (e.key === 'ArrowLeft') laneRef.current = -1;
+                    else if (e.key === 'ArrowRight') laneRef.current = 1;
+                };
+                window.addEventListener('keydown', handleKeyDown);
+                return () => window.removeEventListener('keydown', handleKeyDown);
+            }, [gameState]);
+
+            const startGame = () => {
+                scoreRef.current = 0;
+                livesRef.current = MAX_LIVES;
+                speedRef.current = INITIAL_SPEED;
+                laneRef.current = 0;
+                questionIndexRef.current = 0;
+                
+                setScore(0);
+                setLives(MAX_LIVES);
+                setGameState('PLAYING');
+            };
+
+            return (
+                <div className="relative w-full h-screen overflow-hidden text-white select-none">
+                    <div ref={mountRef} className={`w-full h-full ${feedback === 'MISS' ? 'shake-effect' : ''}`}/>
+
+                    {gameState === 'PLAYING' && (
+                        <>
+                            {feedback === 'HIT' && <div className="absolute inset-0 success-overlay transition-opacity duration-300"></div>}
+                            {feedback === 'MISS' && <div className="absolute inset-0 glitch-overlay transition-opacity duration-300"></div>}
+
+                            <div className="absolute top-4 left-4 font-mono text-xl hud-text">
+                                <div className="text-cyan-400">速度: {speedDisplay} km/h</div>
+                                <div className="text-yellow-400">得分: {score}</div>
+                                <div className="mt-2 text-3xl">
+                                    {Array(lives).fill('❤️').join('')}
+                                    {Array(MAX_LIVES - lives).fill('🖤').join('')}
+                                </div>
+                            </div>
+
+                            <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 w-3/4 md:w-1/2 bg-black/70 border border-cyan-500 p-6 rounded-lg backdrop-blur-sm text-center">
+                                <h2 className="text-gray-400 text-sm mb-2 tracking-widest uppercase">題目</h2>
+                                <p className="text-2xl md:text-4xl font-bold text-white hud-text py-2">
+                                    {currentQuestion ? currentQuestion.sentence : "準備中..."}
+                                </p>
+                                <div className="mt-2 flex justify-between text-xl text-cyan-300 font-bold">
+                                    <span>&lt; 左</span>
+                                    <span>右 &gt;</span>
+                                </div>
+                            </div>
+                        </>
+                    )}
+
+                    {gameState === 'GAME_OVER' && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/90 z-50">
+                            <h1 className="text-6xl font-black text-red-500 mb-4 glitch-text">任務失敗</h1>
+                            <p className="text-2xl text-white mb-8">最終得分: <span className="text-yellow-400">{score}</span></p>
+                            <button onClick={startGame} className="px-8 py-4 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded text-xl shadow-lg">
+                                再次挑戰
+                            </button>
+                        </div>
+                    )}
+
+                    {gameState === 'START' && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/90 z-50">
+                            <h1 className="text-6xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500 mb-8 hud-text">
+                                語法飛車
+                            </h1>
+                            <div className="text-center space-y-4 max-w-lg">
+                                <p className="text-xl text-gray-300">左右移動，衝破正確的連接詞！</p>
+                                <div className="flex justify-center space-x-2 text-2xl">
+                                    {Array(MAX_LIVES).fill('❤️').join('')}
+                                </div>
+                                <p className="text-red-400 text-sm">只有 {MAX_LIVES} 次機會，速度會越來越快！</p>
+                                <button onClick={startGame} className="px-8 py-4 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded text-xl transform hover:scale-105 transition-all">
+                                    啟動引擎
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<Game />);
+    </script>
+
+    <!-- Visit Counter -->
+    <div id="visit-counter-container"></div>
+
+    <!-- Visit Counter Script -->
+    <script src="../../visit-counter.js"></script>
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
+        VisitCounter.init('primarychinese/railshooter/index', {
+            scriptUrl: SCRIPT_URL,
+            containerId: 'visit-counter-container'
+        });
+    </script>
+</body>
+</html>
+

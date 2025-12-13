@@ -1,0 +1,61 @@
+name: Deploy Idiom Zoo Race to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'PrimaryChinese/idiom-zoo-race/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: PrimaryChinese/idiom-zoo-race
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+      
+      - name: Install dependencies
+        run: npm install
+      
+      - name: Build
+        run: npm run build
+        env:
+          CI: false
+      
+      - name: Copy build files to deployment location
+        run: |
+          # 將構建輸出複製到當前目錄（覆蓋現有的 index.html 和 static 文件夾）
+          # 注意：這會覆蓋源文件夾中的 index.html，但這是部署所需的
+          cp -r build/* ./
+          # 確保 .gitignore 不會忽略這些文件
+          git add -f index.html static/ 2>/dev/null || true
+      
+      - name: Commit and push
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add PrimaryChinese/idiom-zoo-race/index.html PrimaryChinese/idiom-zoo-race/static/ 2>/dev/null || true
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Deploy idiom-zoo-race build [skip ci]"
+            git push
+          fi
+
