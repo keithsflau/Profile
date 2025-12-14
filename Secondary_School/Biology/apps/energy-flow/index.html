@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- SEO Meta Tags -->
+    <title>Energy Flow in Ecosystems - Interactive HKDSE Biology Tool</title>
+    <meta name="description" content="Interactive educational tool for HKDSE Biology students exploring energy flow in ecosystems, trophic levels, the 10% law, and ecological pyramids. Visualize energy transfer and understand inverted pyramids." />
+    <meta name="keywords" content="HKDSE Biology, Energy Flow, Trophic Levels, Ecological Pyramids, 10% Law, Food Chain, Energy Transfer, Biology Education, Hong Kong DSE" />
+    <meta name="author" content="HKDSE Biology Education" />
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Energy Flow in Ecosystems - HKDSE Biology" />
+    <meta property="og:description" content="Interactive tool to understand energy flow, trophic levels, and ecological pyramids" />
+    <meta property="og:type" content="website" />
+    
+    <link rel="stylesheet" href="../../../../visit-counter.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    
+    <!-- Visit Counter -->
+    <div id="visit-counter-container"></div>
+    <script src="../../../../visit-counter.js"></script>
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
+        if (typeof VisitCounter !== 'undefined') {
+            VisitCounter.init('secondary_school/biology/apps/energy-flow', {
+                scriptUrl: SCRIPT_URL,
+                containerId: 'visit-counter-container'
+            });
+        }
+    </script>
+  </body>
+</html>

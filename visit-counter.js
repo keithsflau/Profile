@@ -86,7 +86,7 @@ const VisitCounter = (function () {
 
             const data = await response.json();
 
-            if (data.success) {
+            if (data.success && data.data) {
                 markVisitRecorded(pageId);
                 cacheCount(pageId, data.data.totalVisits, data.data.todayVisits);
                 return {
