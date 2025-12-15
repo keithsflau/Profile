@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>詩歌播放器 | AI 歌曲</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --primary: #6366f1;
+        --primary-light: #818cf8;
+        --accent: #10b981;
+        --bg-card: #ffffff;
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+        --border: #e2e8f0;
+      }
+
+      body {
+        font-family: "Noto Sans TC", sans-serif;
+        background: linear-gradient(
+          180deg,
+          #f0f9ff 0%,
+          #e0f2fe 50%,
+          #f0fdf4 100%
+        );
+        color: var(--text-primary);
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        gap: 24px;
+        min-height: 100vh;
+      }
+
+      .card {
+        background: var(--bg-card);
+        border-radius: 20px;
+        border: 1px solid var(--border);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+      }
+
+      /* Header */
+      .header {
+        grid-column: 1 / -1;
+        padding: 20px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .logo {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+      }
+
+      .header h1 {
+        font-size: 1.8rem;
+        font-weight: 700;
+      }
+      .header p {
+        color: var(--text-secondary);
+      }
+
+      .upload-btn {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .upload-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+      }
+
+      #file-input {
+        display: none;
+      }
+
+      /* Playlist */
+      .playlist-section {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        max-height: calc(100vh - 130px);
+      }
+
+      .playlist-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .playlist-header h2 {
+        font-size: 1.2rem;
+        font-weight: 600;
+      }
+
+      .song-count {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+      }
+
+      .playlist {
+        flex: 1;
+        overflow-y: auto;
+      }
+
+      .song-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 6px;
+        border: 2px solid transparent;
+      }
+
+      .song-item:hover {
+        background: #f1f5f9;
+        border-color: var(--primary-light);
+      }
+
+      .song-item.active {
+        background: linear-gradient(135deg, #ede9fe, #e0e7ff);
+        border-color: var(--primary);
+      }
+
+      .song-item.active .song-index {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: white;
+      }
+
+      .song-index {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        font-weight: 600;
+        flex-shrink: 0;
+      }
+
+      .song-info {
+        flex: 1;
+        overflow: hidden;
+      }
+
+      .song-title {
+        font-size: 0.9rem;
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .song-theme {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        margin-top: 2px;
+      }
+
+      .song-delete {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        background: transparent;
+        border: none;
+        color: var(--text-secondary);
+        cursor: pointer;
+        opacity: 0;
+        transition: all 0.2s ease;
+      }
+
+      .song-item:hover .song-delete {
+        opacity: 1;
+      }
+      .song-delete:hover {
+        background: #fee2e2;
+        color: #ef4444;
+      }
+
+      /* Player */
+      .player-section {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding: 20px;
+      }
+
+      /* Video/Lyrics Container */
+      .video-container {
+        background: #000;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        position: relative;
+      }
+
+      #video-player {
+        width: 100%;
+        display: block;
+        max-height: 400px;
+      }
+
+      .video-placeholder {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        min-height: 300px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #1e1b4b, #312e81);
+        color: white;
+      }
+
+      .video-placeholder-icon {
+        font-size: 4rem;
+        margin-bottom: 15px;
+      }
+
+      .video-placeholder p {
+        font-size: 1.1rem;
+        opacity: 0.8;
+      }
+
+      /* Now Playing */
+      .now-playing {
+        text-align: center;
+        padding: 20px;
+        background: linear-gradient(135deg, #fef3c7, #fde68a);
+        border-radius: 16px;
+      }
+
+      .now-playing-label {
+        font-size: 0.85rem;
+        color: #92400e;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 10px;
+      }
+
+      .now-playing-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #78350f;
+      }
+
+      /* Progress */
+      .progress-bar {
+        width: 100%;
+        height: 10px;
+        background: #e2e8f0;
+        border-radius: 5px;
+        cursor: pointer;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #6366f1, #8b5cf6);
+        border-radius: 5px;
+        transition: width 0.1s linear;
+      }
+
+      .time-display {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-top: 10px;
+      }
+
+      /* Controls */
+      .controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        padding: 15px;
+      }
+
+      .control-btn {
+        width: 54px;
+        height: 54px;
+        border-radius: 50%;
+        border: none;
+        background: #f1f5f9;
+        color: var(--text-primary);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        font-size: 1.3rem;
+      }
+
+      .control-btn:hover {
+        background: #e2e8f0;
+        transform: scale(1.1);
+      }
+
+      .control-btn.active {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: white;
+      }
+
+      .control-btn.play-btn {
+        width: 72px;
+        height: 72px;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: white;
+        font-size: 1.8rem;
+        box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
+      }
+
+      .control-btn.play-btn:hover {
+        transform: scale(1.15);
+      }
+
+      /* Volume */
+      .volume-section {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 18px;
+        background: #f8fafc;
+        border-radius: 14px;
+      }
+
+      .volume-icon {
+        font-size: 1.4rem;
+        cursor: pointer;
+      }
+
+      .volume-slider {
+        flex: 1;
+        height: 8px;
+        appearance: none;
+        -webkit-appearance: none;
+        background: #e2e8f0;
+        border-radius: 4px;
+        outline: none;
+      }
+
+      .volume-slider::-webkit-slider-thumb {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 22px;
+        height: 22px;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        border-radius: 50%;
+        cursor: pointer;
+      }
+
+      .volume-value {
+        font-size: 1rem;
+        font-weight: 600;
+        min-width: 50px;
+        text-align: right;
+      }
+
+      /* Drop Zone */
+      .drop-zone {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(99, 102, 241, 0.95);
+        z-index: 1000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        color: white;
+      }
+
+      .drop-zone.active {
+        display: flex;
+      }
+
+      .drop-zone-icon {
+        font-size: 5rem;
+        margin-bottom: 20px;
+        animation: bounce 1s infinite;
+      }
+
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-20px);
+        }
+      }
+
+      @media (max-width: 900px) {
+        .container {
+          grid-template-columns: 1fr;
+        }
+        .header {
+          flex-direction: column;
+          gap: 15px;
+          text-align: center;
+        }
+        .playlist-section {
+          max-height: 300px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="drop-zone" id="drop-zone">
+      <div class="drop-zone-icon">📥</div>
+      <p>放開以添加歌曲</p>
+    </div>
+
+    <div class="container">
+      <header class="header card">
+        <div class="header-left">
+          <div class="logo">🎵</div>
+          <div>
+            <h1>AI 詩歌播放器</h1>
+            <p>聆聽屬靈詩歌，親近神的話語</p>
+          </div>
+        </div>
+        <button class="upload-btn" id="upload-btn">
+          <span>📁</span>
+          <span>上傳歌曲</span>
+        </button>
+        <input type="file" id="file-input" accept="video/*,audio/*" multiple />
+      </header>
+
+      <section class="playlist-section card">
+        <div class="playlist-header">
+          <h2>🎶 播放清單</h2>
+          <span class="song-count" id="song-count">0 首</span>
+        </div>
+        <div class="playlist" id="playlist"></div>
+      </section>
+
+      <section class="player-section card">
+        <!-- Video with Lyrics -->
+        <div class="video-container">
+          <video id="video-player"></video>
+          <div class="video-placeholder" id="video-placeholder">
+            <div class="video-placeholder-icon">🎬</div>
+            <p>選擇一首歌曲開始播放</p>
+            <p style="font-size: 0.9rem; margin-top: 10px; opacity: 0.6">
+              歌詞將在影片中顯示
+            </p>
+          </div>
+        </div>
+
+        <!-- Now Playing -->
+        <div class="now-playing">
+          <div class="now-playing-label">🎵 正在播放</div>
+          <div class="now-playing-title" id="now-playing-title">
+            等待選擇歌曲...
+          </div>
+        </div>
+
+        <!-- Progress -->
+        <div class="progress-container">
+          <div class="progress-bar" id="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+          <div class="time-display">
+            <span id="current-time">0:00</span>
+            <span id="duration">0:00</span>
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+          <button class="control-btn" id="shuffle-btn" title="隨機播放">
+            🔀
+          </button>
+          <button class="control-btn" id="prev-btn" title="上一首">⏮️</button>
+          <button class="control-btn play-btn" id="play-btn" title="播放">
+            ▶️
+          </button>
+          <button class="control-btn" id="next-btn" title="下一首">⏭️</button>
+          <button class="control-btn" id="repeat-btn" title="循環模式">
+            🔁
+          </button>
+        </div>
+
+        <!-- Volume -->
+        <div class="volume-section">
+          <span class="volume-icon" id="mute-btn">🔊</span>
+          <input
+            type="range"
+            class="volume-slider"
+            id="volume-slider"
+            min="0"
+            max="100"
+            value="80"
+          />
+          <span class="volume-value" id="volume-value">80%</span>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      // Updated Song List (17 songs)
+      const defaultSongs = [
+        { file: "Oh-oh-oh.mp4", title: "Oh-oh-oh", theme: "敬拜讚美" },
+        {
+          file: "並非 獻祭 能夠 換取 祢恩寵 並非 善行 能夠 填補 這裂縫 律法 要求 嚴苛.mp4",
+          title: "祢恩寵",
+          theme: "恩典與律法",
+        },
+        {
+          file: "主題：奇異恩典的深度 (Depth of Grace) Suno Prompt_.mp4",
+          title: "奇異恩典的深度",
+          theme: "Depth of Grace",
+        },
+        {
+          file: "主題：婚盟與誓約 (Covenant & Love) Suno Prompt_ .mp4",
+          title: "婚盟與誓約",
+          theme: "Covenant & Love",
+        },
+        {
+          file: "主題：末世論與新天新地 (Eschatology) Suno Prompt_ S.mp4",
+          title: "末世論與新天新地",
+          theme: "Eschatology",
+        },
+        {
+          file: "主題：生命的四季 (Seasons of Life _ Ecclesiastes.mp4",
+          title: "生命的四季",
+          theme: "Seasons of Life",
+        },
+        {
+          file: "主題：聖靈的運行 (The Holy Spirit) Suno Prompt_ .mp4",
+          title: "聖靈的運行",
+          theme: "The Holy Spirit",
+        },
+        {
+          file: "主題：靈魂的黑夜與呼喊 (Dark night of the soul) Sun.mp4",
+          title: "靈魂的黑夜與呼喊",
+          theme: "Dark Night",
+        },
+        {
+          file: "歌名： 《不再是孤兒》 (No Longer Orphans) 主題： 兒子的名.mp4",
+          title: "不再是孤兒",
+          theme: "No Longer Orphans",
+        },
+        {
+          file: "歌名： 《彼此》 (One Another) 主題： 團契生活，彼此相愛（參：希.mp4",
+          title: "彼此",
+          theme: "團契生活",
+        },
+        {
+          file: "歌名： 《磐石的話》 (Words on the Rock) 主題： 神的話語是.mp4",
+          title: "磐石的話",
+          theme: "Words on the Rock",
+        },
+        {
+          file: "歌名： 《血價》 (The Price of Blood) 主題： 十字架的代贖.mp4",
+          title: "血價",
+          theme: "十字架的代贖",
+        },
+        {
+          file: "歌名： 《走進人群》 (Into the Crowd) 主題： 城市宣教，踐行大.mp4",
+          title: "走進人群",
+          theme: "城市宣教",
+        },
+        {
+          file: "歌名： 《靈風》 (Wind of the Spirit) 主題： 聖靈的引導與.mp4",
+          title: "靈風",
+          theme: "Wind of the Spirit",
+        },
+        {
+          file: "歌詞：  外表看來 堅強無缺 內心深處 充滿妥協 我也試過 靠自己修補一切 卻發.mp4",
+          title: "內心深處",
+          theme: "心靈詩歌",
+        },
+        {
+          file: "獨自 一塊 炭火 很快 變灰暗 聚在 一起 燃燒 火光 照 遠近 並非 只是 聚.mp4",
+          title: "炭火團契",
+          theme: "彼此相愛",
+        },
+        {
+          file: "號角 吹響 震動 天際 的四方 七印 揭開 審判 臨到 這 貪妄 日月 無光 星.mp4",
+          title: "號角吹響",
+          theme: "末世啟示",
+        },
+      ];
+
+      // State
+      let songs = [...defaultSongs];
+      let uploadedSongs = [];
+      let currentIndex = -1;
+      let isPlaying = false;
+      let isShuffle = false;
+      let repeatMode = 0;
+      let shuffleOrder = [];
+
+      // DOM
+      const player = document.getElementById("video-player");
+      const videoPlaceholder = document.getElementById("video-placeholder");
+      const playlistEl = document.getElementById("playlist");
+      const playBtn = document.getElementById("play-btn");
+      const prevBtn = document.getElementById("prev-btn");
+      const nextBtn = document.getElementById("next-btn");
+      const shuffleBtn = document.getElementById("shuffle-btn");
+      const repeatBtn = document.getElementById("repeat-btn");
+      const progressBar = document.getElementById("progress-bar");
+      const progressFill = document.getElementById("progress-fill");
+      const currentTimeEl = document.getElementById("current-time");
+      const durationEl = document.getElementById("duration");
+      const nowPlayingTitle = document.getElementById("now-playing-title");
+      const volumeSlider = document.getElementById("volume-slider");
+      const volumeValue = document.getElementById("volume-value");
+      const muteBtn = document.getElementById("mute-btn");
+      const uploadBtn = document.getElementById("upload-btn");
+      const fileInput = document.getElementById("file-input");
+      const dropZone = document.getElementById("drop-zone");
+
+      // Get all songs
+      function getAllSongs() {
+        return [...songs, ...uploadedSongs];
+      }
+
+      // Render Playlist
+      function renderPlaylist() {
+        const allSongs = getAllSongs();
+        playlistEl.innerHTML = "";
+
+        if (allSongs.length === 0) {
+          playlistEl.innerHTML =
+            '<div style="text-align:center;padding:40px;color:#64748b;">📂 播放清單是空的</div>';
+          document.getElementById("song-count").textContent = "0 首";
+          return;
+        }
+
+        allSongs.forEach((song, index) => {
+          const isUploaded = index >= songs.length;
+          const item = document.createElement("div");
+          item.className = `song-item ${
+            index === currentIndex ? "active" : ""
+          }`;
+          item.innerHTML = `
+                    <div class="song-index">${index + 1}</div>
+                    <div class="song-info">
+                        <div class="song-title">${song.title}</div>
+                        <div class="song-theme">${song.theme}${
+            isUploaded ? " 📤" : ""
+          }</div>
+                    </div>
+                    ${
+                      isUploaded
+                        ? `<button class="song-delete" data-index="${index}">✕</button>`
+                        : ""
+                    }
+                `;
+          item.addEventListener("click", (e) => {
+            if (!e.target.classList.contains("song-delete")) {
+              playSong(index);
+            }
+          });
+          playlistEl.appendChild(item);
+        });
+
+        document.querySelectorAll(".song-delete").forEach((btn) => {
+          btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            deleteUploadedSong(parseInt(btn.dataset.index) - songs.length);
+          });
+        });
+
+        document.getElementById(
+          "song-count"
+        ).textContent = `${allSongs.length} 首`;
+      }
+
+      // Delete uploaded song
+      function deleteUploadedSong(uploadIndex) {
+        if (uploadIndex >= 0 && uploadIndex < uploadedSongs.length) {
+          if (uploadedSongs[uploadIndex].blobUrl) {
+            URL.revokeObjectURL(uploadedSongs[uploadIndex].blobUrl);
+          }
+          uploadedSongs.splice(uploadIndex, 1);
+
+          const deletedGlobalIndex = songs.length + uploadIndex;
+          if (currentIndex === deletedGlobalIndex) {
+            currentIndex = -1;
+            player.src = "";
+            videoPlaceholder.style.display = "flex";
+            nowPlayingTitle.textContent = "等待選擇歌曲...";
+            isPlaying = false;
+            updatePlayButton();
+          } else if (currentIndex > deletedGlobalIndex) {
+            currentIndex--;
+          }
+
+          renderPlaylist();
+        }
+      }
+
+      // Play Song
+      function playSong(index) {
+        const allSongs = getAllSongs();
+        if (index < 0 || index >= allSongs.length) return;
+
+        currentIndex = index;
+        const song = allSongs[index];
+
+        // Set source
+        player.src = song.blobUrl || song.file;
+        videoPlaceholder.style.display = "none";
+
+        player
+          .play()
+          .then(() => {
+            isPlaying = true;
+            updatePlayButton();
+            renderPlaylist();
+            nowPlayingTitle.textContent = song.title;
+          })
+          .catch((err) => {
+            console.error("Playback error:", err);
+            nowPlayingTitle.textContent = song.title + " (點擊播放)";
+            renderPlaylist();
+          });
+      }
+
+      // Update Play Button
+      function updatePlayButton() {
+        playBtn.textContent = isPlaying ? "⏸️" : "▶️";
+      }
+
+      // Toggle Play/Pause
+      function togglePlay() {
+        const allSongs = getAllSongs();
+        if (allSongs.length === 0) return;
+
+        if (currentIndex === -1) {
+          playSong(0);
+          return;
+        }
+
+        if (isPlaying) {
+          player.pause();
+        } else {
+          player.play();
+        }
+        isPlaying = !isPlaying;
+        updatePlayButton();
+      }
+
+      // Previous / Next
+      function prevSong() {
+        const allSongs = getAllSongs();
+        if (allSongs.length === 0) return;
+
+        if (isShuffle) {
+          const idx = shuffleOrder.indexOf(currentIndex);
+          playSong(shuffleOrder[idx > 0 ? idx - 1 : shuffleOrder.length - 1]);
+        } else {
+          playSong(currentIndex > 0 ? currentIndex - 1 : allSongs.length - 1);
+        }
+      }
+
+      function nextSong() {
+        const allSongs = getAllSongs();
+        if (allSongs.length === 0) return;
+
+        if (repeatMode === 2) {
+          playSong(currentIndex);
+          return;
+        }
+
+        if (isShuffle) {
+          const idx = shuffleOrder.indexOf(currentIndex);
+          playSong(shuffleOrder[idx < shuffleOrder.length - 1 ? idx + 1 : 0]);
+        } else {
+          if (currentIndex < allSongs.length - 1) {
+            playSong(currentIndex + 1);
+          } else if (repeatMode === 1) {
+            playSong(0);
+          }
+        }
+      }
+
+      // Shuffle
+      function toggleShuffle() {
+        isShuffle = !isShuffle;
+        shuffleBtn.classList.toggle("active", isShuffle);
+
+        if (isShuffle) {
+          const allSongs = getAllSongs();
+          shuffleOrder = [...Array(allSongs.length).keys()];
+          for (let i = shuffleOrder.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffleOrder[i], shuffleOrder[j]] = [
+              shuffleOrder[j],
+              shuffleOrder[i],
+            ];
+          }
+          if (currentIndex >= 0) {
+            const pos = shuffleOrder.indexOf(currentIndex);
+            shuffleOrder.splice(pos, 1);
+            shuffleOrder.unshift(currentIndex);
+          }
+        }
+      }
+
+      // Repeat
+      function toggleRepeat() {
+        repeatMode = (repeatMode + 1) % 3;
+        const icons = ["🔁", "🔂", "🔂"];
+        repeatBtn.textContent = icons[repeatMode];
+        repeatBtn.classList.toggle("active", repeatMode > 0);
+      }
+
+      // Time
+      function formatTime(seconds) {
+        if (isNaN(seconds)) return "0:00";
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs.toString().padStart(2, "0")}`;
+      }
+
+      function updateProgress() {
+        if (player.duration) {
+          progressFill.style.width = `${
+            (player.currentTime / player.duration) * 100
+          }%`;
+          currentTimeEl.textContent = formatTime(player.currentTime);
+          durationEl.textContent = formatTime(player.duration);
+        }
+      }
+
+      progressBar.addEventListener("click", (e) => {
+        if (!player.duration) return;
+        const rect = progressBar.getBoundingClientRect();
+        player.currentTime =
+          ((e.clientX - rect.left) / rect.width) * player.duration;
+      });
+
+      // Volume
+      volumeSlider.addEventListener("input", () => {
+        player.volume = volumeSlider.value / 100;
+        volumeValue.textContent = `${volumeSlider.value}%`;
+        muteBtn.textContent =
+          volumeSlider.value == 0
+            ? "🔇"
+            : volumeSlider.value < 50
+            ? "🔉"
+            : "🔊";
+      });
+
+      let prevVolume = 80;
+      muteBtn.addEventListener("click", () => {
+        if (volumeSlider.value > 0) {
+          prevVolume = volumeSlider.value;
+          volumeSlider.value = 0;
+        } else {
+          volumeSlider.value = prevVolume;
+        }
+        player.volume = volumeSlider.value / 100;
+        volumeValue.textContent = `${volumeSlider.value}%`;
+        muteBtn.textContent = volumeSlider.value == 0 ? "🔇" : "🔊";
+      });
+
+      // File Upload
+      uploadBtn.addEventListener("click", () => fileInput.click());
+
+      fileInput.addEventListener("change", (e) => {
+        handleFiles(e.target.files);
+        fileInput.value = "";
+      });
+
+      function handleFiles(files) {
+        for (const file of files) {
+          if (
+            file.type.startsWith("video/") ||
+            file.type.startsWith("audio/")
+          ) {
+            const blobUrl = URL.createObjectURL(file);
+            const title = file.name.replace(/\.[^/.]+$/, "");
+            uploadedSongs.push({
+              file: file.name,
+              title: title.length > 30 ? title.substring(0, 30) + "..." : title,
+              theme: "自訂上傳",
+              blobUrl: blobUrl,
+            });
+          }
+        }
+        renderPlaylist();
+      }
+
+      // Drag and Drop
+      document.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropZone.classList.add("active");
+      });
+
+      document.addEventListener("dragleave", (e) => {
+        if (e.relatedTarget === null) dropZone.classList.remove("active");
+      });
+
+      document.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropZone.classList.remove("active");
+        handleFiles(e.dataTransfer.files);
+      });
+
+      // Events
+      playBtn.addEventListener("click", togglePlay);
+      prevBtn.addEventListener("click", prevSong);
+      nextBtn.addEventListener("click", nextSong);
+      shuffleBtn.addEventListener("click", toggleShuffle);
+      repeatBtn.addEventListener("click", toggleRepeat);
+
+      player.addEventListener("timeupdate", updateProgress);
+      player.addEventListener("ended", nextSong);
+      player.addEventListener(
+        "loadedmetadata",
+        () => (durationEl.textContent = formatTime(player.duration))
+      );
+      player.addEventListener("play", () => {
+        isPlaying = true;
+        updatePlayButton();
+      });
+      player.addEventListener("pause", () => {
+        isPlaying = false;
+        updatePlayButton();
+      });
+
+      // Keyboard
+      document.addEventListener("keydown", (e) => {
+        if (e.target.tagName === "INPUT") return;
+        switch (e.code) {
+          case "Space":
+            e.preventDefault();
+            togglePlay();
+            break;
+          case "ArrowLeft":
+            player.currentTime -= 5;
+            break;
+          case "ArrowRight":
+            player.currentTime += 5;
+            break;
+          case "ArrowUp":
+            e.preventDefault();
+            volumeSlider.value = Math.min(
+              100,
+              parseInt(volumeSlider.value) + 5
+            );
+            volumeSlider.dispatchEvent(new Event("input"));
+            break;
+          case "ArrowDown":
+            e.preventDefault();
+            volumeSlider.value = Math.max(0, parseInt(volumeSlider.value) - 5);
+            volumeSlider.dispatchEvent(new Event("input"));
+            break;
+        }
+      });
+
+      // Init
+      renderPlaylist();
+      player.volume = 0.8;
+    </script>
+  </body>
+</html>
