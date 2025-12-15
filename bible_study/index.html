@@ -169,6 +169,10 @@
         animation-delay: 0.7s;
       }
 
+      .category-card:nth-child(8) {
+        animation-delay: 0.8s;
+      }
+
       .float-animation {
         animation: float 4s ease-in-out infinite;
       }
@@ -657,6 +661,62 @@
                       class="flex items-center justify-center text-rose-600 group-hover:text-rose-700 transition-colors"
                     >
                       <span class="text-sm font-medium">開始研讀</span>
+                      <svg
+                        class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </a>
+
+                <!-- AI Songs -->
+                <a
+                  href="../AI 歌曲/player.html"
+                  class="category-card glass-card rounded-2xl p-8 hover:bg-white/90 group"
+                >
+                  <div class="space-y-6">
+                    <div
+                      class="w-16 h-16 rounded-xl bg-gradient-to-br from-amber-500 via-orange-600 to-red-700 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform"
+                    >
+                      <svg
+                        class="w-8 h-8 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                        />
+                      </svg>
+                    </div>
+                    <div class="text-center">
+                      <h3
+                        class="text-2xl font-semibold mb-2 group-hover:text-amber-600 transition-colors serif-font text-slate-900"
+                      >
+                        AI 歌曲
+                      </h3>
+                      <p class="text-sm text-slate-600 mb-3">AI Songs</p>
+                      <p class="text-sm text-slate-700 leading-relaxed">
+                        聆聽由 AI
+                        創作的詩歌，讓音樂洗滌心靈，在歌聲中敬拜讚美神。
+                      </p>
+                    </div>
+                    <div
+                      class="flex items-center justify-center text-amber-600 group-hover:text-amber-700 transition-colors"
+                    >
+                      <span class="text-sm font-medium">開始聆聽</span>
                       <svg
                         class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform"
                         fill="none"
