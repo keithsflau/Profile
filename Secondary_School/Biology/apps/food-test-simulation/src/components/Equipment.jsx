@@ -7,88 +7,58 @@ export default function Equipment({ onHeat, onShake, selectedTube }) {
       initial={{ opacity: 0, x: -50 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: 0.3 }}
-      className="glass rounded-2xl p-6 shadow-2xl"
+      className="glass rounded-xl p-3 shadow-xl flex-none"
     >
-      <div className="flex items-center gap-2 mb-4">
-        <FlaskRound className="w-6 h-6 text-orange-400" />
-        <h2 className="text-2xl font-bold text-orange-400">Equipment</h2>
+      <div className="flex items-center gap-2 mb-2">
+        <FlaskRound className="w-5 h-5 text-orange-400" />
+        <h2 className="text-lg font-bold text-orange-400">Equipment</h2>
       </div>
 
-      <div className="space-y-4">
-        {/* Water Bath / Heater */}
-        <motion.div
+      <div className="grid grid-cols-2 gap-2">
+        {/* Heat Button */}
+        <motion.button
           whileHover={{ scale: 1.02 }}
-          className="glass rounded-xl p-4"
+          whileTap={{ scale: 0.98 }}
+          onClick={onHeat}
+          disabled={!selectedTube}
+          className={`
+            p-3 rounded-lg font-semibold transition-all flex flex-col items-center justify-center gap-1
+            ${selectedTube
+              ? 'bg-gradient-to-br from-orange-500/80 to-red-500/80 hover:from-orange-600 hover:to-red-600 text-white shadow-lg shadow-orange-500/20'
+              : 'bg-white/5 text-gray-500 cursor-not-allowed border border-white/5'}
+          `}
         >
-          <div className="flex items-center gap-3 mb-3">
-            <Flame className="w-6 h-6 text-orange-500" />
-            <h3 className="font-semibold text-orange-300">Water Bath</h3>
-          </div>
-          
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={onHeat}
-            disabled={!selectedTube}
-            className={`w-full py-3 px-4 rounded-lg font-semibold transition-all ${
-              selectedTube
-                ? 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg shadow-orange-500/50'
-                : 'bg-gray-700 text-gray-500 cursor-not-allowed'
-            }`}
-          >
-            {selectedTube ? '🔥 Heat Test Tube' : '🔥 Select Tube First'}
-          </motion.button>
-
-          <p className="text-xs text-gray-400 mt-2">
-            Heat to ~80°C for Benedict's test
-          </p>
-        </motion.div>
+          <Flame className={`w-6 h-6 ${selectedTube ? 'animate-pulse' : ''}`} />
+          <span className="text-xs">Heat (80°C)</span>
+        </motion.button>
 
         {/* Shake Button */}
-        <motion.div
+        <motion.button
           whileHover={{ scale: 1.02 }}
-          className="glass rounded-xl p-4"
+          whileTap={{ scale: 0.98 }}
+          onClick={onShake}
+          disabled={!selectedTube}
+          className={`
+            p-3 rounded-lg font-semibold transition-all flex flex-col items-center justify-center gap-1
+            ${selectedTube
+              ? 'bg-gradient-to-br from-cyan-500/80 to-blue-500/80 hover:from-cyan-600 hover:to-blue-600 text-white shadow-lg shadow-cyan-500/20'
+              : 'bg-white/5 text-gray-500 cursor-not-allowed border border-white/5'}
+          `}
         >
-          <div className="flex items-center gap-3 mb-3">
-            <motion.div
-              animate={{ rotate: [0, -10, 10, -10, 10, 0] }}
-              transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-            >
-              <FlaskRound className="w-6 h-6 text-cyan-500" />
-            </motion.div>
-            <h3 className="font-semibold text-cyan-300">Shake / Mix</h3>
-          </div>
-          
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95, rotate: [0, -5, 5, -5, 5, 0] }}
-            onClick={onShake}
-            disabled={!selectedTube}
-            className={`w-full py-3 px-4 rounded-lg font-semibold transition-all ${
-              selectedTube
-                ? 'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white shadow-lg shadow-cyan-500/50'
-                : 'bg-gray-700 text-gray-500 cursor-not-allowed'
-            }`}
+          <motion.div
+            animate={selectedTube ? { rotate: [0, -10, 10, 0] } : {}}
+            transition={{ repeat: Infinity, duration: 1, repeatDelay: 2 }}
           >
-            {selectedTube ? '🔄 Shake Test Tube' : '🔄 Select Tube First'}
-          </motion.button>
-
-          <p className="text-xs text-gray-400 mt-2">
-            Mix reagents thoroughly
-          </p>
-        </motion.div>
-
-        {/* Instructions */}
-        <div className="mt-4 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-          <h4 className="text-sm font-semibold text-blue-300 mb-2">📋 Procedure:</h4>
-          <ol className="text-xs text-gray-300 space-y-1 list-decimal list-inside">
-            <li>Select a test tube</li>
-            <li>Add appropriate reagent(s)</li>
-            <li>Heat or shake if required</li>
-            <li>Observe color change</li>
-            <li>Record results</li>
-          </ol>
-        </div>
+            <FlaskRound className="w-6 h-6" />
+          </motion.div>
+          <span className="text-xs">Shake / Mix</span>
+        </motion.button>
+      </div>
+      
+      {/* Mini Instructions */}
+      <div className="mt-2 text-[10px] text-gray-400 flex justify-between px-1">
+        <span>Use Heat for Benedict's</span>
+        <span>Use Shake for Mixing</span>
       </div>
     </motion.div>
   );

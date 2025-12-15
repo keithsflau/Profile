@@ -216,7 +216,7 @@ export default function TestTubeRack({ testTubes, selectedTube, onSelectTube, on
         <ul className="text-xs text-gray-300 space-y-1">
           <li>• <strong>Solution A:</strong> Contains Glucose & Vitamin C</li>
           <li>• <strong>Solution B:</strong> Contains Starch & Protein</li>
-          <li>• <strong>Solution C:</strong> Contains Sucrose (Non-reducing sugar)</li>
+          <li>• <strong>Solution C:</strong> Contains Sucrose (Non-reducing sugar) & Lipids</li>
         </ul>
       </div>
     </motion.div>

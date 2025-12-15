@@ -9,9 +9,9 @@ import InfoPanel from './components/InfoPanel';
 
 function App() {
   const [testTubes, setTestTubes] = useState([
-    { id: 1, sample: 'Mystery Solution A', contents: ['sample-a'], temperature: 'room', isShaking: false, color: '#f0e68c' },
-    { id: 2, sample: 'Solution B', contents: ['sample-b'], temperature: 'room', isShaking: false, color: '#e6f2ff' },
-    { id: 3, sample: 'Solution C', contents: ['sample-c'], temperature: 'room', isShaking: false, color: '#ffe6f0' },
+    { id: 1, sample: 'Mystery Solution A', contents: ['sample-a'], temperature: 'room', isShaking: false, hasBeenShakenWithEthanol: false, color: '#f0e68c' },
+    { id: 2, sample: 'Solution B', contents: ['sample-b'], temperature: 'room', isShaking: false, hasBeenShakenWithEthanol: false, color: '#e6f2ff' },
+    { id: 3, sample: 'Solution C', contents: ['sample-c'], temperature: 'room', isShaking: false, hasBeenShakenWithEthanol: false, color: '#ffe6f0' },
   ]);
 
   const [selectedTube, setSelectedTube] = useState(null);
@@ -29,7 +29,7 @@ function App() {
     setTestTubes(prev => prev.map(tube => {
       if (tube.id === selectedTube) {
         const newContents = [...tube.contents, reagentId];
-        const newColor = calculateColor(newContents, tube.temperature, tube.isShaking);
+        const newColor = calculateColor(newContents, tube.temperature, tube.isShaking, tube.hasBeenShakenWithEthanol);
         return { ...tube, contents: newContents, color: newColor };
       }
       return tube;
@@ -49,7 +49,7 @@ function App() {
     setTestTubes(prev => prev.map(tube => {
       if (tube.id === selectedTube) {
         const newTemp = tube.temperature === 'room' ? 'hot' : tube.temperature;
-        const newColor = calculateColor(tube.contents, newTemp, tube.isShaking);
+        const newColor = calculateColor(tube.contents, newTemp, tube.isShaking, tube.hasBeenShakenWithEthanol);
         return { ...tube, temperature: newTemp, color: newColor };
       }
       return tube;
@@ -68,24 +68,29 @@ function App() {
 
     setTestTubes(prev => prev.map(tube => {
       if (tube.id === selectedTube) {
-        return { ...tube, isShaking: !tube.isShaking };
+         // Mark as shaken with ethanol if ethanol is present
+         const shakenWithEthanol = tube.contents.includes('ethanol') ? true : tube.hasBeenShakenWithEthanol;
+         return { ...tube, isShaking: !tube.isShaking, hasBeenShakenWithEthanol: shakenWithEthanol };
       }
       return tube;
     }));
 
-    // Reset shaking after animation
+    // Reset shaking after animation but KEEP the state
     setTimeout(() => {
       setTestTubes(prev => prev.map(tube => {
         if (tube.id === selectedTube) {
-          return { ...tube, isShaking: false };
+          // Re-calculate color after shaking completes (crucial for lipid test step 1)
+          const newColor = calculateColor(tube.contents, tube.temperature, false, tube.hasBeenShakenWithEthanol);
+          return { ...tube, isShaking: false, color: newColor };
         }
         return tube;
       }));
+       checkReaction(selectedTube);
     }, 1000);
   };
 
   // Calculate color based on contents and conditions
-  const calculateColor = (contents, temperature, isShaking) => {
+  const calculateColor = (contents, temperature, isShaking, hasBeenShakenWithEthanol) => {
     const sample = contents[0];
     
     // Reducing Sugar Test (Benedict's)
@@ -129,12 +134,20 @@ function App() {
       return '#4169e1'; // Blue if no vitamin C
     }
     
-    // Lipid Test (Ethanol)
+    // Lipid Test (Ethanol Emulsion)
+    // Correct Protocol: Add Ethanol -> Shake (Dissolve) -> Add Water -> Milky White
     if (contents.includes('ethanol') && isShaking) {
-      // Solution C contains Lipids
+      // Just shaking with ethanol: Lipids dissolve, solution stays clear.
       if (sample === 'sample-c') {
-        return '#f5f5f5'; // Milky white emulsion
+         return '#f0f0f0'; // Stays clear (ethanol color logic)
       }
+    }
+
+    if (contents.includes('ethanol') && contents.includes('water') && hasBeenShakenWithEthanol) {
+       // If it has been shaken with ethanol AND now has water:
+       if (sample === 'sample-c') {
+         return '#f5f5f5'; // NOW it turns Milky white emulsion
+       }
     }
     
     // Default colors based on reagent
@@ -143,6 +156,7 @@ function App() {
     if (contents.includes('biuret')) return '#87ceeb'; // Light blue
     if (contents.includes('dcpip')) return '#4169e1'; // Blue
     if (contents.includes('ethanol')) return '#f0f0f0'; // Clear
+    if (contents.includes('water')) return '#e6f7ff'; // Clear/Water
     
     // Default sample colors
     if (sample === 'sample-a') return '#f0e68c';
@@ -157,56 +171,78 @@ function App() {
     const tube = testTubes.find(t => t.id === tubeId);
     if (!tube) return;
 
-    const { sample, contents, temperature } = tube;
+    // Use internal ID (sample-a, sample-b) for logic, and Display Name for report
+    const sampleId = tube.contents[0]; 
+    const sampleName = tube.sample;
+    const { temperature, hasBeenShakenWithEthanol } = tube;
+
+    // Construct effective contents to account for the just-added reagent
+    // (React state updates are async, so 'tube.contents' might be stale)
+    let effectiveContents = [...tube.contents];
+    if (newReagent && !effectiveContents.includes(newReagent)) {
+      effectiveContents.push(newReagent);
+    }
     
     // Benedict's Test (Reducing Sugar)
-    if (contents.includes('benedicts') && temperature === 'hot') {
-      if (sample === 'sample-a') {
-        addResult(sample, 'Reducing Sugar (Benedict\'s)', 'Positive', 'Brick Red Precipitate', 
+    if (effectiveContents.includes('benedicts') && temperature === 'hot') {
+      if (sampleId === 'sample-a') {
+        addResult(sampleName, 'Reducing Sugar (Benedict\'s)', 'Positive', 'Brick Red Precipitate', 
           'Sample A contains reducing sugars (e.g., glucose).');
-      } else if (sample === 'sample-c' && !contents.includes('hcl')) {
-        addResult(sample, 'Reducing Sugar (Benedict\'s)', 'Negative', 'Stays Blue', 
+      } else if (sampleId === 'sample-c' && !effectiveContents.includes('hcl')) {
+        addResult(sampleName, 'Reducing Sugar (Benedict\'s)', 'Negative', 'Stays Blue', 
           'Sample C does not contain reducing sugars initially. It may contain non-reducing sugars.');
       }
     }
     
     // Iodine Test (Starch)
-    if (contents.includes('iodine')) {
-      if (sample === 'sample-b') {
-        addResult(sample, 'Starch (Iodine)', 'Positive', 'Blue-Black Color', 
+    if (effectiveContents.includes('iodine')) {
+      if (sampleId === 'sample-b') {
+        addResult(sampleName, 'Starch (Iodine)', 'Positive', 'Blue-Black Color', 
           'Sample B contains starch.');
       } else {
-        addResult(sample, 'Starch (Iodine)', 'Negative', 'Brown Color', 
+        addResult(sampleName, 'Starch (Iodine)', 'Negative', 'Brown Color', 
           'No starch detected.');
       }
     }
     
     // Biuret Test (Protein)
-    if (contents.includes('biuret')) {
-      if (sample === 'sample-b') {
-        addResult(sample, 'Protein (Biuret)', 'Positive', 'Purple/Lilac Color', 
+    if (effectiveContents.includes('biuret')) {
+      if (sampleId === 'sample-b') {
+        addResult(sampleName, 'Protein (Biuret)', 'Positive', 'Purple/Lilac Color', 
           'Sample B contains proteins.');
       } else {
-        addResult(sample, 'Protein (Biuret)', 'Negative', 'Blue Color', 
+        addResult(sampleName, 'Protein (Biuret)', 'Negative', 'Blue Color', 
           'No protein detected.');
       }
     }
     
     // DCPIP Test (Vitamin C)
-    if (contents.includes('dcpip')) {
-      if (sample === 'sample-a') {
-        addResult(sample, 'Vitamin C (DCPIP)', 'Positive', 'Decolorized', 
+    if (effectiveContents.includes('dcpip')) {
+      if (sampleId === 'sample-a') {
+        addResult(sampleName, 'Vitamin C (DCPIP)', 'Positive', 'Decolorized', 
           'Sample A contains Vitamin C (ascorbic acid).');
       } else {
-        addResult(sample, 'Vitamin C (DCPIP)', 'Negative', 'Stays Blue', 
+        addResult(sampleName, 'Vitamin C (DCPIP)', 'Negative', 'Stays Blue', 
           'No Vitamin C detected.');
       }
     }
     
+    // Lipid Test (Ethanol Emulsion)
+    // Result only effective if shaken with ethanol first, THEN water added
+    if (effectiveContents.includes('ethanol') && effectiveContents.includes('water') && hasBeenShakenWithEthanol) {
+      if (sampleId === 'sample-c') {
+         addResult(sampleName, 'Lipid (Ethanol Emulsion)', 'Positive', 'Milky White Emulsion', 
+          'Sample C contains lipids. Lipids dissolve in ethanol but precipitate as an emulsion when water is added.');
+      } else {
+         addResult(sampleName, 'Lipid (Ethanol Emulsion)', 'Negative', 'Clear', 
+          'No emulsion formed.');
+      }
+    }
+    
     // Non-Reducing Sugar Test (Advanced)
-    if (contents.includes('hcl') && contents.includes('nahco3') && contents.includes('benedicts') && temperature === 'hot') {
-      if (sample === 'sample-c') {
-        addResult(sample, 'Non-Reducing Sugar (Acid Hydrolysis + Benedict\'s)', 'Positive', 'Brick Red Precipitate', 
+    if (effectiveContents.includes('hcl') && effectiveContents.includes('nahco3') && effectiveContents.includes('benedicts') && temperature === 'hot') {
+      if (sampleId === 'sample-c') {
+        addResult(sampleName, 'Non-Reducing Sugar (Acid Hydrolysis + Benedict\'s)', 'Positive', 'Brick Red Precipitate', 
           'Sample C contains non-reducing sugars (e.g., sucrose). Acid hydrolysis breaks glycosidic bonds, releasing reducing sugars (glucose/fructose).');
         setCurrentInfo('non-reducing');
         setShowInfo(true);
@@ -242,6 +278,7 @@ function App() {
           contents: [sample],
           temperature: 'room',
           isShaking: false,
+          hasBeenShakenWithEthanol: false,
           color: defaultColor
         };
       }
@@ -250,56 +287,57 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen text-white p-8">
-      {/* Header */}
+    <div className="h-screen w-screen bg-slate-900 text-white overflow-hidden flex flex-col items-center">
+      {/* Compact Header */}
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-8"
+        className="text-center py-4 flex-none"
       >
-        <div className="flex items-center justify-center gap-3 mb-3">
-          <Beaker className="w-12 h-12 text-cyan-400" />
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+        <div className="flex items-center justify-center gap-3 mb-1">
+          <Beaker className="w-8 h-8 text-cyan-400" />
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
             Food Test Laboratory
           </h1>
-          <Flame className="w-12 h-12 text-orange-400" />
+          <Flame className="w-8 h-8 text-orange-400" />
         </div>
-        <p className="text-xl text-gray-300">
+        <p className="text-sm text-gray-400">
           HKDSE Biology: Biochemical Tests for Biomolecules
-        </p>
-        <p className="text-sm text-gray-400 mt-2">
-          Perform tests for: Glucose, Starch, Protein, Vitamin C, and Non-reducing Sugars
         </p>
       </motion.div>
 
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Panel - Controls */}
-        <div className="lg:col-span-1 space-y-6">
-          <ReagentShelf onAddReagent={handleAddReagent} />
-          <Equipment 
-            onHeat={handleHeat} 
-            onShake={handleShake}
-            selectedTube={selectedTube}
-          />
-        </div>
+      {/* Main Content Area - Fills remaining height */}
+      <div className="flex-1 w-full max-w-7xl px-4 pb-4 min-h-0">
+        <div className="h-full grid grid-cols-1 lg:grid-cols-12 gap-4">
+          
+          {/* Left Panel: Reagents & Equipment (3 cols) */}
+          <div className="lg:col-span-3 flex flex-col gap-4 h-full overflow-y-auto pr-1 custom-scrollbar">
+            <ReagentShelf onAddReagent={handleAddReagent} />
+            <Equipment 
+              onHeat={handleHeat} 
+              onShake={handleShake}
+              selectedTube={selectedTube}
+            />
+          </div>
 
-        {/* Center Panel - Test Tubes */}
-        <div className="lg:col-span-1">
-          <TestTubeRack 
-            testTubes={testTubes}
-            selectedTube={selectedTube}
-            onSelectTube={setSelectedTube}
-            onResetTube={resetTube}
-          />
-        </div>
+          {/* Center Panel: Test Tube Rack (5 cols) */}
+          <div className="lg:col-span-5 flex flex-col justify-center h-full">
+            <TestTubeRack 
+              testTubes={testTubes}
+              selectedTube={selectedTube}
+              onSelectTube={setSelectedTube}
+              onResetTube={resetTube}
+            />
+          </div>
 
-        {/* Right Panel - Results */}
-        <div className="lg:col-span-1">
-          <ResultsTable results={results} />
+          {/* Right Panel: Results & Info (4 cols) */}
+          <div className="lg:col-span-4 h-full overflow-y-auto pr-1 custom-scrollbar">
+            <ResultsTable results={results} />
+          </div>
         </div>
       </div>
 
-      {/* Info Panel */}
+      {/* Info Panel Overlay */}
       <AnimatePresence>
         {showInfo && (
           <InfoPanel 
@@ -308,19 +346,22 @@ function App() {
           />
         )}
       </AnimatePresence>
-
-      {/* Footer */}
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        className="text-center mt-12 text-gray-400 text-sm"
-      >
-        <p className="flex items-center justify-center gap-2">
-          <Info className="w-4 h-4" />
-          Select a test tube, add reagents, and perform tests to identify biomolecules
-        </p>
-      </motion.div>
+      
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.05);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.2);
+          border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(255, 255, 255, 0.3);
+        }
+      `}</style>
     </div>
   );
 }
