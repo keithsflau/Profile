@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cardiac Cycle Simulator</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Fira+Code:wght@500&display=swap');
+
+        body {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .timeline-mark {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+
+<body class="bg-slate-900 h-screen overflow-hidden flex flex-col text-white">
+    <div id="root" class="h-full flex flex-col"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const App = () => {
+            const [phase, setPhase] = useState(0); // 0 (Diastole), 1 (Atrial Sys), 2 (Vent Sys)
+            const [active, setActive] = useState(false);
+            const [bpm, setBpm] = useState(60);
+
+            // Phase Timer
+            useEffect(() => {
+                let timer;
+                if (active) {
+                    const beatDuration = 60000 / bpm;
+                    const ratios = [4, 1, 3];
+                    const totalRatio = 8;
+                    const unit = beatDuration / totalRatio;
+
+                    const nextPhase = (phase + 1) % 3;
+                    const duration = unit * ratios[phase];
+
+                    timer = setTimeout(() => {
+                        setPhase(nextPhase);
+                    }, duration);
+                }
+                return () => clearTimeout(timer);
+            }, [phase, active, bpm]);
+
+            const getPhaseInfo = (p) => {
+                if (p === 0) return { name: "Diastole", desc: "Heart relaxes. Blood flows into atria then ventricles.", valveAV: "OPEN", valveSL: "CLOSED" };
+                if (p === 1) return { name: "Atrial Systole", desc: "Atria contract. Remaining blood pushed into ventricles.", valveAV: "OPEN", valveSL: "CLOSED" };
+                if (p === 2) return { name: "Ventricular Systole", desc: "Ventricles contract. Blood pumped to lungs/body.", valveAV: "CLOSED", valveSL: "OPEN" };
+            };
+
+            const info = getPhaseInfo(phase);
+
+            return (
+                <div className="flex h-full bg-slate-900 font-sans">
+                    {/* Glass Sidebar */}
+                    <div className="w-96 bg-black/40 backdrop-blur-2xl border-r border-white/5 p-8 flex flex-col z-20 shadow-2xl">
+                        <div className="mb-8">
+                            <div className="flex items-center gap-3 mb-2">
+                                <i data-lucide="heart-pulse" className="text-rose-500 w-8 h-8 animate-pulse"></i>
+                                <span className="text-xs font-bold bg-rose-500/10 text-rose-500 px-2 py-1 rounded border border-rose-500/20 uppercase tracking-wider">Module 03</span>
+                            </div>
+                            <h1 className="text-3xl font-bold text-white">Cardiac Cycle</h1>
+                            <p className="text-slate-400 mt-1">Accurate Anatomy & Flow</p>
+                        </div>
+
+                        {/* Controls */}
+                        <div className="space-y-6">
+                            <button
+                                onClick={() => setActive(!active)}
+                                className={`w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg transform active:scale-95
+                                    ${active
+                                        ? 'bg-rose-500/20 text-rose-400 border border-rose-500/50 hover:bg-rose-500/30'
+                                        : 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-emerald-500/20'}
+                                `}
+                            >
+                                <i data-lucide={active ? "pause" : "play"} className="w-5 h-5"></i>
+                                {active ? "PAUSE HEARTBEAT" : "START SIMULATION"}
+                            </button>
+
+                            {/* Phase Indicator */}
+                            <div className="bg-white/5 rounded-2xl p-6 border border-white/5 relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-20 h-20 bg-rose-500/10 rounded-bl-full -mr-4 -mt-4 blur-xl"></div>
+
+                                <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Current Phase</h3>
+                                <div className="text-2xl font-bold text-white mb-2">{info.name}</div>
+                                <div className="text-sm text-slate-400 leading-snug">{info.desc}</div>
+
+                                <div className="grid grid-cols-2 gap-2 mt-6">
+                                    <div className={`p-2 rounded border text-center transition-colors ${phase !== 2 ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300' : 'bg-white/5 border-white/5 text-slate-500'}`}>
+                                        <div className="text-[10px] uppercase font-bold mb-1">AV Valves</div>
+                                        <div className="text-lg font-bold">{info.valveAV}</div>
+                                    </div>
+                                    <div className={`p-2 rounded border text-center transition-colors ${phase === 2 ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300' : 'bg-white/5 border-white/5 text-slate-500'}`}>
+                                        <div className="text-[10px] uppercase font-bold mb-1">SL Valves</div>
+                                        <div className="text-lg font-bold">{info.valveSL}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Cycle Sequence */}
+                            <div className="bg-white/5 rounded-2xl p-4 border border-white/5">
+                                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                    <i data-lucide="list" className="w-3 h-3"></i>
+                                    Cycle Sequence
+                                </h3>
+                                <div className="space-y-2">
+                                    <div className={`text-[10px] p-2 rounded transition-all ${phase === 0 ? 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-200 shadow-lg shadow-emerald-500/10' : 'text-slate-500 opacity-50'}`}>
+                                        <span className="font-bold block mb-0.5 text-xs">1. Diastole</span>
+                                        Blood fills Atria. Flows to Ventricles.
+                                    </div>
+                                    <div className={`text-[10px] p-2 rounded transition-all ${phase === 1 ? 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-200 shadow-lg shadow-emerald-500/10' : 'text-slate-500 opacity-50'}`}>
+                                        <span className="font-bold block mb-0.5 text-xs">2. Atrial Systole</span>
+                                        Atria contract. Pushes blood to Ventns.
+                                    </div>
+                                    <div className={`text-[10px] p-2 rounded transition-all ${phase === 2 ? 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-200 shadow-lg shadow-emerald-500/10' : 'text-slate-500 opacity-50'}`}>
+                                        <span className="font-bold block mb-0.5 text-xs">3. Vent. Systole</span>
+                                        Ventricles contract. Pump to Body/Lungs.
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* BPM Control */}
+                            <div>
+                                <label className="flex justify-between text-sm font-bold text-slate-300 mb-4">
+                                    <span>Heart Rate</span>
+                                    <span className="font-mono text-rose-400">{bpm} BPM</span>
+                                </label>
+                                <input
+                                    type="range" min="40" max="180" value={bpm} onChange={(e) => setBpm(Number(e.target.value))}
+                                    className="w-full h-2 bg-slate-700 rounded-lg accent-rose-500"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="mt-auto pt-6 text-[10px] text-slate-500 leading-relaxed font-mono">
+                            NOTE: Right ventricle sends deoxygenated blood to lungs via Pulmonary Artery. Left ventricle sends oxygenated blood to body via Aorta.
+                        </div>
+                    </div>
+
+                    {/* Visual Area */}
+                    <div className="flex-1 flex items-center justify-center bg-slate-900 relative overflow-hidden">
+                        <div className="absolute inset-0 z-0 opacity-10"
+                            style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '40px 40px' }}>
+                        </div>
+
+                        {/* Anatomically Accurate Heart Construction */}
+                        <div className="relative z-10 w-[700px] h-[700px] transition-transform duration-200"
+                            style={{ transform: phase > 0 ? 'scale(0.98)' : 'scale(1)' }}>
+
+                            <svg viewBox="0 0 600 600" className="w-full h-full drop-shadow-2xl">
+
+                                {/* --- VEINS (Inputs) --- */}
+                                {/* Vena Cava (Superior/Inferior entering Right Atrium) - Blue */}
+                                <path d="M 180 50 L 180 200" stroke="#1e3a8a" strokeWidth="30" fill="none" strokeLinecap="round" />
+                                <path d="M 180 550 L 180 400" stroke="#1e3a8a" strokeWidth="30" fill="none" strokeLinecap="round" />
+
+                                {/* Pulmonary Veins (Entering Left Atrium) - Red */}
+                                <path d="M 420 100 L 420 200" stroke="#7f1d1d" strokeWidth="20" fill="none" strokeLinecap="round" />
+                                <path d="M 500 150 L 420 200" stroke="#7f1d1d" strokeWidth="20" fill="none" strokeLinecap="round" />
+
+                                {/* --- ARTERIES (Outputs - Behind Heart) --- */}
+                                {/* Aorta (Arching from LV) - Red */}
+                                <path d="M 320 250 C 320 100, 450 50, 450 150 L 450 600" stroke="#ef4444" strokeWidth="40" fill="none" />
+
+                                {/* Pulmonary Artery (From RV branching L/R) - Blue */}
+                                <path d="M 280 250 C 280 150, 150 100, 100 150" stroke="#3b82f6" strokeWidth="35" fill="none" />
+                                <path d="M 280 250 C 280 150, 500 150, 550 200" stroke="#3b82f6" strokeWidth="35" fill="none" />
+
+
+                                {/* --- HEART CHAMBERS --- */}
+
+                                {/* Right Ventricle (Thinner Wall) */}
+                                <path d="M 200 300 Q 180 500 300 550 Q 300 400 300 300 Z"
+                                    fill="#60a5fa" stroke="#1d4ed8" strokeWidth="4"
+                                    className={`transition-all duration-300 ${phase === 2 ? 'origin-center scale-95' : ''}`}
+                                />
+
+                                {/* Left Ventricle (Thicker Wall) */}
+                                <path d="M 320 300 Q 320 400 300 550 Q 500 500 450 300 Z"
+                                    fill="#f87171" stroke="#b91c1c" strokeWidth="12"
+                                    className={`transition-all duration-300 ${phase === 2 ? 'origin-center scale-95' : ''}`}
+                                />
+
+                                {/* Right Atrium */}
+                                <path d="M 180 180 C 120 180, 120 300, 200 300 L 280 300 L 280 200 Z"
+                                    fill="#93c5fd"
+                                    className={`transition-all duration-300 ${phase === 1 ? 'origin-bottom scale-90' : ''}`}
+                                />
+
+                                {/* Left Atrium */}
+                                <path d="M 340 200 L 340 300 C 450 300, 450 180, 360 180 Z"
+                                    fill="#fca5a5"
+                                    className={`transition-all duration-300 ${phase === 1 ? 'origin-bottom scale-90' : ''}`}
+                                />
+
+
+                                {/* --- VALVES (Animated Leaflets) --- */}
+
+                                {/* Tricuspid Valve (RA -> RV) - Opens in Phase 0/1 */}
+                                <g transform="translate(240, 300)">
+                                    {/* Left Leaflet */}
+                                    <path d="M -30 0 L -10 20 L -30 5" fill="white" stroke="#e2e8f0" strokeWidth="2"
+                                        style={{
+                                            transformOrigin: '-30px 0px',
+                                            transform: phase !== 2 ? 'rotate(45deg)' : 'rotate(0deg)',
+                                            transition: 'transform 0.2s ease-out'
+                                        }}
+                                    />
+                                    {/* Right Leaflet */}
+                                    <path d="M 10 0 L -10 20 L 10 5" fill="white" stroke="#e2e8f0" strokeWidth="2"
+                                        style={{
+                                            transformOrigin: '10px 0px',
+                                            transform: phase !== 2 ? 'rotate(-45deg)' : 'rotate(0deg)',
+                                            transition: 'transform 0.2s ease-out'
+                                        }}
+                                    />
+                                </g>
+
+                                {/* Bicuspid Valve (LA -> LV) - Opens in Phase 0/1 */}
+                                <g transform="translate(380, 300)">
+                                    <path d="M -30 0 L -10 20 L -30 5" fill="white" stroke="#e2e8f0" strokeWidth="2"
+                                        style={{
+                                            transformOrigin: '-30px 0px',
+                                            transform: phase !== 2 ? 'rotate(45deg)' : 'rotate(0deg)',
+                                            transition: 'transform 0.2s ease-out'
+                                        }}
+                                    />
+                                    <path d="M 10 0 L -10 20 L 10 5" fill="white" stroke="#e2e8f0" strokeWidth="2"
+                                        style={{
+                                            transformOrigin: '10px 0px',
+                                            transform: phase !== 2 ? 'rotate(-45deg)' : 'rotate(0deg)',
+                                            transition: 'transform 0.2s ease-out'
+                                        }}
+                                    />
+                                </g>
+
+                                {/* Pulmonary Valve (RV -> PA) - Opens in Phase 2 */}
+                                <g transform="translate(260, 270)">
+                                    {/* Semi-lunar flaps */}
+                                    <path d="M 0 0 Q 15 15 30 0" fill="none" stroke="white" strokeWidth="4"
+                                        style={{ opacity: phase === 2 ? 0.3 : 1 }}
+                                    />
+                                    {/* Open State */}
+                                    <path d="M 0 0 Q 5 -20 15 -25 Q 25 -20 30 0" fill="white" opacity={phase === 2 ? 1 : 0} />
+                                </g>
+
+                                {/* Aortic Valve (LV -> Aorta) - Opens in Phase 2 */}
+                                <g transform="translate(325, 270)">
+                                    <path d="M 0 0 Q 15 15 30 0" fill="none" stroke="white" strokeWidth="4"
+                                        style={{ opacity: phase === 2 ? 0.3 : 1 }}
+                                    />
+                                    <path d="M 0 0 Q 5 -20 15 -25 Q 25 -20 30 0" fill="white" opacity={phase === 2 ? 1 : 0} />
+                                </g>
+
+                                {/* --- LABELS --- */}
+                                <text x="140" y="240" fill="white" fontSize="14" fontWeight="bold" opacity="0.8">R. Atrium</text>
+                                <text x="400" y="240" fill="white" fontSize="14" fontWeight="bold" opacity="0.8">L. Atrium</text>
+                                <text x="210" y="450" fill="white" fontSize="14" fontWeight="bold" opacity="0.8">R. Ventricle</text>
+                                <text x="360" y="450" fill="white" fontSize="14" fontWeight="bold" opacity="0.8">L. Ventricle</text>
+
+                                {/* Vessel Labels */}
+                                <text x="460" y="100" fill="#ef4444" fontSize="16" fontWeight="bold" style={{ textShadow: '0 0 10px rgba(239,68,68,0.5)' }}>AORTA</text>
+                                <text x="80" y="120" fill="#3b82f6" fontSize="16" fontWeight="bold" style={{ textShadow: '0 0 10px rgba(59,130,246,0.5)' }}>PULMONARY A.</text>
+
+                                {/* --- BLOOD FLOW PARTICLES (Strictly Safe) --- */}
+                                <defs>
+                                    {/* Safe Inflow: VC -> RA Center -> Tricuspid Center -> RV Center */}
+                                    {/* Straight lines and gentle curves to avoid walls */}
+                                    <path id="flowRightIn" d="M 180 50 L 180 200 L 240 300 L 240 400" />
+
+                                    {/* Safe Inflow: PV -> LA Center -> Bicuspid Center -> LV Center */}
+                                    <path id="flowLeftIn" d="M 420 80 L 420 200 L 380 300 L 360 400" />
+
+                                    {/* Safe Outflow: RV Center -> Pulmonary Valve -> PA */}
+                                    <path id="flowRightOut" d="M 240 400 Q 240 320 260 270 Q 270 200 100 150" />
+
+                                    {/* Safe Outflow: LV Center -> Aortic Valve -> Aorta */}
+                                    <path id="flowLeftOut" d="M 360 400 Q 360 320 340 270 Q 330 200 450 100" />
+                                </defs>
+
+                                {/* Right Side (Blue) - Inflow */}
+                                <g style={{ opacity: phase !== 2 ? 1 : 0, transition: 'opacity 0.2s' }}>
+                                    {[...Array(8)].map((_, i) => (
+                                        <circle key={`rb-in-${i}`} r="6" fill="#60a5fa">
+                                            <animateMotion dur={`${1.5 + i * 0.2}s`} repeatCount="indefinite" begin={`${i * 0.2}s`}>
+                                                <mpath href="#flowRightIn" />
+                                            </animateMotion>
+                                        </circle>
+                                    ))}
+                                </g>
+
+                                {/* Left Side (Red) - Inflow */}
+                                <g style={{ opacity: phase !== 2 ? 1 : 0, transition: 'opacity 0.2s' }}>
+                                    {[...Array(8)].map((_, i) => (
+                                        <circle key={`ro-in-${i}`} r="6" fill="#f87171">
+                                            <animateMotion dur={`${1.5 + i * 0.2}s`} repeatCount="indefinite" begin={`${i * 0.2}s`}>
+                                                <mpath href="#flowLeftIn" />
+                                            </animateMotion>
+                                        </circle>
+                                    ))}
+                                </g>
+
+                                {/* Outflow */}
+                                <g style={{ opacity: phase === 2 ? 1 : 0, transition: 'opacity 0.1s' }}>
+                                    {[...Array(12)].map((_, i) => (
+                                        <circle key={`rb-out-${i}`} r="6" fill="#60a5fa">
+                                            <animateMotion dur={`${0.8 + Math.random() * 0.5}s`} repeatCount="indefinite" begin={`${i * 0.05}s`}>
+                                                <mpath href="#flowRightOut" />
+                                            </animateMotion>
+                                        </circle>
+                                    ))}
+                                    {[...Array(12)].map((_, i) => (
+                                        <circle key={`ro-out-${i}`} r="6" fill="#f87171">
+                                            <animateMotion dur={`${0.8 + Math.random() * 0.5}s`} repeatCount="indefinite" begin={`${i * 0.05}s`}>
+                                                <mpath href="#flowLeftOut" />
+                                            </animateMotion>
+                                        </circle>
+                                    ))}
+                                </g>
+
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+        setTimeout(() => lucide.createIcons(), 100);
+    </script>
+</body>
+
+</html>
