@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小二常識：推與拉 | Push and Pull</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #e0f2fe 0%, #bfdbfe 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Push and Pull",
+          zh: "推與拉",
+          ja: "押すと引く",
+        },
+        instruction: {
+          en: "Sort the actions!",
+          zh: "將動作分類！",
+          ja: "行動を分類してください！",
+        },
+        push: { en: "Push", zh: "推" },
+        pull: { en: "Pull", zh: "拉" },
+
+        cart: { en: "Pushing Cart", zh: "推購物車" },
+        door_open: { en: "Open Door (Out)", zh: "推門" },
+        button: { en: "Press Button", zh: "按鈕" },
+
+        tug: { en: "Tug of War", zh: "拔河" },
+        drawer: { en: "Open Drawer", zh: "拉開抽屜" },
+        kite: { en: "Flying Kite", zh: "放風箏" },
+
+        check: { en: "Check", zh: "檢查" },
+        reset: { en: "Reset", zh: "重置" },
+        correct: { en: "Correct! Forces are fun!", zh: "答對了！力學真有趣！" },
+        wrong: { en: "Some are wrong.", zh: "有些分類錯了。" },
+      };
+
+      const tasks = [
+        { id: "cart", label: "cart", icon: "🛒", type: "push" },
+        { id: "tug", label: "tug", icon: "🪢", type: "pull" },
+        { id: "door_open", label: "door_open", icon: "🚪💨", type: "push" },
+        { id: "drawer", label: "drawer", icon: "🗄️", type: "pull" },
+        { id: "button", label: "button", icon: "👆", type: "push" },
+        { id: "kite", label: "kite", icon: "🪁", type: "pull" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [placements, setPlacements] = useState({}); // itemId -> 'push' | 'pull'
+        const [available, setAvailable] = useState([]);
+        const [status, setStatus] = useState(null);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        useEffect(() => {
+          reset();
+        }, []);
+
+        const reset = () => {
+          setAvailable(tasks.map((t) => t.id).sort(() => Math.random() - 0.5));
+          setPlacements({});
+          setStatus(null);
+        };
+
+        const handleDrop = (id, zone) => {
+          setPlacements((prev) => ({ ...prev, [id]: zone }));
+          setAvailable((prev) => prev.filter((x) => x !== id));
+          setStatus(null);
+        };
+
+        const check = () => {
+          if (available.length > 0) {
+            setStatus("wrong"); // Or incomplete
+            return;
+          }
+
+          const wrongItems = tasks.filter(
+            (task) => placements[task.id] !== task.type
+          );
+          if (wrongItems.length === 0) setStatus("correct");
+          else setStatus("wrong");
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-blue-900 mb-4 mt-8 drop-shadow-sm bg-white/50 px-6 py-2 rounded-full">
+              ✋ {getText("title")}
+            </h1>
+            <p className="font-bold text-blue-800 mb-8">
+              {getText("instruction")}
+            </p>
+
+            <div className="flex flex-col md:flex-row gap-8 w-full max-w-5xl mb-8">
+              {/* Push Zone */}
+              <div
+                className="flex-1 bg-blue-100 rounded-3xl p-6 border-4 border-dashed border-blue-400 min-h-[300px] flex flex-col items-center"
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const id = e.dataTransfer.getData("id");
+                  if (id) handleDrop(id, "push");
+                }}
+              >
+                <div className="text-4xl font-black text-blue-500 mb-4 bg-white/80 px-8 py-2 rounded-xl shadow uppercase disable-select pointer-events-none">
+                  ➡️ {getText("push")}
+                </div>
+                <div className="flex flex-wrap gap-4 justify-center">
+                  {Object.entries(placements)
+                    .filter(([id, zone]) => zone === "push")
+                    .map(([id, zone]) => {
+                      const item = tasks.find((t) => t.id === id);
+                      return (
+                        <motion.div
+                          key={id}
+                          layoutId={id}
+                          className="bg-white p-4 rounded-xl shadow-md w-32 flex flex-col items-center cursor-pointer"
+                          onClick={() => {
+                            const n = { ...placements };
+                            delete n[id];
+                            setPlacements(n);
+                            setAvailable((p) => [...p, id]);
+                            setStatus(null);
+                          }}
+                        >
+                          <div className="text-5xl mb-2">{item.icon}</div>
+                          <div className="text-xs font-bold text-slate-600 text-center">
+                            {getText(item.label)}
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                </div>
+              </div>
+
+              {/* Pull Zone */}
+              <div
+                className="flex-1 bg-purple-100 rounded-3xl p-6 border-4 border-dashed border-purple-400 min-h-[300px] flex flex-col items-center"
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const id = e.dataTransfer.getData("id");
+                  if (id) handleDrop(id, "pull");
+                }}
+              >
+                <div className="text-4xl font-black text-purple-500 mb-4 bg-white/80 px-8 py-2 rounded-xl shadow uppercase disable-select pointer-events-none">
+                  ⬅️ {getText("pull")}
+                </div>
+                <div className="flex flex-wrap gap-4 justify-center">
+                  {Object.entries(placements)
+                    .filter(([id, zone]) => zone === "pull")
+                    .map(([id, zone]) => {
+                      const item = tasks.find((t) => t.id === id);
+                      return (
+                        <motion.div
+                          key={id}
+                          layoutId={id}
+                          className="bg-white p-4 rounded-xl shadow-md w-32 flex flex-col items-center cursor-pointer"
+                          onClick={() => {
+                            const n = { ...placements };
+                            delete n[id];
+                            setPlacements(n);
+                            setAvailable((p) => [...p, id]);
+                            setStatus(null);
+                          }}
+                        >
+                          <div className="text-5xl mb-2">{item.icon}</div>
+                          <div className="text-xs font-bold text-slate-600 text-center">
+                            {getText(item.label)}
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                </div>
+              </div>
+            </div>
+
+            {/* Item Bank */}
+            <div className="w-full max-w-4xl bg-white/60 p-6 rounded-3xl min-h-[120px] mb-8">
+              <div className="flex flex-wrap gap-4 justify-center">
+                {available.map((id) => {
+                  const item = tasks.find((t) => t.id === id);
+                  return (
+                    <motion.div
+                      key={id}
+                      layoutId={id}
+                      draggable
+                      onDragStart={(e) => e.dataTransfer.setData("id", id)}
+                      className="bg-white p-4 rounded-xl shadow-md w-32 flex flex-col items-center cursor-grab active:cursor-grabbing hover:scale-105 transition-transform"
+                    >
+                      <div className="text-5xl mb-2">{item.icon}</div>
+                      <div className="text-xs font-bold text-slate-600 text-center">
+                        {getText(item.label)}
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {status && (
+              <div
+                className={`p-4 rounded-2xl font-black text-center text-xl shadow w-full max-w-md mb-8 ${
+                  status === "correct"
+                    ? "bg-green-100 text-green-700"
+                    : "bg-red-100 text-red-600"
+                }`}
+              >
+                {getText(status)}
+              </div>
+            )}
+
+            <div className="flex gap-4 w-full max-w-md">
+              <button
+                onClick={check}
+                className="flex-1 bg-blue-600 text-white py-4 rounded-xl font-bold shadow-xl border-b-4 border-blue-800 active:border-b-0 active:translate-y-1 text-xl"
+              >
+                {getText("check")}
+              </button>
+              <button
+                onClick={reset}
+                className="bg-slate-200 text-slate-600 px-8 py-4 rounded-xl font-bold shadow-xl border-b-4 border-slate-400 active:border-b-0 active:translate-y-1 text-xl"
+              >
+                {getText("reset")}
+              </button>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

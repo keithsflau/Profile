@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小一數學：10的組合 | Number Bonds of 10</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #ecfeff 0%, #06b6d4 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "🔟 Number Bonds of 10",
+          zh: "🔟 10的組合",
+          ja: "🔟 10の分解",
+          ko: "🔟 10의 구성",
+          es: "🔟 Enlaces numéricos de 10",
+          de: "🔟 Zahlzerlegung von 10",
+          fi: "🔟 Numerosidokset 10",
+          fr: "🔟 Compléments de 10",
+          ar: "🔟 مكونات العدد 10",
+          it: "🔟 Legami numerici del 10",
+        },
+        part1: {
+          en: "Part 1:",
+          zh: "第一部分:",
+          ja: "パート1:",
+          ko: "부분 1:",
+          es: "Parte 1:",
+          de: "Teil 1:",
+          fi: "Osa 1:",
+          fr: "Partie 1:",
+          ar: "الجزء 1:",
+          it: "Parte 1:",
+        },
+        part2: {
+          en: "Part 2:",
+          zh: "第二部分:",
+          ja: "パート2:",
+          ko: "부분 2:",
+          es: "Parte 2:",
+          de: "Teil 2:",
+          fi: "Osa 2:",
+          fr: "Partie 2:",
+          ar: "الجزء 2:",
+          it: "Parte 2:",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [part1, setPart1] = useState(3);
+        const total = 10;
+        const part2 = total - part1;
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center justify-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+
+            <h1 className="text-5xl font-black text-cyan-900 mb-8 text-center max-w-2xl">
+              {t.title[lang] || t.title["en"]}
+            </h1>
+
+            <div className="bg-white/90 rounded-3xl p-8 shadow-2xl w-full max-w-2xl text-center border-4 border-cyan-200">
+              {/* Ten Frame Concept Visualization */}
+              <div className="grid grid-cols-5 gap-4 bg-slate-200 p-6 rounded-2xl mb-8 w-full max-w-md mx-auto border-4 border-slate-300">
+                {[...Array(10)].map((_, i) => (
+                  <div
+                    key={i}
+                    className={`w-12 h-12 rounded-full border-4 ${
+                      i < part1
+                        ? "bg-cyan-500 border-cyan-600"
+                        : "bg-white border-slate-400"
+                    }`}
+                  ></div>
+                ))}
+              </div>
+
+              <div className="text-4xl font-black text-cyan-800 mb-8">
+                {part1} + {part2} = 10
+              </div>
+
+              <input
+                type="range"
+                min="0"
+                max="10"
+                value={part1}
+                onChange={(e) => setPart1(parseInt(e.target.value))}
+                className="w-full accent-cyan-500 h-4 bg-slate-200 rounded-lg cursor-pointer mb-8"
+              />
+
+              <div className="grid grid-cols-2 gap-8 font-black text-2xl text-slate-500">
+                <div>
+                  {t.part1[lang] || t.part1["en"]}{" "}
+                  <span className="text-cyan-600 text-4xl">{part1}</span>
+                </div>
+                <div>
+                  {t.part2[lang] || t.part2["en"]}{" "}
+                  <span className="text-slate-400 text-4xl">{part2}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

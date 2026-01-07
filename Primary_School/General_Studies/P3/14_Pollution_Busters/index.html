@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小三常識：污染剋星 | Pollution Busters</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #a1a1aa 0%, #71717a 100%);
+        cursor: crosshair;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Pollution Busters",
+          zh: "污染剋星",
+          ja: "汚染バスターズ",
+          ko: "오염 버스터즈",
+          es: "Cazadores de Contaminación",
+          de: "Umweltverschmutzungs-Jäger",
+          fi: "Saasteentorjujat",
+          fr: "Chasseurs de pollution",
+          ar: "مكافحو التلوث",
+          it: "Cacciatori di Inquinamento",
+        },
+        instruction: {
+          en: "Tap all pollution sources!",
+          zh: "找出所有污染源頭！",
+          ja: "すべての汚染源をタップしよう！",
+          ko: "모든 오염원을 탭하세요!",
+          es: "¡Toca todas las fuentes de contaminación!",
+          de: "Tippe auf alle Verschmutzungsquellen!",
+          fi: "Napauta kaikkia saastelähteitä!",
+          fr: "Touchez toutes les sources de pollution !",
+          ar: "اضغط على جميع مصادر التلوث!",
+          it: "Tocca tutte le fonti di inquinamento!",
+        },
+
+        air: {
+          en: "Air Pollution",
+          zh: "空氣污染",
+          ja: "大気汚染",
+          ko: "대기 오염",
+          es: "Contaminación del Aire",
+          de: "Luftverschmutzung",
+          fi: "Ilmansaasteet",
+          fr: "Pollution de l'air",
+          ar: "تلوث الهواء",
+          it: "Inquinamento dell'Aria",
+        },
+        sound: {
+          en: "Noise Pollution",
+          zh: "噪音污染",
+          ja: "騒音公害",
+          ko: "소음 공해",
+          es: "Contaminación Acústica",
+          de: "Lärmbelästigung",
+          fi: "Melusaaste",
+          fr: "Pollution sonore",
+          ar: "تلوث ضوضائي",
+          it: "Inquinamento Acustico",
+        },
+        light: {
+          en: "Light Pollution",
+          zh: "光污染",
+          ja: "光害",
+          ko: "빛 공해",
+          es: "Contaminación Lumínica",
+          de: "Lichtverschmutzung",
+          fi: "Valosaaste",
+          fr: "Pollution lumineuse",
+          ar: "تلوث ضوئي",
+          it: "Inquinamento Luminoso",
+        },
+        land: {
+          en: "Land Pollution",
+          zh: "土地污染",
+          ja: "土壌汚染",
+          ko: "토양 오염",
+          es: "Contaminación del Suelo",
+          de: "Bodenverschmutzung",
+          fi: "Maaperän saastuminen",
+          fr: "Pollution des sols",
+          ar: "تلوث الأرض",
+          it: "Inquinamento del Suolo",
+        },
+
+        found: {
+          en: "Found:",
+          zh: "發現：",
+          ja: "発見:",
+          ko: "발견:",
+          es: "Encontrado:",
+          de: "Gefunden:",
+          fi: "Löydetty:",
+          fr: "Trouvé :",
+          ar: "تم العثور عليه:",
+          it: "Trovato:",
+        },
+        cleared: {
+          en: "Pollution Cleared!",
+          zh: "污染已清除！",
+          ja: "汚染除去完了！",
+          ko: "오염 제거 완료!",
+          es: "¡Contaminación Eliminada!",
+          de: "Verschmutzung beseitigt!",
+          fi: "Saasteet poistettu!",
+          fr: "Pollution éliminée !",
+          ar: "تم تنظيف التلوث!",
+          it: "Inquinamento eliminato!",
+        },
+        reset: {
+          en: "Play Again",
+          zh: "再玩一次",
+          ja: "もう一度プレイ",
+          ko: "다시 하기",
+          es: "Jugar de Nuevo",
+          de: "Nochmal spielen",
+          fi: "Pelaa uudelleen",
+          fr: "Rejouer",
+          ar: "العب مرة أخرى",
+          it: "Gioca di Nuovo",
+        },
+
+        desc_exhaust: {
+          en: "Car Exhaust",
+          zh: "汽車廢氣",
+          ja: "車の排気ガス",
+          ko: "자동차 배기가스",
+          es: "Escape de coche",
+          de: "Autoabgase",
+          fi: "Auton pakokaasut",
+          fr: "Échappement de voiture",
+          ar: "عوادم السيارات",
+          it: "Scarico auto",
+        },
+        desc_drill: {
+          en: "Construction Noise",
+          zh: "地盤噪音",
+          ja: "工事の騒音",
+          ko: "공사 소음",
+          es: "Ruido de construcción",
+          de: "Baulärm",
+          fi: "Rakennustyömaan melu",
+          fr: "Bruit de construction",
+          ar: "ضوضاء البناء",
+          it: "Rumore di costruzione",
+        },
+        desc_trash: {
+          en: "Litter",
+          zh: "垃圾",
+          ja: "ゴミ",
+          ko: "쓰레기",
+          es: "Basura",
+          de: "Müll",
+          fi: "Roska",
+          fr: "Déchets",
+          ar: "قمامة",
+          it: "Rifiuti",
+        },
+        desc_neon: {
+          en: "Bright Signs",
+          zh: "霓虹燈招牌",
+          ja: "明るい看板",
+          ko: "밝은 간판",
+          es: "Carteles brillantes",
+          de: "Helle Schilder",
+          fi: "Kirkkaat kyltit",
+          fr: "Enseignes lumineuses",
+          ar: "علامات ساطعة",
+          it: "Insegne luminose",
+        },
+        desc_smoke: {
+          en: "Factory Smoke",
+          zh: "工廠黑煙",
+          ja: "工場の煙",
+          ko: "공장 연기",
+          es: "Humo de fábrica",
+          de: "Fabrikrauch",
+          fi: "Tehtaan savu",
+          fr: "Fumée d'usine",
+          ar: "دخان المصانع",
+          it: "Fumo di fabbrica",
+        },
+        desc_sewage: {
+          en: "Dirty Water",
+          zh: "污水",
+          ja: "汚水",
+          ko: "더러운 물",
+          es: "Agua sucia",
+          de: "Schmutzwasser",
+          fi: "Likainen vesi",
+          fr: "Eau sale",
+          ar: "مياه قذرة",
+          it: "Acqua sporca",
+        },
+      };
+
+      const pollutions = [
+        {
+          id: 1,
+          type: "air",
+          icon: "💨",
+          x: 20,
+          y: 30,
+          desc: "desc_smoke",
+          color: "text-slate-500",
+        },
+        {
+          id: 2,
+          type: "sound",
+          icon: "🔨",
+          x: 80,
+          y: 60,
+          desc: "desc_drill",
+          color: "text-yellow-600",
+        },
+        {
+          id: 3,
+          type: "land",
+          icon: "🚮",
+          x: 50,
+          y: 80,
+          desc: "desc_trash",
+          color: "text-slate-400",
+        },
+        {
+          id: 4,
+          type: "air",
+          icon: "🚗",
+          x: 30,
+          y: 70,
+          desc: "desc_exhaust",
+          color: "text-slate-500",
+        },
+        {
+          id: 5,
+          type: "light",
+          icon: "💡",
+          x: 70,
+          y: 20,
+          desc: "desc_neon",
+          color: "text-yellow-300",
+        },
+        {
+          id: 6,
+          type: "land",
+          icon: "🧪",
+          x: 60,
+          y: 85,
+          desc: "desc_sewage",
+          color: "text-green-600",
+        },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [found, setFound] = useState([]); // ids
+        const [cleared, setCleared] = useState(false);
+        const [popups, setPopups] = useState([]); // visual text popups
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        useEffect(() => {
+          if (found.length === pollutions.length) {
+            setCleared(true);
+          }
+        }, [found]);
+
+        const handleClick = (p) => {
+          if (found.includes(p.id)) return;
+
+          setFound((prev) => [...prev, p.id]);
+
+          // Add popup
+          const pid = Date.now();
+          setPopups((prev) => [
+            ...prev,
+            { id: pid, x: p.x, y: p.y, text: getText(p.desc) },
+          ]);
+          setTimeout(() => {
+            setPopups((prev) => prev.filter((pp) => pp.id !== pid));
+          }, 1000);
+        };
+
+        const reset = () => {
+          setFound([]);
+          setCleared(false);
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center select-none font-sans relative overflow-hidden">
+            <LanguageSelector lang={lang} setLang={setLang} />
+
+            <h1 className="text-4xl md:text-5xl font-black text-rose-500 mb-2 mt-8 drop-shadow-md z-10 bg-white/80 px-6 py-2 rounded-full">
+              🕵️ {getText("title")}
+            </h1>
+
+            <div className="absolute top-4 left-4 z-20 font-black text-2xl text-white bg-black/40 px-4 py-2 rounded-xl">
+              {found.length} / {pollutions.length}
+            </div>
+
+            {/* Game Scene (City Background) */}
+            <div className="absolute inset-0 z-0">
+              {/* Sky */}
+              <div
+                className={`absolute inset-0 transition-colors duration-1000 ${
+                  cleared ? "bg-sky-300" : "bg-slate-400"
+                }`}
+              ></div>
+
+              {/* Buildings */}
+              <div className="absolute bottom-0 w-full h-[60%] flex items-end justify-center opacity-50 pointer-events-none">
+                <div className="w-20 h-64 bg-slate-700 mx-1"></div>
+                <div className="w-32 h-96 bg-slate-800 mx-1"></div>
+                <div className="w-24 h-48 bg-slate-600 mx-1"></div>
+                <div className="w-40 h-80 bg-slate-700 mx-1"></div>
+                <div className="w-16 h-40 bg-slate-600 mx-1"></div>
+              </div>
+
+              {/* Pollution Items */}
+              {pollutions.map((p) => {
+                const isFound = found.includes(p.id);
+                return (
+                  <button
+                    key={p.id}
+                    onClick={() => handleClick(p)}
+                    className={`absolute transform -translate-x-1/2 -translate-y-1/2 transition-all duration-500 focus:outline-none
+                                 ${
+                                   isFound
+                                     ? "opacity-0 scale-150 pointer-events-none"
+                                     : "opacity-100 scale-100 hover:scale-110"
+                                 }
+                             `}
+                    style={{ left: `${p.x}%`, top: `${p.y}%` }}
+                  >
+                    <div
+                      className={`text-6xl md:text-8xl drop-shadow-2xl ${p.color}`}
+                    >
+                      {p.icon}
+                    </div>
+                    {/* Hint Pulse */}
+                    {!isFound && (
+                      <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-20 -z-10"></div>
+                    )}
+                  </button>
+                );
+              })}
+
+              {/* Cleared FX */}
+              {cleared && (
+                <div className="absolute inset-0 pointer-events-none">
+                  <div className="absolute top-[20%] left-[20%] text-6xl animate-bounce">
+                    🦋
+                  </div>
+                  <div className="absolute top-[30%] right-[30%] text-6xl animate-bounce delay-100">
+                    🕊️
+                  </div>
+                  <div className="absolute bottom-[20%] left-[40%] text-6xl animate-bounce delay-200">
+                    🌻
+                  </div>
+                </div>
+              )}
+
+              {/* Popups */}
+              <AnimatePresence>
+                {popups.map((pp) => (
+                  <motion.div
+                    key={pp.id}
+                    initial={{ opacity: 0, y: 0 }}
+                    animate={{ opacity: 1, y: -50 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute bg-white text-slate-800 px-4 py-2 rounded-xl font-bold border-2 border-green-400 shadow-xl z-30 pointer-events-none transform -translate-x-1/2"
+                    style={{ left: `${pp.x}%`, top: `${pp.y}%` }}
+                  >
+                    ✅ {pp.text}
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+
+            {/* Win Screen */}
+            {cleared && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/90 p-12 rounded-[3rem] shadow-2xl text-center z-50 backdrop-blur-md"
+              >
+                <div className="text-8xl mb-4">🌿</div>
+                <h2 className="text-4xl font-black text-green-600 mb-6">
+                  {getText("cleared")}
+                </h2>
+                <button
+                  onClick={reset}
+                  className="bg-green-500 text-white px-10 py-4 rounded-full font-black text-xl hover:bg-green-600 shadow-xl"
+                >
+                  {getText("reset")} 🔄
+                </button>
+              </motion.div>
+            )}
+
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/80 px-6 py-2 rounded-full font-bold text-slate-600 z-10 shadow-lg pointer-events-none">
+              {getText("instruction")}
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

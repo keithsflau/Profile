@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mathematical Induction | M2 Algebra</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", sans-serif;
+        background: #0f172a;
+        color: #e2e8f0;
+      }
+      .glass {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .domino {
+        transition: transform 0.5s ease-in;
+        transform-origin: bottom center;
+      }
+      .fall {
+        transform: rotate(70deg);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <div id="root" class="flex-grow flex flex-col"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      const translations = {
+        en: {
+          unit: "Unit 1: Algebra",
+          title: "Mathematical Induction",
+          subtitle: "The Domino Effect",
+          steps: "Steps",
+          base_title: "1. Base Case P(1)",
+          base_desc: "Prove the first domino falls.",
+          ind_title: "2. Inductive Step",
+          ind_desc: "Prove if P(k) falls, it knocks down P(k+1).",
+          conc_title: "3. Conclusion",
+          conc_desc: "P(n) is true for all n.",
+          ready: "Ready to Start",
+          push: "Push P(1)",
+          reset: "Reset",
+          langBtn: "中文",
+        },
+        zh: {
+          unit: "第一單元：代數",
+          title: "數學歸納法",
+          subtitle: "骨牌效應",
+          steps: "證明步驟",
+          base_title: "1. 基本步驟 P(1)",
+          base_desc: "證明第一塊骨牌倒下。",
+          ind_title: "2. 歸納步驟",
+          ind_desc: "證明若 P(k) 倒下，則會推倒 P(k+1)。",
+          conc_title: "3. 結論",
+          conc_desc: "P(n) 對所有 n 皆成立。",
+          ready: "準備開始",
+          push: "推倒 P(1)",
+          reset: "重置",
+          langBtn: "English",
+        },
+      };
+
+      const App = () => {
+        // Logic: P(1) is true. If P(k) true => P(k+1) true. Then All true.
+        // Visual: Dominoes
+
+        const [lang, setLang] = useState("en");
+        const t = translations[lang];
+
+        const n = 10;
+        const [fallen, setFallen] = useState(-1); // index of last fallen
+        const [isAuto, setIsAuto] = useState(false);
+
+        const pushFirst = () => {
+          setFallen(0);
+          setIsAuto(true);
+        };
+
+        const reset = () => {
+          setFallen(-1);
+          setIsAuto(false);
+        };
+
+        useEffect(() => {
+          if (isAuto && fallen >= 0 && fallen < n - 1) {
+            const timer = setTimeout(() => {
+              setFallen((prev) => prev + 1);
+            }, 300); // delay between falls
+            return () => clearTimeout(timer);
+          } else if (fallen === n - 1) {
+            setIsAuto(false);
+          }
+        }, [fallen, isAuto]);
+
+        return (
+          <div className="flex-grow flex flex-col items-center justify-center p-8 select-none">
+            <div className="absolute top-4 right-4">
+              <button
+                onClick={() => setLang((l) => (l === "en" ? "zh" : "en"))}
+                className="px-3 py-1 bg-slate-800 border border-slate-600 rounded-full text-xs font-bold text-emerald-400 hover:bg-slate-700 hover:text-white transition flex items-center gap-2"
+              >
+                <i className="fa-solid fa-language"></i>
+                {t.langBtn}
+              </button>
+            </div>
+
+            <header className="mb-8 text-center">
+              <div className="text-emerald-500 font-bold uppercase tracking-widest text-xs mb-2">
+                {t.unit}
+              </div>
+              <h1 className="text-4xl font-extrabold text-white mb-2">
+                {t.title}
+              </h1>
+              <p className="text-slate-400 font-mono text-lg">{t.subtitle}</p>
+            </header>
+
+            <div className="w-full max-w-4xl space-y-8">
+              <div className="glass p-12 rounded-3xl relative h-64 flex items-end justify-center perspective-1000 overflow-hidden">
+                <div className="absolute inset-x-0 bottom-0 h-4 bg-slate-700"></div>
+
+                <div className="flex gap-4 items-end">
+                  {Array.from({ length: n }).map((_, i) => (
+                    <div key={i} className="relative group">
+                      <div
+                        className={`domino w-8 h-32 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-md shadow-lg border border-white/20 flex flex-col items-center justify-between py-2 ${
+                          fallen >= i ? "fall" : ""
+                        }`}
+                      >
+                        <div className="w-4 h-4 bg-white/20 rounded-full"></div>
+                        <div className="text-white font-bold text-xs">
+                          P{i + 1}
+                        </div>
+                        <div className="w-4 h-4 bg-white/20 rounded-full"></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="glass p-6 rounded-2xl">
+                  <h3 className="text-lg font-bold text-white mb-4">
+                    {t.steps}
+                  </h3>
+                  <div className="space-y-4">
+                    <div
+                      className={`p-4 rounded-xl border ${
+                        fallen >= 0
+                          ? "bg-emerald-900/30 border-emerald-500/50"
+                          : "bg-slate-800 border-transparent"
+                      }`}
+                    >
+                      <div className="font-bold text-sm text-emerald-400 mb-1">
+                        {t.base_title}
+                      </div>
+                      <div className="text-xs text-slate-400">
+                        {t.base_desc}
+                      </div>
+                    </div>
+                    <div
+                      className={`p-4 rounded-xl border ${
+                        fallen > 0
+                          ? "bg-emerald-900/30 border-emerald-500/50"
+                          : "bg-slate-800 border-transparent"
+                      }`}
+                    >
+                      <div className="font-bold text-sm text-emerald-400 mb-1">
+                        {t.ind_title}
+                      </div>
+                      <div className="text-xs text-slate-400">{t.ind_desc}</div>
+                    </div>
+                    <div
+                      className={`p-4 rounded-xl border ${
+                        fallen === n - 1
+                          ? "bg-emerald-900/30 border-emerald-500/50"
+                          : "bg-slate-800 border-transparent"
+                      }`}
+                    >
+                      <div className="font-bold text-sm text-emerald-400 mb-1">
+                        {t.conc_title}
+                      </div>
+                      <div className="text-xs text-slate-400">
+                        {t.conc_desc}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="glass p-6 rounded-2xl flex flex-col justify-center items-center gap-6">
+                  <div className="text-center">
+                    <div className="text-6xl mb-4">
+                      {fallen === -1 ? "🤔" : fallen === n - 1 ? "🎉" : "😲"}
+                    </div>
+                    <div className="text-slate-300 font-mono text-sm">
+                      {fallen === -1 ? t.ready : `P(${fallen + 1}) is True`}
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4">
+                    <button
+                      onClick={pushFirst}
+                      disabled={fallen >= 0}
+                      className="px-6 py-3 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed text-slate-900 font-bold rounded-xl transition"
+                    >
+                      {t.push}
+                    </button>
+                    <button
+                      onClick={reset}
+                      className="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl transition"
+                    >
+                      {t.reset}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      };
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小六數學：百分數增加 | Percentage Increase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #f0fdf4 0%, #22c55e 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      function App() {
+        const [original, setOriginal] = useState(200);
+        const [percent, setPercent] = useState(25);
+
+        const increase = (original * percent) / 100;
+        const newValue = original + increase;
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-5xl font-black text-green-900 mb-2">
+              📈 百分數增加
+            </h1>
+            <p className="text-xl text-green-700 font-bold mb-8">
+              Percentage Increase
+            </p>
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-2xl w-full">
+              <div className="grid grid-cols-2 gap-6 mb-8">
+                <div className="text-center">
+                  <label className="block font-bold text-green-700 mb-2">
+                    原價 Original
+                  </label>
+                  <input
+                    type="number"
+                    value={original}
+                    onChange={(e) =>
+                      setOriginal(parseFloat(e.target.value) || 0)
+                    }
+                    className="w-full text-3xl font-black text-center border-4 border-green-300 rounded-xl p-2"
+                  />
+                </div>
+                <div className="text-center">
+                  <label className="block font-bold text-green-700 mb-2">
+                    增加 Increase (%)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="200"
+                    value={percent}
+                    onChange={(e) =>
+                      setPercent(parseFloat(e.target.value) || 0)
+                    }
+                    className="w-full text-3xl font-black text-center border-4 border-green-300 rounded-xl p-2"
+                  />
+                </div>
+              </div>
+
+              <div className="bg-slate-50 rounded-2xl p-6 mb-6">
+                <p className="font-bold mb-2">計算:</p>
+                <p className="font-mono">
+                  增加量 = {original} × {percent}% = {increase}
+                </p>
+                <p className="font-mono">
+                  新價 = {original} + {increase} = {newValue}
+                </p>
+              </div>
+
+              <div className="bg-emerald-100 rounded-2xl p-6 text-center border-4 border-emerald-300">
+                <div className="text-emerald-600 font-bold">
+                  新數值 New Value
+                </div>
+                <div className="text-5xl font-black text-emerald-800">
+                  ${newValue}
+                </div>
+              </div>
+
+              <div className="mt-6 bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
+                <p className="font-bold">💡 快捷方法: 原價 × (1 + 百分數)</p>
+                <p className="text-sm font-mono">
+                  {original} × (1 + {percent}%) = {original} ×{" "}
+                  {(1 + percent / 100).toFixed(2)} = {newValue}
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

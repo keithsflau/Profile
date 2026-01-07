@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Say No to Drugs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #f3f4f6;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Say NO to Drugs",
+          zh: "向毒品說不",
+          ja: "薬物にNOと言おう",
+          ko: "마약에 NO라고 말하세요",
+          es: "Di NO a las drogas",
+          de: "Sag NEIN zu Drogen",
+          fi: "Sano EI huumeille",
+          fr: "Dites NON à la drogue",
+          ar: "قل لا للمخدرات",
+          it: "Dì NO alla droga",
+        },
+        instruction: {
+          en: "What should you say?",
+          zh: "你應該說什麼？",
+          ja: "何を言うべきですか？",
+          ko: "뭐라고 말해야 할까요?",
+          es: "¿Qué deberías decir?",
+          de: "Was solltest du sagen?",
+          fi: "Mitä sinun pitäisi sanoa?",
+          fr: "Que devriez-vous dire ?",
+          ar: "ماذا يجب أن تقول؟",
+          it: "Cosa dovresti dire?",
+        },
+        offer: {
+          en: "Hey, try this pill. It's fun!",
+          zh: "嘿，試試這顆藥丸，很有趣！",
+          ja: "ねえ、この薬を試してみて。楽しいよ！",
+          ko: "이봐, 이 알약 먹어봐. 재밌어!",
+        },
+        yes: {
+          en: "Okay, I'll try.",
+          zh: "好吧，我試試。",
+          ja: "わかった、試してみる。",
+          ko: "알겠어, 시도해볼게.",
+        },
+        no: {
+          en: "No! Leave me alone.",
+          zh: "不！走開。",
+          ja: "いいえ！放っておいて。",
+          ko: "안 돼! 저리 가.",
+        },
+
+        bad_end: {
+          en: "Oh no! Never take unknown pills.",
+          zh: "糟了！切勿服用不明藥丸。",
+          ja: "あーあ！未知の薬は絶対に飲まないで。",
+          ko: "오 안돼! 알 수 없는 알약은 절대 먹지 마세요.",
+        },
+        good_end: {
+          en: "Great job! Keep yourself safe.",
+          zh: "做得好！保護自己安全。",
+          ja: "よくやった！自分を守ろう。",
+          ko: "잘했어! 자신을 안전하게 지키세요.",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [result, setResult] = useState(null); // good, bad
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-slate-800">
+              {getText("title")}
+            </h1>
+
+            <div className="bg-white p-8 rounded-3xl shadow-xl max-w-2xl w-full border-4 border-slate-200">
+              {/* Scene */}
+              <div className="flex justify-between items-end mb-8 h-40 px-8 relative">
+                {/* Stranger */}
+                <div className="text-center">
+                  <div className="text-8xl">🕵️‍♂️</div>
+                  <div className="bg-slate-200 p-2 rounded-t-xl rounded-br-xl text-sm font-bold absolute top-0 left-20 w-40 shadow">
+                    {getText("offer")}
+                  </div>
+                </div>
+
+                {/* You */}
+                <div className="text-8xl">🧑</div>
+              </div>
+
+              {/* Choices */}
+              {!result ? (
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => setResult("bad")}
+                    className="flex-1 bg-red-100 hover:bg-red-200 text-red-900 border-2 border-red-300 p-4 rounded-xl font-bold"
+                  >
+                    {getText("yes")}
+                  </button>
+                  <button
+                    onClick={() => setResult("good")}
+                    className="flex-1 bg-green-100 hover:bg-green-200 text-green-900 border-2 border-green-300 p-4 rounded-xl font-bold"
+                  >
+                    {getText("no")}
+                  </button>
+                </div>
+              ) : (
+                <div
+                  className={`p-8 rounded-xl font-bold text-center text-xl animate-bounce ${
+                    result === "good"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
+                  }`}
+                >
+                  {getText(result === "good" ? "good_end" : "bad_end")}
+                  <br />
+                  <button
+                    onClick={() => setResult(null)}
+                    className="mt-4 text-sm underline text-slate-500"
+                  >
+                    Replay
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

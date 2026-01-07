@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小六數學：百分數全能計算機</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      src="https://unpkg.com/react@18/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.min.js"></script>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        min-height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState } = React;
+      const { motion } = window.Motion;
+      const { Percent, TrendingUp, TrendingDown, Calculator, ShoppingBag } =
+        window.LucideReact;
+
+      function App() {
+        const [mode, setMode] = useState("basic"); // basic, discount, increase, problem
+        const [value, setValue] = useState(100);
+        const [percentage, setPercentage] = useState(20);
+        const [originalPrice, setOriginalPrice] = useState(500);
+        const [discountRate, setDiscountRate] = useState(20);
+
+        const result = (value * percentage) / 100;
+        const discountAmount = (originalPrice * discountRate) / 100;
+        const finalPrice = originalPrice - discountAmount;
+
+        const scenarios = [
+          {
+            type: "discount",
+            scenario: "打折優惠",
+            original: 800,
+            rate: 25,
+            icon: "🏷️",
+          },
+          {
+            type: "increase",
+            scenario: "價格上升",
+            original: 300,
+            rate: 15,
+            icon: "📈",
+          },
+          {
+            type: "tax",
+            scenario: "增值稅",
+            original: 1000,
+            rate: 10,
+            icon: "💰",
+          },
+          {
+            type: "commission",
+            scenario: "佣金計算",
+            original: 5000,
+            rate: 3,
+            icon: "💼",
+          },
+        ];
+
+        const renderProgressBar = (percent) => {
+          return (
+            <div className="w-full h-12 bg-white/30 rounded-full overflow-hidden relative">
+              <motion.div
+                className="h-full bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-end pr-4"
+                initial={{ width: 0 }}
+                animate={{ width: `${percent}%` }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+              >
+                <span className="text-white font-black text-xl drop-shadow">
+                  {percent}%
+                </span>
+              </motion.div>
+            </div>
+          );
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <header className="text-center mb-8">
+              <div className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-md px-6 py-3 rounded-full mb-4">
+                <Percent className="text-white" size={24} />
+                <span className="text-white font-bold text-lg">小六數學</span>
+              </div>
+              <h1 className="text-5xl md:text-6xl font-black text-white mb-2 tracking-tight">
+                百分數全能計算機
+              </h1>
+              <p className="text-xl text-white/80 font-medium">
+                Percentage Master
+              </p>
+            </header>
+
+            {/* Mode Selector */}
+            <div className="flex flex-wrap gap-3 justify-center mb-8">
+              <button
+                onClick={() => setMode("basic")}
+                className={`px-6 py-3 rounded-2xl font-bold transition-all ${
+                  mode === "basic"
+                    ? "bg-white text-pink-600 shadow-lg scale-105"
+                    : "bg-white/20 text-white"
+                }`}
+              >
+                基本計算
+              </button>
+              <button
+                onClick={() => setMode("discount")}
+                className={`px-6 py-3 rounded-2xl font-bold transition-all ${
+                  mode === "discount"
+                    ? "bg-white text-pink-600 shadow-lg scale-105"
+                    : "bg-white/20 text-white"
+                }`}
+              >
+                折扣計算
+              </button>
+              <button
+                onClick={() => setMode("scenarios")}
+                className={`px-6 py-3 rounded-2xl font-bold transition-all ${
+                  mode === "scenarios"
+                    ? "bg-white text-pink-600 shadow-lg scale-105"
+                    : "bg-white/20 text-white"
+                }`}
+              >
+                實際應用
+              </button>
+            </div>
+
+            <main className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8">
+              {/* Main Calculation Area */}
+              <div className="lg:col-span-8 bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl">
+                {/* Basic Mode */}
+                {mode === "basic" && (
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-800 mb-6">
+                      基本百分數計算
+                    </h2>
+
+                    <div className="mb-6">
+                      <label className="block text-sm font-bold text-slate-600 mb-3">
+                        數值
+                      </label>
+                      <input
+                        type="number"
+                        value={value}
+                        onChange={(e) =>
+                          setValue(parseFloat(e.target.value) || 0)
+                        }
+                        className="w-full px-6 py-4 rounded-2xl border-2 border-pink-200 focus:border-pink-500 outline-none text-2xl font-black text-center"
+                      />
+                    </div>
+
+                    <div className="mb-6">
+                      <label className="block text-sm font-bold text-slate-600 mb-3">
+                        百分比 (%)
+                      </label>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={percentage}
+                        onChange={(e) =>
+                          setPercentage(parseInt(e.target.value))
+                        }
+                        className="w-full mb-3"
+                      />
+                      <div className="text-center text-4xl font-black text-pink-600 mb-4">
+                        {percentage}%
+                      </div>
+                      {renderProgressBar(percentage)}
+                    </div>
+
+                    <div className="bg-gradient-to-br from-pink-50 to-orange-50 rounded-2xl p-8 border-2 border-pink-200">
+                      <div className="text-center mb-4">
+                        <div className="text-xl font-bold text-slate-600 mb-2">
+                          計算公式
+                        </div>
+                        <div className="text-2xl font-mono text-slate-800 mb-4">
+                          {value} × {percentage}% = {value} ×{" "}
+                          {(percentage / 100).toFixed(2)}
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-slate-600 mb-2">
+                          答案
+                        </div>
+                        <div className="text-6xl font-black text-pink-600">
+                          {result.toFixed(2)}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Discount Mode */}
+                {mode === "discount" && (
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-800 mb-6 flex items-center gap-2">
+                      <ShoppingBag /> 購物折扣計算
+                    </h2>
+
+                    <div className="mb-6">
+                      <label className="block text-sm font-bold text-slate-600 mb-3">
+                        原價 ($)
+                      </label>
+                      <input
+                        type="number"
+                        value={originalPrice}
+                        onChange={(e) =>
+                          setOriginalPrice(parseFloat(e.target.value) || 0)
+                        }
+                        className="w-full px-6 py-4 rounded-2xl border-2 border-blue-200 focus:border-blue-500 outline-none text-2xl font-black text-center"
+                      />
+                    </div>
+
+                    <div className="mb-6">
+                      <label className="block text-sm font-bold text-slate-600 mb-3">
+                        折扣率 (%)
+                      </label>
+                      <input
+                        type="range"
+                        min="0"
+                        max="90"
+                        value={discountRate}
+                        onChange={(e) =>
+                          setDiscountRate(parseInt(e.target.value))
+                        }
+                        className="w-full mb-3"
+                      />
+                      <div className="text-center text-4xl font-black text-blue-600 mb-4">
+                        {discountRate}% OFF
+                      </div>
+                      {renderProgressBar(discountRate)}
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                      <div className="bg-slate-100 rounded-2xl p-4 text-center">
+                        <div className="text-sm font-bold text-slate-600 mb-2">
+                          原價
+                        </div>
+                        <div className="text-3xl font-black text-slate-800">
+                          ${originalPrice}
+                        </div>
+                      </div>
+                      <div className="bg-red-100 rounded-2xl p-4 text-center">
+                        <div className="text-sm font-bold text-red-600 mb-2">
+                          減價
+                        </div>
+                        <div className="text-3xl font-black text-red-600">
+                          -${discountAmount.toFixed(2)}
+                        </div>
+                      </div>
+                      <div className="bg-green-100 rounded-2xl p-4 text-center border-2 border-green-400">
+                        <div className="text-sm font-bold text-green-700 mb-2">
+                          實付
+                        </div>
+                        <div className="text-3xl font-black text-green-600">
+                          ${finalPrice.toFixed(2)}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6">
+                      <h3 className="font-black text-lg text-slate-800 mb-3">
+                        計算步驟：
+                      </h3>
+                      <ol className="space-y-2 text-slate-700">
+                        <li>
+                          <strong>1.</strong> 計算折扣金額：${originalPrice} ×{" "}
+                          {discountRate}% = ${discountAmount.toFixed(2)}
+                        </li>
+                        <li>
+                          <strong>2.</strong> 計算實付金額：${originalPrice} - $
+                          {discountAmount.toFixed(2)} ={" "}
+                          <span className="text-green-600 font-black">
+                            ${finalPrice.toFixed(2)}
+                          </span>
+                        </li>
+                      </ol>
+                    </div>
+                  </div>
+                )}
+
+                {/* Scenarios Mode */}
+                {mode === "scenarios" && (
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-800 mb-6">
+                      實際應用場景
+                    </h2>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {scenarios.map((scenario, idx) => {
+                        const amount =
+                          (scenario.original * scenario.rate) / 100;
+                        const final =
+                          scenario.type === "discount"
+                            ? scenario.original - amount
+                            : scenario.original + amount;
+
+                        return (
+                          <div
+                            key={idx}
+                            className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border-2 border-purple-200"
+                          >
+                            <div className="text-4xl mb-3">{scenario.icon}</div>
+                            <h3 className="text-xl font-black text-slate-800 mb-4">
+                              {scenario.scenario}
+                            </h3>
+
+                            <div className="space-y-3 text-slate-700">
+                              <div className="flex justify-between">
+                                <span>原價/基數：</span>
+                                <span className="font-black">
+                                  ${scenario.original}
+                                </span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>百分率：</span>
+                                <span className="font-black">
+                                  {scenario.rate}%
+                                </span>
+                              </div>
+                              <div className="flex justify-between border-t-2 border-purple-200 pt-2">
+                                <span className="font-bold">
+                                  {scenario.type === "discount"
+                                    ? "減少："
+                                    : "增加："}
+                                </span>
+                                <span
+                                  className={`font-black ${
+                                    scenario.type === "discount"
+                                      ? "text-red-600"
+                                      : "text-green-600"
+                                  }`}
+                                >
+                                  ${amount.toFixed(2)}
+                                </span>
+                              </div>
+                              <div className="flex justify-between bg-white rounded-lg p-2 border-2 border-purple-300">
+                                <span className="font-bold">最終：</span>
+                                <span className="font-black text-purple-600 text-lg">
+                                  ${final.toFixed(2)}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Info Panel */}
+              <div className="lg:col-span-4 flex flex-col gap-6">
+                <div className="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-lg">
+                  <h3 className="text-lg font-black text-pink-600 mb-3">
+                    💡 百分數概念
+                  </h3>
+                  <div className="text-sm text-slate-700 leading-relaxed space-y-3">
+                    <div className="bg-pink-50 p-3 rounded-lg">
+                      <strong>百分數 (%)：</strong>
+                      <p className="text-slate-600 mt-1">
+                        表示「每一百份中的若干份」
+                      </p>
+                    </div>
+                    <div className="bg-blue-50 p-3 rounded-lg">
+                      <strong>轉換小數：</strong>
+                      <p className="text-slate-600 mt-1">
+                        25% = 25 ÷ 100 = 0.25
+                      </p>
+                    </div>
+                    <div className="bg-green-50 p-3 rounded-lg">
+                      <strong>轉換分數：</strong>
+                      <p className="text-slate-600 mt-1">50% = 50/100 = 1/2</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-br from-yellow-100 to-orange-100 rounded-3xl p-6 shadow-lg">
+                  <h3 className="text-lg font-black text-orange-700 mb-3">
+                    📊 常用百分數
+                  </h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="bg-white p-2 rounded-lg flex justify-between">
+                      <span>100%</span>
+                      <span className="font-black">全部 / 整體</span>
+                    </div>
+                    <div className="bg-white p-2 rounded-lg flex justify-between">
+                      <span>50%</span>
+                      <span className="font-black">一半</span>
+                    </div>
+                    <div className="bg-white p-2 rounded-lg flex justify-between">
+                      <span>25%</span>
+                      <span className="font-black">四分之一</span>
+                    </div>
+                    <div className="bg-white p-2 rounded-lg flex justify-between">
+                      <span>10%</span>
+                      <span className="font-black">十分之一</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-lg">
+                  <h3 className="text-lg font-black text-slate-800 mb-3">
+                    🎯 應用範疇
+                  </h3>
+                  <ul className="text-sm text-slate-600 space-y-2">
+                    <li>✓ 商店折扣優惠</li>
+                    <li>✓ 銀行利息計算</li>
+                    <li>✓ 考試成績評分</li>
+                    <li>✓ 統計數據分析</li>
+                    <li>✓ 稅務計算</li>
+                  </ul>
+                </div>
+              </div>
+            </main>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

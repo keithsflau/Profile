@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小六數學：圓形探索家</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      src="https://unpkg.com/react@18/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.min.js"></script>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+      .pi-highlight {
+        color: #ef4444;
+        font-weight: 900;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect, useRef } = React;
+      const { motion } = window.Motion;
+      const { Circle, Ruler, RotateCw } = window.LucideReact;
+
+      const PI = Math.PI;
+
+      function App() {
+        const [radius, setRadius] = useState(5);
+        const [showDiameter, setShowDiameter] = useState(true);
+        const [showCircumference, setShowCircumference] = useState(false);
+        const canvasRef = useRef(null);
+
+        const diameter = radius * 2;
+        const circumference = 2 * PI * radius;
+        const area = PI * radius * radius;
+
+        useEffect(() => {
+          const canvas = canvasRef.current;
+          if (!canvas) return;
+
+          const ctx = canvas.getContext("2d");
+          const centerX = canvas.width / 2;
+          const centerY = canvas.height / 2;
+          const scale = 15; // pixels per cm
+
+          // Clear canvas
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          // Draw circle
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, radius * scale, 0, 2 * Math.PI);
+          ctx.strokeStyle = "#3b82f6";
+          ctx.lineWidth = 4;
+          ctx.stroke();
+          ctx.fillStyle = "rgba(59, 130, 246, 0.1)";
+          ctx.fill();
+
+          // Draw center point
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, 5, 0, 2 * Math.PI);
+          ctx.fillStyle = "#ef4444";
+          ctx.fill();
+
+          // Draw radius
+          ctx.beginPath();
+          ctx.moveTo(centerX, centerY);
+          ctx.lineTo(centerX + radius * scale, centerY);
+          ctx.strokeStyle = "#10b981";
+          ctx.lineWidth = 3;
+          ctx.stroke();
+
+          // Label radius
+          ctx.font = "bold 18px Arial";
+          ctx.fillStyle = "#10b981";
+          ctx.fillText(
+            `r = ${radius} cm`,
+            centerX + (radius * scale) / 2 - 30,
+            centerY - 10
+          );
+
+          // Draw diameter if enabled
+          if (showDiameter) {
+            ctx.beginPath();
+            ctx.moveTo(centerX - radius * scale, centerY);
+            ctx.lineTo(centerX + radius * scale, centerY);
+            ctx.strokeStyle = "#f59e0b";
+            ctx.lineWidth = 3;
+            ctx.setLineDash([5, 5]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            ctx.fillStyle = "#f59e0b";
+            ctx.fillText(`d = ${diameter} cm`, centerX - 40, centerY + 25);
+          }
+
+          // Draw circumference visualization
+          if (showCircumference) {
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius * scale + 10, 0, 2 * Math.PI);
+            ctx.strokeStyle = "#8b5cf6";
+            ctx.lineWidth = 2;
+            ctx.setLineDash([10, 5]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+          }
+        }, [radius, showDiameter, showCircumference]);
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <header className="text-center mb-8">
+              <div className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-md px-6 py-3 rounded-full mb-4">
+                <Circle className="text-white" size={24} />
+                <span className="text-white font-bold text-lg">小六數學</span>
+              </div>
+              <h1 className="text-5xl md:text-6xl font-black text-white mb-2 tracking-tight">
+                圓形探索家
+              </h1>
+              <p className="text-xl text-white/80 font-medium">
+                圓周、直徑、半徑、面積
+              </p>
+            </header>
+
+            <main className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8">
+              {/* Visualization Area */}
+              <div className="lg:col-span-8 bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl">
+                {/* Canvas */}
+                <canvas
+                  ref={canvasRef}
+                  width={600}
+                  height={500}
+                  className="w-full bg-slate-50 rounded-2xl mb-6"
+                />
+
+                {/* Display Options */}
+                <div className="flex gap-3 mb-6">
+                  <button
+                    onClick={() => setShowDiameter(!showDiameter)}
+                    className={`flex-1 py-3 rounded-2xl font-bold transition-all ${
+                      showDiameter
+                        ? "bg-orange-500 text-white shadow-lg"
+                        : "bg-slate-100 text-slate-600"
+                    }`}
+                  >
+                    {showDiameter ? "✓" : ""} 顯示直徑
+                  </button>
+                  <button
+                    onClick={() => setShowCircumference(!showCircumference)}
+                    className={`flex-1 py-3 rounded-2xl font-bold transition-all ${
+                      showCircumference
+                        ? "bg-purple-500 text-white shadow-lg"
+                        : "bg-slate-100 text-slate-600"
+                    }`}
+                  >
+                    {showCircumference ? "✓" : ""} 顯示圓周
+                  </button>
+                </div>
+
+                {/* Measurements */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="bg-green-50 rounded-2xl p-4 text-center border-2 border-green-200">
+                    <div className="text-sm font-bold text-slate-600 mb-1">
+                      半徑 (r)
+                    </div>
+                    <div className="text-3xl font-black text-green-600">
+                      {radius}
+                    </div>
+                    <div className="text-xs text-slate-500">cm</div>
+                  </div>
+                  <div className="bg-orange-50 rounded-2xl p-4 text-center border-2 border-orange-200">
+                    <div className="text-sm font-bold text-slate-600 mb-1">
+                      直徑 (d)
+                    </div>
+                    <div className="text-3xl font-black text-orange-600">
+                      {diameter}
+                    </div>
+                    <div className="text-xs text-slate-500">cm</div>
+                  </div>
+                  <div className="bg-purple-50 rounded-2xl p-4 text-center border-2 border-purple-200">
+                    <div className="text-sm font-bold text-slate-600 mb-1">
+                      圓周 (C)
+                    </div>
+                    <div className="text-2xl font-black text-purple-600">
+                      {circumference.toFixed(2)}
+                    </div>
+                    <div className="text-xs text-slate-500">cm</div>
+                  </div>
+                  <div className="bg-blue-50 rounded-2xl p-4 text-center border-2 border-blue-200">
+                    <div className="text-sm font-bold text-slate-600 mb-1">
+                      面積 (A)
+                    </div>
+                    <div className="text-2xl font-black text-blue-600">
+                      {area.toFixed(2)}
+                    </div>
+                    <div className="text-xs text-slate-500">cm²</div>
+                  </div>
+                </div>
+
+                {/* Formulas */}
+                <div className="mt-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6">
+                  <h3 className="text-lg font-black text-purple-600 mb-4">
+                    📐 重要公式
+                  </h3>
+
+                  <div className="space-y-4">
+                    <div className="bg-white p-4 rounded-lg">
+                      <div className="font-bold text-slate-700 mb-2">
+                        圓周公式：
+                      </div>
+                      <div className="text-xl font-mono">
+                        C = 2<span className="pi-highlight">π</span>r = 2 ×{" "}
+                        <span className="pi-highlight">π</span> × {radius} ≈{" "}
+                        {circumference.toFixed(2)} cm
+                      </div>
+                      <div className="text-sm text-slate-500 mt-2">
+                        或：C = <span className="pi-highlight">π</span>d ={" "}
+                        <span className="pi-highlight">π</span> × {diameter} ≈{" "}
+                        {circumference.toFixed(2)} cm
+                      </div>
+                    </div>
+
+                    <div className="bg-white p-4 rounded-lg">
+                      <div className="font-bold text-slate-700 mb-2">
+                        面積公式：
+                      </div>
+                      <div className="text-xl font-mono">
+                        A = <span className="pi-highlight">π</span>r² ={" "}
+                        <span className="pi-highlight">π</span> × {radius}² ≈{" "}
+                        {area.toFixed(2)} cm²
+                      </div>
+                    </div>
+
+                    <div className="bg-yellow-50 p-4 rounded-lg border-2 border-yellow-200">
+                      <div className="font-black text-yellow-800">
+                        圓周率 π (Pi):
+                      </div>
+                      <div className="text-2xl font-mono text-yellow-900 mt-2">
+                        <span className="pi-highlight">π</span> ≈ 3.14159...
+                      </div>
+                      <div className="text-sm text-yellow-700 mt-2">
+                        一般計算時用 <span className="font-black">3.14</span> 或{" "}
+                        <span className="font-black">22/7</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Control Panel */}
+              <div className="lg:col-span-4 flex flex-col gap-6">
+                <div className="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-lg">
+                  <h3 className="text-xl font-black text-purple-600 mb-4 flex items-center gap-2">
+                    <Ruler size={24} /> 調整半徑
+                  </h3>
+
+                  <div className="mb-6">
+                    <input
+                      type="range"
+                      min="1"
+                      max="15"
+                      value={radius}
+                      onChange={(e) => setRadius(parseInt(e.target.value))}
+                      className="w-full mb-4"
+                    />
+                    <div className="text-center">
+                      <div className="text-5xl font-black text-green-600 mb-2">
+                        {radius} cm
+                      </div>
+                      <div className="text-sm text-slate-500">
+                        拖動滑桿改變半徑
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      onClick={() => setRadius(3)}
+                      className="py-2 bg-green-100 hover:bg-green-200 text-green-700 rounded-lg font-bold"
+                    >
+                      3cm
+                    </button>
+                    <button
+                      onClick={() => setRadius(5)}
+                      className="py-2 bg-green-100 hover:bg-green-200 text-green-700 rounded-lg font-bold"
+                    >
+                      5cm
+                    </button>
+                    <button
+                      onClick={() => setRadius(7)}
+                      className="py-2 bg-green-100 hover:bg-green-200 text-green-700 rounded-lg font-bold"
+                    >
+                      7cm
+                    </button>
+                    <button
+                      onClick={() => setRadius(10)}
+                      className="py-2 bg-green-100 hover:bg-green-200 text-green-700 rounded-lg font-bold"
+                    >
+                      10cm
+                    </button>
+                    <button
+                      onClick={() => setRadius(12)}
+                      className="py-2 bg-green-100 hover:bg-green-200 text-green-700 rounded-lg font-bold"
+                    >
+                      12cm
+                    </button>
+                    <button
+                      onClick={() => setRadius(15)}
+                      className="py-2 bg-green-100 hover:bg-green-200 text-green-700 rounded-lg font-bold"
+                    >
+                      15cm
+                    </button>
+                  </div>
+                </div>
+
+                <div className="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-lg">
+                  <h3 className="text-lg font-black text-slate-800 mb-3">
+                    💡 圓形知識
+                  </h3>
+                  <div className="text-sm text-slate-600 leading-relaxed space-y-2">
+                    <p>
+                      <strong className="text-green-600">
+                        半徑 (Radius)：
+                      </strong>
+                      圓心到圓周上任何一點的距離
+                    </p>
+                    <p>
+                      <strong className="text-orange-600">
+                        直徑 (Diameter)：
+                      </strong>
+                      通過圓心的最長線段，等於2倍半徑
+                    </p>
+                    <p>
+                      <strong className="text-purple-600">
+                        圓周 (Circumference)：
+                      </strong>
+                      圓形邊界的長度
+                    </p>
+                    <p>
+                      <strong className="text-blue-600">面積 (Area)：</strong>
+                      圓形內部的空間大小
+                    </p>
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-br from-red-100 to-pink-100 rounded-3xl p-6 shadow-lg">
+                  <h3 className="text-lg font-black text-red-700 mb-3">
+                    🎯 關係式
+                  </h3>
+                  <div className="text-sm space-y-2">
+                    <div className="bg-white p-2 rounded-lg">d = 2r</div>
+                    <div className="bg-white p-2 rounded-lg">
+                      C = <span className="pi-highlight">π</span>d = 2
+                      <span className="pi-highlight">π</span>r
+                    </div>
+                    <div className="bg-white p-2 rounded-lg">
+                      A = <span className="pi-highlight">π</span>r²
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </main>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

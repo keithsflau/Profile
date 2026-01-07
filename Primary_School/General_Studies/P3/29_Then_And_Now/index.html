@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小三常識：今昔香港 | Then And Now</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #d6d3d1 0%, #a8a29e 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Then And Now",
+          zh: "今昔香港",
+          ja: "昔と今",
+          ko: "그때와 지금",
+          es: "Antes y Ahora",
+          de: "Damals und Heute",
+          fi: "Silloin ja nyt",
+          fr: "Avant et Maintenant",
+          ar: "الماضي والحاضر",
+          it: "Allora e Adesso",
+        },
+        instruction: {
+          en: "Match the Old with the New!",
+          zh: "將舊事物與新事物配對！",
+          ja: "古いものと新しいものを合わせよう！",
+          ko: "옛 것과 새 것을 짝지으세요!",
+          es: "¡Combina lo Viejo con lo Nuevo!",
+          de: "Ordne Alt und Neu zu!",
+          fi: "Yhdistä vanha ja uusi!",
+          fr: "Associez l'Ancien avec le Nouveau !",
+          ar: "طابق القديم بالجديد!",
+          it: "Abbina il Vecchio con il Nuovo!",
+        },
+
+        rickshaw: {
+          en: "Rickshaw",
+          zh: "人力車",
+          ja: "人力車",
+          ko: "인력거",
+          es: "Rickshaw",
+          de: "Rikscha",
+          fi: "Riksa",
+          fr: "Pousse-pousse",
+          ar: "ريكاشة",
+          it: "Risciò",
+        },
+        taxi: {
+          en: "Taxi",
+          zh: "的士",
+          ja: "タクシー",
+          ko: "택시",
+          es: "Taxi",
+          de: "Taxi",
+          fi: "Taksi",
+          fr: "Taxi",
+          ar: "سيارة أجرة",
+          it: "Taxi",
+        },
+
+        abacus: {
+          en: "Abacus",
+          zh: "算盤",
+          ja: "そろばん",
+          ko: "주판",
+          es: "Ábaco",
+          de: "Abakus",
+          fi: "Helmitaulu",
+          fr: "Abaque",
+          ar: "عداد",
+          it: "Abaco",
+        },
+        calculator: {
+          en: "Calculator",
+          zh: "計算機",
+          ja: "電卓",
+          ko: "계산기",
+          es: "Calculadora",
+          de: "Taschenrechner",
+          fi: "Laskin",
+          fr: "Calculatrice",
+          ar: "آلة حاسبة",
+          it: "Calcolatrice",
+        },
+
+        letter: {
+          en: "Letter",
+          zh: "書信",
+          ja: "手紙",
+          ko: "편지",
+          es: "Carta",
+          de: "Brief",
+          fi: "Kirje",
+          fr: "Lettre",
+          ar: "رسالة",
+          it: "Lettera",
+        },
+        email: {
+          en: "Email/Phone",
+          zh: "電郵/手機",
+          ja: "メール/電話",
+          ko: "이메일/전화",
+          es: "Email/Teléfono",
+          de: "E-Mail/Telefon",
+          fi: "Sähköposti/Puhelin",
+          fr: "Email/Téléphone",
+          ar: "بريد إلكتروني/هاتف",
+          it: "Email/Telefono",
+        },
+
+        fan: {
+          en: "Hand Fan",
+          zh: "葵扇",
+          ja: "うちわ",
+          ko: "부채",
+          es: "Abanico",
+          de: "Fächer",
+          fi: "Viuhka",
+          fr: "Éventail",
+          ar: "مروحة يدوية",
+          it: "Ventaglio",
+        },
+        ac: {
+          en: "Air Con",
+          zh: "冷氣機",
+          ja: "エアコン",
+          ko: "에어컨",
+          es: "Aire Acondicionado",
+          de: "Klimaanlage",
+          fi: "Ilmastointi",
+          fr: "Climatisation",
+          ar: "مكيف هواء",
+          it: "Aria Condizionata",
+        },
+
+        well: {
+          en: "Water Well",
+          zh: "井",
+          ja: "井戸",
+          ko: "우물",
+          es: "Pozo de agua",
+          de: "Brunnen",
+          fi: "Kaivo",
+          fr: "Puits",
+          ar: "بئر",
+          it: "Pozzo",
+        },
+        tap: {
+          en: "Water Tap",
+          zh: "水龍頭",
+          ja: "蛇口",
+          ko: "수도꼭지",
+          es: "Grifo",
+          de: "Wasserhahn",
+          fi: "Vesihana",
+          fr: "Robinet",
+          ar: "صنبور",
+          it: "Rubinetto",
+        },
+
+        candle: {
+          en: "Candle/Oil Lamp",
+          zh: "蠟燭/油燈",
+          ja: "ろうそく/ランプ",
+          ko: "양초/기름 램프",
+          es: "Vela/Lámpara de aceite",
+          de: "Kerze/Öllampe",
+          fi: "Kynttilä/Öljylamppu",
+          fr: "Bougie/Lampe à huile",
+          ar: "شمعة/مصباح زيت",
+          it: "Candela/Lampada a olio",
+        },
+        lightbulb: {
+          en: "Electric Light",
+          zh: "電燈",
+          ja: "電球",
+          ko: "전등",
+          es: "Luz eléctrica",
+          de: "Glühbirne",
+          fi: "Sähkövalo",
+          fr: "Lumière électrique",
+          ar: "مصباح كهربائي",
+          it: "Luce Elettrica",
+        },
+
+        old: {
+          en: "Then (Old)",
+          zh: "昔日 (舊)",
+          ja: "昔",
+          ko: "과거 (구)",
+          es: "Antes (Viejo)",
+          de: "Damals (Alt)",
+          fi: "Silloin (Vanha)",
+          fr: "Avant (Vieux)",
+          ar: "ثم (قديم)",
+          it: "Allora (Vecchio)",
+        },
+        new: {
+          en: "Now (New)",
+          zh: "今日 (新)",
+          ja: "今",
+          ko: "현재 (신)",
+          es: "Ahora (Nuevo)",
+          de: "Heute (Neu)",
+          fi: "Nyt (Uusi)",
+          fr: "Maintenant (Nouveau)",
+          ar: "الآن (جديد)",
+          it: "Adesso (Nuovo)",
+        },
+
+        correct: {
+          en: "Correct Match!",
+          zh: "配對正確！",
+          ja: "正解！",
+          ko: "정답입니다!",
+          es: "¡Pareja Correcta!",
+          de: "Richtig zugeordnet!",
+          fi: "Oikea pari!",
+          fr: "Bonne correspondance !",
+          ar: "تطابق صحيح!",
+          it: "Abbinamento Corretto!",
+        },
+        wrong: {
+          en: "Not a match!",
+          zh: "配對錯誤！",
+          ja: "違います！",
+          ko: "짝이 아니에요!",
+          es: "¡No coincide!",
+          de: "Kein Treffer!",
+          fi: "Ei täsmää!",
+          fr: "Pas de correspondance !",
+          ar: "لا يوجد تطابق!",
+          it: "Non corrisponde!",
+        },
+        completed: {
+          en: "History Expert!",
+          zh: "歷史專家！",
+          ja: "歴史のエキスパート！",
+          ko: "역사 전문가!",
+          es: "¡Experto en Historia!",
+          de: "Geschichtsexperte!",
+          fi: "Historia-asiantuntija!",
+          fr: "Expert en histoire !",
+          ar: "خبير التاريخ!",
+          it: "Esperto di Storia!",
+        },
+        reset: {
+          en: "Play Again",
+          zh: "再玩一次",
+          ja: "もう一度プレイ",
+          ko: "다시 하기",
+          es: "Jugar de Nuevo",
+          de: "Nochmal spielen",
+          fi: "Pelaa uudelleen",
+          fr: "Rejouer",
+          ar: "العب مرة أخرى",
+          it: "Gioca di Nuovo",
+        },
+      };
+
+      const pairs = [
+        {
+          id: 1,
+          old: { id: "rickshaw", icon: "🛺" },
+          new: { id: "taxi", icon: "🚕" },
+        },
+        {
+          id: 2,
+          old: { id: "abacus", icon: "🧮" },
+          new: { id: "calculator", icon: "📱" },
+        }, // Calculator app on phone
+        {
+          id: 3,
+          old: { id: "letter", icon: "✉️" },
+          new: { id: "email", icon: "📧" },
+        },
+        { id: 4, old: { id: "fan", icon: "🪭" }, new: { id: "ac", icon: "❄️" } },
+        {
+          id: 5,
+          old: { id: "well", icon: "🕳️" },
+          new: { id: "tap", icon: "🚰" },
+        },
+        {
+          id: 6,
+          old: { id: "candle", icon: "🕯️" },
+          new: { id: "lightbulb", icon: "💡" },
+        },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [queue, setQueue] = useState([]);
+        const [current, setCurrent] = useState(null);
+        const [options, setOptions] = useState([]);
+        const [feedback, setFeedback] = useState(null);
+        const [score, setScore] = useState(0);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        useEffect(() => {
+          initGame();
+        }, []);
+
+        const initGame = () => {
+          const q = [...pairs].sort(() => Math.random() - 0.5);
+          setQueue(q);
+          nextRound(q[0]);
+          setScore(0);
+        };
+
+        const nextRound = (round) => {
+          if (!round) {
+            setCurrent(null);
+            return;
+          }
+          setCurrent(round);
+          setFeedback(null);
+
+          // Generate options: Correct answer + 3 distractors (from 'new' category of other pairs)
+          const distractors = pairs
+            .filter((p) => p.id !== round.id)
+            .map((p) => p.new)
+            .sort(() => Math.random() - 0.5)
+            .slice(0, 3);
+          const opts = [round.new, ...distractors].sort(
+            () => Math.random() - 0.5
+          );
+          setOptions(opts);
+        };
+
+        const handleChoice = (opt) => {
+          if (feedback) return;
+
+          if (opt.id === current.new.id) {
+            setFeedback("correct");
+            setScore((s) => s + 1);
+            setTimeout(() => {
+              const nextIdx = queue.indexOf(current) + 1;
+              if (nextIdx < queue.length) nextRound(queue[nextIdx]);
+              else setCurrent(null);
+            }, 1000);
+          } else {
+            setFeedback("wrong");
+            setTimeout(() => setFeedback(null), 800);
+          }
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center select-none font-sans overflow-hidden">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-stone-700 mb-2 mt-8 drop-shadow-sm bg-white/50 px-6 py-2 rounded-full">
+              🕰️ {getText("title")}
+            </h1>
+
+            <div className="font-bold text-stone-600 mb-8 bg-white/40 px-4 py-1 rounded-full">
+              {getText("instruction")}
+            </div>
+
+            {current ? (
+              <div className="w-full max-w-4xl flex flex-col md:flex-row gap-8 items-center flex-1 justify-center relative">
+                {/* The Old Item (Target) */}
+                <div className="relative flex flex-col items-center">
+                  <div className="bg-sepia-200 p-12 rounded-[2rem] shadow-2xl border-8 border-stone-400 sepia bg-[url('https://www.transparenttextures.com/patterns/aged-paper.png')] w-64 h-64 flex flex-col items-center justify-center">
+                    <div className="text-8xl mb-4 opacity-80">
+                      {current.old.icon}
+                    </div>
+                    <div className="font-black text-2xl text-stone-800 uppercase tracking-widest">
+                      {getText("old")}
+                    </div>
+                    <div className="text-xl font-bold text-stone-700">
+                      {getText(current.old.id)}
+                    </div>
+                  </div>
+                  {/* Arrow */}
+                  <div className="md:hidden text-4xl text-stone-500 my-4">
+                    ⬇️
+                  </div>
+                </div>
+
+                <div className="hidden md:block text-6xl text-stone-400">
+                  ➡️
+                </div>
+
+                {/* The New Options */}
+                <div className="flex-1 w-full grid grid-cols-2 gap-4">
+                  {options.map((opt) => (
+                    <button
+                      key={opt.id}
+                      onClick={() => handleChoice(opt)}
+                      disabled={feedback}
+                      className="bg-white p-6 rounded-2xl shadow-lg border-2 border-stone-200 hover:border-blue-400 hover:bg-blue-50 transition-all active:scale-95 flex flex-col items-center"
+                    >
+                      <div className="text-5xl mb-2">{opt.icon}</div>
+                      <div className="font-black text-lg text-slate-700">
+                        {getText(opt.id)}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                {feedback && (
+                  <div
+                    className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 px-8 py-4 rounded-3xl font-black text-3xl shadow-2xl whitespace-nowrap ${
+                      feedback === "correct"
+                        ? "bg-green-600 text-white"
+                        : "bg-red-500 text-white"
+                    }`}
+                  >
+                    {getText(feedback)}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="bg-white/90 p-12 rounded-3xl shadow-xl text-center mt-20 backdrop-blur-sm">
+                <div className="text-8xl mb-4">⌛</div>
+                <h2 className="text-4xl font-black text-stone-800 mb-6">
+                  {getText("completed")}
+                </h2>
+                <button
+                  onClick={initGame}
+                  className="bg-stone-600 text-white px-10 py-4 rounded-full font-black text-2xl hover:bg-stone-700 shadow-xl"
+                >
+                  {getText("reset")} 🔄
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

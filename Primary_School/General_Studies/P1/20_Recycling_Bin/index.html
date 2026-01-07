@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小一常識：垃圾分類回收 | Recycling Bin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #f3f4f6 0%, #d1d5db 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Recycling Time",
+          zh: "垃圾分類回收",
+          ja: "リサイクル",
+        },
+        instruction: {
+          en: "Drag the waste to the correct bin!",
+          zh: "把垃圾拖到正確的回收箱！",
+          ja: "ゴミを正しいゴミ箱にドラッグしてください！",
+        },
+        paper: { en: "Paper", zh: "紙張 (藍)" },
+        metal: { en: "Metal", zh: "金屬 (黃)" },
+        plastic: { en: "Plastic", zh: "塑膠 (啡)" },
+        correct: { en: "Correct!", zh: "答對了！" },
+        wrong: { en: "Wrong Bin!", zh: "放錯了！" },
+        score: { en: "Score", zh: "分數" },
+
+        newspaper: { en: "Newspaper", zh: "報紙" },
+        box: { en: "Cardboard Box", zh: "紙皮箱" },
+        book: { en: "Old Book", zh: "舊書" },
+
+        can: { en: "Soda Can", zh: "汽水罐" },
+        tin: { en: "Tin Can", zh: "罐頭" },
+
+        bottle: { en: "Water Bottle", zh: "膠樽" },
+        shampoo: { en: "Shampoo Bottle", zh: "洗髮水樽" },
+        bag: { en: "Plastic Bag", zh: "膠袋" },
+      };
+
+      const items = [
+        { id: "newspaper", icon: "📰", type: "paper" },
+        { id: "box", icon: "📦", type: "paper" },
+        { id: "book", icon: "📚", type: "paper" },
+        { id: "can", icon: "🥤", type: "metal" },
+        { id: "tin", icon: "🥫", type: "metal" },
+        { id: "bottle", icon: "🧴", type: "plastic" }, // Simplified icon
+        { id: "shampoo", icon: "🧴", type: "plastic" },
+        { id: "bag", icon: "🛍️", type: "plastic" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [currentItem, setCurrentItem] = useState(null);
+        const [score, setScore] = useState(0);
+        const [feedback, setFeedback] = useState(null);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        useEffect(() => {
+          spawn();
+        }, []);
+
+        const spawn = () => {
+          const i = items[Math.floor(Math.random() * items.length)];
+          setCurrentItem({ ...i, uid: Date.now() });
+        };
+
+        const handleBinClick = (binType) => {
+          if (!currentItem) return;
+          if (currentItem.type === binType) {
+            setScore(score + 10);
+            setFeedback("correct");
+            setTimeout(() => {
+              setFeedback(null);
+              spawn();
+            }, 500);
+          } else {
+            setScore(Math.max(0, score - 5));
+            setFeedback("wrong");
+            setTimeout(() => setFeedback(null), 500);
+          }
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-slate-800 mb-4 mt-8 drop-shadow-sm">
+              ♻️ {getText("title")}
+            </h1>
+            <div className="bg-white px-6 py-2 rounded-full shadow mb-4 font-bold text-slate-600">
+              {getText("score")}: {score}
+            </div>
+
+            {/* Spawn Area */}
+            <div className="h-64 md:h-80 w-full flex flex-col items-center justify-center relative">
+              <AnimatePresence mode="wait">
+                {currentItem && (
+                  <motion.div
+                    key={currentItem.uid}
+                    initial={{ scale: 0, y: -50 }}
+                    animate={{ scale: 1, y: 0 }}
+                    exit={{ scale: 0, opacity: 0 }}
+                    className="bg-white p-6 rounded-3xl shadow-2xl border-4 border-slate-100 flex flex-col items-center"
+                    drag
+                    dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+                    dragElastic={0.2}
+                  >
+                    <span className="text-9xl mb-2">{currentItem.icon}</span>
+                    <span className="font-bold text-slate-500">
+                      {getText(currentItem.id)}
+                    </span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {feedback && (
+                <motion.div
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1.2, opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className={`absolute text-5xl font-black ${
+                    feedback === "correct" ? "text-green-500" : "text-red-500"
+                  }`}
+                >
+                  {getText(feedback)}
+                </motion.div>
+              )}
+            </div>
+
+            <p className="font-bold text-slate-500 mb-4">
+              {getText("instruction")}
+            </p>
+
+            {/* Bins */}
+            <div className="flex gap-4 md:gap-8 w-full max-w-4xl justify-center items-end">
+              {/* Blue - Paper */}
+              <button
+                onClick={() => handleBinClick("paper")}
+                className="flex-1 max-w-[150px] aspect-[2/3] bg-blue-500 rounded-t-xl border-t-8 border-x-8 border-blue-600 relative overflow-hidden flex flex-col items-center justify-end pb-4 hover:scale-105 transition-transform"
+              >
+                <div className="absolute top-4 text-white text-6xl">📄</div>
+                <span className="text-white font-black text-xl">
+                  {getText("paper")}
+                </span>
+              </button>
+
+              {/* Yellow - Metal */}
+              <button
+                onClick={() => handleBinClick("metal")}
+                className="flex-1 max-w-[150px] aspect-[2/3] bg-yellow-400 rounded-t-xl border-t-8 border-x-8 border-yellow-500 relative overflow-hidden flex flex-col items-center justify-end pb-4 hover:scale-105 transition-transform"
+              >
+                <div className="absolute top-4 text-white text-6xl">🥫</div>
+                <span className="text-white font-black text-xl">
+                  {getText("metal")}
+                </span>
+              </button>
+
+              {/* Brown - Plastic */}
+              <button
+                onClick={() => handleBinClick("plastic")}
+                className="flex-1 max-w-[150px] aspect-[2/3] bg-amber-800 rounded-t-xl border-t-8 border-x-8 border-amber-900 relative overflow-hidden flex flex-col items-center justify-end pb-4 hover:scale-105 transition-transform"
+              >
+                <div className="absolute top-4 text-white text-6xl">🧴</div>
+                <span className="text-white font-black text-xl">
+                  {getText("plastic")}
+                </span>
+              </button>
+            </div>
+            {/* Bin Labels for HK context clarity (Blue=Paper, Yellow=Metal, Brown=Plastic) is standard */}
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

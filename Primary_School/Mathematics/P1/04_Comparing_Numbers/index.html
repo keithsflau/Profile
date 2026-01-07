@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小一數學：比較大小 | Comparisons</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fefce8 0%, #facc15 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "⚖️ Comparisons",
+          zh: "⚖️ 比較大小",
+          ja: "⚖️ 大小の比較",
+          ko: "⚖️ 크기 비교",
+          es: "⚖️ Comparaciones",
+          de: "⚖️ Vergleiche",
+          fi: "⚖️ Vertailut",
+          fr: "⚖️ Comparaisons",
+          ar: "⚖️ المقارنات",
+          it: "⚖️ Confronti",
+        },
+        whichMore: {
+          en: "Which is MORE?",
+          zh: "哪邊 多?",
+          ja: "どっちが多い?",
+          ko: "어느 쪽이 더 많나요?",
+          es: "¿Cuál es MÁS?",
+          de: "Welches ist MEHR?",
+          fi: "Kumpi on ENEMMÄN?",
+          fr: "Lequel est PLUS?",
+          ar: "أيهما أكثر؟",
+          it: "Qual è di PIÙ?",
+        },
+        whichLess: {
+          en: "Which is LESS?",
+          zh: "哪邊 少?",
+          ja: "どっちが少ない?",
+          ko: "어느 쪽이 더 적나요?",
+          es: "¿Cuál es MENOS?",
+          de: "Welches ist WENIGER?",
+          fi: "Kumpi on VÄHEMMÄN?",
+          fr: "Lequel est MOINS?",
+          ar: "أيهما أقل؟",
+          it: "Qual è di MENO?",
+        },
+        more: {
+          en: "More!",
+          zh: "多!",
+          ja: "多い!",
+          ko: "많다!",
+          es: "¡Más!",
+          de: "Mehr!",
+          fi: "Enemmän!",
+          fr: "Plus!",
+          ar: "أكثر!",
+          it: "Di più!",
+        },
+        less: {
+          en: "Less!",
+          zh: "少!",
+          ja: "少ない!",
+          ko: "적다!",
+          es: "¡Menos!",
+          de: "Weniger!",
+          fi: "Vähemmän!",
+          fr: "Moins!",
+          ar: "أقل!",
+          it: "Meno!",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [left, setLeft] = useState(5);
+        const [right, setRight] = useState(3);
+        const [mode, setMode] = useState("more"); // more, less
+        const [feedback, setFeedback] = useState("");
+
+        const newRound = () => {
+          setLeft(Math.floor(Math.random() * 9) + 1);
+          setRight(Math.floor(Math.random() * 9) + 1);
+          setMode(Math.random() > 0.5 ? "more" : "less");
+          setFeedback("");
+          if (left === right) setRight(right === 9 ? 8 : right + 1);
+        };
+
+        useEffect(newRound, []);
+
+        const check = (side) => {
+          let correct = false;
+          if (mode === "more") {
+            if (side === "left" && left > right) correct = true;
+            if (side === "right" && right > left) correct = true;
+          } else {
+            if (side === "left" && left < right) correct = true;
+            if (side === "right" && right < left) correct = true;
+          }
+
+          if (correct) {
+            setFeedback("CORRECT");
+            setTimeout(newRound, 1500);
+          } else {
+            setFeedback("WRONG");
+          }
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center justify-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+
+            <h1 className="text-5xl font-black text-yellow-800 mb-8">
+              {t.title[lang] || t.title["en"]}
+            </h1>
+
+            <div className="bg-white/90 rounded-3xl p-8 shadow-2xl w-full max-w-3xl text-center border-4 border-yellow-300">
+              <h2 className="text-3xl font-black text-slate-700 mb-12">
+                {mode === "more"
+                  ? t.whichMore[lang] || t.whichMore["en"]
+                  : t.whichLess[lang] || t.whichLess["en"]}
+              </h2>
+
+              <div className="flex flex-col md:flex-row gap-8 justify-center items-stretch">
+                <button
+                  onClick={() => check("left")}
+                  className="flex-1 bg-blue-100 hover:bg-blue-200 border-4 border-blue-300 rounded-3xl p-6 transition-transform active:scale-95 group"
+                >
+                  <div className="flex flex-wrap gap-2 justify-center mb-4 min-h-[100px] content-center">
+                    {Array.from({ length: left }).map((_, i) => (
+                      <div key={i} className="text-4xl">
+                        🔵
+                      </div>
+                    ))}
+                  </div>
+                  <div className="text-6xl font-black text-blue-500">
+                    {left}
+                  </div>
+                </button>
+
+                <div className="flex items-center justify-center">
+                  <div className="text-4xl font-black text-slate-300">VS</div>
+                </div>
+
+                <button
+                  onClick={() => check("right")}
+                  className="flex-1 bg-red-100 hover:bg-red-200 border-4 border-red-300 rounded-3xl p-6 transition-transform active:scale-95 group"
+                >
+                  <div className="flex flex-wrap gap-2 justify-center mb-4 min-h-[100px] content-center">
+                    {Array.from({ length: right }).map((_, i) => (
+                      <div key={i} className="text-4xl">
+                        🔴
+                      </div>
+                    ))}
+                  </div>
+                  <div className="text-6xl font-black text-red-500">
+                    {right}
+                  </div>
+                </button>
+              </div>
+
+              {feedback === "CORRECT" && (
+                <div className="mt-8 text-4xl font-black text-green-500 animate-bounce">
+                  {mode === "more"
+                    ? t.more[lang] || t.more["en"]
+                    : t.less[lang] || t.less["en"]}{" "}
+                  {get("correct", lang)}
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

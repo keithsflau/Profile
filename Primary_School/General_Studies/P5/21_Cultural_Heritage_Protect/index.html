@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Cultural Heritage Protection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #fdfaf5;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Protecting Heritage",
+          zh: "保護文化遺產",
+          ja: "文化遺産の保護",
+          ko: "문화 유산 보호",
+          es: "Protección del patrimonio",
+          de: "Schutz des Kulturerbes",
+          fi: "Kulttuuriperinnön suojelu",
+          fr: "Protection du patrimoine",
+          ar: "حماية التراث",
+          it: "Protezione del Patrimonio",
+        },
+        instruction: {
+          en: "Is this action GOOD or BAD for heritage?",
+          zh: "這個行為對文化遺產是好還是壞？",
+          ja: "この行動は遺産にとって良いですか、悪いですか？",
+          ko: "이 행동은 유산에 좋은가요, 나쁜가요?",
+          es: "¿Es esta acción BUENA o MALA para el patrimonio?",
+          de: "Ist diese Handlung GUT oder SCHLECHT für das Erbe?",
+          fi: "Onko tämä toimi HYVÄ vai HUONO perinnölle?",
+          fr: "Cette action est-elle BONNE ou MAUVAISE pour le patrimoine ?",
+          ar: "هل هذا الإجراء جيد أم سيئ للتراث؟",
+          it: "Questa azione è BUONA o CATTIVA per il patrimonio?",
+        },
+        do: {
+          en: "DO (Good)",
+          zh: "應該做 (好)",
+          ja: "するべき (良い)",
+          ko: "해야 함 (좋음)",
+          es: "HACER (Bueno)",
+          de: "TUN (Gut)",
+          fi: "TEE (Hyvä)",
+          fr: "FAIRE (Bon)",
+          ar: "افعل (جيد)",
+          it: "FARE (Buono)",
+        },
+        dont: {
+          en: "DON'T (Bad)",
+          zh: "不應該做 (壞)",
+          ja: "してはいけない (悪い)",
+          ko: "하지 마세요 (나쁨)",
+          es: "NO HACER (Malo)",
+          de: "NICHT TUN (Schlecht)",
+          fi: "ÄLÄ TEE (Huono)",
+          fr: "NE PAS FAIRE (Mauvais)",
+          ar: "لا تفعل (سيئ)",
+          it: "NON FARE (Cattivo)",
+        },
+
+        a1: {
+          en: "Draw graffiti on old walls.",
+          zh: "在古牆上塗鴉。",
+          ja: "古い壁に落書きをする。",
+          ko: "오래된 벽에 낙서하기.",
+        },
+        a2: {
+          en: "Take photos without flash.",
+          zh: "拍照時不使用閃光燈。",
+          ja: "フラッシュなしで写真を撮る。",
+          ko: "플래시 없이 사진 찍기.",
+        },
+        a3: {
+          en: "Climb on statues.",
+          zh: "攀爬雕像。",
+          ja: "像に登る。",
+          ko: "동상에 올라가기.",
+        },
+        a4: {
+          en: "Follow visitor rules.",
+          zh: "遵守參觀規則。",
+          ja: "訪問者のルールに従う。",
+          ko: "방문자 규칙 따르기.",
+        },
+        a5: {
+          en: "Pick up trash.",
+          zh: "撿起垃圾 (保持清潔)。",
+          ja: "ゴミを拾う。",
+          ko: "쓰레기 줍기.",
+        },
+        a6: {
+          en: "Carve your name on wood.",
+          zh: "在木頭上刻上名字。",
+          ja: "木に名前を彫る。",
+          ko: "나무에 이름 새기기.",
+        },
+
+        correct: { en: "Correct!", zh: "正確！", ja: "正解！", ko: "정답!" },
+        wrong: {
+          en: "Wrong!",
+          zh: "錯誤！",
+          ja: "不正解！",
+          ko: "틀렸습니다!",
+        },
+      };
+
+      const actions = [
+        { id: "a1", type: "dont", icon: "🎨" },
+        { id: "a2", type: "do", icon: "📷" },
+        { id: "a3", type: "dont", icon: "🧗" },
+        { id: "a4", type: "do", icon: "📜" },
+        { id: "a5", type: "do", icon: "🚮" },
+        { id: "a6", type: "dont", icon: "🔪" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [index, setIndex] = useState(0);
+        const [feedback, setFeedback] = useState(null);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+        const current = actions[index];
+
+        const handleAnswer = (ans) => {
+          if (feedback) return;
+          if (ans === current.type) {
+            setFeedback("correct");
+            setTimeout(() => {
+              setFeedback(null);
+              setIndex((index + 1) % actions.length);
+            }, 1000);
+          } else {
+            setFeedback("wrong");
+            setTimeout(() => setFeedback(null), 500);
+          }
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col items-center justify-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-amber-800">
+              {getText("title")}
+            </h1>
+
+            <div className="w-full max-w-lg bg-white p-8 rounded-3xl shadow-xl text-center border-4 border-amber-100">
+              <div className="mb-8 p-10 bg-amber-50 rounded-2xl flex flex-col items-center">
+                <div className="text-8xl mb-4">{current.icon}</div>
+                <div className="text-2xl font-bold text-slate-800">
+                  {getText(current.id)}
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <button
+                  onClick={() => handleAnswer("do")}
+                  className="flex-1 bg-green-100 hover:bg-green-200 text-green-900 py-6 rounded-2xl font-black text-xl flex flex-col items-center gap-2 border-b-4 border-green-300 active:border-b-0 active:translate-y-1"
+                >
+                  <span className="text-4xl">👍</span>
+                  {getText("do")}
+                </button>
+                <button
+                  onClick={() => handleAnswer("dont")}
+                  className="flex-1 bg-red-100 hover:bg-red-200 text-red-900 py-6 rounded-2xl font-black text-xl flex flex-col items-center gap-2 border-b-4 border-red-300 active:border-b-0 active:translate-y-1"
+                >
+                  <span className="text-4xl">👎</span>
+                  {getText("dont")}
+                </button>
+              </div>
+
+              {feedback && (
+                <div
+                  className={`mt-6 text-3xl font-black ${
+                    feedback === "correct" ? "text-green-600" : "text-red-500"
+                  } animate-bounce`}
+                >
+                  {getText(feedback)}
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小四數學：對稱圖形工廠</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #f0abfc 0%, #c026d3 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      function App() {
+        // 8x8 Grid
+        // User draws on left, app mirrors on right
+        const [grid, setGrid] = useState(
+          Array(8)
+            .fill()
+            .map(() => Array(4).fill(false))
+        ); // Only modify left 4 cols
+
+        const toggle = (r, c) => {
+          const newGrid = [...grid];
+          newGrid[r] = [...newGrid[r]];
+          newGrid[r][c] = !newGrid[r][c];
+          setGrid(newGrid);
+        };
+
+        const clear = () =>
+          setGrid(
+            Array(8)
+              .fill()
+              .map(() => Array(4).fill(false))
+          );
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-5xl font-black text-white mb-8">
+              🦋 對稱圖形工廠
+            </h1>
+
+            <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl">
+              <div className="flex mb-4 gap-4 justify-center">
+                <button
+                  onClick={clear}
+                  className="bg-fuchsia-500 text-white px-6 py-2 rounded-xl font-bold hover:bg-fuchsia-600"
+                >
+                  清除畫板
+                </button>
+              </div>
+
+              <div className="relative border-4 border-fuchsia-200 rounded-xl overflow-hidden bg-white shadow-inner">
+                {/* Central Line */}
+                <div className="absolute top-0 bottom-0 left-1/2 w-1 bg-fuchsia-500 z-10 border-l border-dashed border-white"></div>
+
+                <div className="flex">
+                  {/* Left: Interactive */}
+                  <div className="grid grid-cols-4 gap-1 p-1 bg-fuchsia-50 border-r-2 border-fuchsia-200">
+                    {grid.map((row, r) =>
+                      row.map((active, c) => (
+                        <div
+                          key={`l-${r}-${c}`}
+                          onClick={() => toggle(r, c)}
+                          className={`w-12 h-12 rounded cursor-pointer transition-all border border-slate-100 ${
+                            active
+                              ? "bg-fuchsia-500 scale-90"
+                              : "bg-white hover:bg-fuchsia-100"
+                          }`}
+                        />
+                      ))
+                    )}
+                  </div>
+
+                  {/* Right: Mirrored */}
+                  <div className="grid grid-cols-4 gap-1 p-1 bg-fuchsia-50">
+                    {grid.map((row, r) =>
+                      // Reverse column order for mirroring
+                      [...row]
+                        .reverse()
+                        .map((active, c) => (
+                          <div
+                            key={`r-${r}-${c}`}
+                            className={`w-12 h-12 rounded transition-all border border-slate-100 ${
+                              active ? "bg-fuchsia-500/50" : "bg-white"
+                            }`}
+                          />
+                        ))
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 text-center font-bold text-fuchsia-800">
+                點擊左邊方格繪畫，右邊會自動出現對稱圖形！
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

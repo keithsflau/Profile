@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小三數學：面積認識</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #d1fae5 0%, #6ee7b7 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      function App() {
+        const [length, setLength] = useState(6);
+        const [width, setWidth] = useState(4);
+        const area = length * width;
+        const squares = [...Array(width)].map((_, i) =>
+          [...Array(length)].map((_, j) => ({ x: j, y: i }))
+        );
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-6xl font-black text-green-900 mb-8">
+              ⬜ 面積認識
+            </h1>
+            <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-6xl w-full">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div>
+                  <div className="mb-6">
+                    <label className="block text-lg font-bold mb-2">
+                      長度：{length}
+                    </label>
+                    <input
+                      type="range"
+                      min="1"
+                      max="12"
+                      value={length}
+                      onChange={(e) => setLength(parseInt(e.target.value))}
+                      className="w-full"
+                    />
+                  </div>
+                  <div className="mb-6">
+                    <label className="block text-lg font-bold mb-2">
+                      闊度：{width}
+                    </label>
+                    <input
+                      type="range"
+                      min="1"
+                      max="12"
+                      value={width}
+                      onChange={(e) => setWidth(parseInt(e.target.value))}
+                      className="w-full"
+                    />
+                  </div>
+                  <div className="bg-gradient-to-r from-green-100 to-emerald-100 rounded-2xl p-6 border-4 border-green-400">
+                    <div className="text-lg font-bold text-green-700 mb-2">
+                      面積公式
+                    </div>
+                    <div className="text-3xl font-black text-green-600 mb-4">
+                      長 × 闊
+                    </div>
+                    <div className="text-2xl font-mono text-green-800">
+                      = {length} × {width}
+                    </div>
+                    <div className="mt-4 text-6xl font-black text-green-600">
+                      = {area} cm²
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-green-50 rounded-2xl p-6">
+                  <div className="text-center mb-4 text-lg font-bold text-green-800">
+                    數一數有多少個小正方形
+                  </div>
+                  <div
+                    className="inline-grid gap-1"
+                    style={{ gridTemplateColumns: `repeat(${length},1fr)` }}
+                  >
+                    {squares.flat().map((s, i) => (
+                      <div
+                        key={i}
+                        className="w-10 h-10 bg-green-400 border-2 border-green-600 rounded"
+                      />
+                    ))}
+                  </div>
+                  <div className="mt-6 text-center text-2xl font-black text-green-700">
+                    共 {area} 個小正方形
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

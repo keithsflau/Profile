@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Natural Wonders</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #ecfdf5;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Wonders of Nature",
+          zh: "自然奇觀",
+          ja: "自然の驚異",
+          ko: "자연의 경이",
+          es: "Maravillas de la naturaleza",
+          de: "Wunder der Natur",
+          fi: "Luonnon ihmeet",
+          fr: "Merveilles de la nature",
+          ar: "عجائب الطبيعة",
+          it: "Meraviglie della Natura",
+        },
+        instruction: {
+          en: "Identify the natural wonder.",
+          zh: "辨認自然奇觀。",
+          ja: "自然の驚異を特定してください。",
+          ko: "자연의 경이를 식별하세요.",
+          es: "Identifica la maravilla natural.",
+          de: "Identifiziere das Naturwunder.",
+          fi: "Tunnista luonnonihme.",
+          fr: "Identifiez la merveille naturelle.",
+          ar: "حدد العجيبة الطبيعية.",
+          it: "Identifica la meraviglia naturale.",
+        },
+        everest: {
+          en: "Mount Everest",
+          zh: "珠穆朗瑪峰",
+          ja: "エベレスト",
+          ko: "에베레스트 산",
+        },
+        canyon: {
+          en: "Grand Canyon",
+          zh: "大峽谷",
+          ja: "グランドキャニオン",
+          ko: "그랜드 캐년",
+        },
+        amazon: {
+          en: "Amazon Rainforest",
+          zh: "亞馬遜雨林",
+          ja: "アマゾン熱帯雨林",
+          ko: "아마존 열대우림",
+        },
+        aurora: { en: "Aurora", zh: "極光", ja: "オーロラ", ko: "오로라" },
+
+        correct: { en: "Correct!", zh: "正確！", ja: "正解！", ko: "정답!" },
+        wrong: {
+          en: "Try Again",
+          zh: "再試一次",
+          ja: "もう一度",
+          ko: "다시 시도",
+        },
+      };
+
+      const wonders = [
+        { id: "everest", icon: "🏔️", color: "text-slate-700" },
+        { id: "canyon", icon: "🏜️", color: "text-orange-700" },
+        { id: "amazon", icon: "🌳", color: "text-green-700" },
+        { id: "aurora", icon: "🌌", color: "text-purple-700" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [idx, setIdx] = useState(0);
+        const [feedback, setFeedback] = useState(null);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+        const current = wonders[idx];
+
+        const check = (id) => {
+          if (feedback) return;
+          if (id === current.id) {
+            setFeedback("correct");
+            setTimeout(() => {
+              setFeedback(null);
+              setIdx((idx + 1) % wonders.length);
+            }, 1000);
+          } else {
+            setFeedback("wrong");
+            setTimeout(() => setFeedback(null), 500);
+          }
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-emerald-800">
+              {getText("title")}
+            </h1>
+            <p className="mb-8 font-bold text-slate-500">
+              {getText("instruction")}
+            </p>
+
+            <motion.div
+              key={current.id}
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className={`w-full max-w-lg aspect-video bg-white rounded-3xl shadow-xl flex items-center justify-center mb-12 border-4 border-emerald-200 ${current.color}`}
+            >
+              <div className="text-[120px]">{current.icon}</div>
+            </motion.div>
+
+            <div className="grid grid-cols-2 gap-4 w-full max-w-lg">
+              {wonders.map((w) => (
+                <button
+                  key={w.id}
+                  onClick={() => check(w.id)}
+                  className="p-4 bg-emerald-100 hover:bg-emerald-200 text-emerald-900 rounded-xl font-bold text-lg shadow-sm"
+                >
+                  {getText(w.id)}
+                </button>
+              ))}
+            </div>
+
+            {feedback && (
+              <div
+                className={`mt-8 text-3xl font-black ${
+                  feedback === "correct" ? "text-green-600" : "text-red-500"
+                } animate-bounce`}
+              >
+                {getText(feedback)}
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

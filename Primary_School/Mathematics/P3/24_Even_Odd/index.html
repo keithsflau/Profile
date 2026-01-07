@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>小三數學：單數與雙數</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fef3c7 0%, #fb923c 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { motion } = window.Motion;
+      function App() {
+        const [num, setNum] = useState(12);
+        const isEven = num % 2 === 0;
+        const dots = [...Array(num)].map((_, i) => i);
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-6xl font-black text-orange-900 mb-8">
+              🔢 單數與雙數
+            </h1>
+            <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full">
+              <input
+                type="number"
+                value={num}
+                onChange={(e) =>
+                  setNum(
+                    Math.max(0, Math.min(30, parseInt(e.target.value) || 0))
+                  )
+                }
+                className="w-full px-8 py-6 text-6xl font-black text-center rounded-2xl border-4 border-orange-300 mb-6"
+              />
+              <div
+                className={`text-center py-8 rounded-2xl mb-8 ${
+                  isEven ? "bg-green-100" : "bg-blue-100"
+                }`}
+              >
+                <div
+                  className={`text-5xl font-black ${
+                    isEven ? "text-green-700" : "text-blue-700"
+                  }`}
+                >
+                  {isEven ? "✓ 雙數 (Even)" : "✓ 單數 (Odd)"}
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-2 mb-8">
+                {dots.map((d, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: i * 0.05 }}
+                    className={`w-12 h-12 rounded-full ${
+                      isEven ? "bg-green-400" : "bg-blue-400"
+                    }`}
+                  />
+                ))}
+              </div>
+              <div className="bg-orange-50 p-6 rounded-xl">
+                <div className="font-bold text-orange-800 text-lg mb-3">
+                  💡 記憶方法
+                </div>
+                <div className="text-orange-700 space-y-2">
+                  <div>• 雙數：可以分成2組，沒有剩餘</div>
+                  <div>• 單數：分成2組後，會剩下1個</div>
+                  <div>• 雙數個位：0, 2, 4, 6, 8</div>
+                  <div>• 單數個位：1, 3, 5, 7, 9</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

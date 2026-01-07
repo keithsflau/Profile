@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Future Career</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #fafafa;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Career Matcher",
+          zh: "職業配對",
+          ja: "キャリアマッチャー",
+          ko: "직업 매칭",
+          es: "Buscador de carreras",
+          de: "Berufe-Finder",
+          fi: "Urahaku",
+          fr: "Chercheur de carrière",
+          ar: "مكتشف الوظائف",
+          it: "Abbinamento Carriera",
+        },
+        instruction: {
+          en: "Match the interest to the job.",
+          zh: "將興趣與工作配對。",
+          ja: "興味を仕事に合わせてください。",
+          ko: "흥미를 직업과 연결하세요.",
+          es: "Empareja el interés con el trabajo.",
+          de: "Ordne das Interesse dem Job zu.",
+          fi: "Yhdistä kiinnostus työhön.",
+          fr: "Associez l'intérêt au travail.",
+          ar: "طابق الاهتمام بالوظيفة.",
+          it: "Abbina l'interesse al lavoro.",
+        },
+        art: {
+          en: "Likes Drawing",
+          zh: "喜歡畫畫",
+          ja: "絵を描くのが好き",
+          ko: "그림 그리기 좋아함",
+        },
+        math: {
+          en: "Likes Numbers",
+          zh: "喜歡數字",
+          ja: "数字が好き",
+          ko: "숫자 좋아함",
+        },
+        science: {
+          en: "Likes Experiments",
+          zh: "喜歡實驗",
+          ja: "実験が好き",
+          ko: "실험 좋아함",
+        },
+        care: {
+          en: "Likes Helping People",
+          zh: "喜歡幫助人",
+          ja: "人を助けるのが好き",
+          ko: "사람 돕는 것 좋아함",
+        },
+
+        designer: {
+          en: "Designer",
+          zh: "設計師",
+          ja: "デザイナー",
+          ko: "디자이너",
+        },
+        accountant: {
+          en: "Accountant",
+          zh: "會計師",
+          ja: "会計士",
+          ko: "회계사",
+        },
+        scientist: {
+          en: "Scientist",
+          zh: "科學家",
+          ja: "科学者",
+          ko: "과학자",
+        },
+        doctor: { en: "Doctor", zh: "醫生", ja: "医者", ko: "의사" },
+
+        correct: { en: "Correct!", zh: "正確！", ja: "正解！", ko: "정답!" },
+      };
+
+      const pairs = [
+        { id: 1, interest: "art", job: "designer", icon: "🎨" },
+        { id: 2, interest: "math", job: "accountant", icon: "📊" },
+        { id: 3, interest: "science", job: "scientist", icon: "🔬" },
+        { id: 4, interest: "care", job: "doctor", icon: "🩺" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [idx, setIdx] = useState(0);
+        const [feedback, setFeedback] = useState(null);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+        const current = pairs[idx];
+
+        const check = (job) => {
+          if (feedback) return;
+          if (job === current.job) {
+            setFeedback("correct");
+            setTimeout(() => {
+              setFeedback(null);
+              setIdx((idx + 1) % pairs.length);
+            }, 1000);
+          }
+        };
+
+        const options = [...pairs].sort(() => Math.random() - 0.5);
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-indigo-800">
+              {getText("title")}
+            </h1>
+            <p className="mb-8 font-bold text-slate-500">
+              {getText("instruction")}
+            </p>
+
+            <motion.div
+              key={current.id}
+              initial={{ rotate: -10, opacity: 0 }}
+              animate={{ rotate: 0, opacity: 1 }}
+              className="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl flex flex-col items-center border-2 border-indigo-100 mb-8"
+            >
+              <div className="text-8xl mb-4">{current.icon}</div>
+              <div className="font-bold text-2xl text-slate-700">
+                {getText(current.interest)}
+              </div>
+            </motion.div>
+
+            <div className="grid grid-cols-2 gap-4 w-full max-w-lg">
+              {options.map((opt) => (
+                <button
+                  key={opt.id}
+                  onClick={() => check(opt.job)}
+                  className="p-4 bg-indigo-50 hover:bg-indigo-100 text-indigo-900 rounded-xl font-bold text-lg shadow-sm"
+                >
+                  {getText(opt.job)}
+                </button>
+              ))}
+            </div>
+
+            {feedback && (
+              <div className="mt-8 text-3xl font-black text-green-600 animate-bounce">
+                {getText("correct")}
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Distillation Tower | Junior Science</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        font-family: "Outfit", sans-serif;
+        background: #f1f5f9;
+      }
+
+      .glass-apparatus {
+        background: rgba(255, 255, 255, 0.3);
+        border: 2px solid #64748b;
+        position: relative;
+      }
+
+      .liquid-impure {
+        background: rgba(168, 85, 247, 0.6); /* Purple impure ink */
+        transition: height 0.5s;
+      }
+
+      .liquid-pure {
+        background: rgba(56, 189, 248, 0.5); /* Clear water */
+        transition: height 0.5s;
+      }
+
+      .steam {
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.8) 0%,
+          rgba(255, 255, 255, 0) 70%
+        );
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        opacity: 0;
+      }
+
+      @keyframes rise {
+        0% {
+          transform: translateY(0) scale(1);
+          opacity: 0;
+        }
+        50% {
+          opacity: 0.8;
+        }
+        100% {
+          transform: translateY(-100px) scale(2);
+          opacity: 0;
+        }
+      }
+
+      @keyframes bubble {
+        0% {
+          transform: translateY(0);
+        }
+        100% {
+          transform: translateY(-30px);
+          opacity: 0;
+        }
+      }
+
+      .bubble {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.6);
+        position: absolute;
+        animation: bubble 1s infinite;
+      }
+
+      .condenser-jacket {
+        background: rgba(203, 213, 225, 0.3);
+        border: 2px solid #94a3b8;
+      }
+
+      .water-flow {
+        background: rgba(56, 189, 248, 0.3);
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 0%;
+        transition: height 2s;
+      }
+    </style>
+  </head>
+  <body class="bg-slate-100 text-slate-800 h-screen overflow-hidden">
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      const App = () => {
+        const [heatOn, setHeatOn] = useState(false);
+        const [waterOn, setWaterOn] = useState(false);
+        const [distillate, setDistillate] = useState(0);
+        const [temp, setTemp] = useState(25);
+        const [timer, setTimer] = useState(0);
+
+        useEffect(() => {
+          let interval;
+          if (heatOn) {
+            interval = setInterval(() => {
+              setTemp((prev) => {
+                if (prev < 100) return prev + 1;
+                return 100;
+              });
+
+              if (temp >= 100 && waterOn) {
+                setDistillate((prev) => Math.min(prev + 0.5, 80)); // Max 80px height
+              }
+            }, 100);
+          } else {
+            interval = setInterval(() => {
+              setTemp((prev) => Math.max(prev - 2, 25));
+            }, 100);
+          }
+          return () => clearInterval(interval);
+        }, [heatOn, waterOn, temp]);
+
+        return (
+          <div className="h-full flex flex-col p-6 max-w-7xl mx-auto">
+            <header className="flex justify-between items-center mb-8">
+              <div>
+                <span className="text-purple-600 font-bold uppercase text-xs tracking-wider">
+                  Form 1 Science • Water
+                </span>
+                <h1 className="text-3xl font-extrabold text-slate-800">
+                  Distillation Simulator
+                </h1>
+                <p className="text-slate-500 text-sm">
+                  Separating pure water from coloured ink.
+                </p>
+              </div>
+              <div className="flex gap-4">
+                <div className="bg-white px-6 py-2 rounded-xl shadow-sm border text-center">
+                  <div className="text-xs font-bold text-slate-400">
+                    THERMOMETER
+                  </div>
+                  <div
+                    className={`text-2xl font-mono font-bold ${
+                      temp >= 100 ? "text-red-500" : "text-slate-700"
+                    }`}
+                  >
+                    {Math.round(temp)}°C
+                  </div>
+                </div>
+              </div>
+            </header>
+
+            <div className="flex-grow flex flex-col md:flex-row gap-8 items-center justify-center">
+              {/* Simulation Visual */}
+              <div className="relative w-[800px] h-[500px] bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
+                {/* 1. Bunsen Burner */}
+                <div className="absolute bottom-10 left-[150px] flex flex-col items-center">
+                  {heatOn && (
+                    <div className="w-8 h-20 bg-orange-400 opacity-80 blur-md rounded-t-full animate-pulse origin-bottom"></div>
+                  )}
+                  <div className="w-4 h-16 bg-slate-700"></div>
+                  <div className="w-16 h-4 bg-slate-800 rounded"></div>
+                </div>
+                {/* 2. Round Bottom Flask */}
+                <div className="absolute bottom-[100px] left-[110px] w-24 h-24 rounded-full glass-apparatus z-10 overflow-hidden">
+                  <div className="absolute bottom-0 w-full h-[60%] liquid-impure">
+                    {temp >= 90 && (
+                      <>
+                        <div className="bubble left-[20%] delay-100"></div>
+                        <div className="bubble left-[50%] delay-300"></div>
+                        <div className="bubble left-[80%] delay-0"></div>
+                      </>
+                    )}
+                  </div>
+                </div>
+                {/* Flask Neck */}
+                <div className="absolute bottom-[190px] left-[142px] w-8 h-24 glass-apparatus border-b-0 z-10"></div>
+                {/* 3. Thermometer */}
+                <div className="absolute bottom-[280px] left-[150px] h-32 w-2 bg-yellow-100 border border-slate-400 z-0">
+                  <div
+                    className="absolute bottom-0 w-full bg-red-500 transition-all duration-300"
+                    style={{ height: `${temp}%` }}
+                  ></div>
+                </div>
+                {/* 4. Side Arm / Connector */}
+                <div className="absolute bottom-[260px] left-[150px] w-24 h-8 glass-apparatus border-l-0 rotate-[15deg] origin-left z-10"></div>
+                {/* 5. Liebig Condenser (Outer Jacket + Inner Tube) */}
+                <div className="absolute bottom-[195px] left-[230px] w-[300px] h-16 condenser-jacket rotate-[15deg] origin-left z-0 overflow-hidden">
+                  {/* Cooling Water */}
+                  <div
+                    className={`water-flow ${waterOn ? "h-full" : "h-0"}`}
+                  ></div>
+                </div>
+                <div className="absolute bottom-[207px] left-[230px] w-[320px] h-4 glass-apparatus bg-transparent rotate-[15deg] origin-left z-10 flex items-center justify-center">
+                  {/* Steam/Water particles moving inside */}
+                  {temp >= 100 && (
+                    <div className="w-full flex justify-around opacity-50">
+                      <i className="fa-solid fa-wind animate-slide-right text-gray-400 text-xs"></i>
+                      {waterOn ? (
+                        <i className="fa-solid fa-droplet animate-slide-right text-blue-400 text-xs"></i>
+                      ) : (
+                        <i className="fa-solid fa-wind animate-slide-right text-gray-400 text-xs"></i>
+                      )}
+                    </div>
+                  )}
+                </div>
+                {/* Water In/Out Hoses */}
+                <div className="absolute bottom-[180px] left-[450px] w-2 h-40 bg-blue-300 opacity-50 rotate-12 z-[-1]"></div>{" "}
+                {/* Water In */}
+                <div className="absolute bottom-[300px] left-[280px] w-2 h-40 bg-blue-300 opacity-50 -rotate-12 z-[-1]"></div>{" "}
+                {/* Water Out */}
+                {/* 6. Receiver Beaker */}
+                <div className="absolute bottom-10 right-[150px] w-16 h-24 glass-apparatus border-t-0 rounded-b-lg overflow-hidden">
+                  <div
+                    className="absolute bottom-0 w-full liquid-pure"
+                    style={{ height: `${distillate}px` }}
+                  ></div>
+                </div>
+                {/* Drops falling */}
+                {temp >= 100 && waterOn && (
+                  <div className="absolute bottom-[110px] right-[175px] text-blue-400 animate-bounce">
+                    <i className="fa-solid fa-droplet"></i>
+                  </div>
+                )}
+                {/* Labels */}
+                <div className="absolute top-[150px] left-[20px] text-xs font-bold text-slate-400 text-right w-24 leading-tight">
+                  Anti-bumping granules needed
+                </div>
+                <div className="absolute top-[80px] right-[250px] text-xs font-bold text-slate-400">
+                  Water OUT
+                </div>
+                <div className="absolute bottom-[150px] right-[180px] text-xs font-bold text-slate-400">
+                  Water IN (Bottom)
+                </div>
+              </div>
+
+              {/* Controls */}
+              <div className="w-full max-w-xs space-y-6">
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                  <h3 className="font-bold text-lg mb-4">Controls</h3>
+
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="font-bold">Bunsen Burner</span>
+                    <button
+                      onClick={() => setHeatOn(!heatOn)}
+                      className={`w-12 h-6 rounded-full transition-colors ${
+                        heatOn ? "bg-orange-500" : "bg-slate-300"
+                      } relative`}
+                    >
+                      <div
+                        className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                          heatOn ? "left-7" : "left-1"
+                        }`}
+                      ></div>
+                    </button>
+                  </div>
+
+                  <div className="flex items-center justify-between mb-6">
+                    <span className="font-bold">Cooling Water</span>
+                    <button
+                      onClick={() => setWaterOn(!waterOn)}
+                      className={`w-12 h-6 rounded-full transition-colors ${
+                        waterOn ? "bg-blue-500" : "bg-slate-300"
+                      } relative`}
+                    >
+                      <div
+                        className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                          waterOn ? "left-7" : "left-1"
+                        }`}
+                      ></div>
+                    </button>
+                  </div>
+
+                  <div className="text-xs text-slate-500 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                    <strong>Status:</strong>
+                    {heatOn && !waterOn && temp >= 100 && (
+                      <span className="text-red-500 block mt-1">
+                        <i className="fa-solid fa-triangle-exclamation"></i>{" "}
+                        Steam is escaping! Turn on water.
+                      </span>
+                    )}
+                    {heatOn && waterOn && temp >= 100 && (
+                      <span className="text-green-500 block mt-1">
+                        <i className="fa-solid fa-check"></i> Distillation in
+                        progress.
+                      </span>
+                    )}
+                    {!heatOn && (
+                      <span className="block mt-1">Ready to start.</span>
+                    )}
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => window.location.reload()}
+                  className="w-full py-3 rounded-xl border border-slate-300 hover:bg-slate-50 font-bold text-slate-600 transition"
+                >
+                  Reset Experiment
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

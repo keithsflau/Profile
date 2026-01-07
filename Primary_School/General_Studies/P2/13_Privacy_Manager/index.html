@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小二常識：私隱小管家 | Privacy Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Privacy Manager",
+          zh: "私隱小管家",
+          ja: "プライバシーマネージャー",
+        },
+        instruction: {
+          en: "Should you share this?",
+          zh: "這資料可以分享給陌生人嗎？",
+          ja: "これは共有すべきですか？",
+        },
+        public: { en: "Okay to Share", zh: "可以分享" },
+        private: { en: "Keep Secret!", zh: "必須保密！" },
+
+        name: { en: "First Name", zh: "名字 (例如: 陳大文)" }, // Actually name is borderline, but generally teach full name not share with strangers online.
+        // Let's use clearer distinctions
+
+        phone: { en: "Phone Number", zh: "電話號碼" },
+        address: { en: "Home Address", zh: "住址" },
+        school: { en: "School Name", zh: "學校名稱" },
+        password: { en: "Password", zh: "密碼" },
+        photo: { en: "Selfie in Uniform", zh: "穿校服的照片" },
+
+        favColor: { en: "Favorite Color", zh: "喜歡的顏色" },
+        favFood: { en: "Favorite Food", zh: "喜歡的食物" },
+        hobby: { en: "My Hobby", zh: "我的嗜好" },
+        pet: { en: "My Pet", zh: "我的寵物" },
+
+        correct: { en: "Correct! Stay Safe!", zh: "正確！保護自己！" },
+        wrong: { en: "Oops! Be careful!", zh: "哎呀！要小心！" },
+        score: { en: "Privacy Score", zh: "私隱分數" },
+        completed: { en: "Privacy Expert!", zh: "私隱專家！" },
+        restart: { en: "Play Again", zh: "再玩一次" },
+      };
+
+      const dataItems = [
+        { id: "phone", type: "private", icon: "📱" },
+        { id: "address", type: "private", icon: "🏠" },
+        { id: "password", type: "private", icon: "🔑" },
+        { id: "school", type: "private", icon: "🏫" }, // Generally private online
+        { id: "photo", type: "private", icon: "📸" },
+
+        { id: "favColor", type: "public", icon: "🎨" },
+        { id: "favFood", type: "public", icon: "🍔" },
+        { id: "hobby", type: "public", icon: "⚽" },
+        { id: "pet", type: "public", icon: "🐶" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [queue, setQueue] = useState([]);
+        const [currentItem, setCurrentItem] = useState(null);
+        const [score, setScore] = useState(0);
+        const [feedback, setFeedback] = useState(null);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        useEffect(() => {
+          initGame();
+        }, []);
+
+        const initGame = () => {
+          const q = [...dataItems].sort(() => Math.random() - 0.5);
+          setQueue(q);
+          setCurrentItem(q[0]);
+          setScore(0);
+          setFeedback(null);
+        };
+
+        const handleChoice = (choice) => {
+          if (feedback) return;
+          if (choice === currentItem.type) {
+            setScore((s) => s + 10);
+            setFeedback("correct");
+          } else {
+            setScore((s) => Math.max(0, s - 5));
+            setFeedback("wrong");
+          }
+
+          setTimeout(() => {
+            setFeedback(null);
+            const nextIdx = queue.indexOf(currentItem) + 1;
+            if (nextIdx < queue.length) {
+              setCurrentItem(queue[nextIdx]);
+            } else {
+              setCurrentItem(null); // Finished
+            }
+          }, 1000);
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-indigo-900 mb-4 mt-8 drop-shadow-sm bg-white/50 px-6 py-2 rounded-full">
+              🔒 {getText("title")}
+            </h1>
+
+            {currentItem ? (
+              <div className="w-full max-w-md flex flex-col items-center">
+                <div className="font-bold text-indigo-700 mb-6 bg-white px-4 py-1 rounded-full shadow">
+                  {getText("score")}: {score}
+                </div>
+
+                {/* Card Container - Swipe style visual */}
+                <div className="relative w-72 h-96 bg-white rounded-3xl shadow-2xl border-8 border-indigo-100 flex flex-col items-center justify-center p-6 text-center mb-8 transform transition-transform hover:scale-105">
+                  <div className="absolute top-4 right-4 text-3xl opacity-20">
+                    ❓
+                  </div>
+
+                  <motion.div
+                    key={currentItem.id}
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="bg-indigo-50 w-32 h-32 rounded-full flex items-center justify-center text-7xl mb-6 shadow-inner"
+                  >
+                    {currentItem.icon}
+                  </motion.div>
+                  <h2 className="text-2xl font-black text-slate-800 mb-4">
+                    {getText(currentItem.id)}
+                  </h2>
+
+                  {feedback && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`absolute inset-0 bg-white/90 flex items-center justify-center text-3xl font-black rounded-2xl ${
+                        feedback === "correct"
+                          ? "text-green-600"
+                          : "text-red-500"
+                      }`}
+                    >
+                      {getText(feedback)}
+                    </motion.div>
+                  )}
+                </div>
+
+                <p className="font-bold text-slate-500 mb-6 bg-indigo-50 px-4 py-2 rounded-xl text-center">
+                  "{getText("instruction")}"
+                </p>
+
+                <div className="flex gap-4 w-full">
+                  <button
+                    onClick={() => handleChoice("public")}
+                    className="flex-1 bg-green-500 hover:bg-green-600 text-white py-4 rounded-2xl shadow-xl font-bold text-lg flex flex-col items-center border-b-4 border-green-700 active:border-b-0 active:translate-y-1"
+                  >
+                    <span className="text-3xl mb-1">📢</span>
+                    {getText("public")}
+                  </button>
+                  <button
+                    onClick={() => handleChoice("private")}
+                    className="flex-1 bg-red-500 hover:bg-red-600 text-white py-4 rounded-2xl shadow-xl font-bold text-lg flex flex-col items-center border-b-4 border-red-700 active:border-b-0 active:translate-y-1"
+                  >
+                    <span className="text-3xl mb-1">🤫</span>
+                    {getText("private")}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white/90 p-12 rounded-3xl shadow-xl text-center mt-12">
+                <div className="text-8xl mb-4">🛡️</div>
+                <h2 className="text-3xl font-black text-indigo-800 mb-6">
+                  {getText("completed")}
+                </h2>
+                <p className="text-xl mb-8 font-bold text-slate-600">
+                  {getText("score")}: {score}
+                </p>
+                <button
+                  onClick={initGame}
+                  className="bg-indigo-500 text-white px-10 py-4 rounded-full font-black text-xl hover:bg-indigo-600 shadow-xl border-b-4 border-indigo-700 active:border-b-0 active:translate-y-1"
+                >
+                  {getText("restart")} 🔄
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Normal Distribution | S6 Math</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-slate-50 text-slate-800 min-h-screen">
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useMemo } = React;
+      const App = () => {
+        const [mean, setMean] = useState(0);
+        const [sd, setSd] = useState(1);
+
+        // Generate Path
+        const points = useMemo(() => {
+          const pts = [];
+          // x from -5 to 5
+          // Screen X: 0 to 600. -5->0, 5->600. Scale factor 60. Offset 300.
+          // Screen Y: 0 to 300. Max Y is when x=mean. y ~ 0.4/sd.
+          // Let's scale Y so max height is around 250px.
+
+          for (let x = -5; x <= 5; x += 0.1) {
+            const exponent = -0.5 * Math.pow((x - mean) / sd, 2);
+            const y = (1 / (sd * Math.sqrt(2 * Math.PI))) * Math.exp(exponent);
+
+            const sx = (x + 5) * 60; // Map -5..5 to 0..600
+            const sy = 300 - y * 500; // Scale Y
+            pts.push(`${sx},${sy}`);
+          }
+          return pts.join(" ");
+        }, [mean, sd]);
+
+        return (
+          <div className="p-8 max-w-4xl mx-auto min-h-screen flex flex-col items-center select-none">
+            <header className="mb-8 text-center">
+              <div className="text-slate-500 font-bold uppercase text-xs tracking-widest mb-2">
+                Unit 1: Statistics
+              </div>
+              <h1 className="text-4xl font-extrabold text-slate-900">
+                Normal Distribution
+              </h1>
+              <p className="text-slate-500">
+                Visualize Mean ($\mu$) and Standard Deviation ($\sigma$)
+              </p>
+            </header>
+
+            <div className="bg-white p-8 rounded-3xl shadow-xl border border-slate-200 w-full mb-8 flex flex-col items-center">
+              <svg
+                width="600"
+                height="320"
+                className="border-b border-slate-300 bg-slate-50 rounded-t-xl mb-4"
+              >
+                {/* Axis */}
+                <line
+                  x1="0"
+                  y1="300"
+                  x2="600"
+                  y2="300"
+                  stroke="#94a3b8"
+                  strokeWidth="2"
+                />
+                <line
+                  x1="300"
+                  y1="0"
+                  x2="300"
+                  y2="300"
+                  stroke="#e2e8f0"
+                  strokeDasharray="4"
+                />
+
+                {/* Curve */}
+                <polyline
+                  points={points}
+                  fill="none"
+                  stroke="#6366f1"
+                  strokeWidth="3"
+                />
+
+                {/* Mean Line */}
+                <line
+                  x1={(mean + 5) * 60}
+                  y1="0"
+                  x2={(mean + 5) * 60}
+                  y2="300"
+                  stroke="#f43f5e"
+                  strokeDasharray="4"
+                  opacity="0.5"
+                />
+              </svg>
+
+              <div className="flex flex-col gap-6 w-full max-w-md">
+                <div>
+                  <div className="flex justify-between mb-2">
+                    <label className="font-bold text-slate-700">
+                      Mean ($\mu$)
+                    </label>
+                    <span className="font-mono bg-slate-100 px-2 rounded text-slate-600">
+                      {mean}
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="-2"
+                    max="2"
+                    step="0.1"
+                    value={mean}
+                    onChange={(e) => setMean(Number(e.target.value))}
+                    className="w-full accent-rose-500"
+                  />
+                </div>
+                <div>
+                  <div className="flex justify-between mb-2">
+                    <label className="font-bold text-slate-700">
+                      Standard Deviation ($\sigma$)
+                    </label>
+                    <span className="font-mono bg-slate-100 px-2 rounded text-slate-600">
+                      {sd}
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0.5"
+                    max="3"
+                    step="0.1"
+                    value={sd}
+                    onChange={(e) => setSd(Number(e.target.value))}
+                    className="w-full accent-indigo-500"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <footer className="mt-12">
+              <a
+                href="../index.html"
+                className="text-slate-500 hover:text-slate-700 font-bold"
+              >
+                <i className="fa-solid fa-arrow-left mr-2"></i> Back to
+                Dashboard
+              </a>
+            </footer>
+          </div>
+        );
+      };
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小六數學：比的概念 | Ratio Concept</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #e0e7ff 0%, #6366f1 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      function App() {
+        const [a, setA] = useState(3);
+        const [b, setB] = useState(5);
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-5xl font-black text-indigo-100 mb-2">
+              📊 比的概念
+            </h1>
+            <p className="text-xl text-indigo-200 font-bold mb-8">
+              Ratio Concept
+            </p>
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-3xl w-full">
+              <div className="flex items-center justify-center gap-6 mb-8">
+                <div className="text-center">
+                  <label className="block font-bold text-indigo-700 mb-2">
+                    數量 A
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={a}
+                    onChange={(e) =>
+                      setA(Math.max(1, parseInt(e.target.value) || 1))
+                    }
+                    className="w-20 text-3xl font-black text-center border-4 border-indigo-300 rounded-xl p-2"
+                  />
+                </div>
+                <span className="text-5xl font-black text-indigo-400">:</span>
+                <div className="text-center">
+                  <label className="block font-bold text-indigo-700 mb-2">
+                    數量 B
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={b}
+                    onChange={(e) =>
+                      setB(Math.max(1, parseInt(e.target.value) || 1))
+                    }
+                    className="w-20 text-3xl font-black text-center border-4 border-indigo-300 rounded-xl p-2"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-2 mb-6 justify-center">
+                <div className="flex gap-1">
+                  {[...Array(a)].map((_, i) => (
+                    <div key={i} className="w-8 h-8 bg-blue-500 rounded"></div>
+                  ))}
+                </div>
+                <div className="flex gap-1">
+                  {[...Array(b)].map((_, i) => (
+                    <div key={i} className="w-8 h-8 bg-pink-500 rounded"></div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-indigo-50 rounded-2xl p-6 text-center border-2 border-indigo-200">
+                <p className="text-xl font-bold text-indigo-800">
+                  藍色 : 粉色 = {a} : {b}
+                </p>
+                <p className="text-lg text-indigo-600 mt-2">
+                  Blue : Pink = {a} : {b}
+                </p>
+              </div>
+
+              <div className="mt-6 bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
+                <p className="font-bold">
+                  💡 比 (Ratio) 表示兩個數量的相對關係
+                </p>
+                <p className="text-sm">
+                  比不是分數，但可以轉換: {a}:{b} = {a}/{b}
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小二常識：洗手七部曲 | Hand Washing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, Reorder } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Hand Washing Steps",
+          zh: "洗手七部曲",
+          ja: "手洗いの手順",
+        },
+        instruction: {
+          en: "Order the steps vertically!",
+          zh: "按正確順序上下排列洗手步驟！",
+          ja: "手洗いの手順を正しい順序に並べてください！",
+        },
+        check: { en: "Check Order", zh: "檢查順序" },
+        reset: { en: "Reset", zh: "重置" },
+        correct: { en: "Clean and Safe!", zh: "乾淨衛生！" },
+        wrong: {
+          en: "Incorrect Order, Try Again.",
+          zh: "次序不對，再試一次。",
+        },
+
+        step1: { en: "1. Wet Hands", zh: "1. 用水弄濕雙手" },
+        step2: { en: "2. Apply Soap", zh: "2. 加入梘液" },
+        step3: { en: "3. Rub Palms", zh: "3. 掌心對掌心搓揉" },
+        step4: { en: "4. Rub Back of Hands", zh: "4. 搓揉手背" },
+        step5: { en: "5. Rub Fingers", zh: "5. 搓揉指隙和指背" }, // Simplified
+        step6: { en: "6. Rinse Hands", zh: "6. 清水沖洗" },
+        step7: { en: "7. Dry Hands", zh: "7. 抹乾雙手" },
+      };
+
+      const correctOrder = [1, 2, 3, 4, 5, 6, 7];
+
+      const stepData = [
+        { id: 1, label: "step1", icon: "💧" },
+        { id: 2, label: "step2", icon: "🧼" },
+        { id: 3, label: "step3", icon: "🙏" },
+        { id: 4, label: "step4", icon: "🖐️" },
+        { id: 5, label: "step5", icon: "🤞" },
+        { id: 6, label: "step6", icon: "🚿" },
+        { id: 7, label: "step7", icon: "🧻" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [items, setItems] = useState([]);
+        const [status, setStatus] = useState(null);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        useEffect(() => {
+          shuffle();
+        }, []);
+
+        const shuffle = () => {
+          const shuffled = [...stepData].sort(() => Math.random() - 0.5);
+          setItems(shuffled);
+          setStatus(null);
+        };
+
+        const check = () => {
+          const currentIds = items.map((i) => i.id);
+          const isCorrect = currentIds.every(
+            (val, index) => val === correctOrder[index]
+          );
+          if (isCorrect) setStatus("correct");
+          else setStatus("wrong");
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-blue-800 mb-4 mt-8 drop-shadow-sm bg-white/50 px-6 py-2 rounded-full">
+              🙌 {getText("title")}
+            </h1>
+            <p className="font-bold text-blue-700 mb-6">
+              {getText("instruction")}
+            </p>
+
+            <div className="w-full max-w-md">
+              <Reorder.Group
+                axis="y"
+                values={items}
+                onReorder={setItems}
+                className="space-y-3"
+              >
+                {items.map((item) => (
+                  <Reorder.Item key={item.id} value={item}>
+                    <div
+                      className={`bg-white p-4 rounded-xl shadow-md border-b-4 border-slate-200 flex items-center gap-4 cursor-grab active:cursor-grabbing hover:scale-[1.02] transition-transform ${
+                        status === "correct"
+                          ? "border-green-300 bg-green-50"
+                          : status === "wrong"
+                          ? "border-red-200 bg-red-50"
+                          : ""
+                      }`}
+                    >
+                      <div className="text-4xl bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center shadow-inner">
+                        {item.icon}
+                      </div>
+                      <div className="font-bold text-slate-700 text-lg">
+                        {getText(item.label)}
+                      </div>
+                      <div className="ml-auto text-slate-300">☰</div>
+                    </div>
+                  </Reorder.Item>
+                ))}
+              </Reorder.Group>
+            </div>
+
+            {status && (
+              <div
+                className={`mt-6 p-4 rounded-2xl font-black text-center text-xl shadow w-full max-w-md ${
+                  status === "correct"
+                    ? "bg-green-100 text-green-700"
+                    : "bg-red-100 text-red-600"
+                }`}
+              >
+                {getText(status)}
+              </div>
+            )}
+
+            <div className="flex gap-4 w-full max-w-md mt-6 pb-12">
+              <button
+                onClick={check}
+                className="flex-1 bg-blue-500 text-white py-4 rounded-xl font-bold shadow-lg hover:bg-blue-600 text-xl border-b-4 border-blue-700 active:border-b-0 active:translate-y-1"
+              >
+                {getText("check")}
+              </button>
+              <button
+                onClick={shuffle}
+                className="bg-slate-200 text-slate-600 px-6 py-4 rounded-xl font-bold shadow-lg hover:bg-slate-300 text-xl border-b-4 border-slate-400 active:border-b-0 active:translate-y-1"
+              >
+                {getText("reset")}
+              </button>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

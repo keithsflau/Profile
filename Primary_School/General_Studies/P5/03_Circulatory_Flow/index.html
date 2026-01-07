@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Circulatory Flow</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #0f172a;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Circulatory System Flow",
+          zh: "循環系統流動",
+          ja: "循環器系の流れ",
+          ko: "순환계 흐름",
+          es: "Flujo del sistema circulatorio",
+          de: "Kreislauffluss",
+          fi: "Verenkiertojärjestelmän virtaus",
+          fr: "Flux du système circulatoire",
+          ar: "تدفق الجهاز الدوري",
+          it: "Flusso del Sistema Circolatorio",
+        },
+        instruction: {
+          en: "Pump the heart to move blood!",
+          zh: "按壓心臟以推動血液！",
+          ja: "心臓をポンプして血液を動かしてください！",
+          ko: "심장을 펌프질하여 혈액을 이동시키세요!",
+          es: "¡Bombea el corazón para mover la sangre!",
+          de: "Pumpe das Herz, um Blut zu bewegen!",
+          fi: "Pumppaa sydäntä liikuttamaan verta!",
+          fr: "Pompez le cœur pour faire bouger le sang !",
+          ar: "ضخ القلب لتحريك الدم!",
+          it: "Pompa il cuore per muovere il sangue!",
+        },
+        oxygenated: {
+          en: "Oxygenated Blood (Red)",
+          zh: "含氧血 (紅)",
+          ja: "酸素化血液 (赤)",
+          ko: "산소화된 혈액 (빨강)",
+          es: "Sangre oxigenada (Rojo)",
+          de: "Sauerstoffreiches Blut (Rot)",
+          fi: "Happipitoinen veri (Punainen)",
+          fr: "Sang oxygéné (Rouge)",
+          ar: "الدم المؤكسج (أحمر)",
+          it: "Sangue Ossigenato (Rosso)",
+        },
+        deoxygenated: {
+          en: "Deoxygenated Blood (Blue)",
+          zh: "缺氧血 (藍)",
+          ja: "脱酸素化血液 (青)",
+          ko: "탈산소화된 혈액 (파랑)",
+          es: "Sangre desoxigenada (Azul)",
+          de: "Sauerstoffarmes Blut (Blau)",
+          fi: "Hapeton veri (Sininen)",
+          fr: "Sang désoxygéné (Bleu)",
+          ar: "دم غير مؤكسج (أزرق)",
+          it: "Sangue Deossigenato (Blu)",
+        },
+        lungs: {
+          en: "Lungs: Get Oxygen",
+          zh: "肺部：獲取氧氣",
+          ja: "肺: 酸素を得る",
+          ko: "폐: 산소 획득",
+          es: "Pulmones: Obtener oxígeno",
+          de: "Lungen: Sauerstoff aufnehmen",
+          fi: "Keuhkot: Hanki happea",
+          fr: "Poumons : Obtenir de l'oxygène",
+          ar: "رئتين: الحصول على الأكسجين",
+          it: "Polmoni: Ottieni ossigeno",
+        },
+        body: {
+          en: "Body: Use Oxygen",
+          zh: "身體：使用氧氣",
+          ja: "体: 酸素を使う",
+          ko: "신체: 산소 사용",
+          es: "Cuerpo: Usar oxígeno",
+          de: "Körper: Sauerstoff verbrauchen",
+          fi: "Keho: Käytä happea",
+          fr: "Corps : Utiliser l'oxygène",
+          ar: "جسم: استخدام الأكسجين",
+          it: "Corpo: Usa ossigeno",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [pumping, setPumping] = useState(false);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const pump = () => {
+          setPumping(true);
+          setTimeout(() => setPumping(false), 300);
+        };
+
+        // Particles Animation Logic
+        // We will define particles moving along a path (The "8" figure loop)
+        // Upper loop: Heart -> Lungs -> Heart
+        // Lower loop: Heart -> Body -> Heart
+        // Path needs CSS `offset-path`. Or use simpler React state movement.
+        // Let's use CSS Animation for continuous flow, controlled by "animation-play-state".
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-4 text-red-500">
+              {getText("title")}
+            </h1>
+            <p className="mb-8 font-bold text-slate-400">
+              {getText("instruction")}
+            </p>
+
+            <div className="relative w-full max-w-2xl h-[600px] border-4 border-slate-700 bg-slate-800 rounded-3xl overflow-hidden flex flex-col items-center justify-between py-10">
+              {/* Lungs (Top) */}
+              <div className="relative z-10 bg-cyan-200 text-cyan-900 px-6 py-3 rounded-xl font-bold shadow opacity-80 backdrop-blur">
+                🫁 {getText("lungs")}
+              </div>
+
+              {/* Heart (Center) */}
+              <div className="relative z-20 my-auto">
+                <button
+                  onClick={pump}
+                  className={`text-9xl transition-transform active:scale-90 ${
+                    pumping ? "scale-110 drop-shadow-[0_0_30px_red]" : ""
+                  }`}
+                >
+                  ❤️
+                </button>
+              </div>
+
+              {/* Body (Bottom) */}
+              <div className="relative z-10 bg-orange-200 text-orange-900 px-6 py-3 rounded-xl font-bold shadow opacity-80 backdrop-blur">
+                🦾 {getText("body")}
+              </div>
+
+              {/* Flow Path SVG */}
+              <svg
+                className="absolute inset-0 w-full h-full z-0 pointer-events-none"
+                viewBox="0 0 400 600"
+              >
+                {/* Upper Loop: Heart (200,300) to Lungs (200, 100) */}
+                {/* Right side going UP (Blue) -> Lungs -> Left side going DOWN (Red) */}
+                <path
+                  id="pathLungsToHeart"
+                  d="M150,100 C100,100 100,300 150,300"
+                  stroke="#ef4444"
+                  strokeWidth="10"
+                  fill="none"
+                  opacity="0.3"
+                  markerEnd="url(#arrowRed)"
+                />
+                <path
+                  id="pathHeartToLungs"
+                  d="M250,300 C300,300 300,100 250,100"
+                  stroke="#3b82f6"
+                  strokeWidth="10"
+                  fill="none"
+                  opacity="0.3"
+                  markerEnd="url(#arrowBlue)"
+                />
+
+                {/* Lower Loop: Heart (200,300) to Body (200, 500) */}
+                {/* Left side going DOWN (Red) -> Body -> Right side going UP (Blue) */}
+                {/* Wait, Arteries carry Red from heart. Veins carry Blue to heart. */}
+                {/* Systemic: Left Ventricle (Red) -> Body. */}
+                {/* Pulmonary: Right Ventricle (Blue) -> Lungs. */}
+
+                {/* Let's simplify visual: Red OUT of Heart to Body. Blue IN to Heart from Body. */}
+                <path
+                  id="pathHeartToBody"
+                  d="M150,300 C100,300 100,500 150,500"
+                  stroke="#ef4444"
+                  strokeWidth="10"
+                  fill="none"
+                  opacity="0.3"
+                />
+                <path
+                  id="pathBodyToHeart"
+                  d="M250,500 C300,500 300,300 250,300"
+                  stroke="#3b82f6"
+                  strokeWidth="10"
+                  fill="none"
+                  opacity="0.3"
+                />
+
+                <defs>
+                  <marker
+                    id="arrowRed"
+                    markerWidth="10"
+                    markerHeight="10"
+                    refX="5"
+                    refY="5"
+                    orient="auto"
+                  >
+                    <path d="M0,0 L10,5 L0,10" fill="#ef4444" />
+                  </marker>
+                  <marker
+                    id="arrowBlue"
+                    markerWidth="10"
+                    markerHeight="10"
+                    refX="5"
+                    refY="5"
+                    orient="auto"
+                  >
+                    <path d="M0,0 L10,5 L0,10" fill="#3b82f6" />
+                  </marker>
+                </defs>
+
+                {/* Particles */}
+                {/* Only move if pumping is recent? or continuously but speed up on pump? Let's continuous. */}
+                {/* Using React to render circles along paths is complex without a library. 
+                       We will use CSS motion path if supported or simple CSS animations on fixed paths.
+                       For reliability, let's use CSS @keyframes on absolute divs positioned approx on path.
+                   */}
+              </svg>
+
+              {/* CSS Based Particles */}
+              {/* Red Blood: Lungs -> Heart -> Body */}
+              <div className="absolute inset-0 pointer-events-none">
+                {/* Red Particles flowing DOWN from Lungs to Heart to Body */}
+                <div
+                  className={`particle-red absolute top-[100px] left-[145px] text-red-500 text-2xl ${
+                    pumping ? "animate-flow-fast" : "animate-flow-slow"
+                  }`}
+                >
+                  🔴
+                </div>
+                <div
+                  className={`particle-red absolute top-[200px] left-[110px] text-red-500 text-2xl ${
+                    pumping ? "animate-flow-fast" : "animate-flow-slow"
+                  }`}
+                  style={{ animationDelay: "0.5s" }}
+                >
+                  🔴
+                </div>
+                <div
+                  className={`particle-red absolute top-[400px] left-[110px] text-red-500 text-2xl ${
+                    pumping ? "animate-flow-fast" : "animate-flow-slow"
+                  }`}
+                  style={{ animationDelay: "1s" }}
+                >
+                  🔴
+                </div>
+
+                {/* Blue Particles flowing UP from Body to Heart to Lungs */}
+                <div
+                  className={`particle-blue absolute top-[500px] left-[245px] text-blue-500 text-2xl ${
+                    pumping ? "animate-flow-up-fast" : "animate-flow-up-slow"
+                  }`}
+                >
+                  🔵
+                </div>
+                <div
+                  className={`particle-blue absolute top-[400px] left-[280px] text-blue-500 text-2xl ${
+                    pumping ? "animate-flow-up-fast" : "animate-flow-up-slow"
+                  }`}
+                  style={{ animationDelay: "0.5s" }}
+                >
+                  🔵
+                </div>
+                <div
+                  className={`particle-blue absolute top-[200px] left-[280px] text-blue-500 text-2xl ${
+                    pumping ? "animate-flow-up-fast" : "animate-flow-up-slow"
+                  }`}
+                  style={{ animationDelay: "1s" }}
+                >
+                  🔵
+                </div>
+              </div>
+
+              <style>{`
+                   @keyframes flowDown {
+                      0% { top: 100px; left: 150px; opacity: 0; }
+                      20% { opacity: 1; }
+                      40% { top: 300px; left: 150px; } /* Heart */
+                      60% { top: 400px; left: 100px; }
+                      100% { top: 500px; left: 150px; opacity: 0; }
+                   }
+                   @keyframes flowUp {
+                      0% { top: 500px; left: 250px; opacity: 0; }
+                      20% { opacity: 1; }
+                      40% { top: 300px; left: 250px; } /* Heart */
+                      60% { top: 200px; left: 300px; }
+                      100% { top: 100px; left: 250px; opacity: 0; }
+                   }
+                   .animate-flow-slow { animation: flowDown 4s linear infinite; }
+                   .animate-flow-fast { animation: flowDown 1s linear infinite; }
+                   .animate-flow-up-slow { animation: flowUp 4s linear infinite; }
+                   .animate-flow-up-fast { animation: flowUp 1s linear infinite; }
+                `}</style>
+
+              <div className="absolute bottom-4 flex gap-4 text-xs font-bold w-full justify-center">
+                <div className="flex items-center gap-2">
+                  <span className="w-4 h-4 bg-red-500 rounded-full"></span>{" "}
+                  {getText("oxygenated")}
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-4 h-4 bg-blue-500 rounded-full"></span>{" "}
+                  {getText("deoxygenated")}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

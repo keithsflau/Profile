@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>S2 Science Master Class | Band 1A Interactive Labs</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Plus+Jakarta+Sans:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- React & ReactDOM -->
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              outfit: ["Outfit", "sans-serif"],
+              jakarta: ["Plus Jakarta Sans", "sans-serif"],
+            },
+            colors: {
+              brand: {
+                50: "#f0fdf4",
+                100: "#dcfce7",
+                500: "#22c55e",
+                600: "#16a34a",
+                900: "#14532d",
+              },
+              science: {
+                blue: "#3b82f6",
+                purple: "#8b5cf6",
+                orange: "#f59e0b",
+                red: "#ef4444",
+                cyan: "#06b6d4",
+              },
+            },
+            animation: {
+              float: "float 6s ease-in-out infinite",
+              "slide-up": "slideUp 0.5s ease-out forwards",
+            },
+            keyframes: {
+              float: {
+                "0%, 100%": { transform: "translateY(0)" },
+                "50%": { transform: "translateY(-10px)" },
+              },
+              slideUp: {
+                "0%": { opacity: "0", transform: "translateY(20px)" },
+                "100%": { opacity: "1", transform: "translateY(0)" },
+              },
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      body {
+        background-color: #f8fafc;
+        background-image: radial-gradient(
+            at 0% 0%,
+            rgba(34, 197, 94, 0.1) 0px,
+            transparent 50%
+          ),
+          radial-gradient(
+            at 100% 0%,
+            rgba(6, 182, 212, 0.1) 0px,
+            transparent 50%
+          ),
+          radial-gradient(
+            at 100% 100%,
+            rgba(245, 158, 11, 0.1) 0px,
+            transparent 50%
+          );
+        background-attachment: fixed;
+      }
+      .glossy-card {
+        background: rgba(255, 255, 255, 0.82);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05),
+          0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      }
+      .glossy-card:hover {
+        background: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05),
+          0 10px 10px -5px rgba(0, 0, 0, 0.02);
+        transform: translateY(-2px);
+      }
+      .status-badge {
+        font-size: 0.65rem;
+        letter-spacing: 0.05em;
+      }
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f5f9;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+    </style>
+  </head>
+  <body class="font-jakarta text-slate-800 antialiased">
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      // --- Data Configuration ---
+      // S2 Science: 6 Units, 30 Apps
+      const curriculum = [
+        {
+          id: "unit7",
+          title: "Unit 7: Living Things & Air",
+          color: "text-brand-600",
+          bg: "bg-green-50",
+          border: "border-green-200",
+          icon: "fa-lungs",
+          apps: [
+            {
+              id: "01",
+              title: "Photosynthesis Lab",
+              path: "01_Photosynthesis/index.html",
+              status: "live",
+              icon: "fa-sun",
+            },
+            {
+              id: "02",
+              title: "Respiration Runner",
+              path: "02_Respiration/index.html",
+              status: "live",
+              icon: "fa-person-running",
+            },
+            {
+              id: "03",
+              title: "Gas Exchange",
+              path: "Alveolar Gas Exchange Simulation/index.html",
+              status: "live",
+              icon: "fa-arrows-left-right",
+            },
+            {
+              id: "04",
+              title: "Air Composition",
+              path: "04_Air_Composition/index.html",
+              status: "live",
+              icon: "fa-chart-pie",
+            },
+            {
+              id: "05",
+              title: "Lung Health",
+              path: "05_Lung_Health/index.html",
+              status: "live",
+              icon: "fa-skull",
+            },
+            {
+              id: "06",
+              title: "BioCycle Explorer",
+              path: "BioCycle/index.html",
+              status: "live",
+              icon: "fa-recycle",
+            },
+          ],
+        },
+        {
+          id: "unit8",
+          title: "Unit 8: Electricity",
+          color: "text-science-orange",
+          bg: "bg-orange-50",
+          border: "border-orange-200",
+          icon: "fa-bolt",
+          apps: [
+            {
+              id: "07",
+              title: "Circuit Constructor",
+              path: "07_Circuit_Constructor/index.html",
+              status: "live",
+              icon: "fa-code-branch",
+            },
+            {
+              id: "08",
+              title: "Ohm's Law Lab",
+              path: "Ohm-s-Law/index.html",
+              status: "live",
+              icon: "fa-wave-square",
+            },
+            {
+              id: "09",
+              title: "Electrical Safety",
+              path: "09_Safety_House/index.html",
+              status: "live",
+              icon: "fa-house-chimney-crack",
+            },
+            {
+              id: "10",
+              title: "Electromagnet",
+              path: "10_Electromagnet/index.html",
+              status: "live",
+              icon: "fa-magnet",
+            },
+            {
+              id: "11",
+              title: "Domestic Bill",
+              path: "11_Domestic_Bill/index.html",
+              status: "live",
+              icon: "fa-file-invoice-dollar",
+            },
+          ],
+        },
+        {
+          id: "unit9",
+          title: "Unit 9: Acids & Alkalis",
+          color: "text-science-purple",
+          bg: "bg-purple-50",
+          border: "border-purple-200",
+          icon: "fa-flask-vial",
+          apps: [
+            {
+              id: "12",
+              title: "pH Scale Slider",
+              path: "12_pH_Scale/index.html",
+              status: "live",
+              icon: "fa-sliders",
+            },
+            {
+              id: "13",
+              title: "Neutralization",
+              path: "13_Titration_Sim/index.html",
+              status: "live",
+              icon: "fa-fill-drip",
+            },
+            {
+              id: "14",
+              title: "Indicators Lab",
+              path: "14_Indicators/index.html",
+              status: "live",
+              icon: "fa-eye-dropper",
+            },
+            {
+              id: "15",
+              title: "Acid Rain City",
+              path: "15_Acid_Rain/index.html",
+              status: "live",
+              icon: "fa-cloud-showers-heavy",
+            },
+            {
+              id: "16",
+              title: "Reactivity Series",
+              path: "16_Reactivity/index.html",
+              status: "live",
+              icon: "fa-explosion",
+            },
+            {
+              id: "17",
+              title: "Atomic Structure",
+              path: "Atomic structures/index.html",
+              status: "live",
+              icon: "fa-atom",
+            },
+          ],
+        },
+        {
+          id: "unit10",
+          title: "Unit 10: Sensing",
+          color: "text-science-blue",
+          bg: "bg-blue-50",
+          border: "border-blue-200",
+          icon: "fa-eye",
+          apps: [
+            {
+              id: "18",
+              title: "Eye Anatomy",
+              path: "18_Eye_Anatomy/index.html",
+              status: "live",
+              icon: "fa-eye",
+            },
+            {
+              id: "19",
+              title: "Optics Lab",
+              path: "19_Optics_Lab/index.html",
+              status: "live",
+              icon: "fa-glasses",
+            },
+            {
+              id: "20",
+              title: "Ear & Sound",
+              path: "20_Ear_Sound/index.html",
+              status: "live",
+              icon: "fa-ear-listen",
+            },
+            {
+              id: "21",
+              title: "Skin Sensitivity",
+              path: "21_Skin_Touch/index.html",
+              status: "live",
+              icon: "fa-hand-pointer",
+            },
+            {
+              id: "22",
+              title: "Reaction Time",
+              path: "22_Reaction_Time/index.html",
+              status: "live",
+              icon: "fa-stopwatch",
+            },
+          ],
+        },
+        {
+          id: "unit11",
+          title: "Unit 11: Force & Motion",
+          color: "text-science-red",
+          bg: "bg-red-50",
+          border: "border-red-200",
+          icon: "fa-weight-hanging",
+          apps: [
+            {
+              id: "23",
+              title: "Force Meter",
+              path: "23_Force_Meter/index.html",
+              status: "live",
+              icon: "fa-scale-balanced",
+            },
+            {
+              id: "24",
+              title: "Friction Lab",
+              path: "24_Friction_Lab/index.html",
+              status: "live",
+              icon: "fa-road",
+            },
+            {
+              id: "25",
+              title: "Resultant Force",
+              path: "25_Resultant_Force/index.html",
+              status: "live",
+              icon: "fa-arrows-left-right",
+            },
+            {
+              id: "26",
+              title: "Gravity Mass",
+              path: "26_Gravity_Mass/index.html",
+              status: "live",
+              icon: "fa-planet-ringed",
+            },
+            {
+              id: "27",
+              title: "Motion Graph",
+              path: "27_Motion_Graph/index.html",
+              status: "live",
+              icon: "fa-chart-line",
+            },
+            {
+              id: "28",
+              title: "Newton's Cradle",
+              path: "Newton-s-Cradle/index.html",
+              status: "live",
+              icon: "fa-bowling-ball",
+            },
+          ],
+        },
+        {
+          id: "unit12",
+          title: "Unit 12: Human & Space",
+          color: "text-science-cyan",
+          bg: "bg-cyan-50",
+          border: "border-cyan-200",
+          icon: "fa-user-astronaut",
+          apps: [
+            {
+              id: "29",
+              title: "Color Psychology",
+              path: "29_Psychology_Colors/index.html",
+              status: "live",
+              icon: "fa-palette",
+            },
+            {
+              id: "30",
+              title: "Space Mission",
+              path: "30_Space_Mission/index.html",
+              status: "live",
+              icon: "fa-rocket",
+            },
+          ],
+        },
+      ];
+
+      // --- Components ---
+
+      const Header = () => (
+        <header className="relative py-12 px-6 mb-8 text-center bg-white/50 backdrop-blur-sm border-b border-white/40">
+          <div className="max-w-4xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand-50 text-brand-600 text-xs font-bold uppercase tracking-wider rounded-full mb-4 border border-brand-100">
+              <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
+              Secondary 2
+            </div>
+            <h1 className="font-outfit text-4xl md:text-6xl font-extrabold text-slate-900 tracking-tight mb-4">
+              Junior Science{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-science-blue">
+                Pro Labs
+              </span>
+            </h1>
+            <p className="text-lg text-slate-500 max-w-2xl mx-auto font-jakarta">
+              Advanced interactive systems for the S2 Curriculum. Master
+              Biology, Chemistry, and Physics with 30 dedicated applications.
+            </p>
+          </div>
+        </header>
+      );
+
+      const AppCard = ({ app, colorBase }) => {
+        const isLive = app.status === "live";
+
+        return (
+          <a
+            href={isLive ? app.path : "#"}
+            className={`block group relative h-full p-5 rounded-2xl transition-all duration-300 ${
+              isLive
+                ? "glossy-card cursor-pointer"
+                : "bg-slate-50 border border-slate-100 opacity-60 cursor-not-allowed"
+            }`}
+            onClick={(e) => !isLive && e.preventDefault()}
+          >
+            <div className="flex justify-between items-start mb-4">
+              <div
+                className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${
+                  isLive
+                    ? "bg-white shadow-sm " + colorBase
+                    : "bg-slate-200 text-slate-400"
+                }`}
+              >
+                <i className={`fa-solid ${app.icon}`}></i>
+              </div>
+              <span
+                className={`status-badge px-2 py-1 rounded-md font-bold uppercase ${
+                  isLive
+                    ? "bg-emerald-100 text-emerald-700"
+                    : "bg-slate-200 text-slate-500"
+                }`}
+              >
+                {isLive ? "Active" : "Coming Soon"}
+              </span>
+            </div>
+
+            <h3
+              className={`font-outfit font-bold text-lg leading-tight mb-1 ${
+                isLive
+                  ? "text-slate-800 group-hover:text-brand-600 transition-colors"
+                  : "text-slate-400"
+              }`}
+            >
+              {app.title}
+            </h3>
+            <p className="text-xs text-slate-400 font-mono">APP-{app.id}</p>
+
+            {isLive && (
+              <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300">
+                <i className="fa-solid fa-arrow-right text-brand-500"></i>
+              </div>
+            )}
+          </a>
+        );
+      };
+
+      const UnitSection = ({ unit }) => (
+        <div className="mb-12">
+          <div className="flex items-center gap-3 mb-6 pl-2">
+            <div
+              className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl shadow-sm ${unit.bg} ${unit.color} border ${unit.border}`}
+            >
+              <i className={`fa-solid ${unit.icon}`}></i>
+            </div>
+            <div>
+              <h2 className="font-outfit text-2xl font-bold text-slate-800">
+                {unit.title}
+              </h2>
+              <div className="h-1 w-20 bg-gradient-to-r from-slate-200 to-transparent mt-1 rounded-full"></div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {unit.apps.map((app) => (
+              <AppCard key={app.id} app={app} colorBase={unit.color} />
+            ))}
+          </div>
+        </div>
+      );
+
+      const Dashboard = () => {
+        return (
+          <div className="min-h-screen pb-20">
+            <Header />
+
+            <main className="container mx-auto px-6 max-w-7xl">
+              {curriculum.map((unit) => (
+                <UnitSection key={unit.id} unit={unit} />
+              ))}
+            </main>
+
+            <footer className="text-center py-10 text-slate-400 text-sm">
+              <p>© 2025 Science Department. All Rights Reserved.</p>
+              <p className="mt-2 text-xs">Innovation in Learning.</p>
+            </footer>
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<Dashboard />);
+    </script>
+  </body>
+</html>

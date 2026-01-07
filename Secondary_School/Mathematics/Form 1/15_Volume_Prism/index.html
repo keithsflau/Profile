@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Volume Visualizer | S1 Math</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-cyan-50 text-slate-800 min-h-screen">
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+
+      const App = () => {
+        const [L, setL] = useState(3); // x
+        const [W, setW] = useState(2); // y
+        const [H, setH] = useState(4); // z
+
+        // Isometric projection constants
+        const tileW = 40;
+        const tileH = 24; // flattness
+
+        // Generates styles for a cube at grid x,y,z
+        const Cube = ({ x, y, z }) => {
+          // Screen X: (x - y) * tileW
+          // Screen Y: (x + y) * tileH - z * (tileH * 1.5)
+
+          // Adjust scale for view
+          const sx = (x - y) * (tileW / 2);
+          const sy = (x + y) * (tileH / 2) - z * 35; // 35 is vertical step
+
+          return (
+            <div
+              className="absolute transition-all duration-300"
+              style={{
+                left: `calc(50% + ${sx}px)`,
+                top: `calc(60% + ${sy}px)`,
+                zIndex: x + y + z, // Painter's algo sort
+              }}
+            >
+              {/* CSS Cube */}
+              <div className="relative w-10 h-10 group">
+                {/* Top Face */}
+                <div className="absolute w-10 h-10 bg-cyan-400 border border-cyan-500 origin-bottom-right transform skew-x-[60deg] rotate-[-75deg] scale-y-[0.6] -translate-y-[22px] translate-x-[2px] opacity-90 group-hover:bg-cyan-300"></div>
+
+                {/* Actually, constructing valid 3D cubes with pure CSS transform is tricky without a library.
+                                 Let's use SVGs for each cube which is much reliable for isometric Look.
+                             */}
+                <svg
+                  width="44"
+                  height="50"
+                  viewBox="0 0 44 50"
+                  className="drop-shadow-sm"
+                >
+                  <path
+                    d="M22 0 L44 11 L22 22 L0 11 Z"
+                    fill="#22d3ee"
+                    stroke="#0891b2"
+                    strokeWidth="1"
+                  />{" "}
+                  {/* Top */}
+                  <path
+                    d="M0 11 L22 22 L22 46 L0 35 Z"
+                    fill="#06b6d4"
+                    stroke="#0891b2"
+                    strokeWidth="1"
+                  />{" "}
+                  {/* Left */}
+                  <path
+                    d="M22 22 L44 11 L44 35 L22 46 Z"
+                    fill="#0ea5e9"
+                    stroke="#0891b2"
+                    strokeWidth="1"
+                  />{" "}
+                  {/* Right */}
+                </svg>
+                <div className="absolute top-4 left-4 text-[8px] text-white/50">
+                  {x},{y},{z}
+                </div>
+              </div>
+            </div>
+          );
+        };
+
+        const cubes = [];
+        // Order: z bottom up, then x/y back to front
+        // Back corner is low X, low Y.
+        // Painter's Algo for Isometric: Draw furthest away first.
+        // Further away = Smallest X+Y?
+        // Lowest Z is bottom.
+
+        for (let z = 0; z < H; z++) {
+          for (let y = 0; y < W; y++) {
+            for (let x = 0; x < L; x++) {
+              cubes.push(<Cube key={`${x}-${y}-${z}`} x={x} y={y} z={z} />);
+            }
+          }
+        }
+
+        return (
+          <div className="p-8 max-w-4xl mx-auto min-h-screen flex flex-col items-center overflow-hidden">
+            <header className="mb-8 text-center">
+              <div className="text-cyan-600 font-bold uppercase text-xs tracking-widest mb-2">
+                Unit 2: Geometry
+              </div>
+              <h1 className="text-4xl font-extrabold text-slate-900">
+                Volume Visualizer
+              </h1>
+              <p className="text-slate-500">Volume = Area of Base × Height</p>
+            </header>
+
+            <div className="flex flex-col md:flex-row gap-12 w-full pt-8 h-[600px] relative">
+              {/* Controls */}
+              <div className="w-full md:w-1/3 bg-white p-6 rounded-3xl shadow-xl border border-cyan-100 z-50 h-fit">
+                <h2 className="font-bold text-xl mb-6">Dimensions</h2>
+
+                <div className="space-y-6">
+                  <div>
+                    <label className="flex justify-between font-bold text-slate-500 mb-2">
+                      <span>Length (x)</span>{" "}
+                      <span className="bg-slate-100 px-2 rounded">{L}</span>
+                    </label>
+                    <input
+                      type="range"
+                      min="1"
+                      max="8"
+                      value={L}
+                      onChange={(e) => setL(Number(e.target.value))}
+                      className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="flex justify-between font-bold text-slate-500 mb-2">
+                      <span>Width (y)</span>{" "}
+                      <span className="bg-slate-100 px-2 rounded">{W}</span>
+                    </label>
+                    <input
+                      type="range"
+                      min="1"
+                      max="8"
+                      value={W}
+                      onChange={(e) => setW(Number(e.target.value))}
+                      className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="flex justify-between font-bold text-slate-500 mb-2">
+                      <span>Height (z)</span>{" "}
+                      <span className="bg-slate-100 px-2 rounded">{H}</span>
+                    </label>
+                    <input
+                      type="range"
+                      min="1"
+                      max="8"
+                      value={H}
+                      onChange={(e) => setH(Number(e.target.value))}
+                      className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-8 pt-8 border-t border-slate-100">
+                  <div className="text-xs uppercase font-bold text-slate-400">
+                    Total Volume
+                  </div>
+                  <div className="text-5xl font-extrabold text-cyan-600 my-2">
+                    {L * W * H}
+                  </div>
+                  <div className="text-sm font-mono text-slate-500 bg-slate-50 p-2 rounded">
+                    {L} × {W} × {H} = {L * W * H} units³
+                  </div>
+                </div>
+              </div>
+
+              {/* Visual Stage */}
+              <div className="flex-1 relative">
+                <div className="absolute inset-0 flex items-center justify-center -translate-y-20">
+                  {/* Render Cubes */}
+                  {cubes}
+                </div>
+              </div>
+            </div>
+
+            <footer className="mt-auto">
+              <a
+                href="../index.html"
+                className="text-cyan-600 hover:text-cyan-800 font-bold"
+              >
+                <i className="fa-solid fa-arrow-left mr-2"></i> Back to
+                Dashboard
+              </a>
+            </footer>
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

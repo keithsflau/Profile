@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小五數學：代數入門平衡天秤</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      src="https://unpkg.com/react@18/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.min.js"></script>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+      .balance-arm {
+        width: 400px;
+        height: 8px;
+        background: linear-gradient(90deg, #4b5563, #9ca3af, #4b5563);
+        border-radius: 4px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+      .fulcrum {
+        width: 30px;
+        height: 100px;
+        background: linear-gradient(180deg, #374151, #1f2937);
+        clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { Scale, Check, X, RefreshCw, Lightbulb, Trophy } =
+        window.LucideReact;
+
+      function App() {
+        const [equation, setEquation] = useState({
+          left: 5,
+          operation: "+",
+          unknown: 3,
+          right: 8,
+        });
+        const [userAnswer, setUserAnswer] = useState("");
+        const [feedback, setFeedback] = useState(null);
+        const [score, setScore] = useState(0);
+        const [showHint, setShowHint] = useState(false);
+
+        const equations = [
+          {
+            left: 5,
+            operation: "+",
+            unknown: 3,
+            right: 8,
+            display: "x + 5 = 8",
+          },
+          {
+            left: 12,
+            operation: "-",
+            unknown: 5,
+            right: 7,
+            display: "12 - x = 7",
+          },
+          {
+            left: 3,
+            operation: "×",
+            unknown: 4,
+            right: 12,
+            display: "3 × x = 12",
+          },
+          {
+            left: 15,
+            operation: "÷",
+            unknown: 3,
+            right: 5,
+            display: "15 ÷ x = 5",
+          },
+          {
+            left: 7,
+            operation: "+",
+            unknown: 6,
+            right: 13,
+            display: "x + 7 = 13",
+          },
+          {
+            left: 20,
+            operation: "-",
+            unknown: 8,
+            right: 12,
+            display: "20 - x = 12",
+          },
+        ];
+
+        const currentEq =
+          equations[Math.floor(Math.random() * equations.length)];
+
+        const generateQuestion = () => {
+          const newEq = equations[Math.floor(Math.random() * equations.length)];
+          setEquation(newEq);
+          setUserAnswer("");
+          setFeedback(null);
+          setShowHint(false);
+        };
+
+        const checkAnswer = () => {
+          if (parseInt(userAnswer) === equation.unknown) {
+            setFeedback("correct");
+            setScore((s) => s + 10);
+          } else {
+            setFeedback("incorrect");
+          }
+        };
+
+        const getBalanceTilt = () => {
+          // Visual representation of balance
+          if (!userAnswer) return 0;
+          const userVal = parseInt(userAnswer) || 0;
+          const difference = userVal - equation.unknown;
+          return Math.max(-20, Math.min(20, difference * 5));
+        };
+
+        const renderHint = () => {
+          const { left, operation, unknown, right } = equation;
+
+          if (operation === "+") {
+            return (
+              <div className="space-y-2">
+                <p>
+                  如果 x + {left} = {right}
+                </p>
+                <p>
+                  那麼 x = {right} - {left}
+                </p>
+                <p>答案：x = {unknown}</p>
+              </div>
+            );
+          } else if (operation === "-") {
+            return (
+              <div className="space-y-2">
+                <p>
+                  如果 {left} - x = {right}
+                </p>
+                <p>
+                  那麼 x = {left} - {right}
+                </p>
+                <p>答案：x = {unknown}</p>
+              </div>
+            );
+          } else if (operation === "×") {
+            return (
+              <div className="space-y-2">
+                <p>
+                  如果 {left} × x = {right}
+                </p>
+                <p>
+                  那麼 x = {right} ÷ {left}
+                </p>
+                <p>答案：x = {unknown}</p>
+              </div>
+            );
+          } else {
+            return (
+              <div className="space-y-2">
+                <p>
+                  如果 {left} ÷ x = {right}
+                </p>
+                <p>
+                  那麼 x = {left} ÷ {right}
+                </p>
+                <p>答案：x = {unknown}</p>
+              </div>
+            );
+          }
+        };
+
+        useEffect(() => {
+          generateQuestion();
+        }, []);
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <header className="text-center mb-8">
+              <div className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-md px-6 py-3 rounded-full mb-4">
+                <Scale className="text-white" size={24} />
+                <span className="text-white font-bold text-lg">小五數學</span>
+              </div>
+              <h1 className="text-5xl md:text-6xl font-black text-white mb-2 tracking-tight">
+                代數入門：平衡天秤
+              </h1>
+              <p className="text-xl text-white/80 font-medium">找出未知數 x</p>
+              <div className="mt-4 inline-flex items-center gap-2 bg-yellow-400 px-6 py-2 rounded-full">
+                <Trophy className="text-yellow-800" size={20} />
+                <span className="font-black text-yellow-800 text-xl">
+                  {score}
+                </span>
+              </div>
+            </header>
+
+            <main className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8">
+              {/* Balance Visualization */}
+              <div className="lg:col-span-8 bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl">
+                {/* Equation Display */}
+                <div className="text-center mb-8 bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-6">
+                  <div className="text-5xl font-black text-slate-800 mb-4">
+                    {equation.display}
+                  </div>
+                  <div className="text-lg text-slate-600 font-medium">
+                    找出 x 的值是多少？
+                  </div>
+                </div>
+
+                {/* Balance Scale */}
+                <div className="flex flex-col items-center mb-8">
+                  {/* Arms */}
+                  <motion.div
+                    className="balance-arm mb-4"
+                    animate={{ rotate: getBalanceTilt() }}
+                    transition={{ type: "spring", stiffness: 100 }}
+                  >
+                    {/* Left Side */}
+                    <div
+                      className="relative"
+                      style={{ left: "-180px", top: "-80px" }}
+                    >
+                      <div className="bg-blue-500 w-32 h-32 rounded-2xl flex items-center justify-center text-white font-black text-4xl shadow-lg">
+                        {equation.operation === "+" && `x + ${equation.left}`}
+                        {equation.operation === "-" && `${equation.left} - x`}
+                        {equation.operation === "×" && `${equation.left} × x`}
+                        {equation.operation === "÷" && `${equation.left} ÷ x`}
+                      </div>
+                    </div>
+
+                    {/* Right Side */}
+                    <div
+                      className="relative"
+                      style={{ left: "240px", top: "-212px" }}
+                    >
+                      <div className="bg-orange-500 w-32 h-32 rounded-2xl flex items-center justify-center text-white font-black text-5xl shadow-lg">
+                        {equation.right}
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Fulcrum */}
+                  <div className="fulcrum"></div>
+                </div>
+
+                {/* Answer Input */}
+                <div className="flex gap-4 mb-6">
+                  <div className="flex-1 flex items-center gap-4 bg-gradient-to-r from-purple-100 to-blue-100 rounded-2xl p-4">
+                    <span className="text-3xl font-black text-slate-700">
+                      x =
+                    </span>
+                    <input
+                      type="number"
+                      value={userAnswer}
+                      onChange={(e) => setUserAnswer(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && checkAnswer()}
+                      placeholder="?"
+                      className="flex-1 px-6 py-3 rounded-xl border-2 border-purple-300 focus:border-purple-500 outline-none text-3xl font-black text-center"
+                    />
+                  </div>
+                  <button
+                    onClick={checkAnswer}
+                    className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-2xl font-bold text-xl shadow-lg transition-all flex items-center gap-2"
+                  >
+                    <Check /> 確認
+                  </button>
+                </div>
+
+                {/* Feedback */}
+                {feedback === "correct" && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-green-100 text-green-700 p-6 rounded-2xl font-bold text-center text-xl mb-4"
+                  >
+                    ✓ 答對了！天秤平衡了！x = {equation.unknown}
+                  </motion.div>
+                )}
+
+                {feedback === "incorrect" && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-red-100 text-red-700 p-6 rounded-2xl font-bold text-center text-xl mb-4"
+                  >
+                    ✗ 天秤還未平衡，再試試看！
+                  </motion.div>
+                )}
+
+                {/* Hint Toggle */}
+                <button
+                  onClick={() => setShowHint(!showHint)}
+                  className="w-full mb-4 py-3 bg-yellow-50 hover:bg-yellow-100 text-yellow-700 rounded-xl font-bold transition-all flex items-center justify-center gap-2"
+                >
+                  <Lightbulb size={20} /> {showHint ? "隱藏" : "顯示"}提示
+                </button>
+
+                {showHint && (
+                  <div className="bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-6 text-yellow-800">
+                    {renderHint()}
+                  </div>
+                )}
+
+                {/* Next Question */}
+                <button
+                  onClick={generateQuestion}
+                  className="w-full py-4 bg-slate-800 hover:bg-slate-900 text-white rounded-2xl font-bold text-lg shadow-lg transition-all flex items-center justify-center gap-2 mt-4"
+                >
+                  <RefreshCw size={20} /> 下一題
+                </button>
+              </div>
+
+              {/* Info Panel */}
+              <div className="lg:col-span-4 flex flex-col gap-6">
+                <div className="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-lg">
+                  <h3 className="text-lg font-black text-purple-600 mb-3">
+                    💡 代數基本概念
+                  </h3>
+                  <div className="text-sm text-slate-700 leading-relaxed space-y-3">
+                    <div className="bg-purple-50 p-3 rounded-lg">
+                      <strong>未知數 (x)：</strong>
+                      <p className="text-slate-600 mt-1">
+                        代表我們要找出的數字
+                      </p>
+                    </div>
+                    <div className="bg-blue-50 p-3 rounded-lg">
+                      <strong>等式：</strong>
+                      <p className="text-slate-600 mt-1">
+                        等號兩邊的值必須相等
+                      </p>
+                    </div>
+                    <div className="bg-green-50 p-3 rounded-lg">
+                      <strong>解方程：</strong>
+                      <p className="text-slate-600 mt-1">
+                        找出 x 的值，使等式成立
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-br from-orange-100 to-red-100 rounded-3xl p-6 shadow-lg">
+                  <h3 className="text-lg font-black text-orange-700 mb-3">
+                    🎯 解題要訣
+                  </h3>
+                  <div className="text-sm text-slate-700 space-y-2">
+                    <p>
+                      <strong>加法：</strong> x + a = b → x = b - a
+                    </p>
+                    <p>
+                      <strong>減法：</strong> a - x = b → x = a - b
+                    </p>
+                    <p>
+                      <strong>乘法：</strong> a × x = b → x = b ÷ a
+                    </p>
+                    <p>
+                      <strong>除法：</strong> a ÷ x = b → x = a ÷ b
+                    </p>
+                  </div>
+                </div>
+
+                <div className="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-lg">
+                  <h3 className="text-lg font-black text-slate-800 mb-3">
+                    🏆 學習目標
+                  </h3>
+                  <div className="text-sm text-slate-600 leading-relaxed">
+                    <p>
+                      通過平衡天秤的概念，理解代數方程的基本原理。等號就像天秤的支點，兩邊必須平衡！
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </main>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

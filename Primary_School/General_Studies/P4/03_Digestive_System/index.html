@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Digestive System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: radial-gradient(circle, #fce7f3 0%, #fae8ff 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Digestive System",
+          zh: "消化系統",
+          ja: "消化器系",
+          ko: "소화계",
+          es: "Sistema digestivo",
+          de: "Verdauungssystem",
+          fi: "Ruoansulatuselimistö",
+          fr: "Système digestif",
+          ar: "الجهاز الهضمي",
+          it: "Sistema Digerente",
+        },
+        instruction: {
+          en: "Place the organs in the correct position.",
+          zh: "將器官放在正確的位置。",
+          ja: "臓器を正しい位置に置いてください。",
+          ko: "장기를 올바른 위치에 놓으세요.",
+          es: "Coloca los órganos en la posición correcta.",
+          de: "Platziere die Organe an der richtigen Position.",
+          fi: "Aseta elimet oikeaan asentoon.",
+          fr: "Placez les organes dans la bonne position.",
+          ar: "ضع الأعضاء في الموضع الصحيح.",
+          it: "Metti gli organi nella posizione corretta.",
+        },
+        correct: {
+          en: "Correct!",
+          zh: "答對了！",
+          ja: "正解！",
+          ko: "정답!",
+          es: "¡Correcto!",
+          de: "Richtig!",
+          fi: "Oikein!",
+          fr: "Correct !",
+          ar: "صحيح!",
+          it: "Corretto!",
+        },
+        mouth: {
+          en: "Mouth",
+          zh: "口腔",
+          ja: "口",
+          ko: "입",
+          es: "Boca",
+          de: "Mund",
+          fi: "Suu",
+          fr: "Bouche",
+          ar: "فم",
+          it: "Bocca",
+        },
+        esophagus: {
+          en: "Esophagus",
+          zh: "食道",
+          ja: "食道",
+          ko: "식도",
+          es: "Esófago",
+          de: "Speiseröhre",
+          fi: "Ruokatorvi",
+          fr: "Œsophage",
+          ar: "مريء",
+          it: "Esofago",
+        },
+        stomach: {
+          en: "Stomach",
+          zh: "胃",
+          ja: "胃",
+          ko: "위",
+          es: "Estómago",
+          de: "Magen",
+          fi: "Vatsa",
+          fr: "Estomac",
+          ar: "معدة",
+          it: "Stomaco",
+        },
+        intestine_s: {
+          en: "Small Intestine",
+          zh: "小腸",
+          ja: "小腸",
+          ko: "소장",
+          es: "Intestino delgado",
+          de: "Dünndarm",
+          fi: "Ohutsuoli",
+          fr: "Intestin grêle",
+          ar: "أمعاء دقيقة",
+          it: "Intestino Tenue",
+        },
+        intestine_l: {
+          en: "Large Intestine",
+          zh: "大腸",
+          ja: "大腸",
+          ko: "대장",
+          es: "Intestino grueso",
+          de: "Dickdarm",
+          fi: "Paksusuoli",
+          fr: "Gros intestin",
+          ar: "أمعاء غليظة",
+          it: "Intestino Crasso",
+        },
+      };
+
+      const organs = [
+        {
+          id: "mouth",
+          top: "5%",
+          left: "45%",
+          w: "10%",
+          h: "5%",
+          color: "bg-red-400",
+        },
+        {
+          id: "esophagus",
+          top: "10%",
+          left: "48%",
+          w: "4%",
+          h: "15%",
+          color: "bg-pink-300",
+        },
+        {
+          id: "stomach",
+          top: "25%",
+          left: "50%",
+          w: "15%",
+          h: "10%",
+          color: "bg-orange-300",
+        }, // Simplified pos
+        {
+          id: "intestine_s",
+          top: "35%",
+          left: "40%",
+          w: "20%",
+          h: "15%",
+          color: "bg-red-200",
+        },
+        {
+          id: "intestine_l",
+          top: "35%",
+          left: "35%",
+          w: "30%",
+          h: "20%",
+          color: "bg-amber-600",
+          z: -1,
+        },
+      ];
+
+      // In a real app we would use SVG paths. Here we use draggable divs matching targets.
+      // Targets
+      const targets = [
+        { id: "mouth", y: 20, x: 140, label: "mouth" },
+        { id: "esophagus", y: 60, x: 140, label: "esophagus" }, // Using simplified pixels relative to a container
+        { id: "stomach", y: 130, x: 160, label: "stomach" },
+        { id: "intestine_l", y: 170, x: 140, label: "intestine_l" }, // Large wraps small
+        { id: "intestine_s", y: 190, x: 140, label: "intestine_s" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [placed, setPlaced] = useState({}); // { id: boolean }
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const handleDragStart = (e, id) => {
+          e.dataTransfer.setData("id", id);
+        };
+
+        const handleDrop = (e, targetId) => {
+          const draggedId = e.dataTransfer.getData("id");
+          if (draggedId === targetId) {
+            setPlaced((prev) => ({ ...prev, [targetId]: true }));
+          }
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col items-center justify-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-3xl font-black text-pink-700 mb-4">
+              {getText("title")}
+            </h1>
+
+            <div className="flex flex-col md:flex-row gap-12 items-start">
+              {/* Body Outline (Drop Zone) */}
+              <div className="relative w-80 h-[500px] bg-pink-50 border-4 border-pink-200 rounded-[3rem] shadow-inner flex flex-col items-center pt-8">
+                <div className="text-pink-300 font-bold mb-4">Body</div>
+
+                {targets.map((tgt) => (
+                  <div
+                    key={tgt.id}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => handleDrop(e, tgt.id)}
+                    className={`absolute border-2 border-dashed border-pink-400 rounded-lg flex items-center justify-center transition-all
+                           ${
+                             placed[tgt.id]
+                               ? "bg-pink-400 text-white border-none shadow-lg"
+                               : "bg-white/50 text-xs text-pink-400"
+                           }
+                        `}
+                    style={{
+                      top: tgt.y + "px",
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                      width:
+                        tgt.id === "esophagus"
+                          ? "30px"
+                          : tgt.id === "mouth"
+                          ? "60px"
+                          : tgt.id === "stomach"
+                          ? "100px"
+                          : tgt.id === "intestine_s"
+                          ? "80px"
+                          : "140px",
+                      height:
+                        tgt.id === "esophagus"
+                          ? "60px"
+                          : tgt.id === "mouth"
+                          ? "30px"
+                          : tgt.id === "stomach"
+                          ? "50px"
+                          : "70px",
+                      zIndex: tgt.id === "intestine_l" ? 0 : 10,
+                    }}
+                  >
+                    {placed[tgt.id] ? getText(tgt.label) : ""}
+                  </div>
+                ))}
+
+                {/* Connecting lines simplified CSS */}
+                {placed.mouth && placed.esophagus && (
+                  <div className="absolute top-[50px] left-1/2 -translate-x-1/2 w-1 h-[10px] bg-pink-400"></div>
+                )}
+              </div>
+
+              {/* Organs (Draggables) */}
+              <div className="grid grid-cols-2 gap-4">
+                {targets.map(
+                  (tgt) =>
+                    !placed[tgt.id] && (
+                      <div
+                        key={tgt.id}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, tgt.id)}
+                        className="w-32 h-20 bg-white border-2 border-pink-300 rounded-xl flex items-center justify-center font-bold text-pink-700 shadow-md cursor-grab active:cursor-grabbing hover:bg-pink-50"
+                      >
+                        {getText(tgt.label)}
+                      </div>
+                    )
+                )}
+                {Object.keys(placed).length === targets.length && (
+                  <div className="col-span-2 text-center">
+                    <div className="text-4xl mb-2">🎉</div>
+                    <div className="text-2xl font-bold text-green-600">
+                      {getText("correct")}
+                    </div>
+                    <button
+                      onClick={() => setPlaced({})}
+                      className="mt-4 bg-pink-500 text-white px-6 py-2 rounded-full font-bold"
+                    >
+                      Reset
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

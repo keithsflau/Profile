@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Energy Forms</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Energy Sorter",
+          zh: "能量分類器",
+          ja: "エネルギー仕分け",
+          ko: "에너지 분류기",
+          es: "Clasificador de energía",
+          de: "Energiesortierer",
+          fi: "Energialajittelija",
+          fr: "Trieur d'énergie",
+          ar: "فارز الطاقة",
+          it: "Selezionatore di Energia",
+        },
+        instruction: {
+          en: "Match the object to its main form of energy.",
+          zh: "將物體與其主要能量形式配對。",
+          ja: "物体をその主なエネルギー形態と一致させてください。",
+          ko: "물체를 주요 에너지 형태와 연결하세요.",
+          es: "Empareja el objeto con su forma principal de energía.",
+          de: "Ordne das Objekt seiner Hauptenergieform zu.",
+          fi: "Yhdistä esine sen pääasialliseen energiamuotoon.",
+          fr: "Associez l'objet à sa principale forme d'énergie.",
+          ar: "طابق الكائن مع شكله الرئيسي من الطاقة.",
+          it: "Abbina l'oggetto alla sua forma principale di energia.",
+        },
+        kinetic: { en: "Kinetic", zh: "動能", ja: "運動", ko: "운동" },
+        potential: { en: "Potential", zh: "位能", ja: "位置", ko: "위치" },
+        chemical: { en: "Chemical", zh: "化學能", ja: "化学", ko: "화학" },
+        electrical: { en: "Electrical", zh: "電能", ja: "電気", ko: "전기" },
+        light: { en: "Light", zh: "光能", ja: "光", ko: "빛" },
+
+        car: {
+          en: "Moving Car",
+          zh: "行駛中的汽車",
+          ja: "走っている車",
+          ko: "움직이는 차",
+        },
+        dam: {
+          en: "Water in Dam",
+          zh: "水壩裡的水",
+          ja: "ダムの水",
+          ko: "댐의 물",
+        },
+        battery: { en: "Battery", zh: "電池", ja: "電池", ko: "배터리" },
+        bulb: {
+          en: "Lit Bulb",
+          zh: "亮著的燈泡",
+          ja: "点灯した電球",
+          ko: "켜진 전구",
+        },
+        socket: { en: "Wall Socket", zh: "插座", ja: "コンセント", ko: "소켓" },
+        food: { en: "Apple", zh: "蘋果", ja: "リンゴ", ko: "사과" },
+
+        correct: { en: "Correct!", zh: "正確！", ja: "正解！", ko: "정답!" },
+      };
+
+      const items = [
+        { id: "car", type: "kinetic", icon: "🚗" },
+        { id: "dam", type: "potential", icon: "🌊" },
+        { id: "battery", type: "chemical", icon: "🔋" },
+        { id: "bulb", type: "light", icon: "💡" },
+        { id: "socket", type: "electrical", icon: "🔌" },
+        { id: "food", type: "chemical", icon: "🍎" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [idx, setIdx] = useState(0);
+        const [feedback, setFeedback] = useState(null);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+        const current = items[idx];
+
+        const handleGuess = (type) => {
+          if (feedback) return;
+          if (type === current.type) {
+            setFeedback("correct");
+            setTimeout(() => {
+              setFeedback(null);
+              setIdx((idx + 1) % items.length);
+            }, 1000);
+          } else {
+            setFeedback("wrong");
+            setTimeout(() => setFeedback(null), 500);
+          }
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-indigo-700">
+              {getText("title")}
+            </h1>
+            <p className="mb-8 font-bold text-slate-500">
+              {getText("instruction")}
+            </p>
+
+            <div className="bg-indigo-50 p-12 rounded-3xl shadow-xl mb-12 flex flex-col items-center">
+              <div className="text-9xl mb-4">{current.icon}</div>
+              <div className="text-2xl font-bold text-indigo-900">
+                {getText(current.id)}
+              </div>
+              {feedback === "correct" && (
+                <div className="text-green-500 font-black text-3xl mt-4 animate-bounce">
+                  ✓
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-4xl">
+              {["kinetic", "potential", "chemical", "electrical", "light"].map(
+                (type) => (
+                  <button
+                    key={type}
+                    onClick={() => handleGuess(type)}
+                    className="p-4 bg-white border-2 border-indigo-200 rounded-xl hover:bg-indigo-100 text-indigo-800 font-bold shadow-sm transition-all"
+                  >
+                    {getText(type)}
+                  </button>
+                )
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Air Quality</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #f1f5f9;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Air Quality Index (AQI)",
+          zh: "空氣質素指數",
+          ja: "空気質指数",
+          ko: "대기질 지수",
+          es: "Índice de Calidad del Aire",
+          de: "Luftqualitätsindex",
+          fi: "Ilmanlaatuindeksi",
+          fr: "Indice de qualité de l'air",
+          ar: "مؤشر جودة الهواء",
+          it: "Indice Qualità Aria",
+        },
+        instruction: {
+          en: "Match the AQI level to the health advice.",
+          zh: "將空氣質素水平與健康建議配對。",
+          ja: "AQIレベルを健康アドバイスに合わせてください。",
+          ko: "AQI 수준을 건강 조언에 맞추세요.",
+          es: "Haga coincidir el nivel de AQI con los consejos de salud.",
+          de: "Ordne das AQI-Level dem Gesundheitsrat zu.",
+          fi: "Yhdistä ilmanlaatuindeksi terveysneuvoihin.",
+          fr: "Associez le niveau IQA aux conseils de santé.",
+          ar: "طابق مستوى مؤشر جودة الهواء مع النصائح الصحية.",
+          it: "Abbina il livello AQI ai consigli sanitari.",
+        },
+        level_low: {
+          en: "Low (1-3)",
+          zh: "低 (1-3)",
+          ja: "低い (1-3)",
+          ko: "낮음 (1-3)",
+          es: "Bajo (1-3)",
+          de: "Niedrig (1-3)",
+          fi: "Matala (1-3)",
+          fr: "Faible (1-3)",
+          ar: "منخفض (1-3)",
+          it: "Basso (1-3)",
+        },
+        level_med: {
+          en: "Moderate (4-6)",
+          zh: "中 (4-6)",
+          ja: "中程度 (4-6)",
+          ko: "보통 (4-6)",
+          es: "Moderado (4-6)",
+          de: "Mittel (4-6)",
+          fi: "Kohtalainen (4-6)",
+          fr: "Modéré (4-6)",
+          ar: "متوسط (4-6)",
+          it: "Moderato (4-6)",
+        },
+        level_high: {
+          en: "High (7)",
+          zh: "高 (7)",
+          ja: "高い (7)",
+          ko: "높음 (7)",
+          es: "Alto (7)",
+          de: "Hoch (7)",
+          fi: "Korkea (7)",
+          fr: "Élevé (7)",
+          ar: "مرتفع (7)",
+          it: "Alto (7)",
+        },
+        level_vhigh: {
+          en: "Very High (8-10)",
+          zh: "甚高 (8-10)",
+          ja: "非常に高い (8-10)",
+          ko: "매우 높음 (8-10)",
+          es: "Muy Alto (8-10)",
+          de: "Sehr Hoch (8-10)",
+          fi: "Erittäin korkea (8-10)",
+          fr: "Très élevé (8-10)",
+          ar: "مرتفع جدا (8-10)",
+          it: "Molto Alto (8-10)",
+        },
+        level_serious: {
+          en: "Serious (10+)",
+          zh: "嚴重 (10+)",
+          ja: "深刻 (10+)",
+          ko: "심각 (10+)",
+          es: "Grave (10+)",
+          de: "Ernst (10+)",
+          fi: "Vakava (10+)",
+          fr: "Grave (10+)",
+          ar: "خطير (10+)",
+          it: "Grave (10+)",
+        },
+
+        advice_good: {
+          en: "Enjoy outdoor activities!",
+          zh: "享受戶外活動！",
+          ja: "屋外での活動を楽しもう！",
+          ko: "야외 활동을 즐기세요!",
+          es: "¡Disfruta de las actividades al aire libre!",
+          de: "Genießen Sie Outdoor-Aktivitäten!",
+          fi: "Nauti ulkoilusta!",
+          fr: "Profitez des activités de plein air !",
+          ar: "استمتع بالأنشطة الخارجية!",
+          it: "Goditi le attività all'aperto!",
+        },
+        advice_bad: {
+          en: "Reduce outdoor activities.",
+          zh: "減少戶外活動。",
+          ja: "屋外活動を減らしてください。",
+          ko: "야외 활동을 줄이세요.",
+          es: "Reducir las actividades al aire libre.",
+          de: "Reduzieren Sie Outdoor-Aktivitäten.",
+          fi: "Vähennä ulkoilua.",
+          fr: "Réduisez les activités de plein air.",
+          ar: "قلل من الأنشطة الخارجية.",
+          it: "Riduci le attività all'aperto.",
+        },
+
+        correct: {
+          en: "Correct!",
+          zh: "正確！",
+          ja: "正解！",
+          ko: "정답!",
+          es: "¡Correcto!",
+          de: "Richtig!",
+          fi: "Oikein!",
+          fr: "Correct !",
+          ar: "صحيح!",
+          it: "Corretto!",
+        },
+      };
+
+      // Simplified game: Show AQI Gauge, user picks "Go Out" or "Stay In" / Mask?
+      // Or simple scale learner.
+      // Let's do a Gauge Simulation. Slider moves, background changes colour, character reacts.
+
+      const levels = [
+        {
+          val: 2,
+          label: "level_low",
+          color: "bg-green-400",
+          advice: "advice_good",
+          face: "😁",
+        },
+        {
+          val: 5,
+          label: "level_med",
+          color: "bg-yellow-400",
+          advice: "advice_good",
+          face: "😐",
+        },
+        {
+          val: 7,
+          label: "level_high",
+          color: "bg-orange-400",
+          advice: "advice_bad",
+          face: "😷",
+        },
+        {
+          val: 9,
+          label: "level_vhigh",
+          color: "bg-red-500",
+          advice: "advice_bad",
+          face: "🤢",
+        },
+        {
+          val: 11,
+          label: "level_serious",
+          color: "bg-purple-900",
+          advice: "advice_bad",
+          face: "☠️",
+        },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [aqi, setAqi] = useState(3);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const currentLevel =
+          levels.find((l) => aqi <= (l.val === 11 ? 20 : l.val + 1)) ||
+          levels[4];
+
+        // Find rough match logic:
+        // 1-3 Low -> index 0 (val 2 covers 1-3 roughly in simple UI)
+        // Let's just resolve based on ranges
+        const getLevelData = (v) => {
+          if (v <= 3) return levels[0];
+          if (v <= 6) return levels[1];
+          if (v === 7) return levels[2];
+          if (v <= 10) return levels[3];
+          return levels[4];
+        };
+
+        const data = getLevelData(aqi);
+
+        return (
+          <div
+            className={`min-h-screen flex flex-col items-center p-4 transition-colors duration-1000 ${data.color} bg-opacity-20`}
+          >
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-slate-800">
+              {getText("title")}
+            </h1>
+
+            <div className="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-xl text-center">
+              <div className="text-8xl mb-4 transition-all duration-500 transform hover:scale-110">
+                {data.face}
+              </div>
+
+              <div className="text-6xl font-black mb-2 text-slate-700">
+                {aqi}
+              </div>
+              <div
+                className={`inline-block px-4 py-1 rounded text-white font-bold mb-6 ${data.color}`}
+              >
+                {getText(data.label)}
+              </div>
+
+              <input
+                type="range"
+                min="1"
+                max="12"
+                value={aqi}
+                onChange={(e) => setAqi(Number(e.target.value))}
+                className="w-full h-4 bg-slate-200 rounded-lg appearance-none cursor-pointer mb-8"
+              />
+
+              <div className="bg-slate-50 p-6 rounded-xl border-2 border-slate-100">
+                <div className="text-slate-500 text-sm font-bold uppercase mb-2">
+                  Health Advice
+                </div>
+                <div className="text-xl font-bold text-slate-800">
+                  {getText(data.advice)}
+                </div>
+              </div>
+            </div>
+
+            {/* Background Elements */}
+            {aqi > 7 && (
+              <div className="fixed inset-0 pointer-events-none bg-gray-500/20 z-[-1] backdrop-blur-[1px]"></div>
+            )}
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

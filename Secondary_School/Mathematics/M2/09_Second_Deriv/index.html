@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Second Derivative Test | M2 Calculus</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      body {
+        font-family: "Outfit", sans-serif;
+        background: #0f172a;
+        color: #e2e8f0;
+      }
+      .glass {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .draggable {
+        cursor: grab;
+      }
+      .draggable:active {
+        cursor: grabbing;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <div id="root" class="flex-grow flex flex-col"></div>
+    <script type="text/babel">
+      const { useState, useRef } = React;
+
+      const translations = {
+        en: {
+          unit: "Unit 2: Calculus",
+          title: "Second Derivative Test",
+          subtitle: "Concavity & Inflection Points",
+          drag: "Drag anywhere to move point",
+          inflection: "Inflection Point",
+          concaveUp: "Concave UP",
+          concaveDown: "Concave DOWN",
+          slope: "Slope f'(x)",
+          concavity: "Concavity f''(x)",
+          testTitle: "The Second Derivative Test:",
+          critical: "At a critical point (slope = 0):",
+          happy: "(Happy) = Local Min",
+          sad: "(Sad) = Local Max",
+          pos: "Positive f''",
+          neg: "Negative f''",
+          langBtn: "中文",
+        },
+        zh: {
+          unit: "第二單元：微積分",
+          title: "二階導數判別法",
+          subtitle: "凹凸性與拐點",
+          drag: "拖動任意處移動點",
+          inflection: "拐點 (反曲點)",
+          concaveUp: "凹向上 (Concave Up)",
+          concaveDown: "凹向下 (Concave Down)",
+          slope: "斜率 f'(x)",
+          concavity: "凹凸性 f''(x)",
+          testTitle: "二階導數判別法：",
+          critical: "在臨界點 (斜率 = 0)：",
+          happy: "(笑臉) = 局部極小值",
+          sad: "(哭臉) = 局部極大值",
+          pos: "正 f''",
+          neg: "負 f''",
+          langBtn: "English",
+        },
+      };
+
+      const App = () => {
+        // Cubic Function: y = 1/3 x^3 - x
+        // y' = x^2 - 1  (Roots: -1, 1) usually
+        // Let's adjust for screen
+        // f(x) = 0.5 * (1/3 x^3 - x)
+        const f = (x) => 0.5 * ((x * x * x) / 3 - 3 * x);
+        // f'(x) = 0.5 * (x^2 - 3)
+        const f_prime = (x) => 0.5 * (x * x - 3);
+        // f''(x) = 0.5 * (2x) = x
+        const f_double = (x) => x;
+
+        const [lang, setLang] = useState("en");
+        const t = translations[lang];
+
+        const [x, setX] = useState(-2);
+        const [dragging, setDragging] = useState(false);
+
+        // Visuals
+        const w = 600,
+          h = 400;
+        const range = 5;
+        const scaleX = w / (2 * range);
+        const scaleY = h / (2 * range); // uniform scale
+        const originX = w / 2,
+          originY = h / 2;
+
+        const toScreen = (x, y) => ({
+          x: originX + x * scaleX,
+          y: originY - y * scaleY,
+        });
+        const fromScreenX = (sx) => (sx - originX) / scaleX;
+
+        const handleMouseMove = (e) => {
+          if (!dragging) return;
+          const rect = e.currentTarget.getBoundingClientRect();
+          let val = fromScreenX(e.clientX - rect.left);
+          if (val < -4.5) val = -4.5;
+          if (val > 4.5) val = 4.5;
+          setX(val);
+        };
+
+        // Tangent Line
+        // y - y1 = m(x - x1)
+        const yVal = f(x);
+        const m = f_prime(x);
+        const concavity = f_double(x);
+
+        // Tangent endpoints (small segment)
+        const t_len = 2;
+        const xT1 = x - t_len / Math.sqrt(1 + m * m); // pseudo clamp
+        const xT2 = x + t_len / Math.sqrt(1 + m * m);
+        // Simpler: x +/- 1
+        const tanP1 = { x: x - 1.5, y: f(x) - 1.5 * m };
+        const tanP2 = { x: x + 1.5, y: f(x) + 1.5 * m };
+
+        // Character Face
+        const isHappy = concavity > 0; // Concave Up
+        const isSad = concavity < 0; // Concave Down
+        const isInflection = Math.abs(concavity) < 0.1;
+
+        // Curve Path
+        const pts = [];
+        for (let i = -5; i <= 5; i += 0.1) pts.push({ x: i, y: f(i) });
+        const dCurve = `M ${pts
+          .map((p) => {
+            const s = toScreen(p.x, p.y);
+            return `${s.x},${s.y}`;
+          })
+          .join(" L ")}`;
+
+        return (
+          <div
+            className="flex-grow flex flex-col items-center justify-center p-8 select-none"
+            onMouseUp={() => setDragging(false)}
+          >
+            <div className="absolute top-4 right-4">
+              <button
+                onClick={() => setLang((l) => (l === "en" ? "zh" : "en"))}
+                className="px-3 py-1 bg-slate-800 border border-slate-600 rounded-full text-xs font-bold text-emerald-400 hover:bg-slate-700 hover:text-white transition flex items-center gap-2"
+              >
+                <i className="fa-solid fa-language"></i>
+                {t.langBtn}
+              </button>
+            </div>
+
+            <header className="mb-8 text-center">
+              <div className="text-emerald-500 font-bold uppercase tracking-widest text-xs mb-2">
+                {t.unit}
+              </div>
+              <h1 className="text-4xl font-extrabold text-white mb-2">
+                {t.title}
+              </h1>
+              <p className="text-slate-400 font-mono text-lg">{t.subtitle}</p>
+            </header>
+
+            <div className="flex flex-col lg:flex-row gap-8 w-full max-w-5xl">
+              <div className="flex-1 glass p-6 rounded-3xl relative">
+                <svg
+                  width="100%"
+                  height="400"
+                  viewBox="0 0 600 400"
+                  className="overflow-visible bg-slate-900 rounded-xl cursor-crosshair"
+                  onMouseMove={handleMouseMove}
+                  onMouseDown={() => setDragging(true)}
+                >
+                  <line
+                    x1={originX}
+                    y1="0"
+                    x2={originX}
+                    y2={h}
+                    stroke="#334155"
+                    strokeWidth="2"
+                  />
+                  <line
+                    x1="0"
+                    y1={originY}
+                    x2={w}
+                    y2={originY}
+                    stroke="#334155"
+                    strokeWidth="2"
+                  />
+
+                  <path
+                    d={dCurve}
+                    fill="none"
+                    stroke="#2dd4bf"
+                    strokeWidth="4"
+                  />
+
+                  {/* Tangent */}
+                  <line
+                    x1={toScreen(tanP1.x, tanP1.y).x}
+                    y1={toScreen(tanP1.x, tanP1.y).y}
+                    x2={toScreen(tanP2.x, tanP2.y).x}
+                    y2={toScreen(tanP2.x, tanP2.y).y}
+                    stroke="#f43f5e"
+                    strokeWidth="2"
+                    strokeDasharray="5,5"
+                  />
+
+                  {/* Point */}
+                  <circle
+                    cx={toScreen(x, yVal).x}
+                    cy={toScreen(x, yVal).y}
+                    r="8"
+                    fill={isHappy ? "#34d399" : isSad ? "#f43f5e" : "#fbbf24"}
+                    stroke="white"
+                    strokeWidth="2"
+                    className="draggable hover:scale-125 transition-transform"
+                  />
+                </svg>
+                <div className="absolute top-4 left-4 text-xs text-slate-500">
+                  {t.drag}
+                </div>
+              </div>
+
+              <div className="w-full lg:w-80 space-y-6">
+                <div className="glass p-6 rounded-2xl text-center">
+                  <div className="text-6xl mb-4 transition-all duration-300">
+                    {isInflection ? "😐" : isHappy ? "🙂" : "☹️"}
+                  </div>
+                  <div
+                    className={`text-2xl font-bold mb-1 ${
+                      isHappy
+                        ? "text-emerald-400"
+                        : isSad
+                        ? "text-rose-400"
+                        : "text-amber-400"
+                    }`}
+                  >
+                    {isInflection
+                      ? t.inflection
+                      : isHappy
+                      ? t.concaveUp
+                      : t.concaveDown}
+                  </div>
+                  <div className="text-xs text-slate-400 font-mono">
+                    f''(x) {isInflection ? "≈ 0" : isHappy ? "> 0" : "< 0"}
+                  </div>
+                </div>
+
+                <div className="glass p-6 rounded-2xl">
+                  <div className="space-y-4 font-mono text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">{t.slope}</span>
+                      <span
+                        className={m > 0 ? "text-emerald-400" : "text-rose-400"}
+                      >
+                        {m.toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">{t.concavity}</span>
+                      <span
+                        className={
+                          concavity > 0
+                            ? "text-emerald-400"
+                            : concavity < 0
+                            ? "text-rose-400"
+                            : "text-amber-400"
+                        }
+                      >
+                        {concavity.toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="glass p-6 rounded-2xl text-xs text-slate-300 leading-relaxed">
+                  <strong>{t.testTitle}</strong>
+                  <br />
+                  {t.critical}
+                  <ul className="list-disc list-inside mt-2 space-y-1">
+                    <li>
+                      <span className="text-emerald-400">{t.pos}</span>{" "}
+                      {t.happy}
+                    </li>
+                    <li>
+                      <span className="text-rose-400">{t.neg}</span> {t.sad}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      };
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

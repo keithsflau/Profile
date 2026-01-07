@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Plant Kingdom | Junior Science</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        font-family: "Outfit", sans-serif;
+        background: #ecfdf5;
+      }
+      .branch-line {
+        position: absolute;
+        background: #a7f3d0;
+        z-index: 0;
+      }
+    </style>
+  </head>
+  <body class="bg-emerald-50 text-slate-900 min-h-screen">
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState } = React;
+
+      const Node = ({ title, icon, color, children, onSelect, selected }) => {
+        const isSelected = selected === title;
+        return (
+          <div className="flex flex-col items-center z-10 relative">
+            <button
+              onClick={() => onSelect(title)}
+              className={`w-40 p-4 rounded-xl border-2 transition-all shadow-md flex flex-col items-center gap-2 ${
+                isSelected
+                  ? "bg-emerald-600 border-emerald-800 text-white scale-110"
+                  : "bg-white border-emerald-100 hover:border-emerald-300"
+              }`}
+            >
+              <i
+                className={`fa-solid ${icon} text-3xl ${
+                  isSelected ? "text-white" : color
+                }`}
+              ></i>
+              <span className="font-bold text-sm leading-tight text-center">
+                {title}
+              </span>
+            </button>
+            {children && <div className="h-8 w-1 bg-emerald-200"></div>}
+            {children && (
+              <div className="flex gap-8 relative pt-4">
+                <div
+                  className="absolute top-0 left-1/2 -translate-x-1/2 w-[calc(100%-10rem)] h-[2px] bg-emerald-200"
+                  style={{ display: children.length > 1 ? "block" : "none" }}
+                ></div>
+                {/* Simplified tree lines - React rendering recursive trees perfectly with lines is tricky, using flex gap for layout */}
+                {children}
+              </div>
+            )}
+          </div>
+        );
+      };
+
+      const App = () => {
+        const [detail, setDetail] = useState(null);
+
+        const data = {
+          title: "Plant Kingdom",
+          desc: "Organisms that make their own food (Photosynthesis).",
+          sub: [
+            {
+              title: "Non-Flowering",
+              desc: "Plants that do not produce flowers.",
+              sub: [
+                {
+                  title: "Mosses",
+                  desc: "No true roots/stems/leaves. Reproduce by spores.",
+                  icon: "fa-certificate",
+                },
+                {
+                  title: "Ferns",
+                  desc: "Have roots/stems/leaves. Reproduce by spores underneath leaves.",
+                  icon: "fa-leaf",
+                },
+                {
+                  title: "Gymnosperms",
+                  desc: "Needle-shaped leaves. Reproduce by seeds in cones.",
+                  icon: "fa-tree",
+                },
+              ],
+            },
+            {
+              title: "Flowering (Angiosperms)",
+              desc: "Plants that produce flowers and fruits.",
+              sub: [
+                {
+                  title: "Monocots",
+                  desc: "1 seed leaf. Parallel veins. Fibrous root.",
+                  icon: "fa-seedling",
+                },
+                {
+                  title: "Dicots",
+                  desc: "2 seed leaves. Network veins. Tap root.",
+                  icon: "fa-cannabis",
+                }, // Leaf icon
+              ],
+            },
+          ],
+        };
+
+        // Flatten data for lookup
+        const getInfo = (name) => {
+          if (name === "Plant Kingdom") return data;
+          for (let g of data.sub) {
+            if (g.title === name) return g;
+            for (let s of g.sub) {
+              if (s.title === name) return s;
+            }
+          }
+          return null;
+        };
+
+        const handleSelect = (name) => {
+          setDetail(getInfo(name));
+        };
+
+        return (
+          <div className="p-8 min-h-screen flex flex-col items-center">
+            <header className="text-center mb-12">
+              <span className="text-emerald-600 font-bold uppercase text-xs tracking-widest">
+                Form 1 Science • Biology
+              </span>
+              <h1 className="text-4xl font-extrabold text-slate-800">
+                Plant Classification
+              </h1>
+            </header>
+
+            <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+              {/* Tree Diagram (Interactive) */}
+              <div className="lg:col-span-2 overflow-x-auto pb-4">
+                <div className="min-w-[700px] flex justify-center">
+                  <div className="flex flex-col items-center">
+                    <button
+                      onClick={() => handleSelect("Plant Kingdom")}
+                      className="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-6 py-3 rounded-xl font-bold border-2 border-emerald-300 mb-4 transition"
+                    >
+                      Plant Kingdom
+                    </button>
+                    <div className="h-8 w-1 bg-emerald-300"></div>
+                    <div className="w-[400px] h-1 bg-emerald-300 relative mb-4">
+                      <div className="absolute left-0 top-0 h-4 w-1 bg-emerald-300"></div>
+                      <div className="absolute right-0 top-0 h-4 w-1 bg-emerald-300"></div>
+                    </div>
+
+                    <div className="flex gap-20">
+                      {/* Non-Flowering Branch */}
+                      <div className="flex flex-col items-center">
+                        <button
+                          onClick={() => handleSelect("Non-Flowering")}
+                          className="bg-white hover:bg-slate-50 border-2 border-slate-200 px-4 py-2 rounded-lg font-bold mb-4 w-40"
+                        >
+                          Non-Flowering
+                        </button>
+                        <div className="h-4 w-1 bg-emerald-200"></div>
+                        <div className="w-[260px] h-1 bg-emerald-200 relative mb-4">
+                          <div className="absolute left-0 top-0 h-4 w-1 bg-emerald-200"></div>
+                          <div className="absolute left-1/2 -translate-x-1/2 top-0 h-4 w-1 bg-emerald-200"></div>
+                          <div className="absolute right-0 top-0 h-4 w-1 bg-emerald-200"></div>
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleSelect("Mosses")}
+                            className="bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 p-2 rounded w-24 text-xs font-bold text-center"
+                          >
+                            Mosses
+                          </button>
+                          <button
+                            onClick={() => handleSelect("Ferns")}
+                            className="bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 p-2 rounded w-24 text-xs font-bold text-center"
+                          >
+                            Ferns
+                          </button>
+                          <button
+                            onClick={() => handleSelect("Gymnosperms")}
+                            className="bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 p-2 rounded w-28 text-xs font-bold text-center"
+                          >
+                            Gymnosperms
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Flowering Branch */}
+                      <div className="flex flex-col items-center">
+                        <button
+                          onClick={() =>
+                            handleSelect("Flowering (Angiosperms)")
+                          }
+                          className="bg-white hover:bg-slate-50 border-2 border-slate-200 px-4 py-2 rounded-lg font-bold mb-4 w-40"
+                        >
+                          Flowering
+                        </button>
+                        <div className="h-4 w-1 bg-emerald-200"></div>
+                        <div className="w-[120px] h-1 bg-emerald-200 relative mb-4">
+                          <div className="absolute left-0 top-0 h-4 w-1 bg-emerald-200"></div>
+                          <div className="absolute right-0 top-0 h-4 w-1 bg-emerald-200"></div>
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleSelect("Monocots")}
+                            className="bg-pink-50 hover:bg-pink-100 border border-pink-200 p-2 rounded w-24 text-xs font-bold text-center"
+                          >
+                            Monocots
+                          </button>
+                          <button
+                            onClick={() => handleSelect("Dicots")}
+                            className="bg-pink-50 hover:bg-pink-100 border border-pink-200 p-2 rounded w-24 text-xs font-bold text-center"
+                          >
+                            Dicots
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Detail Panel */}
+              <div className="bg-white p-8 rounded-3xl shadow-xl border border-emerald-100 min-h-[400px]">
+                {detail ? (
+                  <div className="animate-fade-in">
+                    <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-3xl mb-6">
+                      <i className={`fa-solid ${detail.icon || "fa-info"}`}></i>
+                    </div>
+                    <h2 className="text-3xl font-extrabold text-slate-800 mb-4">
+                      {detail.title}
+                    </h2>
+                    <p className="text-lg text-slate-600 leading-relaxed">
+                      {detail.desc}
+                    </p>
+
+                    {detail.title === "Mosses" && (
+                      <div className="mt-4 p-4 bg-slate-50 rounded-xl text-sm italic">
+                        Example: Funaria
+                      </div>
+                    )}
+                    {detail.title === "Ferns" && (
+                      <div className="mt-4 p-4 bg-slate-50 rounded-xl text-sm italic">
+                        Example: Sword Fern
+                      </div>
+                    )}
+                    {detail.title === "Gymnosperms" && (
+                      <div className="mt-4 p-4 bg-slate-50 rounded-xl text-sm italic">
+                        Example: Pine, Fir, Cypress
+                      </div>
+                    )}
+                    {detail.title === "Monocots" && (
+                      <div className="mt-4 p-4 bg-slate-50 rounded-xl text-sm italic">
+                        Example: Grass, Lily, Maize
+                      </div>
+                    )}
+                    {detail.title === "Dicots" && (
+                      <div className="mt-4 p-4 bg-slate-50 rounded-xl text-sm italic">
+                        Example: Rose, Hibiscus, Oak
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="h-full flex items-center justify-center text-slate-400 text-center">
+                    <p>
+                      Select a group from the diagram
+                      <br />
+                      to see details.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <footer className="mt-12 text-center">
+              <a
+                href="../index.html"
+                className="text-emerald-600/50 hover:text-emerald-600 transition font-bold"
+              >
+                <i className="fa-solid fa-arrow-left mr-2"></i> Back to
+                Dashboard
+              </a>
+            </footer>
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

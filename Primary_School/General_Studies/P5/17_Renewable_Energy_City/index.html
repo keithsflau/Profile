@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Renewable Energy City</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #f0fdf4;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Green Energy Grid",
+          zh: "綠色能源電網",
+          ja: "グリーンエネルギーグリッド",
+          ko: "친환경 에너지 그리드",
+          es: "Red de energía verde",
+          de: "Grünes Energienetz",
+          fi: "Vihreä energiaverkko",
+          fr: "Réseau d'énergie verte",
+          ar: "شبكة الطاقة الخضراء",
+          it: "Rete Energetica Verde",
+        },
+        instruction: {
+          en: "Meet the city's power demand using renewable energy!",
+          zh: "利用可再生能源滿足城市的電力需求！",
+          ja: "再生可能エネルギーを使って都市の電力需要を満たしてください！",
+          ko: "재생 에너지를 사용하여 도시의 전력 수요를 충족시키세요!",
+          es: "¡Satisface la demanda de energía de la ciudad utilizando energía renovable!",
+          de: "Decke den Energiebedarf der Stadt mit erneuerbaren Energien!",
+          fi: "Tyydytä kaupungin sähköntarve uusiutuvalla energialla!",
+          fr: "Répondez aux besoins énergétiques de la ville en utilisant des énergies renouvelables !",
+          ar: "تلبية طلب المدينة على الطاقة باستخدام الطاقة المتجددة!",
+          it: "Soddisfa la domanda energetica della città usando energia rinnovabile!",
+        },
+        solar: {
+          en: "Solar Farm",
+          zh: "太陽能發電場",
+          ja: "ソーラーファーム",
+          ko: "태양광 발전소",
+          es: "Granja solar",
+          de: "Solarpark",
+        },
+        wind: {
+          en: "Wind Turbines",
+          zh: "風力渦輪機",
+          ja: "風力タービン",
+          ko: "풍력 터빈",
+          es: "Turbinas eólicas",
+          de: "Windkraftanlagen",
+        },
+        hydro: {
+          en: "Hydro Dam",
+          zh: "水力發電站",
+          ja: "水力発電ダム",
+          ko: "수력 발전소",
+          es: "Presa hidroeléctrica",
+          de: "Wasserkraftwerk",
+        },
+        fossil: {
+          en: "Coal Plant (Dirty)",
+          zh: "煤發電廠 (污染)",
+          ja: "石炭火力発電所 (汚染)",
+          ko: "석탄 발전소 (오염)",
+          es: "Planta de carbón (Sucio)",
+          de: "Kohlekraftwerk (Schmutzig)",
+        },
+
+        demand: {
+          en: "Demand",
+          zh: "需求",
+          ja: "需要",
+          ko: "수요",
+          es: "Demanda",
+          de: "Bedarf",
+        },
+        supply: {
+          en: "Supply",
+          zh: "供應",
+          ja: "供給",
+          ko: "공급",
+          es: "Suministro",
+          de: "Versorgung",
+        },
+        pollution: {
+          en: "Pollution",
+          zh: "污染",
+          ja: "汚染",
+          ko: "오염",
+          es: "Contaminación",
+          de: "Verschmutzung",
+        },
+
+        status_ok: {
+          en: "Grid Stable",
+          zh: "電網穩定",
+          ja: "グリッド安定",
+          ko: "그리드 안정",
+        },
+        status_low: {
+          en: "Blackout!",
+          zh: "停電！",
+          ja: "停電！",
+          ko: "정전!",
+        },
+        status_high: { en: "Overload", zh: "過載", ja: "過負荷", ko: "과부하" },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [counts, setCounts] = useState({
+          solar: 0,
+          wind: 0,
+          hydro: 0,
+          fossil: 0,
+        });
+        const [demand, setDemand] = useState(100);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        // Outputs
+        const O_SOLAR = 10;
+        const O_WIND = 20;
+        const O_HYDRO = 50;
+        const O_FOSSIL = 100;
+
+        const supply =
+          counts.solar * O_SOLAR +
+          counts.wind * O_WIND +
+          counts.hydro * O_HYDRO +
+          counts.fossil * O_FOSSIL;
+        const pollution = counts.fossil * 50;
+
+        const balance = supply - demand;
+        let status = "status_ok";
+        let statusColor = "text-green-600";
+        if (balance < 0) {
+          status = "status_low";
+          statusColor = "text-red-600";
+        }
+        if (balance > 50) {
+          status = "status_high";
+          statusColor = "text-orange-600";
+        }
+
+        // Demand fluctuation
+        useEffect(() => {
+          const interval = setInterval(() => {
+            setDemand((prev) => {
+              const change = Math.floor(Math.random() * 20) - 10;
+              return Math.max(50, Math.min(300, prev + change));
+            });
+          }, 2000);
+          return () => clearInterval(interval);
+        }, []);
+
+        const modify = (type, delta) => {
+          setCounts((prev) => ({
+            ...prev,
+            [type]: Math.max(0, prev[type] + delta),
+          }));
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-4 text-emerald-800">
+              {getText("title")}
+            </h1>
+
+            {/* Dashboard */}
+            <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div className="bg-white p-6 rounded-2xl shadow-lg border-2 border-emerald-100 flex flex-col justify-center">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="font-bold text-slate-500">
+                    {getText("demand")}
+                  </span>
+                  <span className="text-2xl font-black">{demand} MW</span>
+                </div>
+                <div className="w-full h-4 bg-slate-200 rounded-full overflow-hidden">
+                  <motion.div
+                    className="h-full bg-slate-500"
+                    animate={{
+                      width: `${Math.min(100, (demand / 300) * 100)}%`,
+                    }}
+                  ></motion.div>
+                </div>
+
+                <div className="flex justify-between items-center mb-2 mt-4">
+                  <span className="font-bold text-slate-500">
+                    {getText("supply")}
+                  </span>
+                  <span
+                    className={`text-2xl font-black ${
+                      balance >= 0 ? "text-green-600" : "text-red-600"
+                    }`}
+                  >
+                    {supply} MW
+                  </span>
+                </div>
+                <div className="w-full h-4 bg-slate-200 rounded-full overflow-hidden">
+                  <motion.div
+                    className={`h-full ${
+                      balance >= 0 ? "bg-green-500" : "bg-red-500"
+                    }`}
+                    animate={{
+                      width: `${Math.min(100, (supply / 300) * 100)}%`,
+                    }}
+                  ></motion.div>
+                </div>
+
+                <div
+                  className={`mt-4 text-center text-xl font-black ${statusColor} border-2 border-current rounded-lg p-2`}
+                >
+                  {getText(status)}
+                </div>
+              </div>
+
+              {/* City Visual */}
+              <div className="bg-slate-900 rounded-2xl p-6 relative overflow-hidden flex items-center justify-center">
+                {/* Buildings */}
+                <div className="flex items-end gap-1 absolute bottom-0">
+                  {[...Array(5)].map((_, i) => (
+                    <div
+                      key={i}
+                      className={`w-12 bg-slate-700 transition-opacity duration-300 ${
+                        balance >= 0 ? "opacity-100" : "opacity-20"
+                      }`}
+                      style={{ height: `${60 + i * 20}px` }}
+                    >
+                      {/* Windows */}
+                      <div className="grid grid-cols-2 gap-1 p-1">
+                        {[...Array(4)].map((_, j) => (
+                          <div
+                            key={j}
+                            className={`w-3 h-4 ${
+                              balance >= 0 ? "bg-yellow-200" : "bg-slate-800"
+                            }`}
+                          ></div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Pollution Cloud */}
+                {pollution > 0 && (
+                  <div className="absolute top-4 right-4 text-4xl opacity-80">
+                    🌫️
+                    <div className="text-xs text-white text-center font-bold bg-red-600 px-2 rounded-full mt-1">
+                      {getText("pollution")}: {pollution}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Controls */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-4xl">
+              <ControlCard
+                name={getText("solar")}
+                icon="☀️"
+                count={counts.solar}
+                onAdd={() => modify("solar", 1)}
+                onSub={() => modify("solar", -1)}
+                color="bg-yellow-100 border-yellow-300 text-yellow-800"
+              />
+              <ControlCard
+                name={getText("wind")}
+                icon="🌬️"
+                count={counts.wind}
+                onAdd={() => modify("wind", 1)}
+                onSub={() => modify("wind", -1)}
+                color="bg-sky-100 border-sky-300 text-sky-800"
+              />
+              <ControlCard
+                name={getText("hydro")}
+                icon="💧"
+                count={counts.hydro}
+                onAdd={() => modify("hydro", 1)}
+                onSub={() => modify("hydro", -1)}
+                color="bg-blue-100 border-blue-300 text-blue-800"
+              />
+              <ControlCard
+                name={getText("fossil")}
+                icon="🏭"
+                count={counts.fossil}
+                onAdd={() => modify("fossil", 1)}
+                onSub={() => modify("fossil", -1)}
+                color="bg-slate-200 border-slate-400 text-slate-800"
+              />
+            </div>
+
+            <div className="mt-8 text-slate-500 font-bold">
+              {getText("instruction")}
+            </div>
+          </div>
+        );
+      }
+
+      function ControlCard({ name, icon, count, onAdd, onSub, color }) {
+        return (
+          <div
+            className={`p-4 rounded-xl border-b-4 flex flex-col items-center ${color}`}
+          >
+            <div className="text-4xl mb-2">{icon}</div>
+            <div className="font-bold text-center text-sm mb-4 min-h-[2.5em]">
+              {name}
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={onSub}
+                className="w-8 h-8 rounded-full bg-white/50 hover:bg-white font-bold text-xl"
+              >
+                –
+              </button>
+              <span className="text-2xl font-black">{count}</span>
+              <button
+                onClick={onAdd}
+                className="w-8 h-8 rounded-full bg-white/50 hover:bg-white font-bold text-xl"
+              >
+                +
+              </button>
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小三常識：植物生命週期 | Plant Lifecycle</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(180deg, #dcfce7 0%, #4ade80 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Plant Lifecycle",
+          zh: "植物生命週期",
+          ja: "植物のライフサイクル",
+          ko: "식물의 생명 주기",
+          es: "Ciclo de Vida de las Plantas",
+          de: "Lebenszyklus der Pflanzen",
+          fi: "Kasvin elinkaari",
+          fr: "Cycle de vie des plantes",
+          ar: "دورة حياة النبات",
+          it: "Ciclo Vitale delle Piante",
+        },
+        instruction: {
+          en: "Put them in order!",
+          zh: "按順序排列！",
+          ja: "順番に並べて！",
+          ko: "순서대로 놓으세요!",
+          es: "¡Ponlos en orden!",
+          de: "Bring sie in die richtige Reihenfolge!",
+          fi: "Laita ne järjestykseen!",
+          fr: "Mettez-les dans l'ordre !",
+          ar: "رتبهم!",
+          it: "Mettili in ordine!",
+        },
+
+        seed: {
+          en: "1. Seed",
+          zh: "1. 種子",
+          ja: "1. 種",
+          ko: "1. 씨앗",
+          es: "1. Semilla",
+          de: "1. Samen",
+          fi: "1. Siemen",
+          fr: "1. Graine",
+          ar: "1. بذرة",
+          it: "1. Seme",
+        },
+        germination: {
+          en: "2. Germination",
+          zh: "2. 發芽",
+          ja: "2. 発芽",
+          ko: "2. 발아",
+          es: "2. Germinación",
+          de: "2. Keimung",
+          fi: "2. Itäminen",
+          fr: "2. Germination",
+          ar: "2. إنبات",
+          it: "2. Germinazione",
+        },
+        sprout: {
+          en: "3. Sprout",
+          zh: "3. 幼苗",
+          ja: "3. 芽",
+          ko: "3. 새싹",
+          es: "3. Brote",
+          de: "3. Spross",
+          fi: "3. Verso",
+          fr: "3. Pousse",
+          ar: "3. برعم",
+          it: "3. Germoglio",
+        },
+        adult: {
+          en: "4. Adult Plant",
+          zh: "4. 成長",
+          ja: "4. 成木",
+          ko: "4. 성체 식물",
+          es: "4. Planta Adulta",
+          de: "4. Ausgewachsene Pflanze",
+          fi: "4. Aikuinen kasvi",
+          fr: "4. Plante adulte",
+          ar: "4. نبات بالغ",
+          it: "4. Pianta Adulta",
+        },
+        flower: {
+          en: "5. Flowering",
+          zh: "5. 開花",
+          ja: "5. 開花",
+          ko: "5. 개화",
+          es: "5. Floración",
+          de: "5. Blüte",
+          fi: "5. Kukinta",
+          fr: "5. Floraison",
+          ar: "5. إزهار",
+          it: "5. Fioritura",
+        },
+        fruit: {
+          en: "6. Fruiting",
+          zh: "6. 結果",
+          ja: "6. 結実",
+          ko: "6. 결실",
+          es: "6. Fructificación",
+          de: "6. Früchte tragen",
+          fi: "6. Hedelmänmuodostus",
+          fr: "6. Fructification",
+          ar: "6. إثمار",
+          it: "6. Fruttificazione",
+        },
+
+        check: {
+          en: "Check Order",
+          zh: "檢查順序",
+          ja: "順序を確認",
+          ko: "순서 확인",
+          es: "Verificar Orden",
+          de: "Reihenfolge prüfen",
+          fi: "Tarkista järjestys",
+          fr: "Vérifier l'ordre",
+          ar: "تحقق من الترتيب",
+          it: "Controlla Ordine",
+        },
+        perfect: {
+          en: "Perfect Order!",
+          zh: "順序正確！",
+          ja: "完璧な順序！",
+          ko: "완벽한 순서입니다!",
+          es: "¡Orden Perfecto!",
+          de: "Perfekte Reihenfolge!",
+          fi: "Täydellinen järjestys!",
+          fr: "Ordre parfait !",
+          ar: "ترتيب مثالي!",
+          it: "Ordine Perfetto!",
+        },
+        wrong: {
+          en: "Something is wrong...",
+          zh: "順序有誤...",
+          ja: "何かが間違っています...",
+          ko: "무언가 잘못되었습니다...",
+          es: "Algo está mal...",
+          de: "Etwas stimmt nicht...",
+          fi: "Jokin on pielessä...",
+          fr: "Quelque chose ne va pas...",
+          ar: "هناك خطأ ما...",
+          it: "Qualcosa non va...",
+        },
+        reset: {
+          en: "Play Again",
+          zh: "再玩一次",
+          ja: "もう一度プレイ",
+          ko: "다시 하기",
+          es: "Jugar de Nuevo",
+          de: "Nochmal spielen",
+          fi: "Pelaa uudelleen",
+          fr: "Rejouer",
+          ar: "العب مرة أخرى",
+          it: "Gioca di Nuovo",
+        },
+      };
+
+      // Lifecycle of a Bean or Tomato mostly
+      const correctOrder = [
+        "seed",
+        "germination",
+        "sprout",
+        "adult",
+        "flower",
+        "fruit",
+      ];
+
+      const stages = [
+        { id: "seed", icon: "🌰" },
+        { id: "germination", icon: "🌱" },
+        { id: "sprout", icon: "🌿" },
+        { id: "adult", icon: "🌳" },
+        { id: "flower", icon: "🌼" },
+        { id: "fruit", icon: "🍎" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [userOrder, setUserOrder] = useState([]);
+        const [pool, setPool] = useState([]);
+        const [feedback, setFeedback] = useState(null);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        useEffect(() => {
+          initGame();
+        }, []);
+
+        const initGame = () => {
+          setPool([...stages].sort(() => Math.random() - 0.5));
+          setUserOrder([]);
+          setFeedback(null);
+        };
+
+        const addToLine = (item) => {
+          if (feedback === "perfect") return;
+          setUserOrder((prev) => [...prev, item]);
+          setPool((prev) => prev.filter((i) => i.id !== item.id));
+          setFeedback(null);
+        };
+
+        const removeFromLine = (item) => {
+          if (feedback === "perfect") return;
+          setPool((prev) => [...prev, item]);
+          setUserOrder((prev) => prev.filter((i) => i.id !== item.id));
+          setFeedback(null);
+        };
+
+        const check = () => {
+          if (userOrder.length !== correctOrder.length) return;
+
+          const isCorrect = userOrder.every(
+            (item, i) => item.id === correctOrder[i]
+          );
+          if (isCorrect) {
+            setFeedback("perfect");
+          } else {
+            setFeedback("wrong");
+          }
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center select-none font-sans overflow-hidden">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-green-800 mb-2 mt-8 drop-shadow-sm bg-white/50 px-6 py-2 rounded-full">
+              🌻 {getText("title")}
+            </h1>
+            <p className="font-bold text-green-900 mb-8">
+              {getText("instruction")}
+            </p>
+
+            {/* Timeline Area (Drop Zone) */}
+            <div className="w-full max-w-6xl min-h-[200px] mb-8 relative">
+              {/* Line connection visual */}
+              <div className="absolute top-1/2 left-4 right-4 h-2 bg-green-800/20 rounded-full -z-10"></div>
+
+              <div className="flex flex-wrap items-center justify-center gap-4 min-h-[200px] bg-white/40 rounded-3xl p-6 border-4 border-dashed border-green-800/30">
+                <AnimatePresence>
+                  {userOrder.map((item, index) => (
+                    <motion.button
+                      key={item.id}
+                      layoutId={item.id}
+                      onClick={() => removeFromLine(item)}
+                      className="bg-white p-4 rounded-2xl shadow-xl flex flex-col items-center w-32 md:w-40 border-b-4 border-green-600 hover:scale-105 transition-transform"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0 }}
+                    >
+                      <div className="text-6xl mb-2">{item.icon}</div>
+                      <div className="font-bold text-sm md:text-base text-green-900 leading-tight">
+                        {getText(item.id)}
+                      </div>
+                      <div className="absolute -top-3 -right-3 bg-green-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold shadow-md">
+                        {index + 1}
+                      </div>
+                    </motion.button>
+                  ))}
+                </AnimatePresence>
+
+                {userOrder.length === 0 && (
+                  <div className="text-green-800/50 font-black text-2xl animate-pulse">
+                    Start Here
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Feedback */}
+            <div className="h-16 mb-4">
+              {feedback && (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className={`px-8 py-3 rounded-2xl font-black text-2xl shadow-xl ${
+                    feedback === "perfect"
+                      ? "bg-green-600 text-white"
+                      : "bg-red-500 text-white"
+                  }`}
+                >
+                  {getText(feedback)}
+                </motion.div>
+              )}
+            </div>
+
+            {/* Action Button */}
+            {userOrder.length === correctOrder.length &&
+              feedback !== "perfect" && (
+                <button
+                  onClick={check}
+                  className="bg-green-600 text-white px-12 py-4 rounded-full font-black text-2xl shadow-xl hover:bg-green-700 mb-8 animate-bounce"
+                >
+                  {getText("check")}
+                </button>
+              )}
+
+            {feedback === "perfect" && (
+              <button
+                onClick={initGame}
+                className="bg-blue-500 text-white px-12 py-4 rounded-full font-black text-2xl shadow-xl hover:bg-blue-600 mb-8"
+              >
+                {getText("reset")} 🔄
+              </button>
+            )}
+
+            {/* Pool (Source) */}
+            <div className="flex flex-wrap justify-center gap-4 p-4">
+              <AnimatePresence>
+                {pool.map((item) => (
+                  <motion.button
+                    key={item.id}
+                    layoutId={item.id}
+                    onClick={() => addToLine(item)}
+                    className="bg-white/80 p-4 rounded-2xl shadow flex flex-col items-center w-24 h-24 md:w-28 md:h-28 justify-center border-2 border-green-200 hover:bg-white hover:border-green-400 active:scale-95 transition-all"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <div className="text-4xl md:text-5xl">{item.icon}</div>
+                  </motion.button>
+                ))}
+              </AnimatePresence>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

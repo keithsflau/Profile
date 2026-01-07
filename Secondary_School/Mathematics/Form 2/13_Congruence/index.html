@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Congruence Tests | S2 Math</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-indigo-900 text-white min-h-screen">
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+
+      const App = () => {
+        const [mode, setMode] = useState("SSS"); // SSS, SAS, ASA, RHS, AAA (Invalid)
+
+        // Definitions
+        const tests = {
+          SSS: {
+            title: "Side-Side-Side",
+            desc: "If 3 sides are the same, the triangles are congruent.",
+          },
+          SAS: {
+            title: "Side-Angle-Side",
+            desc: "2 sides and the INCLUDED angle must be equal.",
+          },
+          ASA: {
+            title: "Angle-Side-Angle",
+            desc: "2 angles and the INCLUDED side must be equal.",
+          },
+          AAS: {
+            title: "Angle-Angle-Side",
+            desc: "2 angles and a non-included side. (Equivalent to ASA as 3rd angle is fixed).",
+          },
+          RHS: {
+            title: "Right-Angle Hypotenuse Side",
+            desc: "For right-angled triangles, Hypotenuse and one side.",
+          },
+          AAA: {
+            title: "Angle-Angle-Angle",
+            desc: "NOT a congruence test! Only proves similarity (Size can vary).",
+          }, // Counter example
+        };
+
+        const isCongruent = mode !== "AAA";
+
+        return (
+          <div className="p-8 max-w-4xl mx-auto min-h-screen flex flex-col items-center">
+            <header className="mb-8 text-center">
+              <div className="text-indigo-400 font-bold uppercase text-xs tracking-widest mb-2">
+                Unit 5: Geometry
+              </div>
+              <h1 className="text-4xl font-extrabold text-white">
+                Congruence Tests
+              </h1>
+              <p className="text-slate-400">
+                Conditions for two triangles to be identical.
+              </p>
+            </header>
+
+            {/* Mode Selector */}
+            <div className="flex flex-wrap justify-center gap-2 mb-12">
+              {Object.keys(tests).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setMode(t)}
+                  className={`px-4 py-2 rounded-full font-bold transition-all ${
+                    mode === t
+                      ? "bg-white text-indigo-900 scale-105 shadow-lg"
+                      : "bg-indigo-800 text-indigo-300 hover:bg-indigo-700"
+                  }`}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex flex-col items-center w-full max-w-2xl bg-indigo-800 rounded-3xl p-8 shadow-2xl border border-indigo-700">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold mb-2">{tests[mode].title}</h2>
+                <p className="text-indigo-200">{tests[mode].desc}</p>
+              </div>
+
+              {/* Visual Simulation */}
+              <div className="flex gap-8 justify-center items-center mb-8 w-full p-8 bg-indigo-900/50 rounded-2xl relative">
+                {/* Triangle 1 */}
+                <div className="relative w-32 h-32">
+                  <svg
+                    viewBox="0 0 100 100"
+                    className="w-full h-full overflow-visible drop-shadow-xl"
+                  >
+                    <path
+                      d="M10,90 L90,90 L30,20 Z"
+                      fill="#4f46e5"
+                      stroke="white"
+                      strokeWidth="2"
+                    />
+                    {/* Markings based on mode */}
+                    {mode.includes("S") && (
+                      <line
+                        x1="10"
+                        y1="92"
+                        x2="90"
+                        y2="92"
+                        stroke="#fbbf24"
+                        strokeWidth="3"
+                      />
+                    )}
+                    {mode === "SSS" && (
+                      <>
+                        <circle cx="20" cy="55" r="2" fill="#fbbf24" />
+                        <circle cx="60" cy="55" r="2" fill="#fbbf24" />
+                      </>
+                    )}
+                    {/* Simplified visual markings just for concept */}
+                    {mode === "RHS" && (
+                      <path
+                        d="M10,80 L20,80 L20,90"
+                        fill="none"
+                        stroke="white"
+                        strokeWidth="2"
+                      />
+                    )}
+                  </svg>
+                  <div className="text-center mt-2 text-sm font-bold text-indigo-300">
+                    Triangle A
+                  </div>
+                </div>
+
+                {/* Icon */}
+                <div className="text-2xl text-indigo-400 font-bold">
+                  {isCongruent ? "≅" : "≠"}
+                </div>
+
+                {/* Triangle 2 */}
+                <div className="relative w-32 h-32">
+                  <svg
+                    viewBox="0 0 100 100"
+                    className={`w-full h-full overflow-visible drop-shadow-xl transition-all duration-700 ${
+                      !isCongruent ? "scale-125" : ""
+                    }`}
+                  >
+                    <path
+                      d="M10,90 L90,90 L30,20 Z"
+                      fill={isCongruent ? "#4f46e5" : "#db2777"}
+                      stroke="white"
+                      strokeWidth="2"
+                      transform={isCongruent ? "rotate(0)" : "rotate(10)"}
+                    />
+                    {mode.includes("S") && (
+                      <line
+                        x1="10"
+                        y1="92"
+                        x2="90"
+                        y2="92"
+                        stroke="#fbbf24"
+                        strokeWidth="3"
+                        transform={isCongruent ? "rotate(0)" : "rotate(10)"}
+                      />
+                    )}
+                  </svg>
+                  <div className="text-center mt-2 text-sm font-bold text-indigo-300">
+                    Triangle B
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className={`px-6 py-3 rounded-xl font-bold border-2 ${
+                  isCongruent
+                    ? "bg-emerald-500/20 border-emerald-500 text-emerald-300"
+                    : "bg-rose-500/20 border-rose-500 text-rose-300"
+                }`}
+              >
+                {isCongruent ? (
+                  <span>
+                    <i className="fa-solid fa-check mr-2"></i> Congruent
+                    (Identical Size & Shape)
+                  </span>
+                ) : (
+                  <span>
+                    <i className="fa-solid fa-xmark mr-2"></i> Not Necessarily
+                    Congruent (Similarity only)
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <footer className="mt-8">
+              <a
+                href="../index.html"
+                className="text-indigo-400 hover:text-indigo-300 font-bold"
+              >
+                <i className="fa-solid fa-arrow-left mr-2"></i> Back to
+                Dashboard
+              </a>
+            </footer>
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

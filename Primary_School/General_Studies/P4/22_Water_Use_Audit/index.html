@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Water Use Audit</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #f0f9ff;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Water Usage Calculator",
+          zh: "用水量計算機",
+          ja: "使用水量計算機",
+          ko: "물 사용량 계산기",
+          es: "Calculadora de uso de agua",
+          de: "Wasserverbrauchsrechner",
+          fi: "Vedenkulutuslaskuri",
+          fr: "Calculateur de consommation d'eau",
+          ar: "حاسبة استخدام المياه",
+          it: "Calcolatore Uso Acqua",
+        },
+        instruction: {
+          en: "Calculate your daily water usage.",
+          zh: "計算你的每日用水量。",
+          ja: "1日の水使用量を計算します。",
+          ko: "일일 물 사용량을 계산하세요.",
+          es: "Calcula tu uso diario de agua.",
+          de: "Berechne deinen täglichen Wasserverbrauch.",
+          fi: "Laske päivittäinen vedenkulutuksesi.",
+          fr: "Calculez votre consommation d'eau quotidienne.",
+          ar: "احسب استخدامك اليومي للمياه.",
+          it: "Calcola il tuo uso giornaliero di acqua.",
+        },
+        shower: {
+          en: "Showing (mins)",
+          zh: "淋浴 (分鐘)",
+          ja: "シャワー (分)",
+          ko: "샤워 (분)",
+          es: "Ducha (min)",
+          de: "Duschen (Min)",
+          fi: "Suihku (min)",
+          fr: "Douche (min)",
+          ar: "الاستحمام (دقيقة)",
+          it: "Doccia (min)",
+        },
+        toilet: {
+          en: "Toilet flush (times)",
+          zh: "沖廁 (次數)",
+          ja: "トイレ流し (回)",
+          ko: "변기 물내림 (회)",
+          es: "Descarga inodoro (veces)",
+          de: "Toilettenspülung (Mal)",
+          fi: "WC-huuhtelu (kerrat)",
+          fr: "Chasse d'eau (fois)",
+          ar: "غسل المرحاض (مرات)",
+          it: "Sciacquone (volte)",
+        },
+        brush: {
+          en: "Brushing (Tap on)",
+          zh: "刷牙 (開著水龍頭)",
+          ja: "歯磨き (出しっ放し)",
+          ko: "양치질 (수도꼭지 켬)",
+          es: "Cepillado (Grifo abierto)",
+          de: "Zähneputzen (Wasserhahn an)",
+          fi: "Hampaiden harjaus (hana auki)",
+          fr: "Brossage (Robinet ouvert)",
+          ar: "تنظيف الأسنان (الصنبور مفتوح)",
+          it: "Lavare i denti (Rubinetto aperto)",
+        },
+        total: {
+          en: "Total Liters:",
+          zh: "總升數：",
+          ja: "総リットル：",
+          ko: "총 리터:",
+          es: "Litros totales:",
+          de: "Gesamtliter:",
+          fi: "Litraa yhteensä:",
+          fr: "Total litres :",
+          ar: "إجمالي اللترات:",
+          it: "Litri Totali:",
+        },
+        tip: {
+          en: "Tip: A 5-min shower uses ~40L.",
+          zh: "提示：5分鐘淋浴約用40公升。",
+          ja: "ヒント：5分間のシャワーで約40L。",
+          ko: "팁: 5분 샤워는 약 40L를 사용합니다.",
+          es: "Consejo: Una ducha de 5 minutos usa ~40L.",
+          de: "Tipp: 5 Min Duschen verbraucht ~40L.",
+          fi: "Vinkki: 5 min suihku vie ~40L.",
+          fr: "Conseil : Une douche de 5 min utilise ~40L.",
+          ar: "نصيحة: الاستحمام لمدة 5 دقائق يستهلك حوالي 40 لتراً.",
+          it: "Consiglio: Una doccia di 5 min usa ~40L.",
+        },
+        grade: {
+          good: {
+            en: "Great job! Saving water.",
+            zh: "做得好！你在節約用水。",
+            ja: "素晴らしい！節水しています。",
+            ko: "잘했어요! 물을 절약하고 있습니다.",
+            es: "¡Buen trabajo! Ahorrando agua.",
+            de: "Gut gemacht! Wasser sparen.",
+            fi: "Hienoa! Säästät vettä.",
+            fr: "Bien joué ! Économie d'eau.",
+            ar: "عمل رائع! توفير المياه.",
+            it: "Ottimo lavoro! Risparmio acqua.",
+          },
+          bad: {
+            en: "Try to use less water.",
+            zh: "嘗試少用一點水。",
+            ja: "水の使用量を減らしてみてください。",
+            ko: "물을 덜 사용하도록 노력하세요.",
+            es: "Intenta usar menos agua.",
+            de: "Versuche, weniger Wasser zu verbrauchen.",
+            fi: "Yritä käyttää vähemmän vettä.",
+            fr: "Essayez d'utiliser moins d'eau.",
+            ar: "حاول استخدام كمية أقل من الماء.",
+            it: "Cerca di usare meno acqua.",
+          },
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [showerTime, setShowerTime] = useState(10);
+        const [flushes, setFlushes] = useState(5);
+        const [brushingOn, setBrushingOn] = useState(false);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        // Rates
+        const RATE_SHOWER = 8; // L/min
+        const RATE_FLUSH = 7; // L/flush
+        const RATE_BRUSH = 5; // L/min (approx if tapping on) - assume 2 mins
+
+        const total =
+          showerTime * RATE_SHOWER +
+          flushes * RATE_FLUSH +
+          (brushingOn ? 2 * RATE_BRUSH : 0);
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-blue-600">
+              🚰 {getText("title")}
+            </h1>
+
+            <div className="bg-white p-8 rounded-3xl shadow-xl w-full max-w-lg border border-blue-100">
+              {/* Shower */}
+              <div className="mb-6">
+                <div className="flex justify-between font-bold text-slate-700 mb-2">
+                  <span>🚿 {getText("shower")}</span>
+                  <span className="text-blue-500">{showerTime} min</span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="30"
+                  value={showerTime}
+                  onChange={(e) => setShowerTime(Number(e.target.value))}
+                  className="w-full accent-blue-500"
+                />
+              </div>
+
+              {/* Toilet */}
+              <div className="mb-6">
+                <div className="flex justify-between font-bold text-slate-700 mb-2">
+                  <span>🚽 {getText("toilet")}</span>
+                  <span className="text-blue-500">{flushes}</span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="20"
+                  value={flushes}
+                  onChange={(e) => setFlushes(Number(e.target.value))}
+                  className="w-full accent-blue-500"
+                />
+              </div>
+
+              {/* Brushing */}
+              <div className="mb-8 flex items-center justify-between">
+                <span className="font-bold text-slate-700">
+                  🪥 {getText("brush")}
+                </span>
+                <div
+                  onClick={() => setBrushingOn(!brushingOn)}
+                  className={`w-16 h-8 rounded-full p-1 cursor-pointer transition-colors ${
+                    brushingOn ? "bg-red-400" : "bg-green-400"
+                  }`}
+                >
+                  <div
+                    className={`w-6 h-6 bg-white rounded-full shadow-md transition-transform transform ${
+                      brushingOn ? "translate-x-8" : ""
+                    }`}
+                  ></div>
+                </div>
+              </div>
+
+              <div className="border-t pt-6 text-center">
+                <div className="text-slate-500 mb-1">{getText("total")}</div>
+                <motion.div
+                  key={total}
+                  initial={{ scale: 0.8 }}
+                  animate={{ scale: 1 }}
+                  className="text-6xl font-black text-blue-600 mb-4"
+                >
+                  {total} L
+                </motion.div>
+
+                <div
+                  className={`font-bold text-lg px-4 py-2 rounded-lg inline-block ${
+                    total < 150
+                      ? "bg-green-100 text-green-700"
+                      : "bg-orange-100 text-orange-700"
+                  }`}
+                >
+                  {total < 150
+                    ? t.grade.good[lang] || t.grade.good["en"]
+                    : t.grade.bad[lang] || t.grade.bad["en"]}
+                </div>
+              </div>
+
+              <div className="mt-6 text-sm text-slate-400 text-center italic">
+                {getText("tip")}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

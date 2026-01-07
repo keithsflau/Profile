@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小三數學：羅馬數字探險</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #475569 0%, #1e293b 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { motion } = window.Motion;
+
+      function App() {
+        const [num, setNum] = useState(1);
+
+        const toRoman = (n) => {
+          if (n <= 0 || n > 3999) return "超出範圍";
+          const val = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1];
+          const syms = [
+            "M",
+            "CM",
+            "D",
+            "CD",
+            "C",
+            "XC",
+            "L",
+            "XL",
+            "X",
+            "IX",
+            "V",
+            "IV",
+            "I",
+          ];
+          let roman = "";
+          let temp = n;
+          for (let i = 0; i < val.length; i++) {
+            while (temp >= val[i]) {
+              temp -= val[i];
+              roman += syms[i];
+            }
+          }
+          return roman;
+        };
+
+        const symbols = [
+          { r: "I", v: 1, desc: "一" },
+          { r: "V", v: 5, desc: "五" },
+          { r: "X", v: 10, desc: "十" },
+          { r: "L", v: 50, desc: "五十" },
+          { r: "C", v: 100, desc: "一百" },
+          { r: "D", v: 500, desc: "五百" },
+          { r: "M", v: 1000, desc: "一千" },
+        ];
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center text-white">
+            <h1 className="text-6xl font-black text-amber-500 mb-8 drop-shadow-lg">
+              🏛️ 羅馬數字探險
+            </h1>
+
+            <div className="flex flex-col lg:flex-row gap-8 w-full max-w-6xl">
+              {/* Control & Display */}
+              <div className="flex-1 bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 shadow-2xl">
+                <h2 className="text-3xl font-bold mb-6 text-amber-300">
+                  數字轉換器
+                </h2>
+
+                <div className="mb-8">
+                  <input
+                    type="range"
+                    min="1"
+                    max="1000"
+                    value={num}
+                    onChange={(e) => setNum(parseInt(e.target.value))}
+                    className="w-full h-4 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-amber-500"
+                  />
+                  <div className="flex justify-between text-slate-400 mt-2 font-mono">
+                    <span>1</span>
+                    <span>500</span>
+                    <span>1000</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4 mb-8">
+                  <button
+                    onClick={() => setNum(Math.max(1, num - 1))}
+                    className="p-4 bg-slate-700 rounded-xl hover:bg-slate-600 font-black"
+                  >
+                    -
+                  </button>
+                  <input
+                    type="number"
+                    value={num}
+                    onChange={(e) =>
+                      setNum(
+                        Math.max(
+                          1,
+                          Math.min(3999, parseInt(e.target.value) || 1)
+                        )
+                      )
+                    }
+                    className="flex-1 bg-slate-800 border-2 border-slate-600 rounded-2xl py-4 text-center text-4xl font-black text-white"
+                  />
+                  <button
+                    onClick={() => setNum(Math.min(3999, num + 1))}
+                    className="p-4 bg-slate-700 rounded-xl hover:bg-slate-600 font-black"
+                  >
+                    +
+                  </button>
+                </div>
+
+                <motion.div
+                  key={num}
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="bg-gradient-to-br from-amber-600 to-amber-800 rounded-3xl p-12 text-center border-4 border-amber-400 shadow-[0_0_30px_rgba(245,158,11,0.3)]"
+                >
+                  <div className="text-sm font-bold text-amber-200 mb-2">
+                    羅馬數字
+                  </div>
+                  <div className="text-7xl font-serif font-black text-white tracking-widest">
+                    {toRoman(num)}
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Reference Chart */}
+              <div className="flex-1 bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 shadow-2xl">
+                <h2 className="text-3xl font-bold mb-6 text-amber-300">
+                  符號對照表
+                </h2>
+                <div className="grid gap-3">
+                  {symbols.map((s) => (
+                    <div
+                      key={s.r}
+                      className={`flex items-center justify-between p-4 rounded-xl ${
+                        toRoman(num).includes(s.r)
+                          ? "bg-amber-500/20 border border-amber-500/50"
+                          : "bg-slate-800/50"
+                      }`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <span className="text-3xl font-serif font-black text-amber-400 w-12 text-center">
+                          {s.r}
+                        </span>
+                        <span className="text-lg text-slate-300">{s.desc}</span>
+                      </div>
+                      <span className="text-2xl font-black font-mono">
+                        {s.v}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-8 bg-slate-800/50 p-6 rounded-2xl border border-slate-700">
+                  <h3 className="text-xl font-bold text-amber-300 mb-3">
+                    💡 規則小貼士
+                  </h3>
+                  <ul className="space-y-2 text-slate-300 list-disc list-inside">
+                    <li>最多連續出現3次 (例如: III = 3)</li>
+                    <li>左減右加 (例如: IV = 5-1 = 4)</li>
+                    <li>V, L, D 不能重複</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小一數學：數數 1-10 | Counting 1-10</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fff1f2 0%, #fda4af 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "🍎 Counting 1-10",
+          zh: "🍎 數數 1-10",
+          ja: "🍎 1から10まで数える",
+          ko: "🍎 1부터 10까지 세기",
+          es: "🍎 Contando 1-10",
+          de: "🍎 Zählen 1-10",
+          fi: "🍎 Laskeminen 1-10",
+          fr: "🍎 Compter 1-10",
+          ar: "🍎 العد 1-10",
+          it: "🍎 Contare 1-10",
+        },
+        countingTo: {
+          en: "Counting to",
+          zh: "數到",
+          ja: "数える",
+          ko: "세기",
+          es: "Contando hasta",
+          de: "Zählen bis",
+          fi: "Lasketaan",
+          fr: "Compter jusqu'à",
+          ar: "العد إلى",
+          it: "Contando fino a",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [count, setCount] = useState(1);
+
+        const fruits = Array(10).fill("🍎");
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center justify-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+
+            <h1 className="text-4xl md:text-5xl font-black text-rose-600 mb-8 drop-shadow-sm text-center">
+              {t.title[lang] || t.title["en"]}
+            </h1>
+
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-xl w-full max-w-2xl text-center border-4 border-rose-200">
+              <div className="mb-12 h-40 flex flex-wrap justify-center items-center gap-4">
+                {fruits.slice(0, count).map((f, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    className="text-6xl filter drop-shadow-lg"
+                  >
+                    {f}
+                  </motion.div>
+                ))}
+              </div>
+
+              <div className="flex items-center justify-center gap-8">
+                <button
+                  onClick={() => setCount(Math.max(1, count - 1))}
+                  className="w-16 h-16 rounded-full bg-rose-100 text-rose-500 font-black text-3xl shadow-lg border-b-4 border-rose-300 active:scale-95 active:border-b-0 active:translate-y-1 transition-all"
+                >
+                  -
+                </button>
+
+                <div className="text-9xl font-black text-rose-500 w-40">
+                  {count}
+                </div>
+
+                <button
+                  onClick={() => setCount(Math.min(10, count + 1))}
+                  className="w-16 h-16 rounded-full bg-rose-500 text-white font-black text-3xl shadow-lg border-b-4 border-rose-700 active:scale-95 active:border-b-0 active:translate-y-1 transition-all"
+                >
+                  +
+                </button>
+              </div>
+
+              <div className="mt-8 text-2xl font-bold text-rose-400">
+                {t.countingTo[lang] || t.countingTo["en"]} {count}
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Nutrition Scanner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #f0fdf4;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Nutrition Scanner",
+          zh: "營養掃描器",
+          ja: "栄養スキャナー",
+          ko: "영양 스캐너",
+          es: "Escáner de nutrición",
+          de: "Ernährungsscanner",
+          fi: "Ravintoskanneri",
+          fr: "Scanner de nutrition",
+          ar: "ماسح التغذية",
+          it: "Scanner Nutrizionale",
+        },
+        instruction: {
+          en: "Scan the food to see its nutrients!",
+          zh: "掃描食物以查看其營養成分！",
+          ja: "食品をスキャンして栄養素を確認してください！",
+          ko: "음식을 스캔하여 영양소를 확인하세요!",
+          es: "¡Escanea la comida para ver sus nutrientes!",
+          de: "Scanne das Essen, um seine Nährstoffe zu sehen!",
+          fi: "Skannaa ruoka nähdäksesi sen ravintoaineet!",
+          fr: "Scannez les aliments pour voir leurs nutriments !",
+          ar: "امسح الطعام لرؤية عناصره الغذائية!",
+          it: "Scansiona il cibo per vedere i suoi nutrienti!",
+        },
+        scan: {
+          en: "SCAN",
+          zh: "掃描",
+          ja: "スキャン",
+          ko: "스캔",
+          es: "ESCANEAR",
+          de: "SCANNEN",
+          fi: "SKANNAA",
+          fr: "SCANNER",
+          ar: "مسح",
+          it: "SCANSIONA",
+        },
+        protein: {
+          en: "Protein",
+          zh: "蛋白質",
+          ja: "タンパク質",
+          ko: "단백질",
+          es: "Proteína",
+          de: "Protein",
+          fi: "Proteiini",
+          fr: "Protéine",
+          ar: "بروتين",
+          it: "Proteine",
+        },
+        carbs: {
+          en: "Carbohydrates",
+          zh: "碳水化合物",
+          ja: "炭水化物",
+          ko: "탄수화물",
+          es: "Carbohidratos",
+          de: "Kohlenhydrate",
+          fi: "Hiilihydraatit",
+          fr: "Glucides",
+          ar: "كربوهيدرات",
+          it: "Carboidrati",
+        },
+        fat: {
+          en: "Fat",
+          zh: "脂肪",
+          ja: "脂肪",
+          ko: "지방",
+          es: "Grasa",
+          de: "Fett",
+          fi: "Rasva",
+          fr: "Graisses",
+          ar: "دهون",
+          it: "Grassi",
+        },
+        sugar: {
+          en: "Sugar",
+          zh: "糖",
+          ja: "糖分",
+          ko: "설탕",
+          es: "Azúcar",
+          de: "Zucker",
+          fi: "Sokeri",
+          fr: "Sucre",
+          ar: "سكر",
+          it: "Zucchero",
+        },
+
+        verdict: {
+          en: "Verdict:",
+          zh: "評價：",
+          ja: "判定：",
+          ko: "판결:",
+          es: "Veredicto:",
+          de: "Urteil:",
+          fi: "Tuomio:",
+          fr: "Verdict :",
+          ar: "الحكم:",
+          it: "Verdetto:",
+        },
+        healthy: {
+          en: "Healthy Choice",
+          zh: "健康選擇",
+          ja: "健康的な選択",
+          ko: "건강한 선택",
+          es: "Opción saludable",
+          de: "Gesunde Wahl",
+          fi: "Terveellinen valinta",
+          fr: "Choix sain",
+          ar: "خيار صحي",
+          it: "Scelta Salutare",
+        },
+        moderation: {
+          en: "Eat in Moderation",
+          zh: "適量食用",
+          ja: "適度に食べる",
+          ko: "적당히 섭취",
+          es: "Comer con moderación",
+          de: "In Maßen essen",
+          fi: "Syö kohtuudella",
+          fr: "À consommer avec modération",
+          ar: "تناول باعتدال",
+          it: "Mangiare con Moderazione",
+        },
+        unhealthy: {
+          en: "Unhealthy (Limit)",
+          zh: "不健康 (少吃)",
+          ja: "不健康 (制限する)",
+          ko: "건강에 해로움 (제한)",
+          es: "Poco saludable (Limitar)",
+          de: "Ungesund (Begrenzen)",
+          fi: "Epäterveellinen (Rajoita)",
+          fr: "Malsain (Limiter)",
+          ar: "غير صحي (الحد)",
+          it: "Malsano (Limitare)",
+        },
+        // Food Names
+        apple: { en: "Apple", zh: "蘋果", ja: "リンゴ", ko: "사과", es: "Manzana", de: "Apfel", fi: "Omena", fr: "Pomme", ar: "تفاحة", it: "Mela" },
+        burger: { en: "Burger", zh: "漢堡", ja: "ハンバーガー", ko: "햄버거", es: "Hamburguesa", de: "Burger", fi: "Hampurilainen", fr: "Burger", ar: "برغر", it: "Hamburger" },
+        broccoli: { en: "Broccoli", zh: "西蘭花", ja: "ブロッコリー", ko: "브로콜리", es: "Brócoli", de: "Brokkoli", fi: "Parsakaali", fr: "Brocoli", ar: "بروكلي", it: "Broccoli" },
+        pizza: { en: "Pizza", zh: "披薩", ja: "ピザ", ko: "피자", es: "Pizza", de: "Pizza", fi: "Pizza", fr: "Pizza", ar: "بيتزا", it: "Pizza" },
+        rice: { en: "Rice", zh: "米飯", ja: "米", ko: "밥", es: "Arroz", de: "Reis", fi: "Riisi", fr: "Riz", ar: "أرز", it: "Riso" },
+        chicken: { en: "Chicken", zh: "雞肉", ja: "鶏肉", ko: "닭고기", es: "Pollo", de: "Hühnchen", fi: "Kana", fr: "Poulet", ar: "دجاج", it: "Pollo" },
+        cake: { en: "Cake", zh: "蛋糕", ja: "ケーキ", ko: "케이크", es: "Pastel", de: "Kuchen", fi: "Kakku", fr: "Gâteau", ar: "كعكة", it: "Torta" },
+        fish: { en: "Fish", zh: "魚", ja: "魚", ko: "생선", es: "Pescado", de: "Fisch", fi: "Kala", fr: "Poisson", ar: "سمك", it: "Pesce" },
+
+        // Levels
+        low: { en: "Low", zh: "低", ja: "低", ko: "낮음", es: "Bajo", de: "Niedrig", fi: "Matala", fr: "Faible", ar: "منخفض", it: "Basso" },
+        med: { en: "Med", zh: "中", ja: "中", ko: "중간", es: "Medio", de: "Mittel", fi: "Keski", fr: "Moyen", ar: "متوسط", it: "Medio" },
+        high: { en: "High", zh: "高", ja: "高", ko: "높음", es: "Alto", de: "Hoch", fi: "Korkea", fr: "Élevé", ar: "عالي", it: "Alto" },
+      };
+
+      const foods = [
+        { id: 1, name: "apple", icon: "🍎", p: "low", c: "med", f: "low", s: "med", type: "healthy" },
+        { id: 2, name: "burger", icon: "🍔", p: "high", c: "high", f: "high", s: "low", type: "unhealthy" },
+        { id: 3, name: "broccoli", icon: "🥦", p: "med", c: "low", f: "low", s: "low", type: "healthy" },
+        { id: 4, name: "pizza", icon: "🍕", p: "med", c: "high", f: "high", s: "low", type: "unhealthy" },
+        { id: 5, name: "rice", icon: "🍚", p: "low", c: "high", f: "low", s: "low", type: "moderation" },
+        { id: 6, name: "chicken", icon: "🍗", p: "high", c: "low", f: "med", s: "low", type: "healthy" },
+        { id: 7, name: "cake", icon: "🍰", p: "low", c: "high", f: "high", s: "high", type: "unhealthy" },
+        { id: 8, name: "fish", icon: "🐟", p: "high", c: "low", f: "low", s: "low", type: "healthy" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [scannedItem, setScannedItem] = useState(null);
+        const [scanning, setScanning] = useState(false);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const handleScan = (item) => {
+          setScanning(true);
+          setScannedItem(null);
+          setTimeout(() => {
+            setScanning(false);
+            setScannedItem(item);
+          }, 1500);
+        };
+
+        const getColor = (level) => {
+          if (level === "high") return "text-red-500 font-bold";
+          if (level === "med") return "text-yellow-500 font-bold";
+          return "text-green-500 font-bold";
+        };
+
+        const getTypeColor = (type) => {
+          if (type === "healthy")
+            return "bg-green-100 text-green-700 border-green-300";
+          if (type === "moderation")
+            return "bg-yellow-100 text-yellow-700 border-yellow-300";
+          return "bg-red-100 text-red-700 border-red-300";
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-green-700">
+              🤳 {getText("title")}
+            </h1>
+            <p className="mb-8 font-bold text-slate-500">
+              {getText("instruction")}
+            </p>
+
+            <div className="flex flex-col md:flex-row gap-8 w-full max-w-5xl items-start justify-center">
+              {/* Food Belt */}
+              <div className="bg-white p-6 rounded-3xl shadow-lg w-full md:w-1/3 flex flex-wrap gap-4 justify-center border-2 border-slate-100">
+                {foods.map((f) => (
+                  <button
+                    key={f.id}
+                    onClick={() => handleScan(f)}
+                    className="text-6xl p-4 bg-slate-50 rounded-2xl hover:bg-green-50 hover:scale-110 transition-all border border-slate-200"
+                  >
+                    {f.icon}
+                  </button>
+                ))}
+              </div>
+
+              {/* Scanner Device */}
+              <div className="relative w-full md:w-1/2 bg-slate-800 rounded-[3rem] p-8 border-8 border-slate-600 shadow-2xl min-h-[500px] flex flex-col items-center justify-between">
+                {/* Screen */}
+                <div className="w-full bg-black rounded-2xl h-[300px] relative overflow-hidden flex items-center justify-center border-4 border-slate-700">
+                  {scanning && (
+                    <div className="absolute inset-0 z-20 flex items-center justify-center">
+                      <motion.div
+                        className="w-full h-1 bg-green-500 shadow-[0_0_20px_#4ade80]"
+                        animate={{ y: [-150, 150, -150] }}
+                        transition={{
+                          repeat: Infinity,
+                          duration: 1.5,
+                          ease: "linear",
+                        }}
+                      />
+                      <div className="absolute bottom-4 text-green-500 font-mono animate-pulse">
+                        {getText("scan")}...
+                      </div>
+                    </div>
+                  )}
+
+                  {!scanning && scannedItem ? (
+                    <div className="w-full h-full p-6 flex flex-col">
+                      <div className="flex items-center gap-4 mb-4 border-b border-slate-700 pb-4">
+                        <div className="text-6xl">{scannedItem.icon}</div>
+                        <div className="text-3xl text-white font-bold">
+                        <div className="text-3xl text-white font-bold">
+                          {getText(scannedItem.name)}
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4 text-sm font-mono flex-1">
+                        <div className="bg-slate-900 p-2 rounded text-slate-300">
+                          {getText("protein")}:{" "}
+                          <span className={getColor(scannedItem.p)}>
+                            {getText(scannedItem.p)}
+                          </span>
+                        </div>
+                        <div className="bg-slate-900 p-2 rounded text-slate-300">
+                          {getText("carbs")}:{" "}
+                          <span className={getColor(scannedItem.c)}>
+                            {getText(scannedItem.c)}
+                          </span>
+                        </div>
+                        <div className="bg-slate-900 p-2 rounded text-slate-300">
+                          {getText("fat")}:{" "}
+                          <span className={getColor(scannedItem.f)}>
+                            {getText(scannedItem.f)}
+                          </span>
+                        </div>
+                        <div className="bg-slate-900 p-2 rounded text-slate-300">
+                          {getText("sugar")}:{" "}
+                          <span className={getColor(scannedItem.s)}>
+                            {getText(scannedItem.s)}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div
+                        className={`mt-4 p-3 rounded-lg border-l-4 text-center font-bold ${getTypeColor(
+                          scannedItem.type
+                        )}`}
+                      >
+                        {getText(scannedItem.type)}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-slate-600 font-mono text-center px-8">
+                      [ System Ready ]<br />
+                      Select item to scan
+                    </div>
+                  )}
+                </div>
+
+                {/* Controls */}
+                <div className="w-full flex justify-center pb-4">
+                  <div className="w-16 h-16 rounded-full border-4 border-white flex items-center justify-center">
+                    <div className="w-10 h-10 bg-red-500 rounded-full animate-pulse"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

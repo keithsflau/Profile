@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Skeletal System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #1e293b;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Skeleton Puzzle",
+          zh: "骨骼拼圖",
+          ja: "骸骨パズル",
+          ko: "해골 퍼즐",
+          es: "Rompecabezas de esqueleto",
+          de: "Skelett-Puzzle",
+          fi: "Luurankopalapeli",
+          fr: "Puzzle squelette",
+          ar: "لغز الهيكل العظمي",
+          it: "Puzzle Scheletro",
+        },
+        instruction: {
+          en: "Build the human skeleton.",
+          zh: "組裝人體骨骼。",
+          ja: "人間の骨格を組み立ててください。",
+          ko: "인체 골격을 조립하세요.",
+          es: "Construye el esqueleto humano.",
+          de: "Baue das menschliche Skelett.",
+          fi: "Rakenna ihmisen luuranko.",
+          fr: "Construisez le squelette humain.",
+          ar: "بناء الهيكل العظمي البشري.",
+          it: "Costruisci lo scheletro umano.",
+        },
+        skull: { en: "Skull", zh: "頭骨", ja: "頭蓋骨", ko: "두개골" },
+        ribs: { en: "Rib Cage", zh: "胸腔", ja: "胸郭", ko: "흉곽" },
+        pelvis: { en: "Pelvis", zh: "骨盆", ja: "骨盤", ko: "골반" },
+        arms: { en: "Arms", zh: "手臂", ja: "腕", ko: "팔" },
+        legs: { en: "Legs", zh: "腿", ja: "脚", ko: "다리" },
+      };
+
+      const parts = [
+        { id: "skull", icon: "💀", x: 50, y: 10 },
+        { id: "ribs", icon: "🦴", x: 50, y: 30, scaleX: 1.5, rotate: 90 }, // Sideways bone as ribs
+        { id: "pelvis", icon: "🩲", x: 50, y: 50, opacity: 0.5 }, // Using shorts as pelvis proxy
+        { id: "arms", icon: "💪", x: 20, y: 30 },
+        { id: "legs", icon: "🦵", x: 50, y: 70 },
+      ];
+      // Note: Emulating a skeleton visual with emojis is tricky.
+      // Let's use simple shapes/images if possible, or abstract.
+      // Better: Draggable names to locations on a background image.
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [placed, setPlaced] = useState([]);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const handleDrop = (e, targetId) => {
+          e.preventDefault();
+          const draggedId = e.dataTransfer.getData("id");
+          if (draggedId === targetId) {
+            setPlaced([...placed, targetId]);
+          }
+        };
+
+        const handleDragStart = (e, id) => {
+          e.dataTransfer.setData("id", id);
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-6 text-slate-300">
+              {getText("title")}
+            </h1>
+            <p className="mb-4 text-slate-500 font-bold">
+              {getText("instruction")}
+            </p>
+
+            <div className="flex flex-col md:flex-row gap-8 w-full max-w-4xl">
+              {/* Skeleton Outline */}
+              <div className="relative w-[300px] h-[500px] bg-slate-800 rounded-3xl border-4 border-slate-600 mx-auto">
+                {/* Targets */}
+                {/* Skull */}
+                <div
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => handleDrop(e, "skull")}
+                  className={`absolute top-4 left-1/2 -translate-x-1/2 w-24 h-24 border-2 border-dashed border-slate-500 rounded-full flex items-center justify-center ${
+                    placed.includes("skull")
+                      ? "bg-white text-black border-none"
+                      : ""
+                  }`}
+                >
+                  {placed.includes("skull") ? (
+                    "💀"
+                  ) : (
+                    <span className="text-xs">{getText("skull")}</span>
+                  )}
+                </div>
+
+                {/* Ribs */}
+                <div
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => handleDrop(e, "ribs")}
+                  className={`absolute top-32 left-1/2 -translate-x-1/2 w-32 h-24 border-2 border-dashed border-slate-500 rounded-xl flex items-center justify-center ${
+                    placed.includes("ribs")
+                      ? "bg-white text-black border-none"
+                      : ""
+                  }`}
+                >
+                  {placed.includes("ribs") ? (
+                    "🦴"
+                  ) : (
+                    <span className="text-xs">{getText("ribs")}</span>
+                  )}
+                </div>
+
+                {/* Pelvis */}
+                <div
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => handleDrop(e, "pelvis")}
+                  className={`absolute top-60 left-1/2 -translate-x-1/2 w-28 h-16 border-2 border-dashed border-slate-500 rounded-xl flex items-center justify-center ${
+                    placed.includes("pelvis")
+                      ? "bg-white text-black border-none"
+                      : ""
+                  }`}
+                >
+                  {placed.includes("pelvis") ? (
+                    "🩲"
+                  ) : (
+                    <span className="text-xs">{getText("pelvis")}</span>
+                  )}
+                </div>
+
+                {/* Arms */}
+                <div
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => handleDrop(e, "arms")}
+                  className={`absolute top-32 left-4 w-12 h-40 border-2 border-dashed border-slate-500 rounded flex items-center justify-center ${
+                    placed.includes("arms")
+                      ? "bg-white text-black border-none"
+                      : ""
+                  }`}
+                >
+                  {placed.includes("arms") ? (
+                    "💪"
+                  ) : (
+                    <span className="text-xs rotate-90">{getText("arms")}</span>
+                  )}
+                </div>
+
+                {/* Legs */}
+                <div
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => handleDrop(e, "legs")}
+                  className={`absolute bottom-4 left-1/2 -translate-x-1/2 w-32 h-40 border-2 border-dashed border-slate-500 rounded flex items-center justify-center ${
+                    placed.includes("legs")
+                      ? "bg-white text-black border-none"
+                      : ""
+                  }`}
+                >
+                  {placed.includes("legs") ? (
+                    "🦵"
+                  ) : (
+                    <span className="text-xs">{getText("legs")}</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Parts Bin */}
+              <div className="flex-1 bg-slate-700 p-6 rounded-3xl flex flex-wrap gap-4 content-start">
+                {["skull", "ribs", "pelvis", "arms", "legs"].map(
+                  (id) =>
+                    !placed.includes(id) && (
+                      <div
+                        key={id}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, id)}
+                        className="bg-slate-600 p-4 rounded-xl cursor-grab hover:bg-slate-500 text-center w-24"
+                      >
+                        <div className="text-2xl mb-1">
+                          {id === "skull"
+                            ? "💀"
+                            : id === "ribs"
+                            ? "🦴"
+                            : id === "pelvis"
+                            ? "🩲"
+                            : id === "arms"
+                            ? "💪"
+                            : "🦵"}
+                        </div>
+                        <div className="text-xs font-bold">{getText(id)}</div>
+                      </div>
+                    )
+                )}
+                {placed.length === 5 && (
+                  <div className="text-green-400 font-bold text-xl">
+                    {getText("correct") || "Great Job!"}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

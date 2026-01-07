@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小一常識：校規知多少 | Classroom Rules</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fef9c3 0%, #fde047 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Classroom Rules",
+          zh: "校規知多少",
+          ja: "教室のルール",
+          ko: "교실 규칙",
+        },
+        instruction: {
+          en: "Is this behavior correct?",
+          zh: "這個行為正確嗎？",
+          ja: "この行動は正しいですか？",
+          ko: "이 행동이 올바른가요?",
+        },
+        right: { en: "Right", zh: "正確" },
+        wrong: { en: "Wrong", zh: "錯誤" },
+        s1: { en: "Raising hand before speaking", zh: "舉手後才發言" },
+        s2: { en: "Running in the corridor", zh: "在走廊奔跑" },
+        s3: { en: "Listening to the teacher", zh: "專心聽老師講課" },
+        s4: { en: "Sleeping in class", zh: "上課睡覺" },
+        s5: { en: "Fighting with classmates", zh: "與同學打架" },
+        s6: { en: "Queueing up properly", zh: "乖乖排隊" },
+        s7: { en: "Eating in class", zh: "上課偷吃東西" },
+        s8: { en: "Saying 'Good Morning'", zh: "向老師說「早安」" },
+        feedback_good: {
+          en: "Yes! Good students do this!",
+          zh: "做得好！好學生應該這樣做！",
+        },
+        feedback_bad_correct: {
+          en: "Correct! We should NOT do this!",
+          zh: "答對了！我們不應該這樣做！",
+        },
+        feedback_oops: { en: "Oops! Think again.", zh: "哎呀！再想一想。" },
+        score: { en: "Score: ", zh: "分數：" },
+        final: { en: "Quiz Completed!", zh: "測驗完成！" },
+        restart: { en: "Play Again", zh: "再玩一次" },
+      };
+
+      const scenarios = [
+        { id: "s1", isGood: true, emoji: "🙋‍♂️" },
+        { id: "s2", isGood: false, emoji: "🏃‍♂️💨" },
+        { id: "s3", isGood: true, emoji: "👂👩‍🏫" },
+        { id: "s4", isGood: false, emoji: "😴" },
+        { id: "s5", isGood: false, emoji: "🤼" },
+        { id: "s6", isGood: true, emoji: "🚶🚶‍♀️🚶‍♂️" },
+        { id: "s7", isGood: false, emoji: "🍔" },
+        { id: "s8", isGood: true, emoji: "🗣️👋" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [index, setIndex] = useState(0);
+        const [score, setScore] = useState(0);
+        const [showFeedback, setShowFeedback] = useState(null); // 'correct' | 'wrong'
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+        const currentScenario = scenarios[index];
+
+        const handleAnswer = (userSaysGood) => {
+          if (showFeedback) return;
+
+          const isCorrect = userSaysGood === currentScenario.isGood;
+          if (isCorrect) {
+            setScore(score + 10);
+            setShowFeedback("correct");
+          } else {
+            setShowFeedback("wrong");
+          }
+
+          setTimeout(() => {
+            setShowFeedback(null);
+            if (index < scenarios.length - 1) {
+              setIndex(index + 1);
+            } else {
+              setIndex(-1); // End
+            }
+          }, 1500);
+        };
+
+        const restart = () => {
+          setIndex(0);
+          setScore(0);
+          setShowFeedback(null);
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-amber-700 mb-2 mt-8 drop-shadow-sm">
+              📏 {getText("title")}
+            </h1>
+            <div className="text-2xl font-black text-amber-600 mb-6 bg-white px-6 py-2 rounded-full shadow-sm">
+              {getText("score")}
+              {score}
+            </div>
+
+            {index !== -1 ? (
+              <div className="w-full max-w-lg relative">
+                <div className="bg-white rounded-3xl p-8 shadow-2xl text-center border-4 border-amber-300 min-h-[400px] flex flex-col justify-center items-center">
+                  <div className="text-9xl mb-6">{currentScenario.emoji}</div>
+                  <h2 className="text-3xl font-black text-slate-800 mb-4">
+                    {getText(currentScenario.id)}
+                  </h2>
+                  <p className="text-xl text-slate-500 font-bold mb-8">
+                    {getText("instruction")}
+                  </p>
+                </div>
+
+                {/* Feedback Overlay */}
+                {showFeedback && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className={`absolute inset-0 rounded-3xl flex items-center justify-center p-6 z-10 ${
+                      showFeedback === "correct"
+                        ? "bg-green-500/90"
+                        : "bg-red-500/90"
+                    }`}
+                  >
+                    <div className="text-white text-center">
+                      <div className="text-8xl mb-4">
+                        {showFeedback === "correct" ? "🌟" : "🤔"}
+                      </div>
+                      <div className="text-3xl font-black">
+                        {showFeedback === "correct"
+                          ? currentScenario.isGood
+                            ? getText("feedback_good")
+                            : getText("feedback_bad_correct")
+                          : getText("feedback_oops")}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                <div className="grid grid-cols-2 gap-4 mt-6">
+                  <button
+                    onClick={() => handleAnswer(true)}
+                    className="bg-green-500 text-white rounded-2xl py-6 flex flex-col items-center hover:bg-green-600 transition-colors shadow-lg active:scale-95 transform"
+                  >
+                    <span className="text-5xl mb-2">🙆‍♂️</span>
+                    <span className="text-2xl font-black">
+                      {getText("right")}
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => handleAnswer(false)}
+                    className="bg-red-500 text-white rounded-2xl py-6 flex flex-col items-center hover:bg-red-600 transition-colors shadow-lg active:scale-95 transform"
+                  >
+                    <span className="text-5xl mb-2">🙅‍♂️</span>
+                    <span className="text-2xl font-black">
+                      {getText("wrong")}
+                    </span>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center mt-20">
+                <div className="text-8xl mb-6">🏆</div>
+                <h2 className="text-4xl font-black text-amber-800 mb-8">
+                  {getText("final")}
+                </h2>
+                <div className="text-5xl font-black text-amber-600 mb-12">
+                  {getText("score")}
+                  {score}
+                </div>
+                <button
+                  onClick={restart}
+                  className="bg-amber-500 text-white px-10 py-4 rounded-full font-black text-2xl hover:bg-amber-600 shadow-xl"
+                >
+                  {getText("restart")}
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

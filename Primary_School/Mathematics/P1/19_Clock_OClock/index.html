@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小一數學：整點時間 | O'Clock</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fff7ed 0%, #fb923c 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "🕒 O'Clock",
+          zh: "🕒 整點時間",
+          ja: "🕒 〇時",
+          ko: "🕒 정각",
+          es: "🕒 En punto",
+          de: "🕒 Uhr",
+          fi: "🕒 Tasatunnit",
+          fr: "🕒 Heure pile",
+          ar: "🕒 الساعة بالضبط",
+          it: "🕒 In punto",
+        },
+        timeIsIt: {
+          en: "What time is it?",
+          zh: "現在是幾點鐘？",
+          ja: "何時ですか？",
+          ko: "몇 시입니까?",
+          es: "¿Qué hora es?",
+          de: "Wie spät ist es?",
+          fi: "Paljonko kello on?",
+          fr: "Quelle heure est-il ?",
+          ar: "كم الساعة؟",
+          it: "Che ore sono?",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [hour, setHour] = useState(3);
+        const [opts, setOpts] = useState([]);
+        const [feedback, setFeedback] = useState("");
+
+        const newRound = () => {
+          const h = Math.floor(Math.random() * 12) + 1;
+          setHour(h);
+
+          let o = [h];
+          while (o.length < 3) {
+            const r = Math.floor(Math.random() * 12) + 1;
+            if (!o.includes(r)) o.push(r);
+          }
+          setOpts(o.sort(() => Math.random() - 0.5));
+          setFeedback("");
+        };
+
+        useEffect(newRound, []);
+
+        const check = (sel) => {
+          if (sel === hour) {
+            setFeedback("CORRECT");
+            setTimeout(newRound, 1500);
+          } else {
+            setFeedback("WRONG");
+          }
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center justify-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+
+            <h1 className="text-5xl font-black text-orange-900 mb-8 max-w-2xl text-center">
+              {t.title[lang] || t.title["en"]}
+            </h1>
+
+            <div className="bg-white/90 rounded-3xl p-8 shadow-2xl w-full max-w-2xl text-center border-4 border-orange-200">
+              {/* Clock Face */}
+              <div className="relative w-64 h-64 mx-auto mb-12 bg-white rounded-full border-8 border-orange-400 shadow-xl">
+                {/* Markings */}
+                {[...Array(12)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="absolute inset-x-0 top-0 bottom-0 text-center pt-2 font-bold text-slate-400"
+                    style={{ transform: `rotate(${i * 30}deg)` }}
+                  >
+                    <span
+                      className="inline-block"
+                      style={{ transform: `rotate(${-i * 30}deg)` }}
+                    >
+                      {i === 0 ? 12 : i}
+                    </span>
+                  </div>
+                ))}
+                {/* Hands */}
+                <div
+                  className="absolute top-1/2 left-1/2 w-1 h-20 bg-red-500 origin-bottom -translate-x-1/2 -translate-y-full rounded-full transition-transform duration-500"
+                  style={{
+                    transform: `translateX(-50%) translateY(-100%) rotate(${
+                      (hour % 12) * 30
+                    }deg)`,
+                  }}
+                ></div>{" "}
+                {/* Hour Hand */}
+                <div
+                  className="absolute top-1/2 left-1/2 w-1 h-28 bg-blue-500 origin-bottom -translate-x-1/2 -translate-y-full rounded-full"
+                  style={{
+                    transform: `translateX(-50%) translateY(-100%) rotate(0deg)`,
+                  }}
+                ></div>{" "}
+                {/* Minute Hand at 12 */}
+                <div className="absolute top-1/2 left-1/2 w-4 h-4 bg-orange-600 rounded-full -translate-x-1/2 -translate-y-1/2 shadow"></div>
+              </div>
+
+              <h2 className="text-2xl font-bold text-slate-600 mb-8">
+                {t.timeIsIt[lang] || t.timeIsIt["en"]}
+              </h2>
+
+              <div className="flex justify-center gap-4">
+                {opts.map((opt, i) => (
+                  <button
+                    key={i}
+                    onClick={() => check(opt)}
+                    className="px-6 py-4 bg-orange-100 hover:bg-orange-200 text-orange-600 font-black text-2xl rounded-xl border-4 border-orange-300 transition-all active:scale-95"
+                  >
+                    {opt}:00
+                  </button>
+                ))}
+              </div>
+
+              <div className="h-16 mt-8">
+                {feedback === "CORRECT" && (
+                  <div className="text-4xl font-black text-green-500 animate-bounce">
+                    {get("correct", lang)}
+                  </div>
+                )}
+                {feedback === "WRONG" && (
+                  <div className="text-4xl font-black text-red-500 animate-shake">
+                    {get("wrong", lang)}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

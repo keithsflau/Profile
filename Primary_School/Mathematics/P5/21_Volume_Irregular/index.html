@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小五數學：不規則體積 | Irregular Volume</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #ecfeff 0%, #06b6d4 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Irregular Volume",
+          zh: "不規則體積",
+          ja: "不規則な体積",
+          ko: "불규칙한 부피",
+          es: "Volumen Irregular",
+          de: "Unregelmäßiges Volumen",
+          fi: "Epäsäännöllinen tilavuus",
+          fr: "Volume irrégulier",
+          ar: "حجم غير منتظم",
+          it: "Volume irregolare",
+        },
+        subtitle: {
+          en: "Irregular Volume (Composite Shapes)",
+          zh: "不規則體積 (複合圖形)",
+          ja: "不規則な体積 (複合図形)",
+          ko: "불규칙한 부피 (복합 도형)",
+          es: "Volumen Irregular (Formas Compuestas)",
+          de: "Unregelmäßiges Volumen (Zusammengesetzte Formen)",
+          fi: "Epäsäännöllinen tilavuus (yhdistelmämuodot)",
+          fr: "Volume irrégulier (formes composites)",
+          ar: "حجم غير منتظم (أشكال مركبة)",
+          it: "Volume irregolare (forme composte)",
+        },
+        split: {
+          en: "Split Method",
+          zh: "分割法",
+          ja: "分割法",
+          ko: "분할법",
+          es: "Método de División",
+          de: "Aufteilungsmethode",
+          fi: "Jakomenetelmä",
+          fr: "Méthode de division",
+          ar: "طريقة التقسيم",
+          it: "Metodo di divisione",
+        },
+        subtract: {
+          en: "Subtract Method",
+          zh: "填補法",
+          ja: "補完法",
+          ko: "보완법",
+          es: "Método de Sustracción",
+          de: "Subtraktionsmethode",
+          fi: "Vähennysmenetelmä",
+          fr: "Méthode de soustraction",
+          ar: "طريقة الطرح",
+          it: "Metodo di sottrazione",
+        },
+        solidA: {
+          en: "Solid A",
+          zh: "立體 A",
+          ja: "立体 A",
+          ko: "입체 A",
+          es: "Sólido A",
+          de: "Körper A",
+          fi: "Kappale A",
+          fr: "Solide A",
+          ar: "المجسم أ",
+          it: "Solido A",
+        },
+        solidB: {
+          en: "Solid B",
+          zh: "立體 B",
+          ja: "立体 B",
+          ko: "입체 B",
+          es: "Sólido B",
+          de: "Körper B",
+          fi: "Kappale B",
+          fr: "Solide B",
+          ar: "المجسم ب",
+          it: "Solido B",
+        },
+        totalVolume: {
+          en: "Total Volume",
+          zh: "總體積",
+          ja: "総体積",
+          ko: "총 부피",
+          es: "Volumen Total",
+          de: "Gesamtvolumen",
+          fi: "Kokonaistilavuus",
+          fr: "Volume total",
+          ar: "الحجم الكلي",
+          it: "Volume totale",
+        },
+        bigCuboid: {
+          en: "Big Cuboid",
+          zh: "大長方體",
+          ja: "大きな直方体",
+          ko: "큰 직육면체",
+          es: "Cuboide Grande",
+          de: "Großer Quader",
+          fi: "Suuri suorakulmainen särmiö",
+          fr: "Grand parallélépipède",
+          ar: "متوازي مستطيلات كبير",
+          it: "Grande cuboide",
+        },
+        missingPart: {
+          en: "Missing Part",
+          zh: "缺口部分",
+          ja: "欠けている部分",
+          ko: "빈 부분",
+          es: "Parte Faltante",
+          de: "Fehlender Teil",
+          fi: "Puuttuva osa",
+          fr: "Partie manquante",
+          ar: "الجزء المفقود",
+          it: "Parte mancante",
+        },
+        svgDiff: {
+          en: "Big cuboid - missing part",
+          zh: "大長方體 - 缺口",
+          ja: "大きな直方体 - 欠け",
+          ko: "큰 직육면체 - 빈 부분",
+          es: "Cuboide grande - parte faltante",
+          de: "Großer Quader - fehlender Teil",
+          fi: "Suuri särmiö - puuttuva osa",
+          fr: "Grand parallélépipède - partie manquante",
+          ar: "متوازي مستطيلات كبير - جزء مفقود",
+          it: "Grande cuboide - parte mancante",
+        },
+        volume: {
+          en: "Volume",
+          zh: "體積",
+          ja: "体積",
+          ko: "부피",
+          es: "Volumen",
+          de: "Volumen",
+          fi: "Tilavuus",
+          fr: "Volume",
+          ar: "الحجم",
+          it: "Volume",
+        },
+        tip: {
+          en: "Both methods give the same answer!",
+          zh: "兩種方法得出相同答案！",
+          ja: "どちらの方法でも同じ答えになります！",
+          ko: "두 방법 모두 같은 답이 나옵니다!",
+          es: "¡Ambos métodos dan la misma respuesta!",
+          de: "Beide Methoden ergeben die gleiche Antwort!",
+          fi: "Molemmat menetelmät antavat saman vastauksen!",
+          fr: "Les deux méthodes donnent la même réponse !",
+          ar: "الطريقتان تعطيان نفس الإجابة!",
+          it: "Entrambi i metodi danno la stessa risposta!",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const [method, setMethod] = useState("split");
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-5xl font-black text-cyan-900 mb-2 mt-8">
+              🧊 {getText("title")}
+            </h1>
+            <p className="text-xl text-cyan-700 font-bold mb-8">
+              {getText("subtitle")}
+            </p>
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-4xl w-full">
+              <div className="flex justify-center gap-4 mb-6">
+                <button
+                  onClick={() => setMethod("split")}
+                  className={`px-6 py-3 rounded-xl font-bold ${
+                    method === "split"
+                      ? "bg-cyan-500 text-white"
+                      : "bg-slate-100"
+                  }`}
+                >
+                  {getText("split")}
+                </button>
+                <button
+                  onClick={() => setMethod("subtract")}
+                  className={`px-6 py-3 rounded-xl font-bold ${
+                    method === "subtract"
+                      ? "bg-cyan-500 text-white"
+                      : "bg-slate-100"
+                  }`}
+                >
+                  {getText("subtract")}
+                </button>
+              </div>
+
+              {method === "split" && (
+                <div className="flex flex-col md:flex-row gap-8 items-center">
+                  <svg viewBox="0 0 200 150" className="w-64 h-48">
+                    <rect
+                      x="20"
+                      y="20"
+                      width="60"
+                      height="110"
+                      fill="#06b6d4"
+                      stroke="#0891b2"
+                      strokeWidth="2"
+                    />
+                    <rect
+                      x="80"
+                      y="70"
+                      width="100"
+                      height="60"
+                      fill="#22d3ee"
+                      stroke="#0891b2"
+                      strokeWidth="2"
+                    />
+                    <text
+                      x="50"
+                      y="80"
+                      className="text-xs fill-white font-bold"
+                    >
+                      A
+                    </text>
+                    <text
+                      x="130"
+                      y="105"
+                      className="text-xs fill-white font-bold"
+                    >
+                      B
+                    </text>
+                  </svg>
+                  <div className="flex-1 space-y-4">
+                    <div className="bg-cyan-50 rounded-xl p-4 border-2 border-cyan-200">
+                      <p className="font-bold">
+                        {getText("solidA")}: 6 × 4 × 11 = 264 cm³
+                      </p>
+                      <p className="font-bold">
+                        {getText("solidB")}: 10 × 4 × 6 = 240 cm³
+                      </p>
+                      <p className="font-bold text-cyan-600 mt-2">
+                        {getText("totalVolume")} = 264 + 240 = 504 cm³
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {method === "subtract" && (
+                <div className="flex flex-col md:flex-row gap-8 items-center">
+                  <svg viewBox="0 0 200 150" className="w-64 h-48">
+                    <rect
+                      x="20"
+                      y="20"
+                      width="160"
+                      height="110"
+                      fill="#06b6d4"
+                      stroke="#0891b2"
+                      strokeWidth="2"
+                    />
+                    <rect
+                      x="80"
+                      y="20"
+                      width="100"
+                      height="50"
+                      fill="#f0fdfa"
+                      stroke="#0891b2"
+                      strokeWidth="2"
+                      strokeDasharray="4,4"
+                    />
+                    <text
+                      x="100"
+                      y="130"
+                      className="text-xs fill-white font-bold"
+                    >
+                      {getText("svgDiff")}
+                    </text>
+                  </svg>
+                  <div className="flex-1 space-y-4">
+                    <div className="bg-cyan-50 rounded-xl p-4 border-2 border-cyan-200">
+                      <p className="font-bold">
+                        {getText("bigCuboid")}: 16 × 4 × 11 = 704 cm³
+                      </p>
+                      <p className="font-bold">
+                        {getText("missingPart")}: 10 × 4 × 5 = 200 cm³
+                      </p>
+                      <p className="font-bold text-cyan-600 mt-2">
+                        {getText("totalVolume")} = 704 − 200 = 504 cm³
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="mt-6 bg-emerald-100 rounded-2xl p-6 text-center border-4 border-emerald-300">
+                <div className="text-emerald-600 font-bold">
+                  {getText("volume")}
+                </div>
+                <div className="text-5xl font-black text-emerald-800">
+                  504 cm³
+                </div>
+              </div>
+
+              <div className="mt-6 bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
+                <p className="font-bold">💡 {getText("tip")}</p>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

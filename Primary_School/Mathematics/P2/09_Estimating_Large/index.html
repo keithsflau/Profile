@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小二數學：估算數量 | Estimating Quantities</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fff7ed 0%, #c2410c 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "🧐 Estimating",
+          zh: "🧐 估算數量",
+          ja: "🧐 見積もり",
+          ko: "🧐 어림잡기",
+          es: "🧐 Estimación",
+          de: "🧐 Schätzung",
+          fi: "🧐 Arviointi",
+          fr: "🧐 Estimation",
+          ar: "🧐 التقدير",
+          it: "🧐 Stima",
+        },
+        howMany: {
+          en: "About how many?",
+          zh: "這裡大約有多少？",
+          ja: "およそいくつですか？",
+          ko: "대략 몇 개입니까?",
+          es: "¿Cuántos hay aproximadamente?",
+          de: "Wie viele ungefähr?",
+          fi: "Noin kuinka monta?",
+          fr: "Environ combien ?",
+          ar: "كم عددهم تقريباً؟",
+          it: "Circa quanti?",
+        },
+        About: {
+          en: "About",
+          zh: "大約",
+          ja: "約",
+          ko: "약",
+          es: "Aprox.",
+          de: "Etwa",
+          fi: "Noin",
+          fr: "Env.",
+          ar: "تقريبًا",
+          it: "Circa",
+        },
+        Actual: {
+          en: "Actual",
+          zh: "實際數量",
+          ja: "実際",
+          ko: "실제",
+          es: "Real",
+          de: "Tatsächlich",
+          fi: "Todellinen",
+          fr: "Réel",
+          ar: "فعلي",
+          it: "Reale",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [count, setCount] = useState(50);
+        const [feedback, setFeedback] = useState("");
+        const [opts, setOpts] = useState([]);
+
+        const next = () => {
+          // Range 40 - 100
+          const c = Math.floor(Math.random() * 61) + 40;
+          setCount(c);
+
+          // Options: e.g. 20, 50, 80
+          // We want strict nearest 10 or generic buckets?
+          // Let's do multiple choice estimates: e.g. "About 30", "About 50", "About 100"
+          const choices = [30, 50, 70, 100];
+          // Only keep choices that are distinct enough?
+          // Let's just generate strict options dynamically based on count
+          // Correct is round(c, -1) or close.
+          // Let's present: [c-20, c, c+20] roughly
+          let correctOpt = Math.round(c / 10) * 10;
+          let wrong1 = correctOpt - 20;
+          let wrong2 = correctOpt + 20;
+          if (wrong1 < 10) wrong1 = correctOpt + 30;
+
+          setOpts([correctOpt, wrong1, wrong2].sort(() => Math.random() - 0.5));
+          setFeedback("");
+        };
+        useEffect(next, []);
+
+        const check = (est) => {
+          // We accept the closest option
+          const diffs = opts.map((o) => Math.abs(o - count));
+          const minDiff = Math.min(...diffs);
+          const myDiff = Math.abs(est - count);
+
+          if (myDiff === minDiff) {
+            setFeedback("CORRECT");
+            setTimeout(next, 2000);
+          } else {
+            setFeedback("WRONG");
+          }
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center justify-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+
+            <h1 className="text-5xl font-black text-orange-900 mb-8 max-w-2xl text-center">
+              {t.title[lang] || t.title["en"]}
+            </h1>
+
+            <div className="bg-white/90 rounded-3xl p-8 shadow-2xl w-full max-w-2xl text-center border-4 border-orange-200">
+              <div className="relative w-80 h-80 mx-auto mb-12 bg-white rounded-full border-8 border-orange-300 flex items-center justify-center overflow-hidden">
+                <div className="relative z-10 flex flex-wrap justify-center content-center gap-1 p-8">
+                  {[...Array(count)].map((_, i) => (
+                    <div key={i} className="text-xl">
+                      🟤
+                    </div> // Coffee beans or marbles
+                  ))}
+                </div>
+              </div>
+
+              <h2 className="text-2xl font-bold text-slate-700 mb-8">
+                {t.howMany[lang] || t.howMany["en"]}
+              </h2>
+
+              <div className="flex justify-center gap-4">
+                {opts.map((o) => (
+                  <button
+                    key={o}
+                    onClick={() => check(o)}
+                    className="flex-1 py-4 bg-orange-100 border-4 border-orange-300 text-orange-800 rounded-2xl font-black text-2xl shadow-lg hover:bg-orange-200 hover:scale-105 transition-all outline-none"
+                  >
+                    {t.About[lang] || t.About["en"]} {o}
+                  </button>
+                ))}
+              </div>
+
+              <div className="mt-8 min-h-[100px]">
+                {feedback === "CORRECT" && (
+                  <div>
+                    <div className="text-4xl font-black text-green-500 animate-bounce">
+                      {get("correct", lang)}
+                    </div>
+                    <div className="text-xl font-bold text-slate-400 mt-2">
+                      {t.Actual[lang] || t.Actual["en"]}: {count}
+                    </div>
+                  </div>
+                )}
+                {feedback === "WRONG" && (
+                  <div className="text-4xl font-black text-red-500 animate-shake">
+                    {get("wrong", lang)}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bar Chart Builder | S1 Math</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-indigo-50 text-slate-800 min-h-screen">
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+
+      const App = () => {
+        const [data, setData] = useState([
+          { label: "Mon", value: 10, color: "bg-blue-500" },
+          { label: "Tue", value: 25, color: "bg-indigo-500" },
+          { label: "Wed", value: 15, color: "bg-purple-500" },
+          { label: "Thu", value: 30, color: "bg-pink-500" },
+          { label: "Fri", value: 20, color: "bg-rose-500" },
+        ]);
+        const maxVal = 40;
+
+        const updateVal = (index, newVal) => {
+          const newData = [...data];
+          newData[index].value = Math.min(maxVal, Math.max(0, newVal));
+          setData(newData);
+        };
+
+        return (
+          <div className="p-8 max-w-4xl mx-auto min-h-screen flex flex-col items-center">
+            <header className="mb-8 text-center">
+              <div className="text-indigo-600 font-bold uppercase text-xs tracking-widest mb-2">
+                Unit 3: Data
+              </div>
+              <h1 className="text-4xl font-extrabold text-slate-900">
+                Bar Chart Builder
+              </h1>
+              <p className="text-slate-500">
+                Construct bar charts to compare data.
+              </p>
+            </header>
+
+            <div className="bg-white p-8 rounded-3xl shadow-xl border border-indigo-100 w-full mb-8">
+              <h2 className="text-2xl font-bold mb-6 pl-12">
+                Weekly Attendance
+              </h2>
+
+              <div className="flex h-[300px] items-end relative pl-12 pb-8 border-b border-l border-slate-300">
+                {/* Y Axis Grid */}
+                <div className="absolute inset-x-0 inset-y-0 pointer-events-none pb-8 pl-12 flex flex-col justify-between">
+                  {[40, 30, 20, 10].map((v) => (
+                    <div key={v} className="w-full h-px bg-slate-100 relative">
+                      <span className="absolute -left-10 -top-2 text-xs text-slate-400 font-bold w-6 text-right">
+                        {v}
+                      </span>
+                    </div>
+                  ))}
+                  <div className="w-full h-px bg-transparent relative">
+                    <span className="absolute -left-10 -top-2 text-xs text-slate-400 font-bold w-6 text-right">
+                      0
+                    </span>
+                  </div>
+                </div>
+
+                {/* Bars */}
+                <div className="flex justify-around w-full h-full pt-4 items-end z-10">
+                  {data.map((item, i) => (
+                    <div
+                      key={i}
+                      className="flex flex-col items-center group w-16 h-full justify-end relative"
+                    >
+                      {/* Bar */}
+                      <div
+                        className={`${item.color} w-12 rounded-t-lg transition-all duration-300 relative group-hover:opacity-90 cursor-ns-resize shadow-lg`}
+                        style={{ height: `${(item.value / maxVal) * 100}%` }}
+                      >
+                        {/* Value Bubble */}
+                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition">
+                          {item.value}
+                        </div>
+                      </div>
+                      {/* Label */}
+                      <div className="absolute -bottom-8 font-bold text-slate-500 text-sm uppercase">
+                        {item.label}
+                      </div>
+
+                      {/* Click Controls (Invisible overlay for simple clicking or buttons below) */}
+                      {/* Let's construct explicit buttons to edit for accessibility/simplicity */}
+                      <div className="absolute -bottom-20 flex gap-1 opacity-100 transition items-center">
+                        <button
+                          onClick={() => updateVal(i, item.value - 1)}
+                          className="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-xs"
+                        >
+                          <i className="fa-solid fa-minus"></i>
+                        </button>
+                        <button
+                          onClick={() => updateVal(i, item.value + 1)}
+                          className="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-xs"
+                        >
+                          <i className="fa-solid fa-plus"></i>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <footer className="mt-8">
+              <a
+                href="../index.html"
+                className="text-indigo-600 hover:text-indigo-700 font-bold"
+              >
+                <i className="fa-solid fa-arrow-left mr-2"></i> Back to
+                Dashboard
+              </a>
+            </footer>
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

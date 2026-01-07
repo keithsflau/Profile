@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Modern China</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #fdf2f8;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Modern China Developments",
+          zh: "現代中國發展",
+          ja: "現代中国の発展",
+          ko: "현대 중국의 발전",
+          es: "Desarrollos de la China moderna",
+          de: "Entwicklungen im modernen China",
+          fi: "Modernin Kiinan kehitys",
+          fr: "Développements de la Chine moderne",
+          ar: "تطورات الصين الحديثة",
+          it: "Sviluppi della Cina Moderna",
+        },
+        instruction: {
+          en: "Match the achievement to its description.",
+          zh: "將成就與其描述配對。",
+          ja: "成果と説明を合わせてください。",
+          ko: "성과와 설명을 연결하세요.",
+          es: "Empareja el logro con su descripción.",
+          de: "Ordne die Leistung ihrer Beschreibung zu.",
+          fi: "Yhdistä saavutus sen kuvaukseen.",
+          fr: "Associez la réalisation à sa description.",
+          ar: "طابق الإنجاز بوصفه.",
+          it: "Abbina il risultato alla sua descrizione.",
+        },
+        hsr: {
+          en: "High-Speed Rail",
+          zh: "高速鐵路",
+          ja: "高速鉄道",
+          ko: "고속철도",
+        },
+        bridge: {
+          en: "HZMB Bridge",
+          zh: "港珠澳大橋",
+          ja: "港珠澳大橋",
+          ko: "강주아오 대교",
+        },
+        space: {
+          en: "Tiangong Space Station",
+          zh: "天宮空間站",
+          ja: "天宮宇宙ステーション",
+          ko: "톈궁 우주정거장",
+        },
+        beidou: {
+          en: "BeiDou GPS",
+          zh: "北斗衛星導航",
+          ja: "北斗衛星測位システム",
+          ko: "베이더우 위성 항법",
+        },
+
+        correct: { en: "Correct!", zh: "正確！", ja: "正解！", ko: "정답!" },
+      };
+
+      const items = [
+        { id: "hsr", icon: "🚄", color: "text-blue-600" },
+        { id: "bridge", icon: "🌉", color: "text-cyan-600" },
+        { id: "space", icon: "🛰️", color: "text-purple-600" },
+        { id: "beidou", icon: "📡", color: "text-green-600" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [idx, setIdx] = useState(0);
+        const [feedback, setFeedback] = useState(null);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+        const current = items[idx];
+
+        const check = (id) => {
+          if (feedback) return;
+          if (id === current.id) {
+            setFeedback("correct");
+            setTimeout(() => {
+              setFeedback(null);
+              setIdx((idx + 1) % items.length);
+            }, 1000);
+          }
+        };
+
+        const options = [...items].sort(() => Math.random() - 0.5);
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-rose-700">
+              {getText("title")}
+            </h1>
+            <p className="mb-8 font-bold text-slate-500">
+              {getText("instruction")}
+            </p>
+
+            <motion.div
+              key={current.id}
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="w-64 h-64 bg-white rounded-3xl shadow-xl flex items-center justify-center text-9xl mb-8 border-4 border-rose-200"
+            >
+              {current.icon}
+            </motion.div>
+
+            <div className="grid grid-cols-2 gap-4 w-full max-w-lg">
+              {options.map((opt) => (
+                <button
+                  key={opt.id}
+                  onClick={() => check(opt.id)}
+                  className="p-4 bg-white hover:bg-rose-50 border-2 border-rose-100 rounded-xl font-bold text-lg shadow-sm text-slate-700"
+                >
+                  {getText(opt.id)}
+                </button>
+              ))}
+            </div>
+
+            {feedback && (
+              <div className="mt-8 text-3xl font-black text-green-600 animate-bounce">
+                {getText("correct")}
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

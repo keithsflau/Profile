@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小五數學：小數乘法 (×10/100) | Decimals ×10/100</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fef9c3 0%, #eab308 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Decimals × 10/100/1000",
+          zh: "小數乘 10/100/1000",
+          ja: "小数 × 10/100/1000",
+          ko: "소수 × 10/100/1000",
+          es: "Decimales × 10/100/1000",
+          de: "Dezimalzahlen × 10/100/1000",
+          fi: "Desimaalit × 10/100/1000",
+          fr: "Décimales × 10/100/1000",
+          ar: "الكسور العشرية × 10/100/1000",
+          it: "Decimali × 10/100/1000",
+        },
+        moveRight: {
+          en: "Decimal point moves {n} place(s) right",
+          zh: "小數點向右移 {n} 位",
+          ja: "小数点を右に {n} 桁移動",
+          ko: "소수점을 오른쪽으로 {n} 칸 이동",
+          es: "El punto decimal se mueve {n} lugar(es) a la derecha",
+          de: "Dezimalpunkt verschiebt sich um {n} Stelle(n) nach rechts",
+          fi: "Desimaalipilkku siirtyy {n} paikkaa oikealle",
+          fr: "La virgule décimale se déplace de {n} rang(s) vers la droite",
+          ar: "تتحرك العلامة العشرية {n} خانة/خانات لليمين",
+          it: "Il punto decimale si sposta di {n} posto/i a destra",
+        },
+        answer: {
+          en: "Answer",
+          zh: "答案",
+          ja: "答え",
+          ko: "정답",
+          es: "Respuesta",
+          de: "Antwort",
+          fi: "Vastaus",
+          fr: "Réponse",
+          ar: "إجابة",
+          it: "Risposta",
+        },
+        patternTitle: {
+          en: "Pattern:",
+          zh: "規律:",
+          ja: "パターン:",
+          ko: "패턴:",
+          es: "Patrón:",
+          de: "Muster:",
+          fi: "Kaava:",
+          fr: "Modèle :",
+          ar: "نمط:",
+          it: "Modello:",
+        },
+        pattern10: {
+          en: "× 10: Decimal point moves 1 place right",
+          zh: "× 10: 小數點向右移 1 位",
+          ja: "× 10: 小数点を右に 1 桁移動",
+          ko: "× 10: 소수점을 오른쪽으로 1 칸 이동",
+          es: "× 10: El punto decimal se mueve 1 lugar a la derecha",
+          de: "× 10: Dezimalpunkt verschiebt sich um 1 Stelle nach rechts",
+          fi: "× 10: Desimaalipilkku siirtyy 1 paikan oikealle",
+          fr: "× 10 : La virgule décimale se déplace de 1 rang vers la droite",
+          ar: "× 10: تتحرك العلامة العشرية خانة واحدة لليمين",
+          it: "× 10: Il punto decimale si sposta di 1 posto a destra",
+        },
+        pattern100: {
+          en: "× 100: Decimal point moves 2 places right",
+          zh: "× 100: 小數點向右移 2 位",
+          ja: "× 100: 小数点を右に 2 桁移動",
+          ko: "× 100: 소수점을 오른쪽으로 2 칸 이동",
+          es: "× 100: El punto decimal se mueve 2 lugares a la derecha",
+          de: "× 100: Dezimalpunkt verschiebt sich um 2 Stellen nach rechts",
+          fi: "× 100: Desimaalipilkku siirtyy 2 paikkaa oikealle",
+          fr: "× 100 : La virgule décimale se déplace de 2 rangs vers la droite",
+          ar: "× 100: تتحرك العلامة العشرية خانتين لليمين",
+          it: "× 100: Il punto decimale si sposta di 2 posti a destra",
+        },
+        pattern1000: {
+          en: "× 1000: Decimal point moves 3 places right",
+          zh: "× 1000: 小數點向右移 3 位",
+          ja: "× 1000: 小数点を右に 3 桁移動",
+          ko: "× 1000: 소수점을 오른쪽으로 3 칸 이동",
+          es: "× 1000: El punto decimal se mueve 3 lugares a la derecha",
+          de: "× 1000: Dezimalpunkt verschiebt sich um 3 Stellen nach rechts",
+          fi: "× 1000: Desimaalipilkku siirtyy 3 paikkaa oikealle",
+          fr: "× 1000 : La virgule décimale se déplace de 3 rangs vers la droite",
+          ar: "× 1000: تتحرك العلامة العشرية 3 خانات لليمين",
+          it: "× 1000: Il punto decimale si sposta di 3 posti a destra",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const [num, setNum] = useState(3.456);
+        const [multiplier, setMultiplier] = useState(10);
+
+        const result = num * multiplier;
+        const decimalPlaces = num.toString().split(".")[1]?.length || 0;
+        const shift = multiplier === 10 ? 1 : multiplier === 100 ? 2 : 3;
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-5xl font-black text-yellow-900 mb-2 mt-8">
+              ✖️ {getText("title")}
+            </h1>
+
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-2xl w-full mt-8">
+              <div className="flex items-center justify-center gap-4 mb-8 flex-wrap">
+                <input
+                  type="number"
+                  step="0.001"
+                  value={num}
+                  onChange={(e) => setNum(parseFloat(e.target.value) || 0)}
+                  className="w-32 text-3xl font-mono font-black text-center border-4 border-yellow-300 rounded-xl p-2"
+                />
+                <span className="text-3xl font-black text-yellow-400">×</span>
+                <select
+                  value={multiplier}
+                  onChange={(e) => setMultiplier(parseInt(e.target.value))}
+                  className="text-2xl font-bold p-3 border-4 border-yellow-300 rounded-xl"
+                >
+                  <option value="10">10</option>
+                  <option value="100">100</option>
+                  <option value="1000">1000</option>
+                </select>
+              </div>
+
+              <div className="bg-slate-50 rounded-2xl p-6 text-center mb-6">
+                <p className="text-lg text-slate-600 mb-2">
+                  {getText("moveRight").replace("{n}", shift)}
+                </p>
+                <div className="mt-4 text-4xl font-mono font-black text-yellow-600">
+                  {num} → {result}
+                </div>
+              </div>
+
+              <div className="bg-emerald-100 rounded-2xl p-6 text-center border-4 border-emerald-300">
+                <div className="text-emerald-600 font-bold">
+                  {getText("answer")}
+                </div>
+                <div className="text-5xl font-black text-emerald-800">
+                  {result}
+                </div>
+              </div>
+
+              <div className="mt-6 bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
+                <p className="font-bold">💡 {getText("patternTitle")}</p>
+                <ul className="list-disc list-inside text-sm space-y-1">
+                  <li>{getText("pattern10")}</li>
+                  <li>{getText("pattern100")}</li>
+                  <li>{getText("pattern1000")}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

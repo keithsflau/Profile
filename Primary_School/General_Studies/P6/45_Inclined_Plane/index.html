@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Inclined Plane</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #f8fafc;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "The Ramp Challenge",
+          zh: "斜面挑戰",
+          ja: "スロープチャレンジ",
+          ko: "경사로 챌린지",
+          es: "El desafío de la rampa",
+          de: "Die Rampen-Herausforderung",
+          fi: "Ramppikilpailu",
+          fr: "Le défi de la rampe",
+          ar: "تحدي المنحدر",
+          it: "La Sfida della Rampa",
+        },
+        instruction: {
+          en: "Compare lifting vs using a ramp.",
+          zh: "比較直接提起與使用斜面。",
+          ja: "持ち上げるとスロープを使うのを比較してください。",
+          ko: "들어 올리는 것과 경사로를 사용하는 것을 비교하세요.",
+          es: "Compara levantar vs usar una rampa.",
+          de: "Vergleiche Heben vs. Rampe benutzen.",
+          fi: "Vertaa nostamista rampin käyttöön.",
+          fr: "Comparez le levage à l'utilisation d'une rampe.",
+          ar: "قارن بين الرفع واستخدام المنحدر.",
+          it: "Confronta il sollevamento con l'uso di una rampa.",
+        },
+        ramp: {
+          en: "Use Ramp (Easy)",
+          zh: "使用斜面 (省力)",
+          ja: "スロープを使う (簡単)",
+          ko: "경사로 사용 (쉬움)",
+        },
+        lift: {
+          en: "Lift Straight Up (Hard)",
+          zh: "直接提起 (費力)",
+          ja: "真っ直ぐ持ち上げる (難しい)",
+          ko: "똑바로 들어 올리기 (어려움)",
+        },
+
+        move: { en: "MOVE", zh: "移動", ja: "移動", ko: "이동" },
+        reset: { en: "Reset", zh: "重置", ja: "リセット", ko: "재설정" },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [mode, setMode] = useState("ramp"); // ramp, lift
+        const [progress, setProgress] = useState(0);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const move = () => {
+          setProgress(100);
+        };
+
+        const reset = () => {
+          setProgress(0);
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-slate-800">
+              {getText("title")}
+            </h1>
+            <p className="mb-8 font-bold text-slate-500">
+              {getText("instruction")}
+            </p>
+
+            <div className="flex gap-4 mb-4">
+              <button
+                onClick={() => setMode("ramp")}
+                className={`px-4 py-2 rounded-lg font-bold ${
+                  mode === "ramp"
+                    ? "bg-blue-600 text-white"
+                    : "bg-white text-blue-600 border border-blue-300"
+                }`}
+              >
+                {getText("ramp")}
+              </button>
+              <button
+                onClick={() => setMode("lift")}
+                className={`px-4 py-2 rounded-lg font-bold ${
+                  mode === "lift"
+                    ? "bg-blue-600 text-white"
+                    : "bg-white text-blue-600 border border-blue-300"
+                }`}
+              >
+                {getText("lift")}
+              </button>
+            </div>
+
+            <div className="relative w-full max-w-3xl h-[400px] border-b-8 border-slate-700 bg-sky-50 rounded-t-xl overflow-hidden mb-8">
+              {/* Truck Bed */}
+              <div className="absolute top-[100px] right-0 w-[200px] h-[300px] bg-slate-300 border-l-4 border-slate-400">
+                <div className="absolute top bg-red-500 text-white px-2 font-bold right-2 top-2">
+                  TRUCK
+                </div>
+              </div>
+
+              {/* Ramp */}
+              {mode === "ramp" && (
+                <div
+                  className="absolute bottom-0 right-[200px] w-[400px] h-[300px] bg-amber-200 origin-bottom-right"
+                  style={{ clipPath: "polygon(0 100%, 100% 0, 100% 100%)" }}
+                ></div>
+              )}
+
+              {/* Barrel */}
+              <motion.div
+                className="absolute text-6xl w-16 h-16"
+                initial={{ bottom: 10, left: 50 }}
+                animate={
+                  mode === "ramp"
+                    ? { bottom: progress ? 310 : 10, left: progress ? 450 : 50 }
+                    : { bottom: progress ? 310 : 10, left: 450 }
+                }
+                transition={{ duration: 2, ease: "easeInOut" }}
+              >
+                🛢️
+              </motion.div>
+
+              {mode === "lift" && !progress && (
+                <div className="absolute bottom-10 left-[450px] text-xs text-red-500 font-bold">
+                  Needs more force!
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-4">
+              <button
+                onClick={move}
+                className="px-12 py-4 bg-green-500 text-white font-black text-2xl rounded-full shadow-lg hover:scale-105 active:scale-95 transition-transform"
+              >
+                {getText("move")}
+              </button>
+              <button
+                onClick={reset}
+                className="px-6 py-4 bg-gray-400 text-white font-bold rounded-lg"
+              >
+                {getText("reset")}
+              </button>
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

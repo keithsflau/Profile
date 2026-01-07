@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小六數學：時區換算 | Time Zones</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #e0e7ff 0%, #4f46e5 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      function App() {
+        const [hkTime, setHkTime] = useState(12); // Hour 0-23
+
+        const cities = [
+          { name: "香港 Hong Kong", offset: 8, icon: "🇭🇰" },
+          { name: "倫敦 London (GMT)", offset: 0, icon: "🇬🇧" },
+          { name: "紐約 New York (EST)", offset: -5, icon: "🇺🇸" },
+          { name: "東京 Tokyo", offset: 9, icon: "🇯🇵" },
+          { name: "雪梨 Sydney", offset: 11, icon: "🇦🇺" },
+        ];
+
+        const getTimeInCity = (offset) => {
+          // Base is UTC. HK is UTC+8.
+          // UTC time = HK Time - 8
+          // City Time = UTC + City Offset = (HK - 8) + City Offset
+          let h = hkTime - 8 + offset;
+
+          // Handle wrap around
+          while (h < 0) h += 24;
+          while (h >= 24) h -= 24;
+
+          return h;
+        };
+
+        const formatTime = (h) => {
+          const ampm = h >= 12 ? "PM" : "AM";
+          const h12 = h % 12 || 12;
+          return `${h12}:00 ${ampm}`;
+        };
+
+        const getBgColor = (h) => {
+          // Day: 6-18, Night: else
+          if (h >= 6 && h < 18) return "bg-sky-100 border-sky-300 text-sky-900";
+          return "bg-slate-800 border-slate-600 text-white";
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-5xl font-black text-indigo-100 mb-2">
+              🌍 時區換算
+            </h1>
+            <p className="text-xl text-indigo-200 font-bold mb-8">Time Zones</p>
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-2xl w-full">
+              <div className="bg-white p-6 rounded-2xl border-4 border-indigo-200 mb-8 shadow-lg">
+                <label className="block text-center font-bold text-indigo-800 mb-4 text-xl">
+                  設定香港時間 Set Hong Kong Time
+                </label>
+                <div className="flex items-center justify-center gap-4">
+                  <input
+                    type="range"
+                    min="0"
+                    max="23"
+                    value={hkTime}
+                    onChange={(e) => setHkTime(parseInt(e.target.value))}
+                    className="w-full max-w-md accent-indigo-600 h-4 bg-indigo-100 rounded-lg appearance-none cursor-pointer"
+                  />
+                </div>
+                <div className="text-center mt-4 text-4xl font-black text-indigo-900 font-mono">
+                  {formatTime(hkTime)}
+                </div>
+              </div>
+
+              <div className="grid gap-4">
+                {cities.map((city, i) => {
+                  if (city.name.includes("Hong Kong")) return null; // Skip HK in list as it is control
+                  const t = getTimeInCity(city.offset);
+                  const isNextDay = hkTime - 8 + city.offset >= 24;
+                  const isPrevDay = hkTime - 8 + city.offset < 0;
+
+                  return (
+                    <div
+                      key={i}
+                      className={`flex items-center justify-between p-4 rounded-xl border-l-8 shadow-sm transition-colors ${getBgColor(
+                        t
+                      )}`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-3xl">{city.icon}</span>
+                        <div className="font-bold text-lg">{city.name}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-2xl font-black font-mono">
+                          {formatTime(t)}
+                        </div>
+                        <div className="text-xs opacity-75 font-bold">
+                          {isNextDay
+                            ? "+1 Day"
+                            : isPrevDay
+                            ? "-1 Day"
+                            : "Same Day"}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

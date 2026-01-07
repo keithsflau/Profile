@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小四數學：閱讀棒形圖</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #e0e7ff 0%, #6366f1 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      function App() {
+        // Data: Books read by students
+        const data = [
+          { name: "小明", val: 12 },
+          { name: "小美", val: 18 },
+          { name: "大文", val: 8 },
+          { name: "心怡", val: 24 },
+        ];
+
+        const [qIdx, setQIdx] = useState(0);
+        const [feedback, setFeedback] = useState(null);
+
+        const questions = [
+          {
+            q: "誰閱讀的書本最多？",
+            options: ["小明", "小美", "大文", "心怡"],
+            ans: "心怡",
+          },
+          {
+            q: "小明和小美共讀了多少本？",
+            options: ["20", "30", "40", "25"],
+            ans: "30",
+          },
+          {
+            q: "心怡比大文多讀了多少本？",
+            options: ["12", "16", "14", "18"],
+            ans: "16",
+          },
+        ];
+
+        const check = (opt) => {
+          if (opt === questions[qIdx].ans) {
+            setFeedback("correct");
+            setTimeout(() => {
+              setFeedback(null);
+              setQIdx((qIdx + 1) % questions.length);
+            }, 1500);
+          } else {
+            setFeedback("incorrect");
+          }
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-5xl font-black text-indigo-900 mb-8">
+              📊 閱讀數據大師
+            </h1>
+
+            <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-5xl w-full flex flex-col md:flex-row gap-8">
+              <div className="flex-1 bg-slate-50 border-2 border-slate-200 rounded-2xl p-6 relative h-[400px] flex items-end justify-around">
+                {/* Grid Lines */}
+                <div className="absolute inset-0 flex flex-col justify-between p-6 pointer-events-none">
+                  {[...Array(6)].map((_, i) => (
+                    <div key={i} className="w-full h-px bg-slate-300 relative">
+                      <span className="absolute -left-8 -top-3 text-sm font-bold text-slate-500">
+                        {(5 - i) * 5}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {data.map((d, i) => (
+                  <div
+                    key={i}
+                    className="relative w-16 bg-indigo-500 rounded-t-lg z-10 group hover:opacity-90 transition-all cursor-pointer"
+                    style={{ height: `${(d.val / 25) * 100}%` }}
+                  >
+                    <div className="absolute bottom-[-30px] w-full text-center font-bold text-slate-700">
+                      {d.name}
+                    </div>
+                    <div className="absolute -top-8 w-full text-center font-bold text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity bg-white shadow rounded p-1">
+                      {d.val}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="w-full md:w-80 flex flex-col justify-center">
+                <div className="bg-indigo-50 p-6 rounded-2xl border-2 border-indigo-200 mb-4">
+                  <div className="text-xs font-bold text-indigo-400 mb-2">
+                    問題 {qIdx + 1}/{questions.length}
+                  </div>
+                  <h3 className="text-xl font-bold text-indigo-900 mb-6">
+                    {questions[qIdx].q}
+                  </h3>
+
+                  <div className="space-y-3">
+                    {questions[qIdx].options.map((opt) => (
+                      <button
+                        key={opt}
+                        onClick={() => check(opt)}
+                        className="w-full py-3 bg-white border-2 border-indigo-100 rounded-xl font-bold text-indigo-700 hover:bg-indigo-500 hover:text-white transition-all"
+                      >
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {feedback === "correct" && (
+                  <div className="bg-green-500 text-white p-4 rounded-xl text-center font-black text-xl animate-bounce">
+                    ✓ 答對了！
+                  </div>
+                )}
+                {feedback === "incorrect" && (
+                  <div className="bg-red-500 text-white p-4 rounded-xl text-center font-black text-xl animate-shake">
+                    ✗ 再看清楚一點！
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

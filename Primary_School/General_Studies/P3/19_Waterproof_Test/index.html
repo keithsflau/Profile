@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小三常識：防水測試 | Waterproof Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #a5f3fc 0%, #22d3ee 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Waterproof Test",
+          zh: "防水測試",
+          ja: "防水テスト",
+          ko: "방수 테스트",
+          es: "Prueba de Impermeabilidad",
+          de: "Wasserdichtigkeitstest",
+          fi: "Vedenpitävyystesti",
+          fr: "Test d'étanchéité",
+          ar: "اختبار مقاومة الماء",
+          it: "Test di Impermeabilità",
+        },
+        instruction: {
+          en: "Spray water to test!",
+          zh: "噴水進行測試！",
+          ja: "水をスプレーしてテスト！",
+          ko: "물을 뿌려 테스트하세요!",
+          es: "¡Rocía agua para probar!",
+          de: "Sprühe Wasser zum Testen!",
+          fi: "Suihkuta vettä testataksesi!",
+          fr: "Vaporisez de l'eau pour tester !",
+          ar: "رش الماء للاختبار!",
+          it: "Spruzza acqua per testare!",
+        },
+
+        spray: {
+          en: "Spray Water",
+          zh: "噴水",
+          ja: "水をスプレー",
+          ko: "물 뿌리기",
+          es: "Rociar Agua",
+          de: "Wasser sprühen",
+          fi: "Suihkuta vettä",
+          fr: "Vaporiser de l'eau",
+          ar: "رش الماء",
+          it: "Spruzza Acqua",
+        },
+        next: {
+          en: "Next Material",
+          zh: "下一個物料",
+          ja: "次の素材",
+          ko: "다음 재료",
+          es: "Siguiente Material",
+          de: "Nächstes Material",
+          fi: "Seuraava materiaali",
+          fr: "Matériau suivant",
+          ar: "المادة التالية",
+          it: "Materiale Successivo",
+        },
+
+        result_dry: {
+          en: "It stays dry! (Waterproof)",
+          zh: "保持乾爽！ (防水)",
+          ja: "乾いたままです！ (防水)",
+          ko: "마른 상태 유지! (방수)",
+          es: "¡Se mantiene seco! (Impermeable)",
+          de: "Es bleibt trocken! (Wasserdicht)",
+          fi: "Se pysyy kuivana! (Vedenpitävä)",
+          fr: "Il reste sec ! (Imperméable)",
+          ar: "يبقى جافاً! (مقاوم للماء)",
+          it: "Resta asciutto! (Impermeabile)",
+        },
+        result_wet: {
+          en: "It gets wet! (Absorbent)",
+          zh: "變濕了！ (吸水)",
+          ja: "濡れました！ (吸水性)",
+          ko: "젖었습니다! (흡수성)",
+          es: "¡Se moja! (Absorbente)",
+          de: "Es wird nass! (Saugfähig)",
+          fi: "Se kastuu! (Imukykyinen)",
+          fr: "Il devient mouillé ! (Absorbant)",
+          ar: "يصبح مبللاً! (ماص)",
+          it: "Si bagna! (Assorbente)",
+        },
+
+        paper: {
+          en: "Paper",
+          zh: "白紙",
+          ja: "紙",
+          ko: "종이",
+          es: "Papel",
+          de: "Papier",
+          fi: "Paperi",
+          fr: "Papier",
+          ar: "ورقة",
+          it: "Carta",
+        },
+        plastic: {
+          en: "Plastic Sheet",
+          zh: "膠片",
+          ja: "プラスチックシート",
+          ko: "플라스틱 시트",
+          es: "Lámina de plástico",
+          de: "Plastikfolie",
+          fi: "Muovikalvo",
+          fr: "Feuille de plastique",
+          ar: "ح?يفة بلاستيكية",
+          it: "Foglio di plastica",
+        },
+        cloth: {
+          en: "Cotton Cloth",
+          zh: "棉布",
+          ja: "綿布",
+          ko: "면포",
+          es: "Tela de algodón",
+          de: "Baumwolltuch",
+          fi: "Puuvillakangas",
+          fr: "Tissu en coton",
+          ar: "قماش قطني",
+          it: "Panno di cotone",
+        },
+        foil: {
+          en: "Aluminium Foil",
+          zh: "鋁箔紙",
+          ja: "アルミホイル",
+          ko: "알루미늄 호일",
+          es: "Papel de aluminio",
+          de: "Alufolie",
+          fi: "Alumiinifolio",
+          fr: "Papier aluminium",
+          ar: "رقائق الألومنيوم",
+          it: "Foglio di alluminio",
+        },
+        sponge: {
+          en: "Sponge",
+          zh: "海綿",
+          ja: "スポンジ",
+          ko: "스펀지",
+          es: "Esponja",
+          de: "Schwamm",
+          fi: "Sieni",
+          fr: "Éponge",
+          ar: "إسفنجة",
+          it: "Spugna",
+        },
+        raincoat: {
+          en: "Raincoat",
+          zh: "雨衣",
+          ja: "レインコート",
+          ko: "우비",
+          es: "Impermeable",
+          de: "Regenmantel",
+          fi: "Sadetakki",
+          fr: "Imperméable",
+          ar: "معطف واق من المطر",
+          it: "Impermeabile",
+        },
+
+        correct: {
+          en: "Test Complete!",
+          zh: "測試完成！",
+          ja: "テスト完了！",
+          ko: "테스트 완료!",
+          es: "¡Prueba Completa!",
+          de: "Test abgeschlossen!",
+          fi: "Testi valmis!",
+          fr: "Test terminé !",
+          ar: "اكتمل الاختبار!",
+          it: "Test Completato!",
+        },
+        reset: {
+          en: "Test Again",
+          zh: "重新測試",
+          ja: "再テスト",
+          ko: "다시 테스트",
+          es: "Probar de Nuevo",
+          de: "Nochmal testen",
+          fi: "Testaa uudelleen",
+          fr: "Tester à nouveau",
+          ar: "اختبر مرة أخرى",
+          it: "Testa di Nuvo",
+        },
+      };
+
+      const items = [
+        { id: "paper", waterproof: false, icon: "📄", color: "bg-white" },
+        {
+          id: "plastic",
+          waterproof: true,
+          icon: "💳",
+          color: "bg-blue-100 opacity-80",
+        }, // Simulating transparency
+        { id: "cloth", waterproof: false, icon: "👕", color: "bg-red-100" },
+        { id: "foil", waterproof: true, icon: "🥈", color: "bg-gray-300" },
+        {
+          id: "raincoat",
+          waterproof: true,
+          icon: "🧥",
+          color: "bg-yellow-300",
+        },
+        { id: "sponge", waterproof: false, icon: "🧽", color: "bg-yellow-100" }, // Absorbent
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [currentItem, setCurrentItem] = useState(null);
+        const [queue, setQueue] = useState([]);
+        const [wetness, setWetness] = useState(0); // 0 to 100
+        const [tested, setTested] = useState(false);
+        const [animating, setAnimating] = useState(false);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        useEffect(() => {
+          initGame();
+        }, []);
+
+        const initGame = () => {
+          const q = [...items].sort(() => Math.random() - 0.5);
+          setQueue(q);
+          setCurrentItem(q[0]);
+          setWetness(0);
+          setTested(false);
+        };
+
+        const handleSpray = () => {
+          if (tested || animating) return;
+
+          setAnimating(true);
+          setTimeout(() => {
+            setAnimating(false);
+            setTested(true);
+            if (!currentItem.waterproof) {
+              setWetness(100);
+            } else {
+              setWetness(0); // Drops bead up but item inner dry
+            }
+          }, 1500); // Animation duration
+        };
+
+        const next = () => {
+          const nextIdx = queue.indexOf(currentItem) + 1;
+          if (nextIdx < queue.length) {
+            setCurrentItem(queue[nextIdx]);
+            setWetness(0);
+            setTested(false);
+          } else {
+            initGame();
+          }
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center select-none font-sans overflow-hidden">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-cyan-900 mb-4 mt-8 drop-shadow-sm bg-white/50 px-6 py-2 rounded-full">
+              🚿 {getText("title")}
+            </h1>
+
+            {currentItem && (
+              <div className="w-full max-w-lg flex flex-col items-center flex-1 justify-center relative">
+                {/* Test Area */}
+                <div className="relative w-full aspect-square bg-slate-800 rounded-3xl shadow-2xl overflow-hidden border-8 border-slate-600 mb-8 flex items-center justify-center">
+                  {/* Item Holder */}
+                  <div
+                    className={`w-64 h-64 ${currentItem.color} rounded-xl shadow-lg flex items-center justify-center text-9xl relative transition-all duration-1000`}
+                    style={{
+                      filter:
+                        wetness > 0 ? "brightness(0.8) sepia(0.2)" : "none",
+                      transform:
+                        wetness > 0 && !currentItem.waterproof
+                          ? "scale(0.95)"
+                          : "none", // Soggy effect
+                    }}
+                  >
+                    {currentItem.icon}
+
+                    {/* Water Layer */}
+                    {(tested || animating) && (
+                      <div className="absolute inset-0 overflow-hidden rounded-xl">
+                        {/* Spray Animation */}
+                        {animating && (
+                          <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full w-20 h-full bg-blue-400/50 blur-xl animate-spray"></div>
+                        )}
+
+                        {/* Beads (If waterproof) */}
+                        {currentItem.waterproof && tested && (
+                          <div className="absolute inset-0">
+                            {[...Array(20)].map((_, i) => (
+                              <div
+                                key={i}
+                                className="absolute bg-blue-400/80 rounded-full shadow-inner border border-white/50"
+                                style={{
+                                  width: Math.random() * 20 + 10 + "px",
+                                  height: Math.random() * 20 + 10 + "px",
+                                  top: Math.random() * 80 + "%",
+                                  left: Math.random() * 80 + "%",
+                                }}
+                              ></div>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Soak (If not waterproof) */}
+                        {!currentItem.waterproof && tested && (
+                          <div className="absolute inset-0 bg-blue-900/30 mix-blend-multiply"></div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Nozzle Visual */}
+                  <div className="absolute top-4 left-1/2 -translate-x-1/2 w-16 h-24 bg-gray-700 rounded-b-xl border-4 border-gray-500 z-20 flex flex-col items-center">
+                    <div className="w-2 h-4 bg-black rounded-full mt-auto mb-2"></div>
+                    {animating && (
+                      <div className="absolute bottom-0 translate-y-full flex flex-col items-center">
+                        <div className="w-0 h-0 border-l-[20px] border-l-transparent border-r-[20px] border-r-transparent border-t-[50px] border-blue-400/50 blur-sm"></div>
+                      </div>
+                    )}
+                  </div>
+
+                  {tested && (
+                    <div
+                      className={`absolute bottom-8 px-6 py-2 rounded-xl font-black text-2xl shadow-xl z-30 ${
+                        currentItem.waterproof
+                          ? "bg-green-500 text-white"
+                          : "bg-blue-600 text-white"
+                      }`}
+                    >
+                      {currentItem.waterproof
+                        ? getText("result_dry")
+                        : getText("result_wet")}
+                    </div>
+                  )}
+                </div>
+
+                <div className="text-2xl font-black text-cyan-900 mb-6">
+                  {getText(currentItem.id)}
+                </div>
+
+                {!tested ? (
+                  <button
+                    onClick={handleSpray}
+                    disabled={animating}
+                    className={`bg-cyan-600 text-white px-12 py-6 rounded-full font-black text-3xl shadow-xl border-b-8 border-cyan-800 active:border-b-0 active:translate-y-2 transition-all ${
+                      animating ? "opacity-50" : "hover:bg-cyan-500"
+                    }`}
+                  >
+                    💧 {getText("spray")}
+                  </button>
+                ) : (
+                  <button
+                    onClick={next}
+                    className="bg-green-500 text-white px-12 py-4 rounded-full font-black text-2xl shadow-xl hover:bg-green-600 hover:scale-105 transition-all"
+                  >
+                    {getText("next")} ➡️
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

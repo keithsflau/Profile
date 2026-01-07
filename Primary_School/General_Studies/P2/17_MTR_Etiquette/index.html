@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小二常識：地鐵禮儀 | MTR Etiquette</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "MTR Etiquette",
+          zh: "地鐵禮儀",
+          ja: "電車のマナー",
+        },
+        instruction: {
+          en: "Who needs the Priority Seat?",
+          zh: "誰需要關愛座？",
+          ja: "優先席が必要なのは誰？",
+        },
+        correct: { en: "Very kind of you!", zh: "你真有愛心！" },
+        wrong: { en: "Try again!", zh: "再試一次！" },
+
+        pregnant: { en: "Pregnant Lady", zh: "孕婦" },
+        elder: { en: "Elderly", zh: "長者" },
+        injured: { en: "Injured Person", zh: "受傷的人" },
+        baby: { en: "Parent with Baby", zh: "抱著嬰兒的家長" },
+
+        student: { en: "Student", zh: "學生" },
+        man: { en: "Young Man", zh: "年輕男士" },
+        lady: { en: "Lady on Phone", zh: "講電話的女士" },
+        gamer: { en: "Gamer", zh: "打機的人" },
+
+        giveSeat: { en: "Give Seat", zh: "讓座" },
+        next: { en: "Next Stop", zh: "下一站" },
+        score: { en: "Kindness Score", zh: "愛心分數" },
+      };
+
+      const scenarios = [
+        {
+          id: 1,
+          passenger: { id: "pregnant", icon: "🤰", type: "need" },
+          others: [
+            { id: "student", icon: "🎒" },
+            { id: "man", icon: "👨‍💻" },
+          ],
+        },
+        {
+          id: 2,
+          passenger: { id: "elder", icon: "👴", type: "need" },
+          others: [
+            { id: "lady", icon: "👱‍♀️" },
+            { id: "gamer", icon: "🎮" },
+          ],
+        },
+        {
+          id: 3,
+          passenger: { id: "injured", icon: "🤕", type: "need" },
+          others: [
+            { id: "student", icon: "👦" },
+            { id: "man", icon: "🧔" },
+          ],
+        },
+        {
+          id: 4,
+          passenger: { id: "baby", icon: "👩‍🍼", type: "need" },
+          others: [
+            { id: "lady", icon: "💄" },
+            { id: "gamer", icon: "🎧" },
+          ],
+        },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [idx, setIdx] = useState(0);
+        const [score, setScore] = useState(0);
+        const [feedback, setFeedback] = useState(null);
+        const [isSeated, setIsSeated] = useState(true); // You are seated initially
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const currentScene = scenarios[idx];
+        const displayPassengers = [
+          currentScene.passenger,
+          ...currentScene.others,
+        ].sort(() => Math.random() - 0.5);
+
+        const handleGiveSeat = (passenger) => {
+          if (passenger.type === "need") {
+            setFeedback("correct");
+            setScore((s) => s + 10);
+            setIsSeated(false);
+          } else {
+            setFeedback("wrong");
+            // small penalty?
+          }
+        };
+
+        const next = () => {
+          setFeedback(null);
+          setIsSeated(true);
+          if (idx < scenarios.length - 1) setIdx(idx + 1);
+          else setIdx(0); // Loop
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-red-700 mb-4 mt-8 drop-shadow-sm bg-white/50 px-6 py-2 rounded-full">
+              🚆 {getText("title")}
+            </h1>
+            <div className="font-bold text-red-600 bg-white px-4 py-1 rounded-full mb-4 shadow">
+              {getText("score")}: {score}
+            </div>
+
+            {/* MTR Carriage Scene */}
+            <div className="w-full max-w-3xl bg-slate-200 rounded-3xl p-8 shadow-2xl relative overflow-hidden border-8 border-slate-300">
+              {/* Windows */}
+              <div className="absolute top-4 left-0 w-full flex justify-between px-4">
+                <div className="w-24 h-20 bg-black/80 rounded-lg animate-pulse"></div>
+                <div className="w-24 h-20 bg-black/80 rounded-lg animate-pulse delay-75"></div>
+                <div className="w-24 h-20 bg-black/80 rounded-lg animate-pulse delay-150"></div>
+              </div>
+
+              {/* Seats */}
+              <div className="mt-24 flex justify-between items-end gap-2 px-2">
+                <div className="w-full h-32 bg-slate-300 rounded-t-xl flex items-end justify-center pb-2 relative border-t-4 border-red-500">
+                  {" "}
+                  {/* Priority Seat */}
+                  <div className="absolute top-2 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white font-bold text-xs">
+                    ➕
+                  </div>
+                  {isSeated ? (
+                    <div className="text-6xl">🧒</div> // You
+                  ) : (
+                    <div className="text-6xl animate-bounce">
+                      {displayPassengers.find((p) => p.type === "need").icon}
+                    </div>
+                  )}
+                </div>
+
+                {/* Other Seats */}
+                <div className="w-full h-32 bg-slate-300 rounded-t-xl flex items-end justify-center pb-2 border-t-4 border-slate-400">
+                  <div className="text-6xl">😴</div>
+                </div>
+                <div className="w-full h-32 bg-slate-300 rounded-t-xl flex items-end justify-center pb-2 border-t-4 border-slate-400">
+                  <div className="text-6xl">📱</div>
+                </div>
+              </div>
+
+              {/* Standing Passengers */}
+              <div className="mt-8">
+                <p className="text-center font-bold text-slate-500 mb-4 bg-white/50 rounded-lg py-2">
+                  {getText("instruction")}
+                </p>
+
+                {feedback === "correct" ? (
+                  <div className="text-center py-8">
+                    <div className="text-4xl text-green-600 font-black mb-4">
+                      {getText("correct")}
+                    </div>
+                    <div className="text-6xl mb-4">🥰</div>
+                    <button
+                      onClick={next}
+                      className="bg-red-500 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-red-600"
+                    >
+                      {getText("next")} ➡️
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex justify-center gap-4">
+                    {displayPassengers.map((p, i) => (
+                      <button
+                        key={i}
+                        onClick={() => handleGiveSeat(p)}
+                        className="bg-white p-4 rounded-xl shadow-lg border-b-4 border-slate-300 hover:-translate-y-1 transition-transform flex flex-col items-center w-28"
+                      >
+                        <div className="text-6xl mb-2">{p.icon}</div>
+                        <div className="text-xs font-bold text-slate-600 text-center leading-tight">
+                          {getText(p.id)}
+                        </div>
+                        <div className="mt-2 bg-red-100 text-red-600 px-2 py-1 rounded text-xs font-bold">
+                          {getText("giveSeat")}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-4 text-center text-slate-400 text-sm">
+              Next Station: Central
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

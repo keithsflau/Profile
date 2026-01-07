@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Electromagnet Maker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #334155;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Electromagnet Maker",
+          zh: "電磁鐵製作",
+          ja: "電磁石メーカー",
+          ko: "전자기석 만들기",
+          es: "Fabricante de electroimanes",
+          de: "Elektromagnet-Bauer",
+          fi: "Sähkömagneetin valmistaja",
+          fr: "Fabricant d'électroaimants",
+          ar: "صانع المغناطيس الكهربائي",
+          it: "Creatore di Elettromagneti",
+        },
+        instruction: {
+          en: "Coil the wire and connect power!",
+          zh: "纏繞電線並接通電源！",
+          ja: "ワイヤーを巻いて電源を接続してください！",
+          ko: "전선을 감고 전원을 연결하세요!",
+          es: "¡Enrolla el cable y conecta la energía!",
+          de: "Wickle den Draht und schließe den Strom an!",
+          fi: "Kierrä johto ja kytke virta!",
+          fr: "Enroulez le fil et connectez l'alimentation !",
+          ar: "لف السلك وقم بتوصيل الطاقة!",
+          it: "Avvolgi il filo e collega l'alimentazione!",
+        },
+        coil: {
+          en: "Coils",
+          zh: "線圈數",
+          ja: "コイル数",
+          ko: "코일 수",
+          es: "Bobinas",
+          de: "Spulen",
+          fi: "Kierrokset",
+          fr: "Bobines",
+          ar: "لفائف",
+          it: "Bobine",
+        },
+        power: {
+          en: "Power",
+          zh: "電源",
+          ja: "電源",
+          ko: "전원",
+          es: "Energía",
+          de: "Strom",
+          fi: "Virta",
+          fr: "Puissance",
+          ar: "طاقة",
+          it: "Potenza",
+        },
+        strength: {
+          en: "Strength",
+          zh: "磁力",
+          ja: "強さ",
+          ko: "강도",
+          es: "Fuerza",
+          de: "Stärke",
+          fi: "Voimakkuus",
+          fr: "Force",
+          ar: "قوة",
+          it: "Forza",
+        },
+        test: {
+          en: "Test Magnet",
+          zh: "測試磁力",
+          ja: "磁力テスト",
+          ko: "자석 테스트",
+          es: "Probar imán",
+          de: "Magnet testen",
+          fi: "Testaa magneettia",
+          fr: "Tester l'aimant",
+          ar: "اختبار المغناطيس",
+          it: "Testa Magnete",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [coils, setCoils] = useState(5); // 5 to 20
+        const [powerOn, setPowerOn] = useState(false);
+        const [clipsPicked, setClipsPicked] = useState(0);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const strength = powerOn ? Math.floor(coils * 0.8) : 0; // Simulated strength
+
+        const handleTest = () => {
+          if (!powerOn) {
+            setClipsPicked(0);
+            return;
+          }
+          // Animate picking up
+          setClipsPicked(strength);
+        };
+
+        const togglePower = () => {
+          setPowerOn(!powerOn);
+          if (powerOn) setClipsPicked(0); // Loose clips if power off
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-orange-400 drop-shadow-lg">
+              {getText("title")}
+            </h1>
+
+            <div className="flex flex-col md:flex-row gap-8 w-full max-w-5xl items-center justify-center">
+              {/* Controls */}
+              <div className="bg-slate-700 p-8 rounded-2xl shadow-xl flex flex-col gap-6 w-full md:w-80">
+                <div className="text-white">
+                  <div className="font-bold mb-2">
+                    {getText("coil")}: {coils}
+                  </div>
+                  <input
+                    type="range"
+                    min="5"
+                    max="25"
+                    value={coils}
+                    onChange={(e) => {
+                      setCoils(Number(e.target.value));
+                      setClipsPicked(0); // Reset on change
+                    }}
+                    className="w-full h-4 bg-slate-500 rounded-full appearance-none cursor-pointer"
+                  />
+                </div>
+
+                <button
+                  onClick={togglePower}
+                  className={`py-4 rounded-xl font-black text-2xl transition-all shadow-lg border-b-4 border-black/30 active:border-b-0 active:translate-y-1
+                        ${
+                          powerOn
+                            ? "bg-green-500 text-white"
+                            : "bg-red-500 text-white"
+                        }
+                     `}
+                >
+                  {powerOn ? "ON" : "OFF"}
+                </button>
+
+                <div className="bg-black/30 p-4 rounded-xl text-center">
+                  <div className="text-slate-400 text-sm">
+                    {getText("strength")}
+                  </div>
+                  <div className="text-3xl font-mono text-cyan-400">
+                    {strength}
+                  </div>
+                </div>
+              </div>
+
+              {/* Simulation View */}
+              <div className="relative w-[500px] h-[500px] bg-slate-200 rounded-full shadow-2xl flex items-center justify-center border-8 border-slate-400 overflow-hidden">
+                {/* Battery */}
+                <div className="absolute top-10 left-10 text-6xl">🔋</div>
+
+                {/* Wire Connections SVG */}
+                <svg className="absolute inset-0 z-0 pointer-events-none">
+                  {/* Wires from battery to nail */}
+                  <path
+                    d="M100,60 C200,60 200,200 250,200"
+                    stroke={powerOn ? "#f97316" : "#475569"}
+                    strokeWidth="6"
+                    fill="none"
+                  />
+                  <path
+                    d="M100,90 C150,90 150,300 250,300"
+                    stroke={powerOn ? "#f97316" : "#475569"}
+                    strokeWidth="6"
+                    fill="none"
+                  />
+                </svg>
+
+                {/* Nail */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-48 bg-gray-400/80 rounded z-10"></div>
+
+                {/* Coils Visualization */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-40 z-20 flex flex-col justify-center gap-[2px]">
+                  {[...Array(coils)].map((_, i) => (
+                    <div
+                      key={i}
+                      className={`w-full h-1 bg-orange-600 rounded-full ${
+                        powerOn ? "animate-pulse" : ""
+                      }`}
+                    ></div>
+                  ))}
+                </div>
+
+                {/* Paper Clips Pile at bottom */}
+                <div className="absolute bottom-10 w-full flex justify-center gap-1 flex-wrap px-20">
+                  {[...Array(20)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      animate={{
+                        y: i < clipsPicked ? -180 + i * 2 : 0,
+                        x: i < clipsPicked ? (Math.random() - 0.5) * 20 : 0,
+                      }}
+                      transition={{ type: "spring", bounce: 0.5 }}
+                      className="text-2xl text-slate-500 rotate-45"
+                    >
+                      📎
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              <button
+                onClick={handleTest}
+                className="absolute bottom-10 bg-blue-500 text-white px-8 py-3 rounded-full font-bold shadow-xl hover:bg-blue-600 z-30"
+              >
+                {getText("test")}
+              </button>
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

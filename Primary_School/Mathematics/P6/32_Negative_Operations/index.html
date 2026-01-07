@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小六數學：負數運算 | Operations with Negatives</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fce7f3 0%, #ec4899 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      function App() {
+        const [val1, setVal1] = useState(3);
+        const [val2, setVal2] = useState(-5);
+        const result = val1 + val2;
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-5xl font-black text-pink-900 mb-2">
+              ➕ 負數加法
+            </h1>
+            <p className="text-xl text-pink-700 font-bold mb-8">
+              Adding Integers (Number Line)
+            </p>
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-4xl w-full">
+              <div className="flex justify-center items-center gap-4 mb-8 text-4xl font-mono font-black text-slate-700">
+                <input
+                  type="number"
+                  value={val1}
+                  onChange={(e) => setVal1(parseInt(e.target.value) || 0)}
+                  className="w-24 text-center border-b-4 border-blue-400 bg-transparent"
+                />
+                <span>+</span>
+                <input
+                  type="number"
+                  value={val2}
+                  onChange={(e) => setVal2(parseInt(e.target.value) || 0)}
+                  className="w-24 text-center border-b-4 border-red-400 bg-transparent"
+                />
+                <span>=</span>
+                <span className={result < 0 ? "text-red-500" : "text-blue-500"}>
+                  {result}
+                </span>
+              </div>
+
+              <div className="relative h-24 bg-slate-100 rounded-xl border border-slate-300 flex items-center mb-4 overflow-hidden">
+                {/* Number Line */}
+                <div className="absolute w-full top-1/2 h-0.5 bg-slate-400"></div>
+                {Array.from({ length: 21 }, (_, i) => i - 10).map((i) => (
+                  <div
+                    key={i}
+                    className="absolute top-1/2 h-2 w-px bg-slate-400"
+                    style={{ left: `${((i + 10) / 20) * 100}%` }}
+                  >
+                    <span className="absolute -top-6 -left-2 text-xs font-bold text-slate-500">
+                      {i}
+                    </span>
+                  </div>
+                ))}
+                <div
+                  className="absolute top-1/2 h-4 w-px bg-slate-600"
+                  style={{ left: "50%" }}
+                >
+                  <span className="absolute -top-8 -left-2 text-base font-black text-slate-800">
+                    0
+                  </span>
+                </div>
+
+                {/* Arrow 1 */}
+                <div
+                  className="absolute top-1/2 h-1 bg-blue-500 transition-all duration-300"
+                  style={{
+                    left: val1 >= 0 ? "50%" : `${((val1 + 10) / 20) * 100}%`,
+                    width: `${(Math.abs(val1) / 20) * 100}%`,
+                    transform: "translateY(-10px)",
+                  }}
+                ></div>
+
+                {/* Arrow 2 */}
+                <div
+                  className="absolute top-1/2 h-1 bg-red-500 transition-all duration-300"
+                  style={{
+                    left:
+                      val2 >= 0
+                        ? `${((val1 + 10) / 20) * 100}%`
+                        : `${((val1 + val2 + 10) / 20) * 100}%`,
+                    width: `${(Math.abs(val2) / 20) * 100}%`,
+                    transform: "translateY(0px)",
+                  }}
+                ></div>
+
+                {/* Result Point */}
+                <div
+                  className="absolute top-1/2 w-4 h-4 bg-pink-600 rounded-full border-2 border-white shadow-lg transition-all duration-300 z-10"
+                  style={{
+                    left: `${((result + 10) / 20) * 100}%`,
+                    transform: "translate(-50%, -50%)",
+                  }}
+                ></div>
+              </div>
+
+              <div className="text-center text-slate-500 text-sm">
+                (顯示範圍 -10 到 10，超出範圍可能顯示不準確 Display range -10 to
+                10)
+              </div>
+
+              <div className="mt-8 grid grid-cols-2 gap-4">
+                <div className="bg-blue-50 p-4 rounded-xl border-l-4 border-blue-400">
+                  <p className="font-bold text-blue-800">
+                    藍色箭頭 (起始): {val1}
+                  </p>
+                </div>
+                <div className="bg-red-50 p-4 rounded-xl border-l-4 border-red-400">
+                  <p className="font-bold text-red-800">
+                    紅色箭頭 (加): {val2}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

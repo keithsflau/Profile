@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小五數學：多邊形面積</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #86efac 0%, #3b82f6 100%);
+      }
+      .shape-path {
+        transition: d 0.3s ease;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+
+      function App() {
+        const [shape, setShape] = useState("triangle"); // triangle, parallelogram, trapezium
+        const [base, setBase] = useState(10);
+        const [height, setHeight] = useState(8);
+        const [topBase, setTopBase] = useState(6); // for trapezium
+
+        const getArea = () => {
+          switch (shape) {
+            case "triangle":
+              return (base * height) / 2;
+            case "parallelogram":
+              return base * height;
+            case "trapezium":
+              return ((base + topBase) * height) / 2;
+            default:
+              return 0;
+          }
+        };
+
+        const getPath = () => {
+          // SVG Coordinate system: 0,0 to 400,300
+          // Center roughly at 200, 200.
+          // Scale factor: 1 unit = 20px? Or 15px.
+          const scale = 15;
+          const cx = 200;
+          const bottomY = 250;
+
+          // Base width in pixels
+          const bPx = base * scale;
+          const hPx = height * scale;
+          const tPx = topBase * scale;
+
+          switch (shape) {
+            case "triangle":
+              // Isosceles triangle for simplicity
+              // x1 = cx, y1 = bottomY - hPx
+              // x2 = cx - bPx/2, y2 = bottomY
+              // x3 = cx + bPx/2, y3 = bottomY
+              return `M${cx},${bottomY - hPx} L${cx + bPx / 2},${bottomY} L${
+                cx - bPx / 2
+              },${bottomY} Z`;
+            case "parallelogram":
+              // Slant it by fixed amount, e.g. 0.3 * hPx
+              const slant = hPx * 0.3;
+              // Bottom Left: cx - bPx/2 - slant/2 ?
+              // Let's center it carefully.
+              const startX = cx - bPx / 2 - slant / 2;
+              return `M${startX + slant},${bottomY - hPx} L${
+                startX + slant + bPx
+              },${bottomY - hPx} L${
+                startX + bPx
+              },${bottomY} L${startX},${bottomY} Z`;
+            case "trapezium":
+              // Centers aligned
+              return `M${cx - tPx / 2},${bottomY - hPx} L${cx + tPx / 2},${
+                bottomY - hPx
+              } L${cx + bPx / 2},${bottomY} L${cx - bPx / 2},${bottomY} Z`;
+            default:
+              return "";
+          }
+        };
+
+        const formulaText = () => {
+          switch (shape) {
+            case "triangle":
+              return "(底 × 高) ÷ 2";
+            case "parallelogram":
+              return "底 × 高";
+            case "trapezium":
+              return "(上底 + 下底) × 高 ÷ 2";
+          }
+        };
+
+        const calcStep = () => {
+          switch (shape) {
+            case "triangle":
+              return `${base} × ${height} ÷ 2`;
+            case "parallelogram":
+              return `${base} × ${height}`;
+            case "trapezium":
+              return `(${topBase} + ${base}) × ${height} ÷ 2`;
+          }
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-5xl font-black text-white mb-8 drop-shadow-md">
+              📐 多邊形面積計算
+            </h1>
+
+            <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-6xl w-full">
+              {/* Shape Selector */}
+              <div className="flex justify-center gap-4 mb-8">
+                {[
+                  { id: "triangle", name: "三角形", icon: "triangle" },
+                  { id: "parallelogram", name: "平行四邊形", icon: "square" }, // No rect icon in lucide that is slanted
+                  { id: "trapezium", name: "梯形", icon: "component" },
+                ].map((s) => (
+                  <button
+                    key={s.id}
+                    onClick={() => setShape(s.id)}
+                    className={`px-8 py-4 rounded-xl text-xl font-black transition-all ${
+                      shape === s.id
+                        ? "bg-green-500 text-white shadow-lg scale-105"
+                        : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                    }`}
+                  >
+                    {s.name}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex flex-col lg:flex-row gap-12">
+                {/* Visualization */}
+                <div className="flex-1 bg-slate-50 rounded-2xl border-4 border-slate-200 overflow-hidden relative flex items-center justify-center min-h-[400px]">
+                  <svg width="400" height="350" className="drop-shadow-xl">
+                    <path
+                      d={getPath()}
+                      fill="rgba(34, 197, 94, 0.2)"
+                      stroke="#16a34a"
+                      strokeWidth="4"
+                      className="shape-path"
+                    />
+
+                    {/* Height Line (Dotted) */}
+                    <line
+                      x1="200"
+                      y1="250"
+                      x2="200"
+                      y2={250 - height * 15}
+                      stroke="#ef4444"
+                      strokeWidth="2"
+                      strokeDasharray="5,5"
+                    />
+                    <text
+                      x="205"
+                      y={250 - (height * 15) / 2}
+                      fill="#ef4444"
+                      fontWeight="bold"
+                      fontSize="16"
+                    >
+                      h = {height}
+                    </text>
+
+                    {/* Base Label */}
+                    <text
+                      x="200"
+                      y="275"
+                      textAnchor="middle"
+                      fill="#16a34a"
+                      fontWeight="bold"
+                      fontSize="18"
+                    >
+                      {shape === "trapezium"
+                        ? `下底 = ${base}`
+                        : `底 = ${base}`}
+                    </text>
+
+                    {/* Top Base Label for Trapezium */}
+                    {shape === "trapezium" && (
+                      <text
+                        x="200"
+                        y={250 - height * 15 - 10}
+                        textAnchor="middle"
+                        fill="#16a34a"
+                        fontWeight="bold"
+                        fontSize="18"
+                      >
+                        上底 = {topBase}
+                      </text>
+                    )}
+                  </svg>
+                </div>
+
+                {/* Controls & Result */}
+                <div className="flex-1 flex flex-col justify-center">
+                  <div className="bg-green-50 p-6 rounded-2xl mb-8">
+                    <div className="flex flex-col gap-6">
+                      {/* Base Slider */}
+                      <div>
+                        <div className="flex justify-between font-bold text-green-800 mb-2">
+                          <span>
+                            {shape === "trapezium"
+                              ? "下底 (Bottom Base)"
+                              : "底 (Base)"}
+                          </span>
+                          <span className="text-2xl">{base}</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="4"
+                          max="20"
+                          value={base}
+                          onChange={(e) => setBase(parseInt(e.target.value))}
+                          className="w-full h-4 bg-green-200 rounded-lg appearance-none cursor-pointer accent-green-600"
+                        />
+                      </div>
+
+                      {/* Height Slider */}
+                      <div>
+                        <div className="flex justify-between font-bold text-red-800 mb-2">
+                          <span>高 (Height)</span>
+                          <span className="text-2xl">{height}</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="4"
+                          max="15"
+                          value={height}
+                          onChange={(e) => setHeight(parseInt(e.target.value))}
+                          className="w-full h-4 bg-red-200 rounded-lg appearance-none cursor-pointer accent-red-600"
+                        />
+                      </div>
+
+                      {/* Top Base Slider (Trapezium only) */}
+                      {shape === "trapezium" && (
+                        <div>
+                          <div className="flex justify-between font-bold text-green-800 mb-2">
+                            <span>上底 (Top Base)</span>
+                            <span className="text-2xl">{topBase}</span>
+                          </div>
+                          <input
+                            type="range"
+                            min="2"
+                            max="15"
+                            value={topBase}
+                            onChange={(e) =>
+                              setTopBase(parseInt(e.target.value))
+                            }
+                            className="w-full h-4 bg-green-200 rounded-lg appearance-none cursor-pointer accent-green-600"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-800 text-white p-8 rounded-2xl shadow-lg relative overflow-hidden">
+                    <div className="relative z-10">
+                      <div className="text-slate-400 font-bold mb-2">
+                        面積公式 (Area Formula)
+                      </div>
+                      <div className="text-2xl font-mono mb-6 text-green-400">
+                        {formulaText()}
+                      </div>
+
+                      <div className="text-slate-400 font-bold mb-2">
+                        計算步驟 (Calculation)
+                      </div>
+                      <div className="text-3xl font-mono mb-6 text-yellow-400">
+                        = {calcStep()}
+                      </div>
+
+                      <div className="w-full h-px bg-slate-600 mb-6"></div>
+
+                      <div className="flex justify-between items-end">
+                        <span className="text-xl font-bold">總面積 (Area)</span>
+                        <span className="text-6xl font-black text-white">
+                          {getArea()}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      lucide.createIcons();
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小四數學：周界公式</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #e0f2fe 0%, #0284c7 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { motion } = window.Motion;
+
+      function App() {
+        const [w, setW] = useState(5);
+        const [h, setH] = useState(3);
+
+        // Perimeter path logic (0,0) -> (w,0) -> (w,h) -> (0,h) -> (0,0)
+        const scale = 40;
+        const p = w * 2 + h * 2;
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-5xl font-black text-sky-900 mb-8">
+              📏 周界公式
+            </h1>
+
+            <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full flex flex-col md:flex-row gap-12 items-center">
+              <div className="flex flex-col gap-6 w-72">
+                <div className="flex items-center gap-4">
+                  <label className="font-bold text-sky-800 text-xl w-16">
+                    長
+                  </label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="8"
+                    value={w}
+                    onChange={(e) => setW(parseInt(e.target.value))}
+                    className="w-full accent-sky-600"
+                  />
+                  <span className="text-2xl font-black text-sky-700">{w}</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <label className="font-bold text-sky-800 text-xl w-16">
+                    闊
+                  </label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="8"
+                    value={h}
+                    onChange={(e) => setH(parseInt(e.target.value))}
+                    className="w-full accent-sky-600"
+                  />
+                  <span className="text-2xl font-black text-sky-700">{h}</span>
+                </div>
+
+                <div className="bg-sky-50 p-6 rounded-2xl border-2 border-sky-200">
+                  <h3 className="font-bold text-sky-800 mb-2">
+                    公式：(長 + 闊) × 2
+                  </h3>
+                  <div className="text-2xl font-bold text-sky-900 mb-2">
+                    ({w} + {h}) × 2
+                  </div>
+                  <div className="text-4xl font-black text-sky-600">= {p}</div>
+                </div>
+              </div>
+
+              {/* Visual Animation */}
+              <div className="relative bg-sky-50 p-12 rounded-2xl shadow-inner border border-sky-200 min-w-[400px] min-h-[400px] flex items-center justify-center">
+                <svg width="350" height="350" className="overflow-visible">
+                  <rect
+                    x="0"
+                    y="0"
+                    width={w * scale}
+                    height={h * scale}
+                    fill="#bae6fd"
+                    stroke="#0ea5e9"
+                    strokeWidth="2"
+                  />
+
+                  <motion.circle
+                    r="8"
+                    fill="#facc15"
+                    stroke="#ca8a04"
+                    strokeWidth="2"
+                    animate={{
+                      x: [0, w * scale, w * scale, 0, 0],
+                      y: [0, 0, h * scale, h * scale, 0],
+                    }}
+                    transition={{
+                      duration: 4,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                  />
+
+                  {/* Labels */}
+                  <text
+                    x={(w * scale) / 2}
+                    y="-10"
+                    textAnchor="middle"
+                    className="font-bold fill-sky-700"
+                  >
+                    長 ({w})
+                  </text>
+                  <text
+                    x={w * scale + 10}
+                    y={(h * scale) / 2}
+                    textAnchor="start"
+                    className="font-bold fill-sky-700"
+                  >
+                    闊 ({h})
+                  </text>
+                  <text
+                    x={(w * scale) / 2}
+                    y={h * scale + 20}
+                    textAnchor="middle"
+                    className="font-bold fill-sky-700"
+                  >
+                    長 ({w})
+                  </text>
+                  <text
+                    x="-10"
+                    y={(h * scale) / 2}
+                    textAnchor="end"
+                    className="font-bold fill-sky-700"
+                  >
+                    闊 ({h})
+                  </text>
+                </svg>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

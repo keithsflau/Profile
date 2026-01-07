@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Photosynthesis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #fdfce7;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Photosynthesis Factory",
+          zh: "光合作用工廠",
+          ja: "光合成工場",
+          ko: "광합성 공장",
+          es: "Fábrica de fotosíntesis",
+          de: "Photosynthese-Fabrik",
+          fi: "Fotosynteesitehdas",
+          fr: "Usine de photosynthèse",
+          ar: "مصنع التمثيل الضوئي",
+          it: "Fabbrica di Fotosintesi",
+        },
+        instruction: {
+          en: "Provide ingredients to make food!",
+          zh: "提供原料來製造食物 (養分)！",
+          ja: "材料を提供して食物を作りましょう！",
+          ko: "음식을 만들기 위해 재료를 공급하세요!",
+          es: "¡Proporcione ingredientes para hacer comida!",
+          de: "Stelle Zutaten bereit, um Nahrung herzustellen!",
+          fi: "Tarjoa ainekset ruoan tekemiseen!",
+          fr: "Fournissez des ingrédients pour faire de la nourriture !",
+          ar: "توفير المكونات لصنع الطعام!",
+          it: "Fornisci gli ingredienti per fare cibo!",
+        },
+        sunlight: {
+          en: "Sunlight",
+          zh: "陽光",
+          ja: "日光",
+          ko: "햇빛",
+          es: "Luz solar",
+          de: "Sonnenlicht",
+          fi: "Auringonvalo",
+          fr: "Lumière du soleil",
+          ar: "ضوء الشمس",
+          it: "Luce Solare",
+        },
+        water: {
+          en: "Water (Roots)",
+          zh: "水 (根部)",
+          ja: "水 (根)",
+          ko: "물 (뿌리)",
+          es: "Agua (Raíces)",
+          de: "Wasser (Wurzeln)",
+          fi: "Vesi (Juuret)",
+          fr: "Eau (Racines)",
+          ar: "ماء (جذور)",
+          it: "Acqua (Radici)",
+        },
+        co2: {
+          en: "Carbon Dioxide",
+          zh: "二氧化碳",
+          ja: "二酸化炭素",
+          ko: "이산화탄소",
+          es: "Dióxido de carbono",
+          de: "Kohlendioxid",
+          fi: "Hiilidioksidi",
+          fr: "Dioxyde de carbone",
+          ar: "ثاني أكسيد الكربون",
+          it: "Biossido di Carbonio",
+        },
+
+        oxygen: {
+          en: "Oxygen",
+          zh: "氧氣",
+          ja: "酸素",
+          ko: "산소",
+          es: "Oxígeno",
+          de: "Sauerstoff",
+          fi: "Happi",
+          fr: "Oxygène",
+          ar: "أكسجين",
+          it: "Ossigeno",
+        },
+        sugar: {
+          en: "Sugar (Food)",
+          zh: "糖 / 澱粉 (食物)",
+          ja: "糖分 (食物)",
+          ko: "설탕 (음식)",
+          es: "Azúcar (Comida)",
+          de: "Zucker (Nahrung)",
+          fi: "Sokeri (Ruoka)",
+          fr: "Sucre (Nourriture)",
+          ar: "سكر (طعام)",
+          it: "Zucchero (Cibo)",
+        },
+        producing: {
+          en: "Making Food...",
+          zh: "製造養分中...",
+          ja: "食物を作っています...",
+          ko: "음식 만드는 중...",
+          es: "Haciendo comida...",
+          de: "Nahrung herstellen...",
+          fi: "Tehdään ruokaa...",
+          fr: "Fabrication de nourriture...",
+          ar: "صنع الطعام...",
+          it: "Preparazione Cibo...",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [hasSun, setHasSun] = useState(false);
+        const [hasWater, setHasWater] = useState(false);
+        const [hasCO2, setHasCO2] = useState(false);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const isProducing = hasSun && hasWater && hasCO2;
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-green-700">
+              {getText("title")}
+            </h1>
+
+            <div className="relative w-full max-w-2xl h-[500px] bg-sky-200 rounded-3xl overflow-hidden shadow-2xl border-4 border-sky-300">
+              {/* Sun Toggle */}
+              <div
+                onClick={() => setHasSun(!hasSun)}
+                className={`absolute top-4 left-4 w-24 h-24 rounded-full transition-all cursor-pointer z-20 flex items-center justify-center font-bold text-yellow-900 border-4
+                      ${
+                        hasSun
+                          ? "bg-yellow-400 border-yellow-300 shadow-[0_0_50px_yellow] scale-110"
+                          : "bg-gray-300 border-gray-400 grayscale"
+                      }
+                   `}
+              >
+                {getText("sunlight")}
+              </div>
+
+              {/* Cloud CO2 Toggle */}
+              <div
+                onClick={() => setHasCO2(!hasCO2)}
+                className={`absolute top-10 right-10 cursor-pointer z-20 transition-all duration-500
+                      ${
+                        hasCO2
+                          ? "opacity-100 scale-110"
+                          : "opacity-40 grayscale"
+                      }
+                   `}
+              >
+                <div className="text-6xl text-white drop-shadow-lg">☁️</div>
+                <div className="text-center font-bold text-slate-600 bg-white/50 rounded px-2">
+                  {getText("co2")}
+                </div>
+
+                {/* CO2 Particles moving to leaf */}
+                {hasCO2 && (
+                  <div className="absolute top-10 left-0 w-full flex justify-center">
+                    <div className="animate-bounce mt-10 text-slate-500 text-2xl font-bold">
+                      ↓↓↓
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Plant / Leaf */}
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-48 h-64 flex flex-col items-center z-10">
+                {/* Stem */}
+                <div className="w-6 h-full bg-green-700"></div>
+                {/* Leaf Big */}
+                <div className="absolute top-10 w-40 h-40 bg-green-500 rounded-tr-[80px] rounded-bl-[80px] shadow-lg flex items-center justify-center">
+                  {isProducing ? (
+                    <div className="flex flex-col items-center animate-pulse">
+                      <span className="text-3xl">⚙️</span>
+                      <span className="text-white font-bold text-xs">
+                        {getText("producing")}
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-green-800 text-4xl">🍃</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Soil / Water */}
+              <div className="absolute bottom-0 w-full h-24 bg-amber-800 z-10 flex items-center justify-center gap-8 border-t-4 border-amber-900">
+                <button
+                  onClick={() => setHasWater(!hasWater)}
+                  className={`px-6 py-2 rounded-full font-bold text-white transition-all
+                         ${
+                           hasWater
+                             ? "bg-blue-500 shadow-[0_0_20px_blue]"
+                             : "bg-slate-500"
+                         }
+                      `}
+                >
+                  💧 {getText("water")}
+                </button>
+              </div>
+
+              {/* Outputs (Oxygen & Sugar) */}
+              {isProducing && (
+                <>
+                  <motion.div
+                    initial={{ opacity: 0, y: 300, x: 200 }}
+                    animate={{ opacity: 1, y: 200, x: 250 }}
+                    transition={{ repeat: Infinity, duration: 2 }}
+                    className="absolute bg-white px-4 py-2 rounded-full text-green-700 font-bold shadow-xl border-2 border-green-500 z-30"
+                  >
+                    🫧 {getText("oxygen")}
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 300, x: 200 }}
+                    animate={{ opacity: 1, y: 250, x: 150 }}
+                    transition={{ repeat: Infinity, duration: 2, delay: 1 }}
+                    className="absolute bg-white px-4 py-2 rounded-full text-pink-600 font-bold shadow-xl border-2 border-pink-500 z-30"
+                  >
+                    🍬 {getText("sugar")}
+                  </motion.div>
+                </>
+              )}
+            </div>
+
+            <div className="text-slate-500 mt-4 font-bold animate-pulse">
+              {getText("instruction")}
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小一常識：認識我的好同學 | Meeting Friends</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fdf4ff 0%, #fae8ff 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Meeting Friends",
+          zh: "認識我的好同學",
+          ja: "友達作り",
+        },
+        friendship: { en: "Friendship", zh: "友誼值" },
+        next: { en: "Next", zh: "繼續" },
+        restart: { en: "Play Again", zh: "再玩一次" },
+        s1_desc: {
+          en: "It's morning. You see a classmate.",
+          zh: "早上，你看見一位同學。",
+        },
+        s1_opt1: { en: "Say 'Good Morning!'", zh: "說「早晨！」" },
+        s1_opt2: { en: "Walk away", zh: "轉身走開" },
+        s1_opt3: { en: "Stick out your tongue", zh: "向他做鬼臉" },
+
+        s2_desc: {
+          en: "A classmate forgot their pencil.",
+          zh: "有同學忘記帶鉛筆。",
+        },
+        s2_opt1: { en: "Laugh at clearly", zh: "嘲笑他" },
+        s2_opt2: { en: "Lend him a pencil", zh: "借他一支鉛筆" },
+        s2_opt3: { en: "Ignore him", zh: "不理會" },
+
+        s3_desc: {
+          en: "You accidentally bumped into someone.",
+          zh: "你不小心撞到了同學。",
+        },
+        s3_opt1: { en: "Run away fast", zh: "立刻跑走" },
+        s3_opt2: { en: "Say 'Watch out!'", zh: "說「小心點！」" },
+        s3_opt3: { en: "Say 'Sorry!'", zh: "說「對不起！」" },
+
+        res_good: {
+          en: "They are happy! (+Friendship)",
+          zh: "他很開心！(+友誼值)",
+        },
+        res_bad: {
+          en: "They are sad... (-Friendship)",
+          zh: "他很傷心... (-友誼值)",
+        },
+        res_neutral: { en: "Nothing happened.", zh: "沒有特別的事情發生。" },
+
+        final_win: { en: "You made great friends!", zh: "你結識了好朋友！" },
+        final_lose: {
+          en: "Try to be nicer next time.",
+          zh: "下次嘗試對人好一點吧。",
+        },
+      };
+
+      const scenarios = [
+        {
+          id: "s1",
+          char: "👦",
+          bg: "bg-blue-100",
+          options: [
+            { id: "opt1", score: 20, fb: "res_good" },
+            { id: "opt2", score: 0, fb: "res_neutral" },
+            { id: "opt3", score: -10, fb: "res_bad" },
+          ],
+        },
+        {
+          id: "s2",
+          char: "👧",
+          bg: "bg-pink-100",
+          options: [
+            { id: "opt1", score: -20, fb: "res_bad" },
+            { id: "opt2", score: 20, fb: "res_good" },
+            { id: "opt3", score: 0, fb: "res_neutral" },
+          ],
+        },
+        {
+          id: "s3",
+          char: "🧒",
+          bg: "bg-green-100",
+          options: [
+            { id: "opt1", score: -10, fb: "res_bad" },
+            { id: "opt2", score: -10, fb: "res_bad" },
+            { id: "opt3", score: 20, fb: "res_good" },
+          ],
+        },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [index, setIndex] = useState(0);
+        const [friendship, setFriendship] = useState(50); // Start middle
+        const [showResult, setShowResult] = useState(null); // null or {score, fb}
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+        const scene = scenarios[index];
+
+        const handleChoice = (opt) => {
+          setFriendship((f) => Math.min(100, Math.max(0, f + opt.score)));
+          setShowResult({ score: opt.score, fb: opt.fb });
+        };
+
+        const nextScene = () => {
+          setShowResult(null);
+          if (index < scenarios.length - 1) {
+            setIndex(index + 1);
+          } else {
+            setIndex(-1); // End
+          }
+        };
+
+        const restart = () => {
+          setIndex(0);
+          setFriendship(50);
+          setShowResult(null);
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+
+            {/* Header Meter */}
+            <div className="w-full max-w-lg bg-white rounded-full h-8 border-2 border-slate-300 relative mt-16 shadow-md overflow-hidden">
+              <motion.div
+                className="h-full bg-gradient-to-r from-red-400 via-yellow-400 to-green-400"
+                animate={{ width: `${friendship}%` }}
+              />
+              <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-slate-700 shadow-white drop-shadow-md">
+                {getText("friendship")}
+              </div>
+            </div>
+
+            {index !== -1 ? (
+              <div className="w-full max-w-lg mt-8 flex-1 flex flex-col justify-end pb-8">
+                {/* Character Area */}
+                <div
+                  className={`flex-1 rounded-t-3xl border-x-4 border-t-4 border-slate-200 flex items-end justify-center pb-0 overflow-hidden relative ${scene.bg}`}
+                >
+                  <div className="absolute top-4 left-4 text-slate-400 text-6xl opacity-20">
+                    🏫
+                  </div>
+                  <motion.div
+                    key={index}
+                    initial={{ y: 50, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    className="text-[150px] leading-none filter drop-shadow-xl"
+                  >
+                    {scene.char}
+                  </motion.div>
+                </div>
+
+                {/* Dialog Box */}
+                <div className="bg-white rounded-b-3xl border-4 border-slate-200 p-6 shadow-xl z-10">
+                  <p className="text-xl font-bold text-slate-700 mb-6 min-h-[3rem]">
+                    {showResult
+                      ? getText(showResult.fb)
+                      : getText(`${scene.id}_desc`)}
+                  </p>
+
+                  {!showResult ? (
+                    <div className="space-y-3">
+                      {scene.options.map((opt) => (
+                        <button
+                          key={opt.id}
+                          onClick={() => handleChoice(opt)}
+                          className="w-full bg-sky-100 hover:bg-sky-200 text-sky-800 font-bold py-4 rounded-xl text-lg text-left px-6 border-2 border-sky-200 transition-colors"
+                        >
+                          {getText(`${scene.id}_${opt.id}`)}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <button
+                      onClick={nextScene}
+                      className="w-full bg-indigo-500 text-white font-black py-4 rounded-xl text-xl hover:bg-indigo-600 shadow-lg"
+                    >
+                      {getText("next")} ➡️
+                    </button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="mt-20 text-center">
+                <div className="text-9xl mb-6">
+                  {friendship >= 60 ? "🥰" : "😟"}
+                </div>
+                <h2 className="text-4xl font-black text-slate-800 mb-4">
+                  {friendship >= 60
+                    ? getText("final_win")
+                    : getText("final_lose")}
+                </h2>
+                <div className="text-2xl font-bold text-slate-500 mb-10">
+                  {getText("friendship")}: {friendship}/100
+                </div>
+                <button
+                  onClick={restart}
+                  className="bg-indigo-500 text-white px-10 py-4 rounded-full font-black text-2xl hover:bg-indigo-600 shadow-xl"
+                >
+                  {getText("restart")} 🔄
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

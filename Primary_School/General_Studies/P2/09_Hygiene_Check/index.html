@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小二常識：個人衛生檢查 | Hygiene Check</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Hygiene Check",
+          zh: "個人衛生檢查",
+          ja: "衛生チェック",
+        },
+        instruction: {
+          en: "Tap on the unhygienic spots to fix them!",
+          zh: "點擊不衛生的地方來修正！",
+          ja: "不衛生な場所をタップして直しましょう！",
+        },
+        clean: { en: "All Clean & Tidy!", zh: "整潔乾淨！" },
+        reset: { en: "Check Again", zh: "再檢查一次" },
+
+        hair: { en: "Messy Hair", zh: "頭髮凌亂" },
+        face: { en: "Dirty Face", zh: "臉骯髒" },
+        nails: { en: "Long Nails", zh: "指甲太長" },
+        clothes: { en: "Stained Clothes", zh: "衣服有污漬" },
+        shoes: { en: "Untied Laces", zh: "鞋帶未綁" },
+      };
+
+      const initialIssues = [
+        { id: "hair", x: 50, y: 15, scale: 1.5, text: "🌪️" },
+        { id: "face", x: 50, y: 25, scale: 1, text: "🍫" },
+        { id: "nails", x: 25, y: 50, scale: 1, text: "💅🚫" }, // Left hand
+        { id: "clothes", x: 50, y: 50, scale: 1.5, text: "🍝" },
+        { id: "shoes", x: 60, y: 90, scale: 1, text: "👟⚠️" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [activeIssues, setActiveIssues] = useState(initialIssues); // List of issue IDs present
+        const [fixedCount, setFixedCount] = useState(0);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const handleFix = (id) => {
+          setActiveIssues((prev) => prev.filter((i) => i.id !== id));
+          setFixedCount((c) => c + 1);
+        };
+
+        const reset = () => {
+          setActiveIssues(initialIssues);
+          setFixedCount(0);
+        };
+
+        const isComplete = activeIssues.length === 0;
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center select-none">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-teal-800 mb-4 mt-8 drop-shadow-md bg-white/50 px-6 py-2 rounded-full">
+              🚿 {getText("title")}
+            </h1>
+            <p className="font-bold text-teal-700 mb-6">
+              {getText("instruction")}
+            </p>
+
+            <div className="relative w-full max-w-md aspect-[3/4] bg-white rounded-3xl shadow-2xl border-8 border-teal-200 overflow-hidden">
+              {/* Character Base - Simple Shapes */}
+              <div className="absolute inset-0 flex flex-col items-center pt-20">
+                {/* Head */}
+                <div className="w-32 h-32 bg-orange-200 rounded-full border-4 border-orange-300 relative">
+                  {/* Eyes */}
+                  <div className="absolute top-12 left-6 w-4 h-4 bg-black rounded-full"></div>
+                  <div className="absolute top-12 right-6 w-4 h-4 bg-black rounded-full"></div>
+                  {/* Mouth */}
+                  <div
+                    className={`absolute bottom-6 left-1/2 -translate-x-1/2 w-10 h-4 border-b-4 border-red-400 rounded-full transition-all ${
+                      isComplete ? "h-8 bg-red-400" : ""
+                    }`}
+                  ></div>
+                </div>
+
+                {/* Body */}
+                <div className="w-40 h-48 bg-blue-400 rounded-3xl -mt-4 border-4 border-blue-500 relative z-0"></div>
+
+                {/* Arms */}
+                <div className="absolute top-48 left-16 w-12 h-32 bg-orange-200 rounded-full -rotate-45 -z-10 border-4 border-orange-300"></div>
+                <div className="absolute top-48 right-16 w-12 h-32 bg-orange-200 rounded-full rotate-45 -z-10 border-4 border-orange-300"></div>
+
+                {/* Legs */}
+                <div className="w-12 h-40 bg-slate-700 -mt-4 ml-[-40px] border-4 border-slate-800 inline-block"></div>
+                <div className="w-12 h-40 bg-slate-700 -mt-4 ml-4 border-4 border-slate-800 inline-block"></div>
+              </div>
+
+              {/* Issues Overlay */}
+              <AnimatePresence>
+                {activeIssues.map((issue) => (
+                  <motion.button
+                    key={issue.id}
+                    initial={{ scale: 0 }}
+                    animate={{ scale: issue.scale }}
+                    exit={{ scale: 2, opacity: 0, filter: "brightness(2)" }}
+                    style={{
+                      left: `${issue.x}%`,
+                      top: `${issue.y}%`,
+                      transform: "translate(-50%, -50%)",
+                    }}
+                    className="absolute z-20 text-5xl filter drop-shadow-lg hover:scale-[1.2] active:scale-95 transition-transform"
+                    onClick={() => handleFix(issue.id)}
+                  >
+                    {issue.text}
+                  </motion.button>
+                ))}
+              </AnimatePresence>
+
+              {/* Clean State Visuals (Appear when issue fixed) */}
+              {/* Hair - Neat */}
+              {!activeIssues.find((i) => i.id === "hair") && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="absolute top-16 left-1/2 -ml-16 w-32 h-12 bg-black rounded-t-full z-10"
+                />
+              )}
+              {/* Nails - Clean */}
+              {!activeIssues.find((i) => i.id === "nails") && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="absolute top-[55%] left-[20%] text-2xl"
+                >
+                  ✨
+                </motion.div>
+              )}
+              {/* Shoes - Tied */}
+              {!activeIssues.find((i) => i.id === "shoes") && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="absolute bottom-4 right-[25%] text-2xl"
+                >
+                  🎀
+                </motion.div>
+              )}
+
+              {/* Success Overlay */}
+              {isComplete && (
+                <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center z-30">
+                  <motion.div
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="text-center"
+                  >
+                    <div className="text-9xl mb-4">🌟</div>
+                    <h2 className="text-3xl font-black text-teal-600 mb-8">
+                      {getText("clean")}
+                    </h2>
+                    <button
+                      onClick={reset}
+                      className="bg-teal-500 text-white px-10 py-4 rounded-full font-black text-xl hover:bg-teal-600 shadow-xl"
+                    >
+                      {getText("reset")} 🔄
+                    </button>
+                  </motion.div>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-8 font-black text-teal-800 text-xl bg-white px-6 py-2 rounded-full shadow-lg">
+              🛠️ {fixedCount} / {initialIssues.length}
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

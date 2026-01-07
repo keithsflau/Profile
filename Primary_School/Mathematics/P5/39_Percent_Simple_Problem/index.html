@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小五數學：百分數應用 | Percentage Problems</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #f0fdf4 0%, #22c55e 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Percentage Word Problems",
+          zh: "百分數應用",
+          ja: "百分率の文章題",
+          ko: "백분율 문장제",
+          es: "Problemas de Porcentaje",
+          de: "Prozent Textaufgaben",
+          fi: "Prosenttiongelmat",
+          fr: "Problèmes de pourcentage",
+          ar: "المسائل اللفظية للنسبة المئوية",
+          it: "Problemi con le percentuali",
+        },
+        has: {
+          en: "Xiaoming has ",
+          zh: "小明有 ",
+          ja: "シャオミンは ",
+          ko: "샤오밍은 ",
+          es: "Xiaoming tiene ",
+          de: "Xiaoming hat ",
+          fi: "Xiaomingilla on ",
+          fr: "Xiaoming a ",
+          ar: "لدى شياو مينغ ",
+          it: "Xiaoming ha ",
+        },
+        dollars: {
+          en: " dollars.",
+          zh: " 元。",
+          ja: " ドル持っています。",
+          ko: " 원을 가지고 있습니다.",
+          es: " dólares.",
+          de: " Dollar.",
+          fi: " dollaria.",
+          fr: " dollars.",
+          ar: " دولار.",
+          it: " dollari.",
+        },
+        spent: {
+          en: "He spent ",
+          zh: "他用了 ",
+          ja: "彼は ",
+          ko: "그는 ",
+          es: "Él gastó ",
+          de: "Er gab ",
+          fi: "Hän käytti ",
+          fr: "Il a dépensé ",
+          ar: "أنفق ",
+          it: "Ha speso ",
+        },
+        buyingBooks: {
+          en: "% buying books.",
+          zh: "% 買書。",
+          ja: "% を本に使いました。",
+          ko: "%를 책을 사는 데 썼습니다.",
+          es: "% comprando libros.",
+          de: "% für Bücher aus.",
+          fi: "% kirjojen ostamiseen.",
+          fr: "% pour acheter des livres.",
+          ar: "% في شراء الكتب.",
+          it: "% per comprare libri.",
+        },
+        question: {
+          en: "Question: How much did he spend on books?",
+          zh: "問：他用了多少錢買書？",
+          ja: "質問：彼は本にいくら使いましたか？",
+          ko: "질문: 그는 책을 사는 데 얼마를 썼습니까?",
+          es: "Pregunta: ¿Cuánto gastó en libros?",
+          de: "Frage: Wie viel hat er für Bücher ausgegeben?",
+          fi: "Kysymys: Kuinka paljon hän käytti kirjoihin?",
+          fr: "Question : Combien a-t-il dépensé pour les livres ?",
+          ar: "سؤال: كم أنفق على الكتب؟",
+          it: "Domanda: Quanto ha speso per i libri?",
+        },
+        solution: {
+          en: "Solution:",
+          zh: "解題步驟:",
+          ja: "解決策:",
+          ko: "풀이:",
+          es: "Solución:",
+          de: "Lösung:",
+          fi: "Ratkaisu:",
+          fr: "Solution :",
+          ar: "الحل:",
+          it: "Soluzione:",
+        },
+        answer: {
+          en: "Answer",
+          zh: "答案",
+          ja: "答え",
+          ko: "정답",
+          es: "Respuesta",
+          de: "Antwort",
+          fi: "Vastaus",
+          fr: "Réponse",
+          ar: "إجابة",
+          it: "Risposta",
+        },
+        formulaTitle: {
+          en: "Formula: Total × Percentage = Part",
+          zh: "公式: 某數 × 百分數 = 部分",
+          ja: "公式: 合計 × 百分率 = 部分",
+          ko: "공식: 합계 × 백분율 = 부분",
+          es: "Fórmula: Total × Porcentaje = Parte",
+          de: "Formel: Gesamt × Prozentsatz = Teil",
+          fi: "Kaava: Yhteensä × Prosenttiosuus = Osa",
+          fr: "Formule : Total × Pourcentage = Partie",
+          ar: "الصيغة: المجموع × النسبة المئوية = الجزء",
+          it: "Formula: Totale × Percentuale = Parte",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const [total, setTotal] = useState(200);
+        const [percent, setPercent] = useState(25);
+
+        const part = (total * percent) / 100;
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-5xl font-black text-green-900 mb-2 mt-8">
+              💰 {getText("title")}
+            </h1>
+
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-2xl w-full mt-8">
+              <div className="bg-green-50 rounded-2xl p-6 mb-6 border-2 border-green-200">
+                <p className="text-lg text-slate-700">
+                  {getText("has")}
+                  <input
+                    type="number"
+                    value={total}
+                    onChange={(e) => setTotal(parseInt(e.target.value) || 0)}
+                    className="w-20 text-xl font-black text-center border-2 border-green-300 rounded mx-1 inline"
+                  />
+                  {getText("dollars")}
+                </p>
+                <p className="text-lg text-slate-700 mt-2">
+                  {getText("spent")}
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={percent}
+                    onChange={(e) => setPercent(parseInt(e.target.value) || 0)}
+                    className="w-16 text-xl font-black text-center border-2 border-green-300 rounded mx-1 inline"
+                  />
+                  {getText("buyingBooks")}
+                </p>
+                <p className="text-xl text-slate-800 mt-4 font-bold">
+                  {getText("question")}
+                </p>
+              </div>
+
+              <div className="bg-slate-50 rounded-2xl p-6 mb-6">
+                <p className="font-bold text-slate-700 mb-2">
+                  {getText("solution")}
+                </p>
+                <p className="font-mono text-lg">
+                  {total} × {percent}%
+                </p>
+                <p className="font-mono text-lg">
+                  = {total} × {percent}/100
+                </p>
+                <p className="font-mono text-lg">
+                  = {total} × {(percent / 100).toFixed(2)}
+                </p>
+                <p className="font-mono text-lg">= {part}</p>
+              </div>
+
+              <div className="bg-emerald-100 rounded-2xl p-6 text-center border-4 border-emerald-300">
+                <div className="text-emerald-600 font-bold">
+                  {getText("answer")}
+                </div>
+                <div className="text-5xl font-black text-emerald-800">
+                  ${part}
+                </div>
+              </div>
+
+              <div className="mt-6 bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
+                <p className="font-bold">💡 {getText("formulaTitle")}</p>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

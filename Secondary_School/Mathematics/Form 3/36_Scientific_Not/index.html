@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scientific Notation 科學記數法 | S3 Math</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-cyan-50 text-slate-800 min-h-screen">
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const App = () => {
+        const [lang, setLang] = useState("en");
+        const [mantissa, setMantissa] = useState(3.5);
+        const [exponent, setExponent] = useState(6);
+        const t = {
+          title: { en: "Scientific Notation", zh: "科學記數法" },
+          mantissa: { en: "Mantissa", zh: "尾數" },
+          exponent: { en: "Exponent", zh: "指數" },
+          standard: { en: "Standard Form", zh: "標準式" },
+          expanded: { en: "Expanded", zh: "展開式" },
+          back: { en: "Back to Dashboard", zh: "返回主頁" },
+        };
+
+        const value = mantissa * Math.pow(10, exponent);
+
+        return (
+          <div className="p-6 max-w-4xl mx-auto min-h-screen flex flex-col">
+            <header className="mb-6 flex justify-between items-center">
+              <div>
+                <div className="text-cyan-600 font-bold uppercase text-xs tracking-widest mb-1">
+                  S3 Math
+                </div>
+                <h1 className="text-3xl font-extrabold text-slate-900">
+                  {t.title[lang]}
+                </h1>
+              </div>
+              <button
+                onClick={() => setLang(lang === "en" ? "zh" : "en")}
+                className="px-3 py-1 bg-white border border-cyan-200 rounded-lg text-sm font-bold hover:bg-cyan-100"
+              >
+                {lang === "en" ? "中文" : "ENG"}
+              </button>
+            </header>
+
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="bg-white p-4 rounded-xl shadow-sm border border-cyan-100">
+                <label className="block text-xs font-bold text-slate-400 mb-1">
+                  {t.mantissa[lang]}: {mantissa}
+                </label>
+                <input
+                  type="range"
+                  min="1"
+                  max="9.9"
+                  step="0.1"
+                  value={mantissa}
+                  onChange={(e) => setMantissa(Number(e.target.value))}
+                  className="w-full accent-cyan-500"
+                />
+              </div>
+              <div className="bg-white p-4 rounded-xl shadow-sm border border-cyan-100">
+                <label className="block text-xs font-bold text-slate-400 mb-1">
+                  {t.exponent[lang]}: {exponent}
+                </label>
+                <input
+                  type="range"
+                  min="-6"
+                  max="12"
+                  value={exponent}
+                  onChange={(e) => setExponent(Number(e.target.value))}
+                  className="w-full accent-cyan-500"
+                />
+              </div>
+            </div>
+
+            <div className="bg-cyan-500 text-white p-8 rounded-2xl shadow-xl text-center mb-6">
+              <div className="text-xs uppercase opacity-80 mb-2">
+                {t.standard[lang]}
+              </div>
+              <div className="text-5xl font-bold font-mono">
+                {mantissa} × 10<sup>{exponent}</sup>
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-2xl border border-cyan-100 text-center">
+              <div className="text-xs font-bold text-slate-400 uppercase mb-2">
+                {t.expanded[lang]}
+              </div>
+              <div className="text-2xl font-mono font-bold text-cyan-600">
+                {exponent >= 0 && exponent <= 10
+                  ? value.toLocaleString()
+                  : value.toExponential()}
+              </div>
+            </div>
+
+            <div className="mt-4 bg-slate-100 p-4 rounded-xl">
+              <div className="text-sm text-center">
+                {lang === "en" ? "Examples: " : "例子："}
+                <span className="font-mono">3.0 × 10⁸</span> = Speed of light,
+                <span className="font-mono ml-2">6.02 × 10²³</span> = Avogadro's
+                number
+              </div>
+            </div>
+
+            <footer className="mt-auto pt-8">
+              <a
+                href="../index.html"
+                className="text-cyan-600 hover:text-cyan-700 font-bold"
+              >
+                <i className="fa-solid fa-arrow-left mr-2"></i>
+                {t.back[lang]}
+              </a>
+            </footer>
+          </div>
+        );
+      };
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Time Zone Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #f8fafc;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Global Time",
+          zh: "世界時間",
+          ja: "世界時計",
+          ko: "세계 시간",
+          es: "Hora global",
+          de: "Weltzeit",
+          fi: "Maailmanaika",
+          fr: "Temps mondial",
+          ar: "التوقيت العالمي",
+          it: "Ora Globale",
+        },
+        london: {
+          en: "London (GMT+0)",
+          zh: "倫敦 (GMT+0)",
+          ja: "ロンドン (GMT+0)",
+          ko: "런던 (GMT+0)",
+        },
+        hk: {
+          en: "Hong Kong (GMT+8)",
+          zh: "香港 (GMT+8)",
+          ja: "香港 (GMT+8)",
+          ko: "홍콩 (GMT+8)",
+        },
+        ny: {
+          en: "New York (GMT-5)",
+          zh: "紐約 (GMT-5)",
+          ja: "ニューヨーク (GMT-5)",
+          ko: "뉴욕 (GMT-5)",
+        },
+        tokyo: {
+          en: "Tokyo (GMT+9)",
+          zh: "東京 (GMT+9)",
+          ja: "東京 (GMT+9)",
+          ko: "도쿄 (GMT+9)",
+        },
+
+        diff: { en: "Difference:", zh: "時差：", ja: "時差：", ko: "시차:" },
+        hours: { en: "hours", zh: "小時", ja: "時間", ko: "시간" },
+      };
+
+      const cities = [
+        { id: "london", offset: 0, icon: "🇬🇧" },
+        { id: "hk", offset: 8, icon: "🇭🇰" },
+        { id: "tokyo", offset: 9, icon: "🇯🇵" },
+        { id: "ny", offset: -5, icon: "🇺🇸" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [baseHour, setBaseHour] = useState(12); // Base on GMT 12:00
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const formatTime = (hour24) => {
+          let h = hour24 % 24;
+          if (h < 0) h += 24;
+          const ampm = h >= 12 ? "PM" : "AM";
+          const showH = h % 12 || 12;
+          return `${showH}:00 ${ampm}`;
+        };
+
+        const getBgColor = (hour24) => {
+          let h = hour24 % 24;
+          if (h < 0) h += 24;
+          if (h >= 6 && h < 18) return "bg-sky-100 text-sky-900"; // Day
+          return "bg-slate-800 text-slate-100"; // Night
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-slate-700">
+              {getText("title")}
+            </h1>
+
+            <div className="w-full max-w-lg mb-8 bg-white p-6 rounded-2xl shadow-md flex flex-col items-center">
+              <div className="text-slate-400 font-bold mb-2">
+                GMT (Greenwich Mean Time)
+              </div>
+              <div className="text-4xl font-black text-slate-800 mb-4">
+                {formatTime(baseHour)}
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="23"
+                value={baseHour}
+                onChange={(e) => setBaseHour(Number(e.target.value))}
+                className="w-full h-4 bg-slate-200 rounded-lg appearance-none cursor-grab"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-4xl">
+              {cities.map((city) => {
+                const localHour = baseHour + city.offset;
+                return (
+                  <div
+                    key={city.id}
+                    className={`p-6 rounded-2xl shadow-lg flex items-center justify-between transition-colors duration-500 ${getBgColor(
+                      localHour
+                    )}`}
+                  >
+                    <div>
+                      <div className="text-4xl mb-2">{city.icon}</div>
+                      <div className="font-bold text-lg">
+                        {getText(city.id)}
+                      </div>
+                    </div>
+                    <div className="text-4xl font-black font-mono">
+                      {formatTime(localHour)}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小五數學：分數乘整數 | Fraction × Whole Number</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #f0fdf4 0%, #86efac 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Fraction × Whole Number",
+          zh: "分數乘整數",
+          ja: "分数 × 整数",
+          ko: "분수 × 정수",
+          es: "Fracción × Número Entero",
+          de: "Bruch × Ganze Zahl",
+          fi: "Murtoluku × Kokonaisluku",
+          fr: "Fraction × Nombre entier",
+          ar: "كسر × عدد صحيح",
+          it: "Frazione × Numero intero",
+        },
+        formulaTitle: {
+          en: "Formula:",
+          zh: "公式:",
+          ja: "公式:",
+          ko: "공식:",
+          es: "Fórmula:",
+          de: "Formel:",
+          fi: "Kaava:",
+          fr: "Formule :",
+          ar: "الصيغة:",
+          it: "Formula:",
+        },
+        formula: {
+          en: "Numerator × Whole ÷ Denominator",
+          zh: "分子 × 整數 ÷ 分母",
+          ja: "分子 × 整数 ÷ 分母",
+          ko: "분자 × 정수 ÷ 분모",
+          es: "Numerador × Entero ÷ Denominador",
+          de: "Zähler × Ganze Zahl ÷ Nenner",
+          fi: "Osoittaja × Kokonaisluku ÷ Nimittäjä",
+          fr: "Numérateur × Entier ÷ Dénominateur",
+          ar: "البسط × العدد الصحيح ÷ المقام",
+          it: "Numeratore × Intero ÷ Denominatore",
+        },
+        simplify: {
+          en: "Simplify:",
+          zh: "約簡:",
+          ja: "約分:",
+          ko: "약분:",
+          es: "Simplificar:",
+          de: "Vereinfachen:",
+          fi: "Supista:",
+          fr: "Simplifier :",
+          ar: "تبسيط:",
+          it: "Semplifica:",
+        },
+        answer: {
+          en: "Answer",
+          zh: "答案",
+          ja: "答え",
+          ko: "답",
+          es: "Respuesta",
+          de: "Antwort",
+          fi: "Vastaus",
+          fr: "Réponse",
+          ar: "إجابة",
+          it: "Risposta",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const [num, setNum] = useState(2);
+        const [denom, setDenom] = useState(5);
+        const [whole, setWhole] = useState(3);
+
+        const gcd = (a, b) => (b === 0 ? a : gcd(b, a % b));
+        const productNum = num * whole;
+        const g = gcd(productNum, denom);
+        const simNum = productNum / g;
+        const simDenom = denom / g;
+        const wholeResult = Math.floor(simNum / simDenom);
+        const fracResult = simNum % simDenom;
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-5xl font-black text-green-900 mb-2 mt-8">
+              ✖️ {getText("title")}
+            </h1>
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-3xl w-full mt-8">
+              <div className="flex items-center justify-center gap-6 mb-8 flex-wrap">
+                <div className="bg-green-50 p-4 rounded-xl border-2 border-green-200">
+                  <div className="flex flex-col items-center">
+                    <input
+                      type="number"
+                      min="1"
+                      value={num}
+                      onChange={(e) =>
+                        setNum(Math.max(1, parseInt(e.target.value) || 1))
+                      }
+                      className="w-16 text-3xl font-black text-center border-b-4 border-green-400 bg-transparent outline-none"
+                    />
+                    <div className="w-16 h-1 bg-green-800 my-1"></div>
+                    <input
+                      type="number"
+                      min="1"
+                      value={denom}
+                      onChange={(e) =>
+                        setDenom(Math.max(1, parseInt(e.target.value) || 1))
+                      }
+                      className="w-16 text-3xl font-black text-center bg-transparent outline-none"
+                    />
+                  </div>
+                </div>
+                <span className="text-4xl font-black text-green-400">×</span>
+                <input
+                  type="number"
+                  min="1"
+                  value={whole}
+                  onChange={(e) =>
+                    setWhole(Math.max(1, parseInt(e.target.value) || 1))
+                  }
+                  className="w-20 text-4xl font-black text-center bg-emerald-50 border-4 border-emerald-200 rounded-xl p-2 outline-none"
+                />
+              </div>
+
+              <div className="bg-slate-50 rounded-2xl p-6 text-center mb-6">
+                <p className="text-xl mb-2">
+                  <b>{getText("formulaTitle")}</b> {getText("formula")}
+                </p>
+                <p className="text-2xl font-mono">
+                  {num} × {whole} = {productNum}
+                </p>
+                <p className="text-2xl font-mono mt-2">
+                  = {productNum}/{denom}
+                </p>
+                {g > 1 && (
+                  <p className="text-lg text-slate-500 mt-2">
+                    {getText("simplify")} ÷ {g} = {simNum}/{simDenom}
+                  </p>
+                )}
+              </div>
+
+              <div className="bg-emerald-100 rounded-2xl p-6 text-center border-4 border-emerald-300">
+                <div className="text-emerald-600 font-bold mb-2">
+                  {getText("answer")}
+                </div>
+                <div className="text-5xl font-black text-emerald-800 flex items-center justify-center gap-2">
+                  {wholeResult > 0 && <span>{wholeResult}</span>}
+                  {fracResult > 0 && (
+                    <span className="text-3xl flex flex-col items-center">
+                      <span>{fracResult}</span>
+                      <span className="w-full h-1 bg-emerald-800 my-1"></span>
+                      <span>{simDenom}</span>
+                    </span>
+                  )}
+                  {wholeResult === 0 && fracResult === 0 && <span>0</span>}
+                </div>
+              </div>
+
+              <div className="mt-6 grid grid-cols-3 gap-2">
+                {[...Array(whole)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="bg-green-100 rounded-xl p-3 border-2 border-green-200"
+                  >
+                    <div className="h-8 bg-white rounded flex overflow-hidden">
+                      {[...Array(denom)].map((_, j) => (
+                        <div
+                          key={j}
+                          className={`flex-1 border-r border-green-200 ${
+                            j < num ? "bg-green-400" : ""
+                          }`}
+                        ></div>
+                      ))}
+                    </div>
+                    <div className="text-center text-sm mt-1 text-green-700">
+                      {num}/{denom}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

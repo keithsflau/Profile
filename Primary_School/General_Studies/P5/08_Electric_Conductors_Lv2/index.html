@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Electric Conductors Lv2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #0f172a;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Circuit Master",
+          zh: "電路大師",
+          ja: "回路マスター",
+          ko: "회로 마스터",
+          es: "Maestro de circuitos",
+          de: "Schaltkreis-Meister",
+          fi: "Virtapiirimestari",
+          fr: "Maître du circuit",
+          ar: "خبير الدوائر",
+          it: "Maestro dei Circuiti",
+        },
+        instruction: {
+          en: "Compare Series vs Parallel circuits.",
+          zh: "比較串聯與並聯電路。",
+          ja: "直列回路と並列回路を比較します。",
+          ko: "직렬 회로와 병렬 회로를 비교하세요.",
+          es: "Compara circuitos en serie y en paralelo.",
+          de: "Vergleiche Reihen- und Parallelschaltungen.",
+          fi: "Vertaa sarja- ja rinnakkaiskytkentöjä.",
+          fr: "Comparez les circuits en série et en parallèle.",
+          ar: "قارن بين الدوائر المتسلسلة والمتوازية.",
+          it: "Confronta circuiti in serie e parallelo.",
+        },
+        series: {
+          en: "Series Circuit",
+          zh: "串聯電路",
+          ja: "直列回路",
+          ko: "직렬 회로",
+          es: "Circuito en serie",
+          de: "Reihenschaltung",
+          fi: "Sarjakytkentä",
+          fr: "Circuit en série",
+          ar: "دائرة متسلسلة",
+          it: "Circuito in Serie",
+        },
+        parallel: {
+          en: "Parallel Circuit",
+          zh: "並聯電路",
+          ja: "並列回路",
+          ko: "병렬 회로",
+          es: "Circuito paralelo",
+          de: "Parallelschaltung",
+          fi: "Rinnakkaiskytkentä",
+          fr: "Circuit en parallèle",
+          ar: "دائرة متوازية",
+          it: "Circuito Parallelo",
+        },
+        removeOne: {
+          en: "Remove One Bulb",
+          zh: "移除一個燈泡",
+          ja: "電球を1つ取り外す",
+          ko: "전구 하나 제거",
+          es: "Quitar una bombilla",
+          de: "Eine Glühbirne entfernen",
+          fi: "Poista yksi lamppu",
+          fr: "Enlever une ampoule",
+          ar: "أزل مصباحًا واحدًا",
+          it: "Rimuovi una Lampadina",
+        },
+        reset: {
+          en: "Reset",
+          zh: "重置",
+          ja: "リセット",
+          ko: "초기화",
+          es: "Reiniciar",
+          de: "Zurücksetzen",
+          fi: "Nollaa",
+          fr: "Réinitialiser",
+          ar: "إعادة تعيين",
+          it: "Ripristina",
+        },
+        brightness: {
+          en: "Brightness:",
+          zh: "亮度：",
+          ja: "明るさ：",
+          ko: "밝기:",
+          es: "Brillo:",
+          de: "Helligkeit:",
+          fi: "Kirkkaus:",
+          fr: "Luminosité :",
+          ar: "السطوع:",
+          it: "Luminosità:",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [bulbRemoved, setBulbRemoved] = useState(false);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        // State: Series - if one removed, other off. Dimmer.
+        // State: Parallel - if one removed, other stays on. Brighter.
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-yellow-400">
+              ⚡ {getText("title")}
+            </h1>
+            <p className="mb-8 font-bold text-slate-400">
+              {getText("instruction")}
+            </p>
+
+            <div className="grid md:grid-cols-2 gap-8 w-full max-w-5xl">
+              {/* Parallel Circuit */}
+              <div className="bg-slate-800 p-8 rounded-3xl border border-slate-600 flex flex-col items-center">
+                <h2 className="text-2xl font-bold mb-6 text-blue-400">
+                  {getText("parallel")}
+                </h2>
+
+                <div className="relative w-64 h-64 border-4 border-yellow-600 rounded-lg flex items-center justify-center">
+                  {/* Battery */}
+                  <div className="absolute bottom-[-20px] left-1/2 -translate-x-1/2 bg-black px-2 text-3xl">
+                    🔋
+                  </div>
+
+                  {/* Wires internal */}
+                  <div className="absolute inset-x-0 top-1/3 border-t-4 border-yellow-600"></div>
+                  <div className="absolute inset-x-0 bottom-1/3 border-b-4 border-yellow-600"></div>
+
+                  {/* Bulb 1 */}
+                  <div className="absolute top-1/3 left-1/4 -translate-y-1/2 -translate-x-1/2">
+                    <div
+                      className={`text-6xl transition-all duration-300 ${
+                        !bulbRemoved
+                          ? "drop-shadow-[0_0_30px_yellow] text-yellow-300"
+                          : "opacity-20 text-gray-500"
+                      }`}
+                    >
+                      💡
+                    </div>
+                  </div>
+
+                  {/* Bulb 2 (Removable) */}
+                  <div
+                    className="absolute top-1/3 right-1/4 -translate-y-1/2 translate-x-1/2 cursor-pointer"
+                    onClick={() => setBulbRemoved(!bulbRemoved)}
+                  >
+                    <div
+                      className={`text-6xl transition-all duration-300 ${
+                        !bulbRemoved
+                          ? "drop-shadow-[0_0_30px_yellow] text-yellow-300"
+                          : "opacity-20 text-gray-500"
+                      }`}
+                    >
+                      💡
+                    </div>
+                    {bulbRemoved && (
+                      <div className="absolute inset-0 flex items-center justify-center text-red-500 text-4xl font-black">
+                        ✕
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="absolute top-0 right-2 text-xs text-slate-500">
+                    Normal Brightness
+                  </div>
+                </div>
+
+                <p className="mt-4 text-center text-slate-300 text-sm">
+                  {bulbRemoved ? "Other bulb stays ON!" : "Both bulbs bright."}
+                </p>
+              </div>
+
+              {/* Series Circuit */}
+              <div className="bg-slate-800 p-8 rounded-3xl border border-slate-600 flex flex-col items-center">
+                <h2 className="text-2xl font-bold mb-6 text-purple-400">
+                  {getText("series")}
+                </h2>
+
+                <div className="relative w-64 h-64 border-4 border-yellow-600 rounded-lg">
+                  {/* Battery */}
+                  <div className="absolute bottom-[-20px] left-1/2 -translate-x-1/2 bg-black px-2 text-3xl">
+                    🔋
+                  </div>
+
+                  {/* Bulb 1 */}
+                  <div className="absolute top-0 left-1/4 -translate-y-1/2 -translate-x-1/2 bg-black px-1">
+                    <div
+                      className={`text-6xl transition-all duration-300 ${
+                        !bulbRemoved
+                          ? "drop-shadow-[0_0_10px_orange] text-orange-300"
+                          : "opacity-20 text-gray-500"
+                      }`}
+                    >
+                      💡
+                    </div>
+                  </div>
+
+                  {/* Bulb 2 (Removable) */}
+                  <div
+                    className="absolute top-0 right-1/4 -translate-y-1/2 translate-x-1/2 bg-black px-1 cursor-pointer"
+                    onClick={() => setBulbRemoved(!bulbRemoved)}
+                  >
+                    <div
+                      className={`text-6xl transition-all duration-300 ${
+                        !bulbRemoved
+                          ? "drop-shadow-[0_0_10px_orange] text-orange-300"
+                          : "opacity-20 text-gray-500"
+                      }`}
+                    >
+                      💡
+                    </div>
+                    {bulbRemoved && (
+                      <div className="absolute inset-0 flex items-center justify-center text-red-500 text-4xl font-black">
+                        ✕
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="absolute bottom-2 right-2 text-xs text-slate-500">
+                    Dimmer Brightness
+                  </div>
+                </div>
+
+                <p className="mt-4 text-center text-slate-300 text-sm">
+                  {bulbRemoved
+                    ? "Circuit broken! All OFF."
+                    : "Bulbs share voltage (Dimmer)."}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-8">
+              <button
+                onClick={() => setBulbRemoved(!bulbRemoved)}
+                className="bg-slate-700 hover:bg-slate-600 px-8 py-3 rounded-full font-bold shadow-lg"
+              >
+                {bulbRemoved ? getText("reset") : getText("removeOne")}
+              </button>
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

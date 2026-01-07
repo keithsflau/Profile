@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小五數學：柱體與摺紙圖 | Prisms and Nets</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #f0fdf4 0%, #22c55e 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Prisms and Nets",
+          zh: "柱體與摺紙圖",
+          ja: "角柱と展開図",
+          ko: "각기둥과 전개도",
+          es: "Prismas y Redes",
+          de: "Prismen und Netze",
+          fi: "Särmiöt ja levityskuvat",
+          fr: "Prismes et patrons",
+          ar: "المنشورات والشبكات",
+          it: "Prismi e sviluppi",
+        },
+        cube: {
+          en: "Cube",
+          zh: "正方體",
+          ja: "立方体",
+          ko: "정육면체",
+          es: "Cubo",
+          de: "Würfel",
+          fi: "Kuutio",
+          fr: "Cube",
+          ar: "مكعب",
+          it: "Cubo",
+        },
+        triangular: {
+          en: "Triangular Prism",
+          zh: "三角柱體",
+          ja: "三角柱",
+          ko: "삼각기둥",
+          es: "Prisma Triangular",
+          de: "Dreiecksprisma",
+          fi: "Kolmioprisma",
+          fr: "Prisme triangulaire",
+          ar: "منشور ثلاثي",
+          it: "Prisma triangolare",
+        },
+        rectangular: {
+          en: "Cuboid",
+          zh: "長方體",
+          ja: "直方体",
+          ko: "직육면체",
+          es: "Cuboide",
+          de: "Quader",
+          fi: "Suorakulmainen särmiö",
+          fr: "Parallélépipède",
+          ar: "متوازي مستطيلات",
+          it: "Parallelepipedo",
+        },
+        faces: {
+          en: "Faces",
+          zh: "面",
+          ja: "面",
+          ko: "면",
+          es: "Caras",
+          de: "Flächen",
+          fi: "Tahkot",
+          fr: "Faces",
+          ar: "وجوه",
+          it: "Facce",
+        },
+        edges: {
+          en: "Edges",
+          zh: "邊",
+          ja: "辺",
+          ko: "모서리",
+          es: "Aristas",
+          de: "Kanten",
+          fi: "Särmät",
+          fr: "Arêtes",
+          ar: "أحرف",
+          it: "Spigoli",
+        },
+        vertices: {
+          en: "Vertices",
+          zh: "頂",
+          ja: "頂点",
+          ko: "꼭짓점",
+          es: "Vértices",
+          de: "Ecken",
+          fi: "Kärjet",
+          fr: "Sommets",
+          ar: "رؤوس",
+          it: "Vertici",
+        },
+        eulerTitle: {
+          en: "Euler's Formula:",
+          zh: "歐拉公式:",
+          ja: "オイラーの多面体定理:",
+          ko: "오일러 공식:",
+          es: "Fórmula de Euler:",
+          de: "Eulersche Polyederformel:",
+          fi: "Eulerin monitahokaslause:",
+          fr: "Formule d'Euler :",
+          ar: "صيغة أويلر:",
+          it: "Formula di Eulero:",
+        },
+        eulerFormula: {
+          en: "Faces + Vertices - Edges = 2",
+          zh: "面 + 頂 - 邊 = 2",
+          ja: "面 + 頂点 - 辺 = 2",
+          ko: "면 + 꼭짓점 - 모서리 = 2",
+          es: "Caras + Vértices - Aristas = 2",
+          de: "Flächen + Ecken - Kanten = 2",
+          fi: "Tahkot + Kärjet - Särmät = 2",
+          fr: "Faces + Sommets - Arêtes = 2",
+          ar: "الوجوه + الرؤوس - الأحرف = 2",
+          it: "Facce + Vertici - Spigoli = 2",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const [shape, setShape] = useState("cube");
+        const shapes = {
+          cube: { faces: 6, edges: 12, vertices: 8 },
+          triangular: {
+            faces: 5,
+            edges: 9,
+            vertices: 6,
+          },
+          rectangular: {
+            faces: 6,
+            edges: 12,
+            vertices: 8,
+          },
+        };
+        const s = shapes[shape];
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-5xl font-black text-green-900 mb-2 mt-8">
+              🎲 {getText("title")}
+            </h1>
+
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-4xl w-full mt-8">
+              <div className="flex justify-center gap-4 mb-6 flex-wrap">
+                {Object.keys(shapes).map((key) => (
+                  <button
+                    key={key}
+                    onClick={() => setShape(key)}
+                    className={`px-4 py-2 rounded-xl font-bold ${
+                      shape === key ? "bg-green-500 text-white" : "bg-slate-100"
+                    }`}
+                  >
+                    {getText(key)}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex flex-col md:flex-row gap-8 items-center">
+                <div className="flex-1 bg-slate-100 rounded-2xl p-6 flex justify-center">
+                  {shape === "cube" && (
+                    <svg viewBox="0 0 200 240" className="w-48">
+                      {/* Net of a cube - cross shape */}
+                      <rect
+                        x="60"
+                        y="0"
+                        width="40"
+                        height="40"
+                        fill="#22c55e"
+                        stroke="#166534"
+                        strokeWidth="2"
+                      />
+                      <rect
+                        x="20"
+                        y="40"
+                        width="40"
+                        height="40"
+                        fill="#4ade80"
+                        stroke="#166534"
+                        strokeWidth="2"
+                      />
+                      <rect
+                        x="60"
+                        y="40"
+                        width="40"
+                        height="40"
+                        fill="#22c55e"
+                        stroke="#166534"
+                        strokeWidth="2"
+                      />
+                      <rect
+                        x="100"
+                        y="40"
+                        width="40"
+                        height="40"
+                        fill="#4ade80"
+                        stroke="#166534"
+                        strokeWidth="2"
+                      />
+                      <rect
+                        x="140"
+                        y="40"
+                        width="40"
+                        height="40"
+                        fill="#86efac"
+                        stroke="#166534"
+                        strokeWidth="2"
+                      />
+                      <rect
+                        x="60"
+                        y="120"
+                        width="40"
+                        height="40"
+                        fill="#4ade80"
+                        stroke="#166534"
+                        strokeWidth="2"
+                      />
+                    </svg>
+                  )}
+                  {shape === "triangular" && (
+                    <svg viewBox="0 0 200 180" className="w-48">
+                      <rect
+                        x="30"
+                        y="40"
+                        width="40"
+                        height="80"
+                        fill="#22c55e"
+                        stroke="#166534"
+                        strokeWidth="2"
+                      />
+                      <rect
+                        x="70"
+                        y="40"
+                        width="40"
+                        height="80"
+                        fill="#4ade80"
+                        stroke="#166534"
+                        strokeWidth="2"
+                      />
+                      <rect
+                        x="110"
+                        y="40"
+                        width="40"
+                        height="80"
+                        fill="#86efac"
+                        stroke="#166534"
+                        strokeWidth="2"
+                      />
+                      <polygon
+                        points="30,40 50,10 70,40"
+                        fill="#bbf7d0"
+                        stroke="#166534"
+                        strokeWidth="2"
+                      />
+                      <polygon
+                        points="110,120 130,150 150,120"
+                        fill="#bbf7d0"
+                        stroke="#166534"
+                        strokeWidth="2"
+                      />
+                    </svg>
+                  )}
+                  {shape === "rectangular" && (
+                    <svg viewBox="0 0 220 200" className="w-48">
+                      <rect
+                        x="60"
+                        y="0"
+                        width="60"
+                        height="40"
+                        fill="#22c55e"
+                        stroke="#166534"
+                        strokeWidth="2"
+                      />
+                      <rect
+                        x="0"
+                        y="40"
+                        width="60"
+                        height="60"
+                        fill="#4ade80"
+                        stroke="#166534"
+                        strokeWidth="2"
+                      />
+                      <rect
+                        x="60"
+                        y="40"
+                        width="60"
+                        height="60"
+                        fill="#22c55e"
+                        stroke="#166534"
+                        strokeWidth="2"
+                      />
+                      <rect
+                        x="120"
+                        y="40"
+                        width="60"
+                        height="60"
+                        fill="#4ade80"
+                        stroke="#166534"
+                        strokeWidth="2"
+                      />
+                      <rect
+                        x="180"
+                        y="40"
+                        width="40"
+                        height="60"
+                        fill="#86efac"
+                        stroke="#166534"
+                        strokeWidth="2"
+                      />
+                      <rect
+                        x="60"
+                        y="100"
+                        width="60"
+                        height="40"
+                        fill="#4ade80"
+                        stroke="#166534"
+                        strokeWidth="2"
+                      />
+                    </svg>
+                  )}
+                </div>
+                <div className="flex-1 space-y-4">
+                  <div className="text-2xl font-black text-green-800 text-center">
+                    {getText(shape)}
+                  </div>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="bg-green-50 rounded-xl p-4 text-center border-2 border-green-200">
+                      <div className="text-3xl font-black text-green-600">
+                        {s.faces}
+                      </div>
+                      <div className="text-sm font-bold text-green-700">
+                        {getText("faces")}
+                      </div>
+                    </div>
+                    <div className="bg-green-50 rounded-xl p-4 text-center border-2 border-green-200">
+                      <div className="text-3xl font-black text-green-600">
+                        {s.edges}
+                      </div>
+                      <div className="text-sm font-bold text-green-700">
+                        {getText("edges")}
+                      </div>
+                    </div>
+                    <div className="bg-green-50 rounded-xl p-4 text-center border-2 border-green-200">
+                      <div className="text-3xl font-black text-green-600">
+                        {s.vertices}
+                      </div>
+                      <div className="text-sm font-bold text-green-700">
+                        {getText("vertices")}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800 text-sm">
+                    <p className="font-bold">💡 {getText("eulerTitle")}</p>
+                    <p>{getText("eulerFormula")}</p>
+                    <p>
+                      {s.faces} + {s.vertices} - {s.edges} ={" "}
+                      {s.faces + s.vertices - s.edges}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

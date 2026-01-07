@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - First Aid</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #f0fdfa;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "First Aid Hero",
+          zh: "急救小英雄",
+          ja: "応急処置ヒーロー",
+          ko: "응급 처치 영웅",
+          es: "Héroe de primeros auxilios",
+          de: "Erste-Hilfe-Held",
+          fi: "Ensiapusankari",
+          fr: "Héros des premiers secours",
+          ar: "بطل الإسعافات الأولية",
+          it: "Eroe del Pronto Soccorso",
+        },
+        instruction: {
+          en: "Treat the wound in order!",
+          zh: "按順序處理傷口！",
+          ja: "順番に傷を治療してください！",
+          ko: "순서대로 상처를 치료하세요!",
+          es: "¡Trata la herida en orden!",
+          de: "Behandle die Wunde der Reihe nach!",
+          fi: "Hoida haava järjestyksessä!",
+          fr: "Traitez la plaie dans l'ordre !",
+          ar: "عالِج الجرح بالترتيب!",
+          it: "Tratta la ferita in ordine!",
+        },
+        clean: {
+          en: "1. Clean (Water)",
+          zh: "1. 清洗 (清水)",
+          ja: "1. 洗浄 (水)",
+          ko: "1. 세척 (물)",
+        },
+        disinfect: {
+          en: "2. Disinfect",
+          zh: "2. 消毒",
+          ja: "2. 消毒",
+          ko: "2. 소독",
+        },
+        bandage: {
+          en: "3. Bandage",
+          zh: "3. 包紮",
+          ja: "3. 包帯",
+          ko: "3. 붕대",
+        },
+
+        done: { en: "Healed!", zh: "治癒了！", ja: "治った！", ko: "치유됨!" },
+        wrong: {
+          en: "Wrong Step!",
+          zh: "步驟錯誤！",
+          ja: "間違った手順！",
+          ko: "잘못된 단계!",
+        },
+      };
+
+      const steps = [
+        { id: "clean", icon: "💧" },
+        { id: "disinfect", icon: "🧴" },
+        { id: "bandage", icon: "🩹" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [step, setStep] = useState(0); // 0, 1, 2, 3 (done)
+        const [feedback, setFeedback] = useState(null);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const perform = (id, idx) => {
+          if (step === 3) return;
+          if (idx === step) {
+            setStep(step + 1);
+            setFeedback(null);
+          } else {
+            setFeedback("wrong");
+            setTimeout(() => setFeedback(null), 500);
+          }
+        };
+
+        const reset = () => {
+          setStep(0);
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-teal-700">
+              {getText("title")}
+            </h1>
+            <p className="mb-8 font-bold text-slate-500">
+              {getText("instruction")}
+            </p>
+
+            <div className="relative w-64 h-80 bg-orange-100 rounded-3xl border-4 border-orange-200 mb-8 flex items-center justify-center overflow-hidden shadow-lg">
+              {/* Arm/Skin */}
+              <div className="absolute inset-0 bg-red-50/50"></div>
+              {/* Wound */}
+              {step < 3 && (
+                <motion.div
+                  className="w-16 h-2 bg-red-600 rounded-full rotate-45"
+                  initial={{ scale: 1 }}
+                  animate={{ opacity: step >= 2 ? 0.2 : 1 }} // Fade out when bandaged? No, simple logic:
+                />
+              )}
+              {/* Visual Feedback of Steps */}
+              {step >= 1 && (
+                <div className="absolute inset-0 bg-blue-200/30 animate-pulse pointer-events-none"></div>
+              )}{" "}
+              {/* Water */}
+              {step >= 2 && (
+                <div className="absolute border-2 border-yellow-400 w-20 h-20 rounded-full animate-ping pointer-events-none"></div>
+              )}{" "}
+              {/* Disinfect */}
+              {step >= 3 && <div className="absolute text-8xl">🩹</div>}{" "}
+              {/* Bandage */}
+            </div>
+
+            <div className="flex flex-col gap-4 w-full max-w-sm">
+              {steps.map((s, idx) => (
+                <button
+                  key={s.id}
+                  onClick={() => perform(s.id, idx)}
+                  disabled={step > idx}
+                  className={`p-4 rounded-xl font-bold text-lg flex items-center gap-4 transition-all ${
+                    step > idx
+                      ? "bg-green-100 text-green-800 opacity-50"
+                      : "bg-white hover:bg-teal-50 shadow text-teal-900"
+                  }`}
+                >
+                  <span className="text-2xl">{s.icon}</span> {getText(s.id)}
+                  {step > idx && <span>✅</span>}
+                </button>
+              ))}
+            </div>
+
+            {step === 3 && (
+              <div className="mt-8">
+                <div className="text-3xl font-black text-green-600 animate-bounce mb-4">
+                  {getText("done")}
+                </div>
+                <button
+                  onClick={reset}
+                  className="px-8 py-2 bg-slate-400 text-white rounded-lg"
+                >
+                  Replay
+                </button>
+              </div>
+            )}
+
+            {feedback && (
+              <div className="mt-8 text-xl font-black text-red-500 animate-pulse">
+                {getText("wrong")}
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

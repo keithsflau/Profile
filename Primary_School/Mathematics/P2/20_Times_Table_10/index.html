@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小二數學：10的乘法 | 10 Times Table</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #f0fdfa 0%, #0d9488 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "🔟 10 Times Table",
+          zh: "🔟 10的乘法",
+          ja: "🔟 10の段",
+          ko: "🔟 10단",
+          es: "🔟 Tabla del 10",
+          de: "🔟 10er-Reihe",
+          fi: "🔟 10:n kertotaulu",
+          fr: "🔟 Table de 10",
+          ar: "🔟 جدول 10",
+          it: "🔟 Tabellina del 10",
+        },
+        check: {
+          en: "Check",
+          zh: "檢查",
+          ja: "確認",
+          ko: "확인",
+          es: "Comprobar",
+          de: "Prüfen",
+          fi: "Tarkista",
+          fr: "Vérifier",
+          ar: "تحقق",
+          it: "Controlla",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [factor, setFactor] = useState(1);
+        const [input, setInput] = useState("");
+        const [feedback, setFeedback] = useState("");
+
+        const newProb = () => {
+          setFactor(Math.floor(Math.random() * 9) + 1);
+          setInput("");
+          setFeedback("");
+        };
+
+        useEffect(newProb, []);
+
+        const check = () => {
+          if (parseInt(input) === factor * 10) {
+            setFeedback("CORRECT");
+            setTimeout(newProb, 1500);
+          } else {
+            setFeedback("WRONG");
+          }
+        };
+
+        const getChant = () => {
+          if (lang === "zh") {
+            const map = {
+              1: "一十得十",
+              2: "二十二十",
+              3: "三十三十",
+              4: "四十四十",
+              5: "五十五十",
+              6: "六十六十",
+              7: "七十七十",
+              8: "八十八十",
+              9: "九十九十",
+            };
+            // Wait, 10's chant is often just "X十" ?
+            // Usually for low levels: "一十得十", "二十得二十"? No usually just implicitly known or "X個十是X0"
+            // Let's stick to standard result
+            return `${factor} 十 ${factor * 10}`;
+          } else {
+            return `${factor} × 10 = ${factor * 10}`;
+          }
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center justify-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+
+            <h1 className="text-5xl font-black text-teal-900 mb-8 max-w-2xl text-center">
+              {t.title[lang] || t.title["en"]}
+            </h1>
+
+            <div className="bg-white/90 rounded-3xl p-8 shadow-2xl w-full max-w-3xl text-center border-4 border-teal-300">
+              <div className="flex justify-center flex-wrap gap-4 mb-8">
+                {[...Array(factor)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="flex gap-1 bg-teal-100 p-2 rounded-lg border-2 border-teal-200 w-16 h-10 items-center justify-center"
+                  >
+                    <div className="w-full h-full border border-teal-400 bg-teal-300 relative">
+                      {/* 10 block represenation simplified */}
+                      <div className="absolute inset-0 grid grid-cols-5 grid-rows-2">
+                        {[...Array(10)].map((_, j) => (
+                          <div
+                            key={j}
+                            className="border border-teal-500 opacity-30"
+                          ></div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="text-6xl font-black text-slate-700 mb-8 font-mono">
+                {factor} × 10 ={" "}
+                <input
+                  type="number"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  className="w-40 text-center border-b-8 border-teal-500 bg-teal-50 focus:bg-white rounded-t-xl outline-none"
+                  autoFocus
+                />
+              </div>
+
+              <button
+                onClick={check}
+                className="px-10 py-3 bg-teal-500 text-white rounded-full font-black text-2xl shadow-xl hover:bg-teal-600 transition-transform active:scale-95"
+              >
+                {t.check[lang] || t.check["en"]}
+              </button>
+
+              <div className="h-16 mt-8">
+                {feedback === "CORRECT" && (
+                  <div className="text-4xl font-black text-green-500 animate-bounce">
+                    {getChant()}!
+                  </div>
+                )}
+                {feedback === "WRONG" && (
+                  <div className="text-4xl font-black text-red-500 animate-shake">
+                    {get("wrong", lang)}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

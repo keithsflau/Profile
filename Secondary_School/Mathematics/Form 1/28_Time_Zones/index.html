@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>World Clock | S1 Math</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-indigo-900 text-white min-h-screen">
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      const App = () => {
+        // Base Time (UTC)
+        const [base, setBase] = useState(new Date());
+
+        useEffect(() => {
+          const timer = setInterval(() => setBase(new Date()), 1000);
+          return () => clearInterval(timer);
+        }, []);
+
+        const zones = [
+          { city: "London", offset: 0, icon: "fa-landmark" },
+          { city: "Hong Kong", offset: 8, icon: "fa-city" },
+          { city: "New York", offset: -5, icon: "fa-building" }, // EST. Ignoring DST for simplicity in S1 math
+          { city: "Tokyo", offset: 9, icon: "fa-torii-gate" },
+          { city: "Sydney", offset: 11, icon: "fa-sun" },
+        ];
+
+        const getCityTime = (offset) => {
+          // Get UTC time first
+          const utc = base.getTime() + base.getTimezoneOffset() * 60000;
+          const cityTime = new Date(utc + 3600000 * offset);
+          return cityTime;
+        };
+
+        const AnalogClock = ({ time }) => {
+          const h = time.getHours() % 12;
+          const m = time.getMinutes();
+          const s = time.getSeconds();
+
+          const degS = s * 6;
+          const degM = m * 6 + s * 0.1;
+          const degH = h * 30 + m * 0.5;
+
+          return (
+            <div className="w-32 h-32 rounded-full border-4 border-slate-700 bg-slate-800 relative shadow-inner mx-auto mb-4">
+              {/* Center */}
+              <div className="absolute top-1/2 left-1/2 w-3 h-3 bg-red-500 rounded-full z-10 -translate-x-1/2 -translate-y-1/2"></div>
+
+              {/* Hour Hand */}
+              <div
+                className="absolute top-1/2 left-1/2 w-1.5 h-10 bg-white origin-bottom -translate-x-1/2 -translate-y-full rounded-full shadow"
+                style={{ transform: `rotate(${degH}deg)` }}
+              ></div>
+
+              {/* Minute Hand */}
+              <div
+                className="absolute top-1/2 left-1/2 w-1 h-14 bg-slate-300 origin-bottom -translate-x-1/2 -translate-y-full rounded-full opacity-80"
+                style={{ transform: `rotate(${degM}deg)` }}
+              ></div>
+
+              {/* Second Hand */}
+              <div
+                className="absolute top-1/2 left-1/2 w-0.5 h-14 bg-red-500 origin-bottom -translate-x-1/2 -translate-y-full rounded-full"
+                style={{ transform: `rotate(${degS}deg)` }}
+              ></div>
+
+              {/* Markers */}
+              {[0, 90, 180, 270].map((d) => (
+                <div
+                  key={d}
+                  className="absolute top-1/2 left-1/2 w-1 h-2 bg-slate-500 origin-center -translate-x-1/2 -translate-y-14"
+                  style={{ transform: `rotate(${d}deg) translateY(-5px)` }}
+                ></div>
+              ))}
+            </div>
+          );
+        };
+
+        return (
+          <div className="p-8 max-w-6xl mx-auto min-h-screen flex flex-col items-center">
+            <header className="mb-12 text-center">
+              <div className="text-indigo-400 font-bold uppercase text-xs tracking-widest mb-2">
+                Unit 3: Measures
+              </div>
+              <h1 className="text-4xl font-extrabold text-white">
+                World Clock
+              </h1>
+              <p className="text-slate-400">
+                Understanding Time Zones (UTC offsets).
+              </p>
+            </header>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 w-full mb-12">
+              {zones.map((z, i) => {
+                const t = getCityTime(z.offset);
+                return (
+                  <div
+                    key={i}
+                    className="bg-slate-800/50 backdrop-blur rounded-2xl p-6 border border-slate-700 text-center hover:bg-slate-800 transition shadow-xl"
+                  >
+                    <div className="text-indigo-400 text-2xl mb-4">
+                      <i className={`fa-solid ${z.icon}`}></i>
+                    </div>
+                    <h3 className="text-xl font-bold font-outfit text-white mb-1">
+                      {z.city}
+                    </h3>
+                    <div className="text-xs font-bold text-slate-500 mb-6 uppercase tracking-wider">
+                      UTC {z.offset >= 0 ? "+" : ""}
+                      {z.offset}
+                    </div>
+
+                    <AnalogClock time={t} />
+
+                    <div className="text-2xl font-mono font-bold text-slate-200">
+                      {t.toLocaleTimeString("en-US", { hour12: false })}
+                    </div>
+                    <div className="text-xs text-slate-500 font-mono mt-1">
+                      {t.toLocaleDateString()}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="bg-slate-800 p-8 rounded-2xl max-w-2xl text-center border border-slate-700">
+              <h3 className="text-xl font-bold mb-4">
+                Time Difference Calculator
+              </h3>
+              <p className="text-slate-400 mb-6">
+                If it is <span className="text-white font-bold">12:00 PM</span>{" "}
+                in London (UTC+0), what time is it in Hong Kong (UTC+8)?
+              </p>
+              <div className="bg-slate-900 p-4 rounded-xl inline-block text-2xl font-bold text-indigo-400">
+                12:00 + 8 hours = 20:00 (8:00 PM)
+              </div>
+            </div>
+
+            <footer className="mt-12">
+              <a
+                href="../index.html"
+                className="text-indigo-400 hover:text-indigo-300 font-bold"
+              >
+                <i className="fa-solid fa-arrow-left mr-2"></i> Back to
+                Dashboard
+              </a>
+            </footer>
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

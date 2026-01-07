@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Probability 概率 | S3 Math</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-orange-50 text-slate-800 min-h-screen">
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const App = () => {
+        const [lang, setLang] = useState("en");
+        const [favorable, setFavorable] = useState(3);
+        const [total, setTotal] = useState(10);
+
+        const t = {
+          title: { en: "Probability", zh: "概率" },
+          favorable: { en: "Favorable Outcomes", zh: "有利結果數" },
+          total: { en: "Total Outcomes", zh: "總結果數" },
+          probability: { en: "Probability", zh: "概率" },
+          back: { en: "Back to Dashboard", zh: "返回主頁" },
+        };
+
+        const prob = total > 0 ? favorable / total : 0;
+        const percent = (prob * 100).toFixed(1);
+
+        return (
+          <div className="p-6 max-w-4xl mx-auto min-h-screen flex flex-col">
+            <header className="mb-6 flex justify-between items-center">
+              <div>
+                <div className="text-orange-600 font-bold uppercase text-xs tracking-widest mb-1">
+                  S3 Math
+                </div>
+                <h1 className="text-3xl font-extrabold text-slate-900">
+                  {t.title[lang]}
+                </h1>
+              </div>
+              <button
+                onClick={() => setLang(lang === "en" ? "zh" : "en")}
+                className="px-3 py-1 bg-white border border-orange-200 rounded-lg text-sm font-bold hover:bg-orange-100"
+              >
+                {lang === "en" ? "中文" : "ENG"}
+              </button>
+            </header>
+
+            <div className="bg-white p-4 rounded-xl border border-orange-100 mb-6 text-center">
+              <div className="text-xl font-mono font-bold text-orange-600">
+                P(E) = {lang === "en" ? "Favorable" : "有利結果"} /{" "}
+                {lang === "en" ? "Total" : "總數"}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="bg-white p-4 rounded-xl shadow-sm border border-orange-100">
+                <label className="block text-xs font-bold text-slate-400 mb-1">
+                  {t.favorable[lang]}: {favorable}
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max={total}
+                  value={favorable}
+                  onChange={(e) => setFavorable(Number(e.target.value))}
+                  className="w-full accent-orange-500"
+                />
+              </div>
+              <div className="bg-white p-4 rounded-xl shadow-sm border border-orange-100">
+                <label className="block text-xs font-bold text-slate-400 mb-1">
+                  {t.total[lang]}: {total}
+                </label>
+                <input
+                  type="range"
+                  min="1"
+                  max="20"
+                  value={total}
+                  onChange={(e) => {
+                    setTotal(Number(e.target.value));
+                    if (favorable > Number(e.target.value))
+                      setFavorable(Number(e.target.value));
+                  }}
+                  className="w-full accent-orange-500"
+                />
+              </div>
+            </div>
+
+            {/* Visual */}
+            <div className="bg-white p-6 rounded-2xl border border-orange-100 mb-6">
+              <div className="flex flex-wrap gap-2 justify-center">
+                {Array.from({ length: total }).map((_, i) => (
+                  <div
+                    key={i}
+                    className={`w-8 h-8 rounded-full ${
+                      i < favorable ? "bg-orange-500" : "bg-slate-200"
+                    }`}
+                  ></div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-orange-500 text-white p-6 rounded-2xl shadow-xl text-center">
+              <div className="text-xs uppercase opacity-80 mb-2">
+                {t.probability[lang]}
+              </div>
+              <div className="text-4xl font-bold">
+                {favorable}/{total} = {prob.toFixed(3)}
+              </div>
+              <div className="text-xl mt-2">{percent}%</div>
+            </div>
+
+            <footer className="mt-auto pt-8">
+              <a
+                href="../index.html"
+                className="text-orange-600 hover:text-orange-700 font-bold"
+              >
+                <i className="fa-solid fa-arrow-left mr-2"></i>
+                {t.back[lang]}
+              </a>
+            </footer>
+          </div>
+        );
+      };
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

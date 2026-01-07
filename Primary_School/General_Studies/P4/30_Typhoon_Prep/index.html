@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Typhoon Prep</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #334155;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Typhoon Preparation",
+          zh: "颱風準備",
+          ja: "台風の準備",
+          ko: "태풍 대비",
+          es: "Preparación para tifones",
+          de: "Taifun-Vorbereitung",
+          fi: "Taifuunivalmistelut",
+          fr: "Préparation aux typhons",
+          ar: "الاستعداد للإعصار",
+          it: "Preparazione Tifone",
+        },
+        instruction: {
+          en: "Tap the items you need to pack for a typhoon!",
+          zh: "點擊你需要為颱風準備的物品！",
+          ja: "台風のために準備する必要があるアイテムをタップしてください！",
+          ko: "태풍에 대비해 챙겨야 할 물건을 탭하세요!",
+          es: "¡Toca los artículos que necesitas empacar para un tifón!",
+          de: "Tippe auf die Gegenstände, die du für einen Taifun einpacken musst!",
+          fi: "Napauta tavaroita, jotka sinun täytyy pakata taifuunia varten!",
+          fr: "Tapez sur les articles que vous devez emballer pour un typhon !",
+          ar: "اضغط على العناصر التي تحتاج إلى حزمها للإعصار!",
+          it: "Tocca gli oggetti che devi preparare per un tifone!",
+        },
+        packed: {
+          en: "Packed Items:",
+          zh: "已打包物品：",
+          ja: "梱包済みアイテム：",
+          ko: "포장된 물품:",
+          es: "Artículos empacados:",
+          de: "Gepackte Artikel:",
+          fi: "Pakatut tavarat:",
+          fr: "Articles emballés :",
+          ar: "العناصر المعبأة:",
+          it: "Oggetti Imballati:",
+        },
+        ready: {
+          en: "You are Ready!",
+          zh: "你準備好了！",
+          ja: "準備完了！",
+          ko: "준비되었습니다!",
+          es: "¡Estás listo!",
+          de: "Du bist bereit!",
+          fi: "Olet valmis!",
+          fr: "Vous êtes prêt !",
+          ar: "أنت مستعد!",
+          it: "Sei Pronto!",
+        },
+
+        // Items
+        tape: {
+          en: "Adhesive Tape",
+          zh: "膠紙",
+          ja: "粘着テープ",
+          ko: "접착 테이프",
+          es: "Cinta adhesiva",
+          de: "Klebeband",
+          fi: "Teippi",
+          fr: "Ruban adhésif",
+          ar: "شريط لاصق",
+          it: "Nastro Adesivo",
+        },
+        food: {
+          en: "Canned Food",
+          zh: "罐頭食品",
+          ja: "缶詰",
+          ko: "통조림",
+          es: "Comida enlatada",
+          de: "Konserven",
+          fi: "Säilykeruoka",
+          fr: "Nourriture en conserve",
+          ar: "طعام معلب",
+          it: "Cibo in Scatola",
+        },
+        water: {
+          en: "Bottled Water",
+          zh: "瓶裝水",
+          ja: "ボトル入り飲料水",
+          ko: "생수",
+          es: "Agua embotellada",
+          de: "Flaschenwasser",
+          fi: "Pullotettu vesi",
+          fr: "Eau en bouteille",
+          ar: "مياه معبأة",
+          it: "Acqua in Bottiglia",
+        },
+        torch: {
+          en: "Flashlight",
+          zh: "手電筒",
+          ja: "懐中電灯",
+          ko: "손전등",
+          es: "Linterna",
+          de: "Taschenlampe",
+          fi: "Taskulamppu",
+          fr: "Lampe de poche",
+          ar: "مصباح يدوي",
+          it: "Torcia",
+        },
+        radio: {
+          en: "Radio",
+          zh: "收音機",
+          ja: "ラジオ",
+          ko: "라디오",
+          es: "Radio",
+          de: "Radio",
+          fi: "Radio",
+          fr: "Radio",
+          ar: "راديو",
+          it: "Radio",
+        },
+        games: {
+          en: "Board Games",
+          zh: "桌上遊戲",
+          ja: "ボードゲーム",
+          ko: "보드 게임",
+          es: "Juegos de mesa",
+          de: "Brettspiele",
+          fi: "Lautapelit",
+          fr: "Jeux de société",
+          ar: "ألعاب الطاولة",
+          it: "Giochi da Tavolo",
+        },
+
+        // Distractors
+        kite: {
+          en: "Kite",
+          zh: "風箏",
+          ja: "凧",
+          ko: "연",
+          es: "Cometa",
+          de: "Drachen",
+          fi: "Leija",
+          fr: "Cerf-volant",
+          ar: "طائرة ورقية",
+          it: "Aquilone",
+        },
+        bike: {
+          en: "Bicycle",
+          zh: "自行車",
+          ja: "自転車",
+          ko: "자전거",
+          es: "Bicicleta",
+          de: "Fahrrad",
+          fi: "Polkupyörä",
+          fr: "Vélo",
+          ar: "دراجة",
+          it: "Bicicletta",
+        },
+        swimsuit: {
+          en: "Swimsuit",
+          zh: "泳衣",
+          ja: "水着",
+          ko: "수영복",
+          es: "Traje de baño",
+          de: "Badeanzug",
+          fi: "Uimapuku",
+          fr: "Maillot de bain",
+          ar: "ملابس سباحة",
+          it: "Costume da Bagno",
+        },
+      };
+
+      const items = [
+        { id: "tape", needed: true, icon: "🩹" }, // adhesive bandage but close enough for tape icon
+        { id: "food", needed: true, icon: "🥫" },
+        { id: "water", needed: true, icon: "💧" },
+        { id: "torch", needed: true, icon: "🔦" },
+        { id: "radio", needed: true, icon: "📻" },
+        { id: "games", needed: false, icon: "🎲" }, // Optional but ok, let's make it needed for sanity? No, survival items.
+        { id: "kite", needed: false, icon: "🪁" },
+        { id: "bike", needed: false, icon: "🚲" },
+        { id: "swimsuit", needed: false, icon: "🩳" },
+      ];
+      // Let's say Games are optional/distractor for strict survival, but good for boredom. Let's stick to essential basics. Needed: tape, food, water, torch, radio.
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [packed, setPacked] = useState([]);
+        const [message, setMessage] = useState("");
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const handlePack = (item) => {
+          if (packed.includes(item.id)) return;
+
+          if (item.needed) {
+            setPacked([...packed, item.id]);
+            // Check win
+            const neededCount = items.filter((i) => i.needed).length;
+            if (packed.length + 1 === neededCount) {
+              setMessage("ready");
+            }
+          } else {
+            // Shake or something?
+            setMessage("Why would you need a " + getText(item.id) + "?");
+            setTimeout(() => setMessage(""), 2000);
+          }
+        };
+
+        const isPacked = (id) => packed.includes(id);
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4 text-white">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-yellow-400">
+              🌀 {getText("title")}
+            </h1>
+
+            <p className="mb-8 text-slate-300 font-bold text-center">
+              {getText("instruction")}
+            </p>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-6 w-full max-w-4xl">
+              {items.map((item) => (
+                <motion.button
+                  key={item.id}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handlePack(item)}
+                  className={`p-6 rounded-2xl flex flex-col items-center justify-center gap-4 shadow-xl border-4 transition-colors
+                        ${
+                          isPacked(item.id)
+                            ? "bg-green-600 border-green-400 opacity-50 cursor-default"
+                            : "bg-slate-700 border-slate-600 hover:bg-slate-600 cursor-pointer"
+                        }
+                     `}
+                >
+                  <div className="text-6xl">{item.icon}</div>
+                  <div className="font-bold text-center">
+                    {getText(item.id)}
+                  </div>
+                  {isPacked(item.id) && (
+                    <div className="absolute inset-0 flex items-center justify-center text-6xl text-green-200 font-black rotate-[-20deg]">
+                      Packed!
+                    </div>
+                  )}
+                </motion.button>
+              ))}
+            </div>
+
+            {/* Message Area */}
+            <div className="fixed bottom-10 bg-slate-800/90 border border-slate-500 px-8 py-4 rounded-full text-xl font-bold text-center shadow-2xl min-h-[4rem] flex items-center justify-center">
+              {message === "ready" ? (
+                <span className="text-green-400 text-2xl">
+                  ✅ {getText("ready")}
+                </span>
+              ) : (
+                <span className="text-yellow-200">{message}</span>
+              )}
+            </div>
+
+            {/* Progress */}
+            <div className="fixed top-20 right-4 bg-black/50 p-4 rounded-xl backdrop-blur-sm">
+              <div className="text-xs text-slate-400 uppercase font-bold mb-2">
+                {getText("packed")}
+              </div>
+              <div className="flex gap-2">
+                {packed.map((id) => (
+                  <span key={id} className="text-2xl">
+                    {items.find((i) => i.id === id).icon}
+                  </span>
+                ))}
+                {[
+                  ...Array(
+                    items.filter((i) => i.needed).length - packed.length
+                  ),
+                ].map((_, i) => (
+                  <span key={i} className="text-2xl opacity-20">
+                    ⚪
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Rain Effect Overlay */}
+            <div className="fixed inset-0 pointer-events-none z-[-1] opacity-20 bg-[url('https://cdn.pixabay.com/animation/2023/06/25/21/55/21-55-46-95_512.gif')] bg-cover"></div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

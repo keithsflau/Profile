@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小五數學：小數乘整數 | Decimal × Whole Number</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #dbeafe 0%, #3b82f6 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Decimal × Whole Number",
+          zh: "小數乘整數",
+          ja: "小数 × 整数",
+          ko: "소수 × 정수",
+          es: "Decimal × Número Entero",
+          de: "Dezimalzahl × Ganze Zahl",
+          fi: "Desimaali × Kokonaisluku",
+          fr: "Décimal × Nombre entier",
+          ar: "عشري × عدد صحيح",
+          it: "Decimale × Numero Intero",
+        },
+        stepsTitle: {
+          en: "Steps:",
+          zh: "計算步驟:",
+          ja: "計算手順:",
+          ko: "계산 단계:",
+          es: "Pasos:",
+          de: "Schritte:",
+          fi: "Vaiheet:",
+          fr: "Étapes :",
+          ar: "خطوات:",
+          it: "Passaggi:",
+        },
+        step1: {
+          en: "{decimal} has {decPlaces} decimal place(s)",
+          zh: "{decimal} 有 {decPlaces} 位小數",
+          ja: "{decimal} には小数点以下 {decPlaces} 桁があります",
+          ko: "{decimal}에는 {decPlaces} 자리 소수가 있습니다",
+          es: "{decimal} tiene {decPlaces} lugar(es) decimal(es)",
+          de: "{decimal} hat {decPlaces} Dezimalstelle(n)",
+          fi: "{decimal}:ssa on {decPlaces} desimaalipaikka(a)",
+          fr: "{decimal} a {decPlaces} décimale(s)",
+          ar: "{decimal} لديه {decPlaces} منازل عشرية",
+          it: "{decimal} ha {decPlaces} cifre decimali",
+        },
+        step2: {
+          en: "Ignore decimal point temporarily: {asWhole} × {whole} = {productWhole}",
+          zh: "暫時忽略小數點: {asWhole} × {whole} = {productWhole}",
+          ja: "一時的に小数点を無視: {asWhole} × {whole} = {productWhole}",
+          ko: "일시적으로 소수점 무시: {asWhole} × {whole} = {productWhole}",
+          es: "Ignora el punto decimal temporalmente: {asWhole} × {whole} = {productWhole}",
+          de: "Dezimalpunkt vorübergehend ignorieren: {asWhole} × {whole} = {productWhole}",
+          fi: "Ohita desimaalipilkku tilapäisesti: {asWhole} × {whole} = {productWhole}",
+          fr: "Ignorer temporairement la virgule : {asWhole} × {whole} = {productWhole}",
+          ar: "تجاهل النقطة العشرية مؤقتًا: {asWhole} × {whole} = {productWhole}",
+          it: "Ignora temporaneamente il punto decimale: {asWhole} × {whole} = {productWhole}",
+        },
+        step3: {
+          en: "Put back {decPlaces} decimal place(s)",
+          zh: "補回 {decPlaces} 位小數",
+          ja: "小数点以下 {decPlaces} 桁を戻す",
+          ko: "소수점 {decPlaces} 자리를 되돌림",
+          es: "Vuelve a colocar {decPlaces} lugar(es) decimal(es)",
+          de: "Füge {decPlaces} Dezimalstelle(n) wieder hinzu",
+          fi: "Palauta {decPlaces} desimaalipaikka(a)",
+          fr: "Remettre {decPlaces} décimale(s)",
+          ar: "أعد {decPlaces} خانة/خانات عشرية",
+          it: "Rimetti {decPlaces} cifre decimali",
+        },
+        answer: {
+          en: "Answer",
+          zh: "答案",
+          ja: "答え",
+          ko: "정답",
+          es: "Respuesta",
+          de: "Antwort",
+          fi: "Vastaus",
+          fr: "Réponse",
+          ar: "إجابة",
+          it: "Risposta",
+        },
+        tipTitle: {
+          en: "Tip:",
+          zh: "技巧:",
+          ja: "ヒント:",
+          ko: "팁:",
+          es: "Consejo:",
+          de: "Tipp:",
+          fi: "Vinkki:",
+          fr: "Astuce :",
+          ar: "نصيحة:",
+          it: "Suggerimento:",
+        },
+        tipText: {
+          en: "Multiply as whole numbers first. Count the decimal places in the multiplicand; the answer has the same number of decimal places!",
+          zh: "先當作整數相乘，再數被乘數有幾位小數，答案就有幾位小數！",
+          ja: "まず整数として掛け算します。被乗数の小数点以下の桁数を数えます。答えもの小数点以下の桁数も同じになります！",
+          ko: "먼저 정수처럼 곱하세요. 피승수의 소수 자릿수를 세세요; 정답도 같은 소수 자릿수를 가집니다!",
+          es: "Multiplica primero como números enteros. Cuenta los lugares decimales en el multiplicando; ¡la respuesta tiene el mismo número de lugares decimales!",
+          de: "Multipliziere zuerst wie ganze Zahlen. Zähle die Dezimalstellen im Multiplikanden; die Antwort hat die gleiche Anzahl an Dezimalstellen!",
+          fi: "Kerro ensin kokonaislukuina. Laske desimaalipaikat kerrottavassa; vastauksessa on sama määrä desimaalipaikkoja!",
+          fr: "Multipliez d'abord comme des nombres entiers. Comptez les décimales du multiplicande; la réponse a le même nombre de décimales !",
+          ar: "اضرب كأعداد صحيحة أولاً. عد المنازل العشرية في المضروب؛ الإجابة تحتوي على نفس عدد المنازل العشرية!",
+          it: "Moltiplica prima come numeri interi. Conta le cifre decimali nel moltiplicando; la risposta ha lo stesso numero di cifre decimali!",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const [decimal, setDecimal] = useState(2.35);
+        const [whole, setWhole] = useState(4);
+
+        const decStr = decimal.toString();
+        const decPlaces = decStr.includes(".")
+          ? decStr.split(".")[1].length
+          : 0;
+        const asWhole = Math.round(decimal * Math.pow(10, decPlaces));
+        const productWhole = asWhole * whole;
+        const result = decimal * whole;
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-5xl font-black text-blue-100 mb-2 mt-8">
+              ✖️ {getText("title")}
+            </h1>
+
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-2xl w-full mt-8">
+              <div className="flex items-center justify-center gap-4 mb-8 flex-wrap">
+                <input
+                  type="number"
+                  step="0.01"
+                  value={decimal}
+                  onChange={(e) => setDecimal(parseFloat(e.target.value) || 0)}
+                  className="w-28 text-3xl font-mono font-black text-center border-4 border-blue-300 rounded-xl p-2"
+                />
+                <span className="text-3xl font-black text-blue-400">×</span>
+                <input
+                  type="number"
+                  min="1"
+                  max="20"
+                  value={whole}
+                  onChange={(e) => setWhole(parseInt(e.target.value) || 1)}
+                  className="w-20 text-3xl font-black text-center border-4 border-blue-300 rounded-xl p-2"
+                />
+              </div>
+
+              <div className="bg-slate-50 rounded-2xl p-6 space-y-3 mb-6">
+                <p className="font-bold text-slate-700">
+                  {getText("stepsTitle")}
+                </p>
+                <p className="font-mono">
+                  1.{" "}
+                  {getText("step1")
+                    .replace("{decimal}", decimal)
+                    .replace("{decPlaces}", decPlaces)}
+                </p>
+                <p className="font-mono">
+                  2.{" "}
+                  {getText("step2")
+                    .replace("{asWhole}", asWhole)
+                    .replace("{whole}", whole)
+                    .replace("{productWhole}", productWhole)}
+                </p>
+                <p className="font-mono">
+                  3. {getText("step3").replace("{decPlaces}", decPlaces)}
+                </p>
+              </div>
+
+              <div className="bg-emerald-100 rounded-2xl p-6 text-center border-4 border-emerald-300">
+                <div className="text-emerald-600 font-bold">
+                  {getText("answer")}
+                </div>
+                <div className="text-5xl font-black text-emerald-800">
+                  {result.toFixed(decPlaces)}
+                </div>
+              </div>
+
+              <div className="mt-6 bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
+                <p className="font-bold">💡 {getText("tipTitle")}</p>
+                <p className="text-sm">{getText("tipText")}</p>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

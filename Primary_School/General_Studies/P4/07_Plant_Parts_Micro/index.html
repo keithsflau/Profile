@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Plant Parts Micro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #ecfccb;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Microscope Lab",
+          zh: "顯微鏡實驗室",
+          ja: "顕微鏡ラボ",
+          ko: "현미경 실험실",
+          es: "Laboratorio de Microscopio",
+          de: "Mikroskop-Labor",
+          fi: "Mikroskooppilaboratorio",
+          fr: "Laboratoire de microscope",
+          ar: "مختبر المجهر",
+          it: "Laboratorio Microscopio",
+        },
+        instruction: {
+          en: "Identify what you see under the microscope!",
+          zh: "辨認你在顯微鏡下看到的東西！",
+          ja: "顕微鏡の下に見えるものを特定してください！",
+          ko: "현미경으로 보이는 것을 식별하세요!",
+          es: "¡Identifica lo que ves bajo el microscopio!",
+          de: "Identifiziere, was du unter dem Mikroskop siehst!",
+          fi: "Tunnista mitä näet mikroskoopissa!",
+          fr: "Identifiez ce que vous voyez au microscope !",
+          ar: "حدد ما تراه تحت المجهر!",
+          it: "Identifica cosa vedi al microscopio!",
+        },
+        correct: {
+          en: "Correct!",
+          zh: "答對了！",
+          ja: "正解！",
+          ko: "정답!",
+          es: "¡Correcto!",
+          de: "Richtig!",
+          fi: "Oikein!",
+          fr: "Correct !",
+          ar: "صحيح!",
+          it: "Corretto!",
+        },
+        cell_wall: {
+          en: "Cell Wall",
+          zh: "細胞壁",
+          ja: "細胞壁",
+          ko: "세포벽",
+          es: "Pared celular",
+          de: "Zellwand",
+          fi: "Soluseinä",
+          fr: "Paroi cellulaire",
+          ar: "الجدار الخلوي",
+          it: "Parete Cellulare",
+        },
+        chloroplast: {
+          en: "Chloroplast",
+          zh: "葉綠體",
+          ja: "葉緑体",
+          ko: "엽록체",
+          es: "Cloroplasto",
+          de: "Chloroplast",
+          fi: "Viherhiukkanen",
+          fr: "Chloroplaste",
+          ar: "البلاستيدات الخضراء",
+          it: "Cloroplasto",
+        },
+        stomata: {
+          en: "Stomata",
+          zh: "氣孔",
+          ja: "気孔",
+          ko: "기공",
+          es: "Estomas",
+          de: "Spaltöffnungen",
+          fi: "Ilmaraot",
+          fr: "Stomates",
+          ar: "الثغور",
+          it: "Stomi",
+        },
+        nucleus: {
+          en: "Nucleus",
+          zh: "細胞核",
+          ja: "細胞核",
+          ko: "세포핵",
+          es: "Núcleo",
+          de: "Zellkern",
+          fi: "Tuma",
+          fr: "Noyau",
+          ar: "نواة",
+          it: "Nucleo",
+        },
+      };
+
+      const slides = [
+        {
+          id: 1,
+          name: "leaf_cell",
+          target: "chloroplast",
+          // Simplified generative art for SVG
+          view: (
+            <svg
+              viewBox="0 0 100 100"
+              className="w-full h-full bg-green-100 rounded-full overflow-hidden"
+            >
+              <path
+                d="M10,10 h80 v80 h-80 z"
+                fill="none"
+                stroke="#22c55e"
+                strokeWidth="2"
+              />
+              {/* Grid of cells */}
+              <path
+                d="M30,10 v80 M50,10 v80 M70,10 v80 M10,30 h80 M10,50 h80 M10,70 h80"
+                stroke="#22c55e"
+                strokeWidth="1"
+                opacity="0.5"
+              />
+              {/* Chloroplasts - green dots */}
+              {[...Array(20)].map((_, i) => (
+                <circle
+                  key={i}
+                  cx={Math.random() * 80 + 10}
+                  cy={Math.random() * 80 + 10}
+                  r="2"
+                  fill="green"
+                />
+              ))}
+            </svg>
+          ),
+          hint: "Green dots that make food",
+        },
+        {
+          id: 2,
+          name: "onion_cell",
+          target: "cell_wall",
+          view: (
+            <svg
+              viewBox="0 0 100 100"
+              className="w-full h-full bg-yellow-50 rounded-full overflow-hidden"
+            >
+              {/* Brick usage */}
+              <path
+                d="M10,20 h80 M10,40 h80 M10,60 h80"
+                stroke="#a3a3a3"
+                strokeWidth="2"
+              />
+              <path
+                d="M30,20 v20 M70,20 v20 M50,40 v20 M30,60 v20"
+                stroke="#a3a3a3"
+                strokeWidth="2"
+              />
+              <rect
+                x="0"
+                y="0"
+                width="100"
+                height="100"
+                fill="none"
+                stroke="#a3a3a3"
+                strokeWidth="10"
+                opacity="0.3"
+              />
+            </svg>
+          ),
+          hint: "The hard outer layer",
+        },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [slideIndex, setSlideIndex] = useState(0);
+        const [feedback, setFeedback] = useState(null);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+        const currentSlide = slides[slideIndex];
+
+        const checkAnswer = (ans) => {
+          if (ans === currentSlide.target) {
+            setFeedback("correct");
+            setTimeout(() => {
+              setFeedback(null);
+              setSlideIndex((slideIndex + 1) % slides.length);
+            }, 1000);
+          } else {
+            setFeedback("wrong"); // Using existing logic implicitly? No, need explicit state.
+            // Let's add simple visual for wrong
+            setTimeout(() => setFeedback(null), 500);
+          }
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4 font-sans bg-lime-50">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-4 text-lime-800">
+              🔬 {getText("title")}
+            </h1>
+
+            <div className="flex flex-col items-center gap-8 w-full max-w-2xl">
+              {/* Microscope View */}
+              <div className="relative w-80 h-80 rounded-full border-[16px] border-slate-700 shadow-2xl bg-white overflow-hidden group">
+                <div className="absolute inset-0 z-10 pointer-events-none rounded-full shadow-[inset_0_0_40px_rgba(0,0,0,0.5)]"></div>
+                {/* Viewport content */}
+                <div className="w-[150%] h-[150%] -ml-[25%] -mt-[25%] transition-transform duration-1000 group-hover:scale-110">
+                  {currentSlide.view}
+                </div>
+
+                {feedback && (
+                  <div
+                    className={`absolute inset-0 flex items-center justify-center z-20 bg-black/50`}
+                  >
+                    <div
+                      className={`text-3xl font-bold px-4 py-2 rounded ${
+                        feedback === "correct"
+                          ? "text-green-400"
+                          : "text-red-400"
+                      }`}
+                    >
+                      {getText(
+                        feedback === "correct" ? "correct" : "instruction"
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <p className="font-bold text-slate-600 text-lg">
+                {getText("instruction")}
+              </p>
+
+              {/* Options */}
+              <div className="grid grid-cols-2 gap-4 w-full">
+                {["cell_wall", "chloroplast", "stomata", "nucleus"].map(
+                  (opt) => (
+                    <button
+                      key={opt}
+                      onClick={() => checkAnswer(opt)}
+                      className="bg-white hover:bg-lime-100 text-lime-900 border-2 border-lime-200 py-4 rounded-xl font-bold shadow-sm transition-all active:scale-95"
+                    >
+                      {getText(opt)}
+                    </button>
+                  )
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

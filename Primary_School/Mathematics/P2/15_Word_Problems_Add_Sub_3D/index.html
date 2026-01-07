@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小二數學：應用題 (三位數) | Word Problems (3-Digit)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fce7f3 0%, #db2777 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "📝 Word Problems",
+          zh: "📝 應用題",
+          ja: "📝 文章題",
+          ko: "📝 문장제",
+          es: "📝 Problemas verbales",
+          de: "📝 Textaufgaben",
+          fi: "📝 Sanalliset tehtävät",
+          fr: "📝 Problèmes écrits",
+          ar: "📝 مسائل نصية",
+          it: "📝 Problemi verbali",
+        },
+        calc: {
+          en: "Calculation:",
+          zh: "列式",
+          ja: "計算式:",
+          ko: "계산:",
+          es: "Cálculo:",
+          de: "Rechnung:",
+          fi: "Lasku:",
+          fr: "Calcul :",
+          ar: "الحساب:",
+          it: "Calcolo:",
+        },
+        ok: {
+          en: "OK",
+          zh: "確定",
+          ja: "OK",
+          ko: "확인",
+          es: "Aceptar",
+          de: "OK",
+          fi: "OK",
+          fr: "OK",
+          ar: "موافق",
+          it: "OK",
+        },
+        thinkAgain: {
+          en: "Think again",
+          zh: "再想想",
+          ja: "もう一度考えて",
+          ko: "다시 생각해 보세요",
+          es: "Piénsalo de nuevo",
+          de: "Denk nochmal nach",
+          fi: "Mieti uudelleen",
+          fr: "Réfléchissez encore",
+          ar: "فكر مرة أخرى",
+          it: "Pensaci ancora",
+        },
+        correct: {
+          en: "Correct! {n1} {op} {n2} = {ans}",
+          zh: "正確！ {n1} {op} {n2} = {ans}",
+          ja: "正解！ {n1} {op} {n2} = {ans}",
+          ko: "정답! {n1} {op} {n2} = {ans}",
+          es: "¡Correcto! {n1} {op} {n2} = {ans}",
+          de: "Richtig! {n1} {op} {n2} = {ans}",
+          fi: "Oikein! {n1} {op} {n2} = {ans}",
+          fr: "Correct ! {n1} {op} {n2} = {ans}",
+          ar: "صحيح! {n1} {op} {n2} = {ans}",
+          it: "Corretto! {n1} {op} {n2} = {ans}",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [p, setP] = useState({});
+        const [input, setInput] = useState("");
+        const [feedback, setFeedback] = useState("");
+
+        const problems = [
+          {
+            zh: "學校有男生 {n1} 人，女生 {n2} 人。全校共有多少人？",
+            en: "There are {n1} boys and {n2} girls. How many students in total?",
+            ja: "学校には男子が {n1} 人、女子が {n2} 人います。全校生徒は何人ですか？",
+            ko: "학교에 남학생이 {n1} 명, 여학생이 {n2} 명 있습니다. 전체 학생 수는 몇 명입니까?",
+            es: "Hay {n1} niños y {n2} niñas en la escuela. ¿Cuántos estudiantes hay en total?",
+            fr: "Il y a {n1} garçons et {n2} filles à l'école. Combien d'élèves au total ?",
+            de: "Es gibt {n1} Jungen und {n2} Mädchen. Wie viele Schüler sind es insgesamt?",
+            op: "+",
+            icon: "🏫",
+          },
+          {
+            zh: "圖書館有書 {n1} 本，借出了 {n2} 本。還剩下多少本？",
+            en: "Library has {n1} books. {n2} are loaned out. How many left?",
+            ja: "図書館に本が {n1} 冊あります。{n2} 冊貸し出されました。残りは何冊ですか？",
+            ko: "도서관에 책이 {n1} 권 있습니다. {n2} 권이 대출되었습니다. 몇 권이 남았습니까?",
+            es: "La biblioteca tiene {n1} libros. {n2} fueron prestados. ¿Cuántos quedan?",
+            fr: "La bibliothèque a {n1} livres. {n2} sont prêtés. Combien en reste-t-il ?",
+            de: "Die Bibliothek hat {n1} Bücher. {n2} sind ausgeliehen. Wie viele sind noch da?",
+            op: "-",
+            icon: "📚",
+          },
+          {
+            zh: "小明有 ${n1}，買玩具用了 ${n2}。他還有多少錢？",
+            en: "Ming has ${n1}, spent ${n2}. How much left?",
+            ja: "ミンは ${n1} 持っていて、おもちゃに ${n2} 使いました。残りはいくらですか？",
+            ko: "밍은 ${n1}를 가지고 있었고, 장난감에 ${n2}를 썼습니다. 얼마가 남았습니까?",
+            es: "Ming tiene ${n1}, gastó ${n2}. ¿Cuánto le queda?",
+            fr: "Ming a ${n1}, a dépensé ${n2}. Combien lui reste-t-il ?",
+            de: "Ming hat ${n1}, hat ${n2} ausgegeben. Wie viel ist übrig?",
+            op: "-",
+            icon: "💰",
+          },
+          {
+            zh: "第一天跑了 {n1} 米，第二天跑了 {n2} 米。兩天共跑了多少米？",
+            en: "Run {n1}m on Day 1, {n2}m on Day 2. Total distance?",
+            ja: "1日目に {n1}m、2日目に {n2}m 走りました。合計距離は？",
+            ko: "첫째 날 {n1}m, 둘째 날 {n2}m를 달렸습니다. 총 거리는?",
+            es: "Corrió {n1} m el día 1, {n2} m el día 2. ¿Distancia total?",
+            fr: "Couru {n1}m le jour 1, {n2}m le jour 2. Distance totale ?",
+            de: "Tag 1: {n1}m, Tag 2: {n2}m gelaufen. Gesamtstrecke?",
+            op: "+",
+            icon: "🏃",
+          },
+        ];
+
+        const next = () => {
+          const tIdx = Math.floor(Math.random() * problems.length);
+          const t = problems[tIdx];
+          let n1 = Math.floor(Math.random() * 400) + 100;
+          let n2 = Math.floor(Math.random() * 300) + 50;
+
+          if (t.op === "-" && n2 > n1) [n1, n2] = [n2, n1];
+
+          setP({ ...t, n1, n2 });
+          setInput("");
+          setFeedback("");
+        };
+
+        useEffect(next, []);
+
+        const check = () => {
+          let ans = p.op === "+" ? p.n1 + p.n2 : p.n1 - p.n2;
+          if (parseInt(input) === ans) {
+            setFeedback("CORRECT");
+            setTimeout(next, 3000);
+          } else {
+            setFeedback("WRONG");
+          }
+        };
+
+        const getProblemText = () => {
+          const tmpl = p[lang] || p["en"]; // Fallback to English
+          if (!tmpl) return "";
+          return tmpl.replace("{n1}", p.n1).replace("{n2}", p.n2);
+        };
+
+        const getCorrectText = () => {
+          const ans = p.op === "+" ? p.n1 + p.n2 : p.n1 - p.n2;
+          const tmpl = t.correct[lang] || t.correct["en"];
+          return tmpl
+            .replace("{n1}", p.n1)
+            .replace("{op}", p.op)
+            .replace("{n2}", p.n2)
+            .replace("{ans}", ans);
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center justify-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+
+            <h1 className="text-5xl font-black text-pink-900 mb-8 max-w-2xl text-center">
+              {t.title[lang] || t.title["en"]}
+            </h1>
+
+            <div className="bg-white/90 rounded-3xl p-8 shadow-2xl w-full max-w-3xl text-center border-4 border-pink-300">
+              <div className="text-8xl mb-8 animate-bounce">{p.icon}</div>
+
+              <div className="text-2xl md:text-3xl font-bold text-slate-700 mb-8 leading-loose bg-pink-50 p-8 rounded-2xl border-2 border-pink-100 text-left">
+                <div className="mb-4 text-pink-800">{getProblemText()}</div>
+              </div>
+
+              <div className="flex justify-center flex-col items-center gap-4 mb-6">
+                <label className="font-bold text-pink-600 text-xl">
+                  {t.calc[lang] || t.calc["en"]} {p.n1} {p.op} {p.n2} = ?
+                </label>
+                <div className="flex gap-4">
+                  <input
+                    type="number"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    className="w-48 text-center text-5xl font-black p-4 border-4 border-pink-400 rounded-2xl"
+                    placeholder="?"
+                  />
+                  <button
+                    onClick={check}
+                    className="px-8 bg-pink-500 text-white rounded-2xl font-bold text-xl hover:bg-pink-600"
+                  >
+                    {t.ok[lang] || t.ok["en"]}
+                  </button>
+                </div>
+              </div>
+
+              <div className="min-h-[60px]">
+                {feedback === "CORRECT" && (
+                  <div className="text-2xl md:text-3xl font-black text-green-500 animate-bounce">
+                    {getCorrectText()}
+                  </div>
+                )}
+                {feedback === "WRONG" && (
+                  <div className="text-3xl font-black text-red-500">
+                    {t.thinkAgain[lang] || t.thinkAgain["en"]}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

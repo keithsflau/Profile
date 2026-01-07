@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Laws of Indices 指數定律 | S2 Math</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-amber-50 text-slate-800 min-h-screen">
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+
+      const App = () => {
+        const [lang, setLang] = useState("en");
+        const [base, setBase] = useState(2);
+        const [m, setM] = useState(3);
+        const [n, setN] = useState(2);
+        const [mode, setMode] = useState("mult"); // 'mult' (x), 'div' (/), 'power' ((^))
+
+        const t = {
+          title: { en: "Laws of Indices", zh: "指數定律" },
+          base: { en: "Base (a)", zh: "底數 (a)" },
+          mult: { en: "Multiplication", zh: "乘法" },
+          div: { en: "Division", zh: "除法" },
+          power: { en: "Power of Power", zh: "冪的乘方" },
+          back: { en: "Back to Dashboard", zh: "返回主頁" },
+        };
+
+        const renderExpansion = () => {
+          if (mode === "mult") {
+            // a^m * a^n
+            return (
+              <div className="flex flex-wrap items-center gap-2 justify-center text-lg font-mono">
+                <div className="bg-white p-2 rounded border border-amber-200">
+                  {[...Array(m)].map((_, i) => (
+                    <span key={i}>
+                      {base}
+                      {i < m - 1 ? "·" : ""}
+                    </span>
+                  ))}
+                </div>
+                <span className="text-xl font-bold">×</span>
+                <div className="bg-white p-2 rounded border border-amber-200">
+                  {[...Array(n)].map((_, i) => (
+                    <span key={i}>
+                      {base}
+                      {i < n - 1 ? "·" : ""}
+                    </span>
+                  ))}
+                </div>
+                <span className="text-xl font-bold">=</span>
+                <div className="bg-amber-100 p-2 rounded border border-amber-300 font-bold text-amber-800">
+                  {base}
+                  <sup>{m + n}</sup>
+                </div>
+              </div>
+            );
+          } else if (mode === "div") {
+            // a^m / a^n
+            // Ensure m >= n for visualization easily
+            const validN = Math.min(n, m);
+            return (
+              <div className="flex flex-col items-center gap-2 text-lg font-mono">
+                <div className="border-b-2 border-amber-400 pb-1 px-4">
+                  {[...Array(m)].map((_, i) => (
+                    <span
+                      key={i}
+                      className={
+                        i < validN
+                          ? "opacity-40 text-red-400 line-through decoration-red-500"
+                          : ""
+                      }
+                    >
+                      {base}
+                      {i < m - 1 ? "·" : ""}
+                    </span>
+                  ))}
+                </div>
+                <div className="pt-1 px-4">
+                  {[...Array(validN)].map((_, i) => (
+                    <span
+                      key={i}
+                      className="opacity-40 text-red-400 line-through decoration-red-500"
+                    >
+                      {base}
+                      {i < validN - 1 ? "·" : ""}
+                    </span>
+                  ))}
+                </div>
+                <div className="mt-2 text-xl font-bold text-amber-800">
+                  = {base}
+                  <sup>{m - validN}</sup>
+                </div>
+              </div>
+            );
+          } else {
+            // (a^m)^n
+            return (
+              <div className="flex flex-col items-center gap-2 text-lg font-mono">
+                <div className="flex flex-wrap gap-4 justify-center">
+                  {[...Array(n)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="bg-white p-2 rounded border border-amber-200 relative"
+                    >
+                      <span className="absolute -top-3 left-1/2 transform -translate-x-1/2 text-xs bg-amber-100 px-1 rounded text-amber-600">
+                        Group {i + 1}
+                      </span>
+                      {[...Array(m)].map((_, j) => (
+                        <span key={j}>
+                          {base}
+                          {j < m - 1 ? "·" : ""}
+                        </span>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-2 text-xl font-bold text-amber-800">
+                  Total = {m} × {n} = {m * n} factors
+                  <br />= {base}
+                  <sup>{m * n}</sup>
+                </div>
+              </div>
+            );
+          }
+        };
+
+        return (
+          <div className="p-6 max-w-4xl mx-auto min-h-screen flex flex-col">
+            <header className="mb-6 flex justify-between items-center">
+              <div>
+                <div className="text-amber-600 font-bold uppercase text-xs tracking-widest mb-1">
+                  S2 Math
+                </div>
+                <h1 className="text-3xl font-extrabold text-slate-900">
+                  {t.title[lang]}
+                </h1>
+              </div>
+              <button
+                onClick={() => setLang(lang === "en" ? "zh" : "en")}
+                className="px-3 py-1 bg-white border border-amber-200 rounded-lg text-sm font-bold hover:bg-amber-100"
+              >
+                {lang === "en" ? "中文" : "ENG"}
+              </button>
+            </header>
+
+            <div className="flex gap-4 mb-6 justify-center">
+              <button
+                onClick={() => setMode("mult")}
+                className={`px-4 py-2 rounded-xl font-bold transition ${
+                  mode === "mult"
+                    ? "bg-amber-500 text-white shadow-lg"
+                    : "bg-white text-amber-600 hover:bg-amber-50"
+                }`}
+              >
+                {t.mult[lang]}
+              </button>
+              <button
+                onClick={() => setMode("div")}
+                className={`px-4 py-2 rounded-xl font-bold transition ${
+                  mode === "div"
+                    ? "bg-amber-500 text-white shadow-lg"
+                    : "bg-white text-amber-600 hover:bg-amber-50"
+                }`}
+              >
+                {t.div[lang]}
+              </button>
+              <button
+                onClick={() => setMode("power")}
+                className={`px-4 py-2 rounded-xl font-bold transition ${
+                  mode === "power"
+                    ? "bg-amber-500 text-white shadow-lg"
+                    : "bg-white text-amber-600 hover:bg-amber-50"
+                }`}
+              >
+                {t.power[lang]}
+              </button>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8 items-start mb-6">
+              <div className="col-span-1 bg-white p-6 rounded-2xl border border-amber-100 shadow-sm">
+                <h3 className="text-sm font-bold text-slate-400 uppercase mb-4">
+                  Input
+                </h3>
+                <div className="space-y-6">
+                  <div>
+                    <label className="text-xs font-bold text-amber-600 block mb-1">
+                      Base (a)
+                    </label>
+                    <input
+                      type="range"
+                      min="2"
+                      max="5"
+                      value={base}
+                      onChange={(e) => setBase(Number(e.target.value))}
+                      className="w-full accent-amber-500"
+                    />
+                    <div className="text-center font-mono font-bold">
+                      {base}
+                    </div>
+                  </div>
+                  <div className="border-t border-slate-100 pt-4">
+                    <label className="text-xs font-bold text-amber-600 block mb-1">
+                      Exponent (m)
+                    </label>
+                    <input
+                      type="range"
+                      min="1"
+                      max="5"
+                      value={m}
+                      onChange={(e) => setM(Number(e.target.value))}
+                      className="w-full accent-amber-500"
+                    />
+                    <div className="text-center font-mono font-bold text-xl text-amber-600">
+                      {m}
+                    </div>
+                  </div>
+                  <div className="border-t border-slate-100 pt-4">
+                    <label className="text-xs font-bold text-blue-600 block mb-1">
+                      Exponent (n)
+                    </label>
+                    <input
+                      type="range"
+                      min="1"
+                      max={mode === "div" ? m : 5}
+                      value={n}
+                      onChange={(e) => setN(Number(e.target.value))}
+                      className="w-full accent-blue-500"
+                    />
+                    <div className="text-center font-mono font-bold text-xl text-blue-600">
+                      {n}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-span-2 space-y-6">
+                <div className="bg-white p-8 rounded-2xl border border-amber-100 shadow-sm min-h-[200px] flex items-center justify-center">
+                  {renderExpansion()}
+                </div>
+
+                <div className="bg-amber-100 p-6 rounded-2xl border border-amber-200 text-center">
+                  <div className="text-xs uppercase font-bold text-amber-600 mb-2">
+                    Formula
+                  </div>
+                  <div className="text-3xl font-serif font-bold text-amber-800">
+                    {mode === "mult" && (
+                      <span>
+                        a<sup>m</sup> × a<sup>n</sup> = a<sup>m+n</sup>
+                      </span>
+                    )}
+                    {mode === "div" && (
+                      <span>
+                        a<sup>m</sup> ÷ a<sup>n</sup> = a<sup>m-n</sup>
+                      </span>
+                    )}
+                    {mode === "power" && (
+                      <span>
+                        (a<sup>m</sup>)<sup>n</sup> = a<sup>m×n</sup>
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-lg font-mono font-bold text-amber-900 mt-2">
+                    {mode === "mult" && (
+                      <span>
+                        {base}
+                        <sup>{m}</sup> × {base}
+                        <sup>{n}</sup> = {base}
+                        <sup>{m + n}</sup>
+                      </span>
+                    )}
+                    {mode === "div" && (
+                      <span>
+                        {base}
+                        <sup>{m}</sup> ÷ {base}
+                        <sup>{n}</sup> = {base}
+                        <sup>{m - n}</sup>
+                      </span>
+                    )}
+                    {mode === "power" && (
+                      <span>
+                        ({base}
+                        <sup>{m}</sup>)<sup>{n}</sup> = {base}
+                        <sup>{m * n}</sup>
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <footer className="mt-auto pt-8">
+              <a
+                href="../index.html"
+                className="text-amber-600 hover:text-amber-700 font-bold"
+              >
+                <i className="fa-solid fa-arrow-left mr-2"></i>
+                {t.back[lang]}
+              </a>
+            </footer>
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

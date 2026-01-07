@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Binomial Distribution | S6 Math 二項分布</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script
+      type="text/javascript"
+      id="MathJax-script"
+      async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+    ></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Sans+TC:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-indigo-50 text-slate-800 min-h-screen">
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect, useMemo } = React;
+
+      const translations = {
+        en: {
+          unit: "Unit 2: Probability",
+          title: "Binomial Distribution",
+          desc: "Visualize P(X=k) for X ~ B(n, p).",
+          trials: "Number of Trials (n)",
+          prob: "Probability of Success (p)",
+          findP: "Find P(X = k)",
+          mean: "Mean",
+          variance: "Variance",
+          result: "P(X = k)",
+        },
+        zh: {
+          unit: "單元二：概率論",
+          title: "二項分布",
+          desc: "視像化 X ~ B(n, p) 的 P(X=k)。",
+          trials: "試驗次數 (n)",
+          prob: "成功概率 (p)",
+          findP: "求 P(X = k)",
+          mean: "平均值",
+          variance: "方差",
+          result: "P(X = k)",
+        },
+      };
+
+      const factorial = (num) => {
+        if (num <= 1) return 1;
+        let result = 1;
+        for (let i = 2; i <= num; i++) result *= i;
+        return result;
+      };
+
+      const comb = (n, k) => factorial(n) / (factorial(k) * factorial(n - k));
+
+      const App = () => {
+        const [lang, setLang] = useState("en");
+        const t = translations[lang];
+
+        const [n, setN] = useState(10);
+        const [p, setP] = useState(0.5);
+        const [k, setK] = useState(5);
+
+        // Calculate P(X = k) for all k from 0 to n
+        const distribution = useMemo(() => {
+          const dist = [];
+          for (let i = 0; i <= n; i++) {
+            const prob = comb(n, i) * Math.pow(p, i) * Math.pow(1 - p, n - i);
+            dist.push({ k: i, prob });
+          }
+          return dist;
+        }, [n, p]);
+
+        const mean = n * p;
+        const variance = n * p * (1 - p);
+        const selectedProb = distribution[k]?.prob || 0;
+
+        // Bar Chart
+        const w = 600,
+          h = 300;
+        const barWidth = Math.min(40, (w - 80) / (n + 1));
+        const maxProb = Math.max(...distribution.map((d) => d.prob));
+
+        useEffect(() => {
+          if (window.MathJax) window.MathJax.typesetPromise();
+        }, [n, p, k, lang]);
+
+        return (
+          <div className="p-8 max-w-5xl mx-auto min-h-screen flex flex-col items-center select-none">
+            <header className="mb-8 text-center w-full relative">
+              <button
+                onClick={() => setLang(lang === "en" ? "zh" : "en")}
+                className="absolute right-0 top-0 px-4 py-2 bg-white rounded-full shadow border border-indigo-200 text-sm font-bold text-indigo-600 hover:bg-indigo-50 transition"
+              >
+                <i className="fa-solid fa-globe mr-2"></i>
+                {lang === "en" ? "中文" : "ENG"}
+              </button>
+              <div className="text-indigo-600 font-bold uppercase text-xs tracking-widest mb-2">
+                {t.unit}
+              </div>
+              <h1 className="text-4xl font-extrabold text-slate-900 mb-2">
+                {t.title}
+              </h1>
+              <p className="text-slate-500">{t.desc}</p>
+            </header>
+
+            <div className="bg-white p-6 rounded-3xl shadow-xl border border-indigo-100 w-full mb-8">
+              {/* Bar Chart */}
+              <div className="bg-slate-50 p-4 rounded-xl mb-6 overflow-x-auto">
+                <svg width={w} height={h} className="mx-auto">
+                  {/* Y Axis */}
+                  <line
+                    x1="40"
+                    y1="20"
+                    x2="40"
+                    y2={h - 40}
+                    stroke="#94a3b8"
+                    strokeWidth="1"
+                  />
+                  {/* X Axis */}
+                  <line
+                    x1="40"
+                    y1={h - 40}
+                    x2={w - 20}
+                    y2={h - 40}
+                    stroke="#94a3b8"
+                    strokeWidth="1"
+                  />
+
+                  {/* Bars */}
+                  {distribution.map((d, i) => {
+                    const barH =
+                      maxProb > 0 ? (d.prob / maxProb) * (h - 80) : 0;
+                    const x = 50 + i * barWidth + i * 2;
+                    const y = h - 40 - barH;
+                    const isSelected = d.k === k;
+                    return (
+                      <g
+                        key={i}
+                        onClick={() => setK(d.k)}
+                        className="cursor-pointer"
+                      >
+                        <rect
+                          x={x}
+                          y={y}
+                          width={barWidth - 2}
+                          height={barH}
+                          fill={isSelected ? "#6366f1" : "#a5b4fc"}
+                          rx="2"
+                          className="transition-all duration-200 hover:opacity-80"
+                        />
+                        <text
+                          x={x + barWidth / 2 - 1}
+                          y={h - 25}
+                          textAnchor="middle"
+                          className="text-[10px] fill-slate-500"
+                        >
+                          {d.k}
+                        </text>
+                      </g>
+                    );
+                  })}
+                </svg>
+              </div>
+
+              {/* Controls */}
+              <div className="grid md:grid-cols-3 gap-6 mb-6">
+                <div>
+                  <label className="text-sm font-bold text-slate-500 block mb-2">
+                    {t.trials}
+                  </label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="20"
+                    value={n}
+                    onChange={(e) => {
+                      setN(Number(e.target.value));
+                      setK(Math.min(k, Number(e.target.value)));
+                    }}
+                    className="w-full accent-indigo-500"
+                  />
+                  <div className="text-right font-mono text-indigo-600 font-bold">
+                    {n}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-bold text-slate-500 block mb-2">
+                    {t.prob}
+                  </label>
+                  <input
+                    type="range"
+                    min="0.01"
+                    max="0.99"
+                    step="0.01"
+                    value={p}
+                    onChange={(e) => setP(Number(e.target.value))}
+                    className="w-full accent-indigo-500"
+                  />
+                  <div className="text-right font-mono text-indigo-600 font-bold">
+                    {p.toFixed(2)}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-bold text-slate-500 block mb-2">
+                    {t.findP}
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max={n}
+                    value={k}
+                    onChange={(e) => setK(Number(e.target.value))}
+                    className="w-full accent-rose-500"
+                  />
+                  <div className="text-right font-mono text-rose-600 font-bold">
+                    k = {k}
+                  </div>
+                </div>
+              </div>
+
+              {/* Stats */}
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="bg-indigo-50 p-4 rounded-xl text-center border border-indigo-100">
+                  <div className="text-xs font-bold text-indigo-400 uppercase">
+                    {t.mean} (μ = np)
+                  </div>
+                  <div className="text-2xl font-bold text-indigo-700 font-mono">
+                    {mean.toFixed(2)}
+                  </div>
+                </div>
+                <div className="bg-purple-50 p-4 rounded-xl text-center border border-purple-100">
+                  <div className="text-xs font-bold text-purple-400 uppercase">
+                    {t.variance} (σ² = npq)
+                  </div>
+                  <div className="text-2xl font-bold text-purple-700 font-mono">
+                    {variance.toFixed(2)}
+                  </div>
+                </div>
+                <div className="bg-rose-50 p-4 rounded-xl text-center border border-rose-100">
+                  <div className="text-xs font-bold text-rose-400 uppercase">
+                    {t.result}
+                  </div>
+                  <div className="text-2xl font-bold text-rose-700 font-mono">
+                    {(selectedProb * 100).toFixed(2)}%
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <footer className="mt-8">
+              <a
+                href="../index.html"
+                className="text-indigo-500 hover:text-indigo-700 font-bold"
+              >
+                <i className="fa-solid fa-arrow-left mr-2"></i> Back to
+                Dashboard
+              </a>
+            </footer>
+          </div>
+        );
+      };
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

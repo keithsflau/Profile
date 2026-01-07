@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小五數學：長方體體積公式 | Cuboid Volume Formula</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fce7f3 0%, #ec4899 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Cuboid Volume Formula",
+          zh: "長方體體積公式",
+          ja: "直方体の体積公式",
+          ko: "직육면체 부피 공식",
+          es: "Fórmula del Volumen del Cuboide",
+          de: "Quader-Volumenformel",
+          fi: "Suorakulmaisen särmiön tilavuuskaava",
+          fr: "Formule du volume du parallélépipède",
+          ar: "صيغة حجم متوازي المستطيلات",
+          it: "Formula del volume del cuboide",
+        },
+        length: {
+          en: "Length (cm):",
+          zh: "長 (cm):",
+          ja: "長さ (cm):",
+          ko: "길이 (cm):",
+          es: "Longitud (cm):",
+          de: "Länge (cm):",
+          fi: "Pituus (cm):",
+          fr: "Longueur (cm) :",
+          ar: "الطول (سم):",
+          it: "Lunghezza (cm):",
+        },
+        width: {
+          en: "Width (cm):",
+          zh: "闊 (cm):",
+          ja: "幅 (cm):",
+          ko: "너비 (cm):",
+          es: "Ancho (cm):",
+          de: "Breite (cm):",
+          fi: "Leveys (cm):",
+          fr: "Largeur (cm) :",
+          ar: "العرض (سم):",
+          it: "Larghezza (cm):",
+        },
+        height: {
+          en: "Height (cm):",
+          zh: "高 (cm):",
+          ja: "高さ (cm):",
+          ko: "높이 (cm):",
+          es: "Altura (cm):",
+          de: "Höhe (cm):",
+          fi: "Korkeus (cm):",
+          fr: "Hauteur (cm) :",
+          ar: "الارتفاع (سم):",
+          it: "Altezza (cm):",
+        },
+        dimL: {
+          en: "L",
+          zh: "長 L",
+          ja: "長 L",
+          ko: "길이 L",
+          es: "L",
+          de: "L",
+          fi: "P",
+          fr: "L",
+          ar: "L",
+          it: "L",
+        },
+        dimW: {
+          en: "W",
+          zh: "闊 W",
+          ja: "幅 W",
+          ko: "너비 W",
+          es: "W",
+          de: "B",
+          fi: "L",
+          fr: "l",
+          ar: "W",
+          it: "W",
+        },
+        dimH: {
+          en: "H",
+          zh: "高 H",
+          ja: "高 H",
+          ko: "높이 H",
+          es: "H",
+          de: "H",
+          fi: "K",
+          fr: "h",
+          ar: "H",
+          it: "H",
+        },
+        formula: {
+          en: "Formula:",
+          zh: "公式:",
+          ja: "公式:",
+          ko: "공식:",
+          es: "Fórmula:",
+          de: "Formel:",
+          fi: "Kaava:",
+          fr: "Formule :",
+          ar: "الصيغة:",
+          it: "Formula:",
+        },
+        volume: {
+          en: "Volume",
+          zh: "體積",
+          ja: "体積",
+          ko: "부피",
+          es: "Volumen",
+          de: "Volumen",
+          fi: "Tilavuus",
+          fr: "Volume",
+          ar: "الحجم",
+          it: "Volume",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const [l, setL] = useState(8);
+        const [w, setW] = useState(5);
+        const [h, setH] = useState(4);
+        const volume = l * w * h;
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-5xl font-black text-pink-100 mb-2 mt-8">
+              📐 {getText("title")}
+            </h1>
+
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-4xl w-full mt-8">
+              <div className="flex flex-col md:flex-row gap-8 items-center">
+                <div className="flex-1">
+                  <svg
+                    viewBox="0 0 200 180"
+                    className="w-full max-w-xs mx-auto"
+                  >
+                    {/* 3D cuboid */}
+                    <polygon
+                      points="20,120 100,120 100,50 20,50"
+                      fill="#f472b6"
+                      stroke="#be185d"
+                      strokeWidth="2"
+                    />
+                    <polygon
+                      points="100,120 160,90 160,20 100,50"
+                      fill="#ec4899"
+                      stroke="#be185d"
+                      strokeWidth="2"
+                    />
+                    <polygon
+                      points="20,50 80,20 160,20 100,50"
+                      fill="#fce7f3"
+                      stroke="#be185d"
+                      strokeWidth="2"
+                    />
+                    {/* Labels */}
+                    <text
+                      x="60"
+                      y="140"
+                      className="text-xs font-bold fill-pink-800"
+                    >
+                      {getText("dimL")} = {l} cm
+                    </text>
+                    <text
+                      x="135"
+                      y="75"
+                      className="text-xs font-bold fill-pink-800"
+                    >
+                      {getText("dimW")} = {w} cm
+                    </text>
+                    <text
+                      x="5"
+                      y="85"
+                      className="text-xs font-bold fill-pink-800"
+                    >
+                      {getText("dimH")} = {h} cm
+                    </text>
+                  </svg>
+                </div>
+                <div className="flex-1 space-y-4">
+                  <div>
+                    <label className="block font-bold text-pink-800 mb-1">
+                      {getText("length")} {l}
+                    </label>
+                    <input
+                      type="range"
+                      min="2"
+                      max="15"
+                      value={l}
+                      onChange={(e) => setL(parseInt(e.target.value))}
+                      className="w-full accent-pink-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-pink-800 mb-1">
+                      {getText("width")} {w}
+                    </label>
+                    <input
+                      type="range"
+                      min="2"
+                      max="12"
+                      value={w}
+                      onChange={(e) => setW(parseInt(e.target.value))}
+                      className="w-full accent-pink-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-pink-800 mb-1">
+                      {getText("height")} {h}
+                    </label>
+                    <input
+                      type="range"
+                      min="2"
+                      max="10"
+                      value={h}
+                      onChange={(e) => setH(parseInt(e.target.value))}
+                      className="w-full accent-pink-500"
+                    />
+                  </div>
+
+                  <div className="bg-pink-50 rounded-xl p-4 border-2 border-pink-200 text-center">
+                    <p className="font-bold text-pink-800">
+                      {getText("formula")}
+                    </p>
+                    <p className="text-2xl font-mono">V = L × W × H</p>
+                  </div>
+
+                  <div className="bg-emerald-100 rounded-2xl p-6 text-center border-4 border-emerald-300">
+                    <div className="text-emerald-600 font-bold">
+                      {getText("volume")}
+                    </div>
+                    <div className="text-4xl font-black text-emerald-800">
+                      {volume} cm³
+                    </div>
+                    <div className="text-sm text-emerald-600">
+                      {l} × {w} × {h} = {volume}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

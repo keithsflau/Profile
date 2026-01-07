@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Muscular System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #fca5a5;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Muscle Power",
+          zh: "肌肉力量",
+          ja: "筋力",
+          ko: "근력",
+          es: "Poder muscular",
+          de: "Muskelkraft",
+          fi: "Lihasvoima",
+          fr: "Force musculaire",
+          ar: "قوة العضلات",
+          it: "Potenza Muscolare",
+        },
+        instruction: {
+          en: "Contract the Biceps to lift the weight!",
+          zh: "收縮二頭肌以舉起重物！",
+          ja: "上腕二頭筋を収縮させて重りを持ち上げよう！",
+          ko: "이두근을 수축하여 무게를 들어 올리세요!",
+          es: "¡Contrae los bíceps para levantar el peso!",
+          de: "Spanne den Bizeps an, um das Gewicht zu heben!",
+          fi: "Jännitä hauislihasta nostaaksesi painon!",
+          fr: "Contractez le biceps pour soulever le poids !",
+          ar: "انقباض العضلة ذات الرأسين لرفع الوزن!",
+          it: "Contrai il bicipite per sollevare il peso!",
+        },
+        biceps: { en: "Biceps", zh: "二頭肌", ja: "上腕二頭筋", ko: "이두근" },
+        triceps: {
+          en: "Triceps",
+          zh: "三頭肌",
+          ja: "上腕三頭筋",
+          ko: "삼두근",
+        },
+        relax: { en: "Relax", zh: "放鬆", ja: "リラックス", ko: "이완" },
+        contract: { en: "Contract", zh: "收縮", ja: "収縮", ko: "수축" },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [flex, setFlex] = useState(0); // 0 to 100
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        // Simulation
+        // Flex 100 = Arm bent (90 deg), Bicep bulge max.
+        // Flex 0 = Arm straight (180 deg), Tricep engaged.
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-red-800">
+              {getText("title")}
+            </h1>
+
+            <div className="w-full max-w-lg bg-white p-8 rounded-3xl shadow-xl flex flex-col items-center">
+              <p className="mb-8 font-bold text-slate-500">
+                {getText("instruction")}
+              </p>
+
+              {/* Arm Render */}
+              <div className="relative w-[300px] h-[300px] flex items-center justify-center">
+                {/* Upper Arm */}
+                <div className="absolute w-32 h-10 bg-red-300 rounded-full top-[100px] left-[50px] z-10">
+                  {/* Bicep Line Bump */}
+                  <motion.div
+                    className="absolute top-[-10px] left-8 w-16 h-8 bg-red-400 rounded-full"
+                    animate={{ scaleY: 1 + flex / 100 }}
+                  ></motion.div>
+                  <div className="absolute top-[-20px] left-10 text-xs font-bold text-red-800">
+                    {getText("biceps")}
+                  </div>
+                </div>
+
+                {/* Lower Arm (Pivoting) */}
+                <motion.div
+                  className="absolute w-32 h-8 bg-red-200 rounded-full top-[110px] left-[170px] origin-left border-4 border-red-300"
+                  animate={{ rotate: -flex * 0.9 }} // 0 to -90 deg
+                >
+                  {/* Hand/Weight */}
+                  <div className="absolute right-[-20px] top-[-10px] text-4xl transform rotate-90">
+                    🏋️
+                  </div>
+                </motion.div>
+
+                {/* Joint */}
+                <div className="absolute top-[105px] left-[165px] w-6 h-6 bg-red-500 rounded-full z-20"></div>
+              </div>
+
+              {/* Slider Control */}
+              <div className="w-full mt-8">
+                <div className="flex justify-between mb-2 font-bold text-red-900">
+                  <span>{getText("relax")}</span>
+                  <span>{getText("contract")}</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={flex}
+                  onChange={(e) => setFlex(Number(e.target.value))}
+                  className="w-full h-8 bg-red-100 rounded-lg appearance-none cursor-grab accent-red-600"
+                />
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

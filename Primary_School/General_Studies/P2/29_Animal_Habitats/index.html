@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小二常識：動物的家 | Animal Habitats</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #bae6fd 0%, #e0f2fe 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Animal Habitats",
+          zh: "動物的家",
+          ja: "動物の生息地",
+        },
+        instruction: {
+          en: "Put animals in their habitats!",
+          zh: "把動物放回牠們的家！",
+          ja: "動物を生息地に戻してあげよう！",
+        },
+
+        land: { en: "Land", zh: "陸地" },
+        sea: { en: "Sea", zh: "海洋" },
+        sky: { en: "Sky", zh: "天空" },
+
+        lion: { en: "Lion", zh: "獅子" },
+        elephant: { en: "Elephant", zh: "大象" },
+        rabbit: { en: "Rabbit", zh: "兔子" },
+
+        fish: { en: "Fish", zh: "魚" },
+        whale: { en: "Whale", zh: "鯨魚" },
+        crab: { en: "Crab", zh: "螃蟹" },
+
+        bird: { en: "Bird", zh: "小鳥" },
+        eagle: { en: "Eagle", zh: "老鷹" },
+        bat: { en: "Bat", zh: "蝙蝠" },
+
+        correct: { en: "Correct!", zh: "正確！" },
+        wrong: { en: "Wrong Habitat!", zh: "住錯地方了！" },
+        completed: {
+          en: "All animals represent happy!",
+          zh: "所有動物都很開心！",
+        },
+        reset: { en: "Play Again", zh: "再玩一次" },
+      };
+
+      const animals = [
+        { id: "lion", icon: "🦁", habitat: "land" },
+        { id: "whale", icon: "🐋", habitat: "sea" },
+        { id: "eagle", icon: "🦅", habitat: "sky" },
+        { id: "fish", icon: "🐠", habitat: "sea" },
+        { id: "rabbit", icon: "🐇", habitat: "land" },
+        { id: "bird", icon: "🐦", habitat: "sky" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [queue, setQueue] = useState([]);
+        const [current, setCurrent] = useState(null);
+        const [feedback, setFeedback] = useState(null);
+        const [placed, setPlaced] = useState({ land: [], sea: [], sky: [] });
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        useEffect(() => {
+          reset();
+        }, []);
+
+        const reset = () => {
+          const q = [...animals].sort(() => Math.random() - 0.5);
+          setQueue(q);
+          setCurrent(q[0]);
+          setPlaced({ land: [], sea: [], sky: [] });
+          setFeedback(null);
+        };
+
+        const handlePlace = (hab) => {
+          if (feedback) return;
+          if (current.habitat === hab) {
+            setFeedback("correct");
+            setPlaced((prev) => ({ ...prev, [hab]: [...prev[hab], current] }));
+            setTimeout(() => {
+              setFeedback(null);
+              const nextIdx = queue.indexOf(current) + 1;
+              if (nextIdx < queue.length) setCurrent(queue[nextIdx]);
+              else setCurrent(null);
+            }, 800);
+          } else {
+            setFeedback("wrong");
+            setTimeout(() => setFeedback(null), 1000);
+          }
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center select-none overflow-hidden">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-sky-800 mb-4 mt-8 drop-shadow-sm bg-white/50 px-6 py-2 rounded-full z-10">
+              🌍 {getText("title")}
+            </h1>
+
+            {!current && (
+              <div className="absolute inset-0 bg-white/80 z-50 flex flex-col items-center justify-center">
+                <div className="text-8xl mb-4">🎉</div>
+                <h2 className="text-3xl font-black text-green-600 mb-6">
+                  {getText("completed")}
+                </h2>
+                <button
+                  onClick={reset}
+                  className="bg-green-600 text-white px-10 py-4 rounded-full font-black text-xl hover:bg-green-700 shadow-xl"
+                >
+                  {getText("reset")} 🔄
+                </button>
+              </div>
+            )}
+
+            {/* Habitat Zones */}
+            <div className="flex-1 w-full max-w-5xl flex flex-col gap-2 relative">
+              {/* Sky */}
+              <div
+                onClick={() => current && handlePlace("sky")}
+                className="flex-1 bg-sky-200 rounded-3xl border-4 border-white shadow-inner relative flex flex-wrap content-start p-4 hover:brightness-105 cursor-pointer transition-all"
+              >
+                <span className="absolute top-2 left-2 font-bold text-sky-600 bg-white/50 px-3 py-1 rounded-full">
+                  {getText("sky")}
+                </span>
+                <div className="text-4xl absolute top-4 right-10 opacity-50">
+                  ☁️
+                </div>
+                {placed.sky.map((a, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="text-5xl m-2"
+                  >
+                    {a.icon}
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Land */}
+              <div
+                onClick={() => current && handlePlace("land")}
+                className="flex-1 bg-green-200 rounded-3xl border-4 border-white shadow-inner relative flex flex-wrap content-center p-4 hover:brightness-105 cursor-pointer transition-all"
+              >
+                <span className="absolute top-2 left-2 font-bold text-green-700 bg-white/50 px-3 py-1 rounded-full">
+                  {getText("land")}
+                </span>
+                <div className="text-4xl absolute bottom-4 right-10 opacity-50">
+                  🌲
+                </div>
+                {placed.land.map((a, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="text-5xl m-2"
+                  >
+                    {a.icon}
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Sea */}
+              <div
+                onClick={() => current && handlePlace("sea")}
+                className="flex-1 bg-blue-300 rounded-3xl border-4 border-white shadow-inner relative flex flex-wrap content-end p-4 hover:brightness-105 cursor-pointer transition-all"
+              >
+                <span className="absolute top-2 left-2 font-bold text-blue-800 bg-white/50 px-3 py-1 rounded-full">
+                  {getText("sea")}
+                </span>
+                <div className="text-4xl absolute bottom-4 right-10 opacity-50">
+                  🌊
+                </div>
+                {placed.sea.map((a, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="text-5xl m-2"
+                  >
+                    {a.icon}
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Draggable (Clickable) Item Overlay */}
+              {current && (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  key={current.id}
+                  className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                >
+                  <div className="bg-white p-6 rounded-full shadow-2xl border-4 border-orange-300 flex flex-col items-center animate-bounce-slow">
+                    <div className="text-7xl mb-2">{current.icon}</div>
+                    <div className="font-bold text-slate-600 bg-slate-100 px-2 rounded">
+                      {getText(current.id)}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {feedback && (
+                <div
+                  className={`absolute inset-0 flex items-center justify-center pointer-events-none z-20`}
+                >
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1.5 }}
+                    className={`p-6 rounded-2xl font-black text-3xl shadow-2xl border-4 border-white ${
+                      feedback === "correct"
+                        ? "bg-green-500 text-white"
+                        : "bg-red-500 text-white"
+                    }`}
+                  >
+                    {getText(feedback)}
+                  </motion.div>
+                </div>
+              )}
+            </div>
+
+            <p className="mt-4 font-bold text-slate-500 animate-pulse">
+              {getText("instruction")}
+            </p>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

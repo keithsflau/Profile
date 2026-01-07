@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小二數學：日曆與星期 | Calendar & Weekdays</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fce7f3 0%, #db2777 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "📅 Calendar & Weekdays",
+          zh: "📅 日曆與星期",
+          ja: "📅 カレンダーと曜日",
+          ko: "📅 달력과 요일",
+          es: "📅 Calendario y días de la semana",
+          de: "📅 Kalender & Wochentage",
+          fi: "📅 Kalenteri & viikonpäivät",
+          fr: "📅 Calendrier et jours de la semaine",
+          ar: "📅 التقويم وأيام الأسبوع",
+          it: "📅 Calendario e giorni della settimana",
+        },
+        today: {
+          en: "Today",
+          zh: "今天",
+          ja: "今日",
+          ko: "오늘",
+          es: "Hoy",
+          de: "Heute",
+          fi: "Tänään",
+          fr: "Aujourd'hui",
+          ar: "اليوم",
+          it: "Oggi",
+        },
+        is: {
+          en: "is",
+          zh: "是",
+          ja: "は",
+          ko: "은/는",
+          es: "es",
+          de: "ist",
+          fi: "on",
+          fr: "est",
+          ar: "هو",
+          it: "è",
+        },
+        dateSuffix: {
+          en: "",
+          zh: "號",
+          ja: "日",
+          ko: "일",
+          es: "",
+          de: "",
+          fi: "",
+          fr: "",
+          ar: "",
+          it: "",
+        },
+        clickHint: {
+          en: "Click calendar to answer",
+          zh: "點擊日曆回答",
+          ja: "カレンダーをクリックして回答",
+          ko: "달력을 클릭하여 답변하세요",
+          es: "Haga clic en el calendario para responder",
+          de: "Klicken Sie auf den Kalender, um zu antworten",
+          fi: "Napsauta kalenteria vastataksesi",
+          fr: "Cliquez sur le calendrier pour répondre",
+          ar: "انقر على التقويم للإجابة",
+          it: "Fai clic sul calendario per rispondere",
+        },
+        correct: {
+          en: "Correct!",
+          zh: "正確！",
+          ja: "正解！",
+          ko: "정답!",
+          es: "¡Correcto!",
+          de: "Richtig!",
+          fi: "Oikein!",
+          fr: "Correct !",
+          ar: "صحيح!",
+          it: "Corretto!",
+        },
+      };
+
+      const weekDays = {
+        zh: ["日", "一", "二", "三", "四", "五", "六"],
+        en: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+        ja: ["日", "月", "火", "水", "木", "金", "土"],
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [today, setToday] = useState(10);
+        const [qType, setQType] = useState(0); // 0: Yesterday, 1: Tomorrow, 2: Next Week
+        const [targetDate, setTargetDate] = useState(11);
+        const [feedback, setFeedback] = useState("");
+        const [offset, setOffset] = useState(2); // First day of month offset (e.g. starts on Tuesday)
+
+        const questions = [
+          {
+            label: {
+              zh: "昨天是幾號？",
+              en: "What date was yesterday?",
+              ja: "昨日は何日でしたか？",
+            },
+            delta: -1,
+          },
+          {
+            label: {
+              zh: "明天是幾號？",
+              en: "What date is tomorrow?",
+              ja: "明日は何日ですか？",
+            },
+            delta: 1,
+          },
+          {
+            label: {
+              zh: "下星期的今天是幾號？",
+              en: "What date is same day next week?",
+              ja: "来週の今日は何日ですか？",
+            },
+            delta: 7,
+          },
+          {
+            label: {
+              zh: "上星期的今天是幾號？",
+              en: "What date is same day last week?",
+              ja: "先週の今日は何日ですか？",
+            },
+            delta: -7,
+          },
+        ];
+
+        const newProb = () => {
+          setFeedback("");
+
+          // Generate random simple month (30 days)
+          // Ensure dates make sense for Qs (+/- 7 days should stay in month approx 1-30)
+          const t = Math.floor(Math.random() * 14) + 8; // 8 to 21
+          setToday(t);
+
+          const qIdx = Math.floor(Math.random() * questions.length);
+          setQType(qIdx);
+          setTargetDate(t + questions[qIdx].delta);
+        };
+
+        useEffect(newProb, []);
+
+        const check = (d) => {
+          if (d === targetDate) {
+            setFeedback("CORRECT");
+            setTimeout(newProb, 1500);
+          } else {
+            setFeedback("WRONG");
+          }
+        };
+
+        const renderCalendar = () => {
+          let days = [];
+          // Empty cells for offset
+          for (let i = 0; i < offset; i++)
+            days.push(<div key={`empty-${i}`} className="h-10 md:h-12"></div>);
+
+          // Days 1-30
+          for (let d = 1; d <= 30; d++) {
+            let isToday = d === today;
+            days.push(
+              <button
+                key={d}
+                onClick={() => check(d)}
+                className={`h-10 md:h-12 rounded-lg font-bold transition-all hover:bg-pink-200
+                   ${
+                     isToday
+                       ? "bg-pink-500 text-white shadow-lg scale-110 border-2 border-pink-700 z-10"
+                       : "bg-white text-slate-700 border border-pink-100"
+                   }
+                   `}
+              >
+                {d}
+                {isToday && (
+                  <div className="text-[0.6rem] uppercase">
+                    {t.today[lang] || t.today["en"]}
+                  </div>
+                )}
+              </button>
+            );
+          }
+          return days;
+        };
+
+        const getWeekDays = () => weekDays[lang] || weekDays["en"];
+        const getQuestionLabel = () =>
+          questions[qType].label[lang] || questions[qType].label["en"];
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center justify-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+
+            <h1 className="text-4xl md:text-5xl font-black text-pink-900 mb-8 max-w-2xl text-center">
+              {t.title[lang] || t.title["en"]}
+            </h1>
+
+            <div className="bg-white/90 rounded-3xl p-6 md:p-8 shadow-2xl w-full max-w-lg text-center border-4 border-pink-300">
+              <div className="bg-pink-50 rounded-2xl p-4 border-2 border-pink-200 mb-8 max-w-sm mx-auto">
+                <div className="grid grid-cols-7 gap-1 md:gap-2 mb-2">
+                  {getWeekDays().map((w) => (
+                    <div
+                      key={w}
+                      className="text-xs md:text-sm font-bold text-pink-800 text-center"
+                    >
+                      {w}
+                    </div>
+                  ))}
+                </div>
+                <div className="grid grid-cols-7 gap-1 md:gap-2">
+                  {renderCalendar()}
+                </div>
+              </div>
+
+              <div className="text-2xl font-bold text-slate-700 mb-2">
+                {t.today[lang] || t.today["en"]} {t.is[lang] || t.is["en"]}{" "}
+                <span className="text-pink-600 bg-pink-100 px-2 rounded-md border border-pink-300">
+                  {today}
+                </span>{" "}
+                {t.dateSuffix[lang] || t.dateSuffix["en"]}
+              </div>
+
+              <div className="text-xl md:text-2xl font-bold text-slate-600 mb-8 bg-white p-4 rounded-xl shadow-sm border border-slate-200 inline-block">
+                {getQuestionLabel()}
+                <div className="text-sm text-slate-400 mt-1">
+                  {t.clickHint[lang] || t.clickHint["en"]}
+                </div>
+              </div>
+
+              <div className="h-16 mt-2">
+                {feedback === "CORRECT" && (
+                  <div className="mt-2 text-4xl font-black text-green-500 animate-bounce">
+                    {t.correct[lang] || t.correct["en"]} ({targetDate})
+                  </div>
+                )}
+                {feedback === "WRONG" && (
+                  <div className="mt-2 text-4xl font-black text-red-500 animate-shake">
+                    {get("wrong", lang)}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

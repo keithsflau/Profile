@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小四數學：方向指南針</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #cffafe 0%, #22d3ee 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { motion } = window.Motion;
+
+      function App() {
+        const [direction, setDirection] = useState("N");
+        const dirs = [
+          { id: "N", angle: 0, name: "北方 (N)" },
+          { id: "NE", angle: 45, name: "東北 (NE)" },
+          { id: "E", angle: 90, name: "東方 (E)" },
+          { id: "SE", angle: 135, name: "東南 (SE)" },
+          { id: "S", angle: 180, name: "南方 (S)" },
+          { id: "SW", angle: 225, name: "西南 (SW)" },
+          { id: "W", angle: 270, name: "西方 (W)" },
+          { id: "NW", angle: 315, name: "西北 (NW)" },
+        ];
+
+        const current = dirs.find((d) => d.id === direction);
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-5xl font-black text-cyan-900 mb-8">
+              🧭 方向指南針
+            </h1>
+
+            <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full flex flex-col md:flex-row items-center gap-12">
+              <div className="relative w-[400px] h-[400px] bg-slate-100 rounded-full border-8 border-slate-300 shadow-inner flex items-center justify-center">
+                {/* Markings */}
+                {dirs.map((d) => (
+                  <div
+                    key={d.id}
+                    className="absolute font-black text-slate-400"
+                    style={{
+                      transform: `rotate(${d.angle}deg) translate(0, -160px) rotate(-${d.angle}deg)`,
+                    }}
+                  >
+                    {d.id}
+                  </div>
+                ))}
+
+                {/* Needle */}
+                <motion.div
+                  animate={{ rotate: current.angle }}
+                  transition={{ type: "spring", stiffness: 100, damping: 15 }}
+                  className="w-16 h-48 bg-transparent absolute"
+                  style={{ transformOrigin: "center bottom", bottom: "50%" }}
+                >
+                  {/* North needle half - red */}
+                  <div className="h-full w-4 bg-red-500 mx-auto rounded-t-full shadow-lg"></div>
+                </motion.div>
+                <motion.div
+                  animate={{ rotate: current.angle + 180 }}
+                  transition={{ type: "spring", stiffness: 100, damping: 15 }}
+                  className="w-16 h-48 bg-transparent absolute"
+                  style={{ transformOrigin: "center bottom", bottom: "50%" }}
+                >
+                  {/* South needle half - white */}
+                  <div className="h-full w-4 bg-white mx-auto rounded-t-full border border-slate-200 shadow-lg"></div>
+                </motion.div>
+
+                <div className="w-8 h-8 bg-slate-300 rounded-full border-2 border-slate-400 absolute z-10"></div>
+              </div>
+
+              <div className="flex flex-col gap-4 w-full max-w-xs">
+                <div className="text-center mb-4">
+                  <div className="text-slate-500 font-bold mb-1">目前方向</div>
+                  <div className="text-4xl font-black text-cyan-600">
+                    {current.name}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    onClick={() => setDirection("NW")}
+                    className="p-3 bg-slate-100 rounded-lg hover:bg-cyan-100 font-bold"
+                  >
+                    NW
+                  </button>
+                  <button
+                    onClick={() => setDirection("N")}
+                    className="p-3 bg-red-100 rounded-lg hover:bg-red-200 font-bold text-red-700"
+                  >
+                    N
+                  </button>
+                  <button
+                    onClick={() => setDirection("NE")}
+                    className="p-3 bg-slate-100 rounded-lg hover:bg-cyan-100 font-bold"
+                  >
+                    NE
+                  </button>
+
+                  <button
+                    onClick={() => setDirection("W")}
+                    className="p-3 bg-slate-100 rounded-lg hover:bg-cyan-100 font-bold"
+                  >
+                    W
+                  </button>
+                  <div className="p-3 flex items-center justify-center">🧭</div>
+                  <button
+                    onClick={() => setDirection("E")}
+                    className="p-3 bg-slate-100 rounded-lg hover:bg-cyan-100 font-bold"
+                  >
+                    E
+                  </button>
+
+                  <button
+                    onClick={() => setDirection("SW")}
+                    className="p-3 bg-slate-100 rounded-lg hover:bg-cyan-100 font-bold"
+                  >
+                    SW
+                  </button>
+                  <button
+                    onClick={() => setDirection("S")}
+                    className="p-3 bg-slate-100 rounded-lg hover:bg-cyan-100 font-bold"
+                  >
+                    S
+                  </button>
+                  <button
+                    onClick={() => setDirection("SE")}
+                    className="p-3 bg-slate-100 rounded-lg hover:bg-cyan-100 font-bold"
+                  >
+                    SE
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

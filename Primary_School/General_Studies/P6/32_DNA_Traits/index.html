@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - DNA Traits</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #eff6ff;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Trait Mixer",
+          zh: "遺傳特徵混合",
+          ja: "特性ミキサー",
+          ko: "특성 혼합기",
+          es: "Mezclador de rasgos",
+          de: "Merkmalsmischer",
+          fi: "Ominaisuus sekoitin",
+          fr: "Mélangeur de traits",
+          ar: "خلاط الصفات",
+          it: "Mixer di Tratti",
+        },
+        instruction: {
+          en: "Mix parents' genes to see the baby's traits.",
+          zh: "混合父母的基因，看看嬰兒的特徵。",
+          ja: "親の遺伝子を混ぜて、赤ちゃんの特性を見てみましょう。",
+          ko: "부모의 유전자를 섞어 아기의 특성을 확인하세요.",
+          es: "Mezcla los genes de los padres para ver los rasgos del bebé.",
+          de: "Mische die Gene der Eltern, um die Merkmale des Babys zu sehen.",
+          fi: "Sekoita vanhempien geenit nähdäksesi vauvan ominaisuudet.",
+          fr: "Mélangez les gènes des parents pour voir les traits du bébé.",
+          ar: "امزج جينات الوالدين لترى صفات الطفل.",
+          it: "Mescola i geni dei genitori per vedere i tratti del bambino.",
+        },
+        dad: { en: "Dad", zh: "爸爸", ja: "父", ko: "아빠" },
+        mom: { en: "Mom", zh: "媽媽", ja: "母", ko: "엄마" },
+        baby: { en: "Baby", zh: "嬰兒", ja: "赤ちゃん", ko: "아기" },
+
+        eyes: { en: "Eyes", zh: "眼睛", ja: "目", ko: "눈" },
+        hair: { en: "Hair", zh: "頭髮", ja: "髪", ko: "머리카락" },
+
+        brown: "#5D4037",
+        blue: "#42A5F5",
+        black: "#212121",
+        blonde: "#FFD54F",
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        // Simple Dominant/Recessive Logic
+        // Brown (B) > Blue (b)
+        // Black (H) > Blonde (h)
+        const [dadGenes, setDadGenes] = useState({ eyes: "B", hair: "H" });
+        const [momGenes, setMomGenes] = useState({ eyes: "b", hair: "h" });
+        const [babyGenes, setBabyGenes] = useState(null);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const makeBaby = () => {
+          // Randomly pick one allele from each
+          // For simplicity in this P6 app, we just randomly pick Dad or Mom's phenotype for display or 50/50
+          // Let's implement actual Punnett logic simulation roughly
+          // Dad provides 'B' or 'b' (if he has genes Bb).
+          // Let's assume Dad is BB or Bb, Mom is bb.
+          // To keep it simple: Just user toggles Dad/Mom visible traits, and Baby gets random mix.
+
+          const babyEyes = Math.random() > 0.5 ? dadGenes.eyes : momGenes.eyes;
+          const babyHair = Math.random() > 0.5 ? dadGenes.hair : momGenes.hair;
+          setBabyGenes({ eyes: babyEyes, hair: babyHair });
+        };
+
+        const Face = ({ genes, label }) => (
+          <div className="flex flex-col items-center">
+            <div className="w-32 h-32 bg-orange-200 rounded-full relative border-4 border-orange-300 shadow-lg">
+              {/* Hair */}
+              <div
+                className="absolute top-0 w-full h-10 rounded-t-full"
+                style={{
+                  backgroundColor: genes.hair === "H" ? t.black : t.blonde,
+                }}
+              ></div>
+              {/* Eyes */}
+              <div
+                className="absolute top-12 left-6 w-6 h-6 rounded-full"
+                style={{
+                  backgroundColor: genes.eyes === "B" ? t.brown : t.blue,
+                }}
+              ></div>
+              <div
+                className="absolute top-12 right-6 w-6 h-6 rounded-full"
+                style={{
+                  backgroundColor: genes.eyes === "B" ? t.brown : t.blue,
+                }}
+              ></div>
+              {/* Smile */}
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-10 h-4 border-b-4 border-red-400 rounded-full"></div>
+            </div>
+            <div className="font-bold mt-2 text-slate-700">
+              {getText(label)}
+            </div>
+          </div>
+        );
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-blue-800">
+              {getText("title")}
+            </h1>
+            <p className="mb-8 font-bold text-slate-500">
+              {getText("instruction")}
+            </p>
+
+            <div className="flex gap-12 items-center mb-8">
+              <div className="flex flex-col gap-4">
+                <Face genes={dadGenes} label="dad" />
+                <div className="flex gap-2 text-xs">
+                  <button
+                    onClick={() =>
+                      setDadGenes({
+                        ...dadGenes,
+                        eyes: dadGenes.eyes === "B" ? "b" : "B",
+                      })
+                    }
+                    className="bg-slate-200 px-2 py-1 rounded"
+                  >
+                    👁️
+                  </button>
+                  <button
+                    onClick={() =>
+                      setDadGenes({
+                        ...dadGenes,
+                        hair: dadGenes.hair === "H" ? "h" : "H",
+                      })
+                    }
+                    className="bg-slate-200 px-2 py-1 rounded"
+                  >
+                    💇
+                  </button>
+                </div>
+              </div>
+
+              <div className="text-4xl font-bold text-slate-300">+</div>
+
+              <div className="flex flex-col gap-4">
+                <Face genes={momGenes} label="mom" />
+                <div className="flex gap-2 text-xs">
+                  <button
+                    onClick={() =>
+                      setMomGenes({
+                        ...momGenes,
+                        eyes: momGenes.eyes === "B" ? "b" : "B",
+                      })
+                    }
+                    className="bg-slate-200 px-2 py-1 rounded"
+                  >
+                    👁️
+                  </button>
+                  <button
+                    onClick={() =>
+                      setMomGenes({
+                        ...momGenes,
+                        hair: momGenes.hair === "H" ? "h" : "H",
+                      })
+                    }
+                    className="bg-slate-200 px-2 py-1 rounded"
+                  >
+                    💇
+                  </button>
+                </div>
+              </div>
+
+              <div className="text-4xl font-bold text-slate-300">=</div>
+
+              <div
+                className={`${
+                  babyGenes ? "opacity-100" : "opacity-20"
+                } transition-opacity`}
+              >
+                {babyGenes ? (
+                  <Face genes={babyGenes} label="baby" />
+                ) : (
+                  <div className="w-32 h-32 rounded-full border-4 border-dashed border-slate-300 flex items-center justify-center text-4xl">
+                    ?
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <button
+              onClick={makeBaby}
+              className="px-8 py-4 bg-blue-600 text-white font-bold rounded-xl shadow-lg hover:bg-blue-700 active:scale-95 text-xl"
+            >
+              🧬 Mix Genes
+            </button>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

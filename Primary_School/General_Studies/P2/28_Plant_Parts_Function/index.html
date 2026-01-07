@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小二常識：植物的身體 | Plant Parts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Plant Parts",
+          zh: "植物的身體",
+          ja: "植物の体",
+        },
+        instruction: {
+          en: "Label the plant parts!",
+          zh: "標示植物的部位！",
+          ja: "植物の部分にラベルを付けよう！",
+        },
+        correct: { en: "Correct!", zh: "答對了！" },
+        wrong: { en: "Not quite.", zh: "不對呢。" },
+
+        root: { en: "Roots", zh: "根" },
+        stem: { en: "Stem", zh: "莖" },
+        leaf: { en: "Leaf", zh: "葉" },
+        flower: { en: "Flower", zh: "花" },
+        fruit: { en: "Fruit", zh: "果實" },
+
+        func_root: { en: "Absorb Water", zh: "吸收水分" },
+        func_stem: { en: "Transport Water", zh: "輸送水分/支撐" },
+        func_leaf: { en: "Make Food", zh: "製造食物" },
+        func_flower: { en: "Reproduce", zh: "繁衍後代" },
+
+        reset: { en: "Reset", zh: "重置" },
+        completed: { en: "Great Job!", zh: "做得好！" },
+      };
+
+      const parts = [
+        { id: "flower", x: 50, y: 15, label: "flower" },
+        { id: "leaf", x: 25, y: 40, label: "leaf" }, // Left leaf
+        { id: "fruit", x: 70, y: 30, label: "fruit" },
+        { id: "stem", x: 50, y: 60, label: "stem" },
+        { id: "root", x: 50, y: 90, label: "root" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [labels, setLabels] = useState({}); // partId -> labelKey
+        const [selectedLabel, setSelectedLabel] = useState(null);
+        const [completed, setCompleted] = useState(false);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const handleDrop = (partId) => {
+          if (selectedLabel) {
+            if (selectedLabel === partId) {
+              setLabels((prev) => ({ ...prev, [partId]: selectedLabel }));
+              setSelectedLabel(null);
+            } else {
+              // Wrong feedback visual maybe
+              alert(getText("wrong"));
+            }
+          }
+        };
+
+        useEffect(() => {
+          if (Object.keys(labels).length === parts.length) {
+            setCompleted(true);
+          }
+        }, [labels]);
+
+        const reset = () => {
+          setLabels({});
+          setCompleted(false);
+          setSelectedLabel(null);
+        };
+
+        const availableLabels = parts
+          .map((p) => p.id)
+          .filter((id) => !labels[id]);
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center select-none">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-green-800 mb-4 mt-8 drop-shadow-sm bg-white/50 px-6 py-2 rounded-full">
+              🌻 {getText("title")}
+            </h1>
+            <p className="font-bold text-green-700 mb-6">
+              {getText("instruction")}
+            </p>
+
+            <div className="flex flex-col md:flex-row gap-8 w-full max-w-4xl items-start">
+              {/* Plant Diagram */}
+              <div className="relative w-full md:w-2/3 aspect-[3/4] bg-white rounded-3xl shadow-xl border-8 border-green-200 overflow-hidden">
+                <div className="absolute inset-x-0 bottom-0 h-1/4 bg-amber-800/20"></div>{" "}
+                {/* Soil */}
+                {/* SVG Plant */}
+                <svg
+                  viewBox="0 0 100 100"
+                  className="absolute inset-0 w-full h-full pointer-events-none"
+                >
+                  {/* Roots */}
+                  <path
+                    d="M50 85 Q40 95 30 95 M50 85 Q60 95 70 95 M50 85 L50 98"
+                    stroke="#8B4513"
+                    strokeWidth="2"
+                    fill="none"
+                  />
+                  {/* Stem */}
+                  <path
+                    d="M50 85 Q52 50 50 25"
+                    stroke="#228B22"
+                    strokeWidth="3"
+                    fill="none"
+                  />
+                  {/* Leaves */}
+                  <path d="M50 60 Q30 50 20 40 Q40 45 50 60" fill="#32CD32" />
+                  <path d="M50 50 Q70 40 80 30 Q60 35 50 50" fill="#32CD32" />
+                  {/* Flower */}
+                  <circle cx="50" cy="15" r="8" fill="#FF69B4" /> {/* Center */}
+                  <path
+                    d="M50 15 m -8,0 a 8,8 0 1,0 16,0 a 8,8 0 1,0 -16,0"
+                    fill="none"
+                    stroke="#FF1493"
+                    strokeWidth="10"
+                    strokeDasharray="2 5"
+                  />{" "}
+                  {/* Petals abstract */}
+                  {/* Fruit */}
+                  <circle cx="70" cy="30" r="5" fill="red" />
+                </svg>
+                {/* Drop Zones */}
+                {parts.map((part) => (
+                  <div
+                    key={part.id}
+                    className={`absolute w-32 h-12 -ml-16 flex items-center justify-center transition-all ${
+                      labels[part.id]
+                        ? "bg-green-100 border-2 border-green-500 text-green-800 font-bold shadow-md rounded-xl"
+                        : "bg-white/80 border-2 border-dashed border-slate-400 rounded-xl cursor-pointer hover:bg-green-50"
+                    }`}
+                    style={{ left: `${part.x}%`, top: `${part.y}%` }}
+                    onClick={() => handleDrop(part.id)}
+                  >
+                    {labels[part.id] ? getText(part.id) : "?"}
+                  </div>
+                ))}
+              </div>
+
+              {/* Labels Bank */}
+              <div className="w-full md:w-1/3 flex flex-col items-center">
+                <h3 className="font-bold text-slate-500 mb-4 bg-white px-4 py-1 rounded-full">
+                  Labels
+                </h3>
+                <div className="flex flex-wrap gap-4 justify-center">
+                  {availableLabels.map((id) => (
+                    <button
+                      key={id}
+                      onClick={() =>
+                        setSelectedLabel(selectedLabel === id ? null : id)
+                      }
+                      className={`px-6 py-3 rounded-xl font-bold shadow-md border-b-4 transition-all w-full text-lg ${
+                        selectedLabel === id
+                          ? "bg-green-500 text-white border-green-700 scale-105"
+                          : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50"
+                      }`}
+                    >
+                      {getText(id)}
+                    </button>
+                  ))}
+                </div>
+
+                {completed && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="mt-8 bg-green-100 text-green-800 p-6 rounded-3xl text-center shadow-xl border-4 border-green-200"
+                  >
+                    <div className="text-6xl mb-2">🌿</div>
+                    <h2 className="text-2xl font-black">
+                      {getText("completed")}
+                    </h2>
+                    <button
+                      onClick={reset}
+                      className="mt-4 bg-green-600 text-white px-8 py-2 rounded-full font-bold hover:bg-green-700 shadow"
+                    >
+                      {getText("reset")}
+                    </button>
+                  </motion.div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

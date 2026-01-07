@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Media Literacy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #f1f5f9;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Media Detective",
+          zh: "媒體偵探",
+          ja: "メディア探偵",
+          ko: "미디어 탐정",
+          es: "Detective de medios",
+          de: "Mediendetektiv",
+          fi: "Mediaetsivä",
+          fr: "Détective média",
+          ar: "محقق إعلامي",
+          it: "Detective Media",
+        },
+        instruction: {
+          en: "Is this post Trustworthy or Suspicious?",
+          zh: "這則帖子是值得信任還是可疑的？",
+          ja: "この投稿は信頼できますか、それとも疑わしいですか？",
+          ko: "이 게시물은 신뢰할 수 있나요, 아니면 의심스러운가요?",
+          es: "¿Es esta publicación confiable o sospechosa?",
+          de: "Ist dieser Beitrag vertrauenswürdig oder verdächtig?",
+          fi: "Onko tämä julkaisu luotettava vai epäilyttävä?",
+          fr: "Ce message est-il digne de confiance ou suspect ?",
+          ar: "هل هذا المنشور جدير بالثقة أم مشبوه؟",
+          it: "Questo post è Affidabile o Sospetto?",
+        },
+        trust: {
+          en: "Trustworthy",
+          zh: "值得信任",
+          ja: "信頼できる",
+          ko: "신뢰할 수 있음",
+          es: "Confiable",
+          de: "Vertrauenswürdig",
+          fi: "Luotettava",
+          fr: "Digne de confiance",
+          ar: "جدير بالثقة",
+          it: "Affidabile",
+        },
+        sus: {
+          en: "Suspicious",
+          zh: "可疑",
+          ja: "疑わしい",
+          ko: "의심스러움",
+          es: "Sospechoso",
+          de: "Verdächtig",
+          fi: "Epäilyttävä",
+          fr: "Suspect",
+          ar: "مشبوه",
+          it: "Sospetto",
+        },
+
+        p1: {
+          en: "Free iPhone! Click here now! Won't last!",
+          zh: "免費送 iPhone！立即點擊！機會難得！",
+          ja: "iPhone無料プレゼント！今すぐクリック！",
+          ko: "무료 아이폰! 지금 클릭하세요!",
+        }, // Sus
+        p2: {
+          en: "Typhoon signal No. 8 issued. - Observatory",
+          zh: "天文台發出八號颱風信號。",
+          ja: "台風警報8号発令。 - 気象台",
+          ko: "태풍 8호 신호 발령. - 기상청",
+        }, // Trust
+        p3: {
+          en: "Eat this magic bean to cure all diseases!",
+          zh: "吃了這個神奇豆子能治百病！",
+          ja: "この魔法の豆を食べれば全ての病気が治る！",
+          ko: "이 마법 콩을 먹으면 만병통치!",
+        }, // Sus
+        p4: {
+          en: "School will be closed tomorrow. - Edu Bureau",
+          zh: "教育局宣佈明日停課。",
+          ja: "明日は休校です。 - 教育局",
+          ko: "내일 휴교합니다. - 교육국",
+        }, // Trust
+
+        correct: { en: "Correct!", zh: "正確！", ja: "正解！", ko: "정답!" },
+        wrong: {
+          en: "Wrong!",
+          zh: "錯誤！",
+          ja: "不正解！",
+          ko: "틀렸습니다!",
+        },
+      };
+
+      const posts = [
+        { id: "p1", type: "sus", author: "LuckyWinner123" },
+        { id: "p2", type: "trust", author: "Official News Channel" },
+        { id: "p3", type: "sus", author: "Dr. Magic" },
+        { id: "p4", type: "trust", author: "Gov Education Dept" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [index, setIndex] = useState(0);
+        const [feedback, setFeedback] = useState(null);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+        const current = posts[index];
+
+        const handleAnswer = (ans) => {
+          if (feedback) return;
+          if (ans === current.type) {
+            setFeedback("correct");
+            setTimeout(() => {
+              setFeedback(null);
+              setIndex((index + 1) % posts.length);
+            }, 1000);
+          } else {
+            setFeedback("wrong");
+            setTimeout(() => setFeedback(null), 500);
+          }
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col items-center justify-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-indigo-700">
+              {getText("title")}
+            </h1>
+
+            <div className="w-full max-w-lg">
+              <div className="text-center font-bold text-slate-500 mb-4">
+                {getText("instruction")}
+              </div>
+
+              {/* Phone Mockup */}
+              <div className="bg-white rounded-[3rem] border-8 border-slate-800 p-6 shadow-2xl relative overflow-hidden min-h-[500px]">
+                {/* Notch */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-slate-800 rounded-b-xl"></div>
+
+                {/* Post */}
+                <div className="mt-8 bg-slate-50 p-4 rounded-xl shadow-sm border border-slate-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-10 h-10 rounded-full bg-slate-300 flex items-center justify-center font-bold text-slate-500">
+                      {current.author[0]}
+                    </div>
+                    <div className="font-bold text-sm text-slate-800">
+                      {current.author}
+                    </div>
+                  </div>
+                  <div className="text-lg font-medium text-slate-800 leading-relaxed min-h-[100px] flex items-center">
+                    {getText(current.id)}
+                  </div>
+                  <div className="mt-4 flex gap-4 text-xs text-slate-400 font-bold">
+                    <span>❤️ 1.2k</span>
+                    <span>💬 342</span>
+                    <span>↗️ 56</span>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="absolute bottom-6 left-6 right-6 flex gap-4">
+                  <button
+                    onClick={() => handleAnswer("sus")}
+                    className="flex-1 bg-red-500 hover:bg-red-600 text-white py-4 rounded-xl font-bold shadow-lg flex flex-col items-center"
+                  >
+                    <span className="text-2xl">⚠️</span>
+                    {getText("sus")}
+                  </button>
+                  <button
+                    onClick={() => handleAnswer("trust")}
+                    className="flex-1 bg-green-500 hover:bg-green-600 text-white py-4 rounded-xl font-bold shadow-lg flex flex-col items-center"
+                  >
+                    <span className="text-2xl">✅</span>
+                    {getText("trust")}
+                  </button>
+                </div>
+
+                {feedback && (
+                  <div
+                    className={`absolute inset-0 bg-white/90 flex items-center justify-center z-20`}
+                  >
+                    <div
+                      className={`text-5xl font-black ${
+                        feedback === "correct"
+                          ? "text-green-500"
+                          : "text-red-500"
+                      } animate-bounce`}
+                    >
+                      {getText(feedback)}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

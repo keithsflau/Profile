@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小一數學：分類 | Sorting</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #ecfccb 0%, #a3e635 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      function App() {
+        // Sort by Color: Red vs Blue
+        const [items, setItems] = useState([
+          { id: 1, type: "red", icon: "🍎" },
+          { id: 2, type: "red", icon: "🚗" },
+          { id: 3, type: "red", icon: "🍓" },
+          { id: 4, type: "blue", icon: "🚙" },
+          { id: 5, type: "blue", icon: "🧢" },
+          { id: 6, type: "blue", icon: "🐟" },
+        ]); // items in pool
+        const [redBin, setRedBin] = useState([]);
+        const [blueBin, setBlueBin] = useState([]);
+        const [solved, setSolved] = useState(false);
+
+        useEffect(() => {
+          setItems(items.sort(() => Math.random() - 0.5));
+        }, []);
+
+        const moveToBin = (item, bin) => {
+          if (bin === "red" && item.type !== "red") return; // Enforce correct sort immediately for simplicity? Or allowed wrong?
+          // Let's enforce rule (Game style)
+          if (bin === item.type) {
+            setItems(items.filter((i) => i.id !== item.id));
+            if (bin === "red") setRedBin([...redBin, item]);
+            else setBlueBin([...blueBin, item]);
+          } else {
+            // Shake effect?
+            alert("Oops! Wrong box.");
+          }
+        };
+
+        useEffect(() => {
+          if (items.length === 0) setSolved(true);
+        }, [items]);
+
+        const reset = () => {
+          window.location.reload();
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center justify-center">
+            <h1 className="text-5xl font-black text-lime-900 mb-8">
+              🧺 分類 Sorting
+            </h1>
+
+            <div className="bg-white/90 rounded-3xl p-8 shadow-2xl w-full max-w-4xl text-center border-4 border-lime-300">
+              <h2 className="text-2xl font-bold text-slate-600 mb-12">
+                把紅色的放進紅箱，藍色的放進藍箱
+                <br />
+                Put Red things in Red Box, Blue in Blue Box
+              </h2>
+
+              {/* Pool */}
+              <div className="flex justify-center gap-4 mb-12 min-h-[80px] flex-wrap">
+                {items.map((item) => (
+                  <div
+                    key={item.id}
+                    className="text-6xl cursor-pointer hover:scale-125 transition-transform draggable"
+                    title="Drag me (Click bins)"
+                  >
+                    {item.icon}
+                  </div>
+                ))}
+                {items.length === 0 && (
+                  <div className="text-2xl font-bold text-slate-300">
+                    Empty!
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-around gap-8">
+                {/* Red Bin */}
+                <div
+                  className="w-1/3 bg-red-100 border-4 border-red-400 rounded-3xl min-h-[200px] p-4 flex flex-col"
+                  onClick={() => items.length > 0 && moveToBin(items[0], "red")}
+                >
+                  <h3 className="text-red-500 font-black text-xl mb-4">
+                    紅色 Red
+                  </h3>
+                  <div className="flex flex-wrap content-start gap-2">
+                    {redBin.map((i) => (
+                      <div key={i.id} className="text-4xl">
+                        {i.icon}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-auto text-slate-400 text-sm">
+                    (Click first item above, then click here)
+                  </div>
+                </div>
+
+                {/* Blue Bin */}
+                <div
+                  className="w-1/3 bg-blue-100 border-4 border-blue-400 rounded-3xl min-h-[200px] p-4 flex flex-col"
+                  onClick={() =>
+                    items.length > 0 && moveToBin(items[0], "blue")
+                  }
+                >
+                  <h3 className="text-blue-500 font-black text-xl mb-4">
+                    藍色 Blue
+                  </h3>
+                  <div className="flex flex-wrap content-start gap-2">
+                    {blueBin.map((i) => (
+                      <div key={i.id} className="text-4xl">
+                        {i.icon}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-auto text-slate-400 text-sm">
+                    (Click first item above, then click here)
+                  </div>
+                </div>
+              </div>
+
+              {/* Improved Interaction: Actually, let's just make items buttons that go to correct bin? 
+                   Wait, user needs to CHOOSE bin. 
+                   Revised Logic: Click item to select, then click bin.
+                   Current Logic (Shortcut): Click bin, it takes the first available item if match.
+                   Let's add 'Select' state.
+               */}
+            </div>
+            {solved && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+                <div className="bg-white p-12 rounded-3xl text-center animate-bounce-in">
+                  <div className="text-6xl mb-4">🎉</div>
+                  <h2 className="text-4xl font-black text-green-500 mb-8">
+                    完成了！ Done!
+                  </h2>
+                  <button
+                    onClick={reset}
+                    className="px-8 py-4 bg-green-500 text-white rounded-full font-bold text-xl"
+                  >
+                    再玩一次 Play Again
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

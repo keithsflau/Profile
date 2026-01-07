@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Silk Road</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #f8f5f2;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Silk Road Trader",
+          zh: "絲綢之路商人",
+          ja: "シルクロードの商人",
+          ko: "실크로드 상인",
+          es: "Comerciante de la Ruta de la Seda",
+          de: "Seidenstraßen-Händler",
+          fi: "Silkkitien kauppias",
+          fr: "Marchand de la Route de la Soie",
+          ar: "تاجر طريق الحرير",
+          it: "Mercante della Via della Seta",
+        },
+        instruction: {
+          en: "Travel from Chang'an to Rome!",
+          zh: "從長安前往羅馬！",
+          ja: "長安からローマへ旅しよう！",
+          ko: "장안에서 로마로 여행하세요!",
+          es: "¡Viaja de Chang'an a Roma!",
+          de: "Reise von Chang'an nach Rom!",
+          fi: "Matkusta Chang'anista Roomaan!",
+          fr: "Voyagez de Chang'an à Rome !",
+          ar: "سافر من تشانغآن إلى روما!",
+          it: "Viaggia da Chang'an a Roma!",
+        },
+        changan: { en: "Chang'an", zh: "長安", ja: "長安", ko: "장안" },
+        rome: { en: "Rome", zh: "羅馬", ja: "ローマ", ko: "로마" },
+
+        move: {
+          en: "Move Caravan",
+          zh: "移動商隊 🐪",
+          ja: "キャラバンを移動",
+          ko: "카라반 이동",
+        },
+        goods: {
+          en: "Trading: Silk & Spices",
+          zh: "交易：絲綢與香料",
+          ja: "取引：絹とスパイス",
+          ko: "거래: 비단 및 향신료",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [progress, setProgress] = useState(0); // 0 to 100
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const move = () => {
+          if (progress < 100) setProgress(Math.min(100, progress + 10));
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-amber-900">
+              {getText("title")}
+            </h1>
+
+            <div className="w-full max-w-3xl bg-amber-50 rounded-3xl p-8 shadow-xl border-4 border-amber-200">
+              <p className="text-center font-bold text-slate-500 mb-8">
+                {getText("instruction")}
+              </p>
+
+              {/* Map Track */}
+              <div className="relative h-32 bg-amber-100 rounded-full w-full flex items-center px-8 border-2 border-amber-300">
+                <div className="absolute left-8 top-1/2 -translate-y-1/2 w-[calc(100%-4rem)] h-2 bg-amber-300"></div>
+
+                <div className="absolute left-4 top-[70%] font-bold">
+                  {getText("changan")}
+                </div>
+                <div className="absolute right-4 top-[70%] font-bold">
+                  {getText("rome")}
+                </div>
+
+                <motion.div
+                  className="absolute text-5xl z-10 -translate-y-[20px]"
+                  animate={{ left: `${progress}%` }}
+                  transition={{ type: "spring", stiffness: 50 }}
+                >
+                  🐪
+                </motion.div>
+              </div>
+
+              <div className="mt-8 flex flex-col items-center gap-4">
+                <div className="bg-white px-6 py-2 rounded-lg font-bold text-amber-700">
+                  {getText("goods")}
+                </div>
+                <button
+                  onClick={move}
+                  className="px-8 py-4 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold text-xl shadow-lg active:scale-95 transition-all"
+                  disabled={progress >= 100}
+                >
+                  {progress >= 100 ? "Arrived! 🎉" : getText("move")}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

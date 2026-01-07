@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小五數學：帶分數減法 | Subtracting Mixed Numbers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.min.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fef3c7 0%, #fcd34d 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Subtracting Mixed Numbers",
+          zh: "帶分數減法",
+          ja: "帯分数の引き算",
+          ko: "대분수 뺄셈",
+          es: "Resta de Números Mixtos",
+          de: "Subtraktion gemischter Zahlen",
+          fi: "Sekalukujen vähennyslasku",
+          fr: "Soustraction de nombres mixtes",
+          ar: "طرح الأعداد الكسرية",
+          it: "Sottrazione di numeri misti",
+        },
+        step1: {
+          en: "Step 1: Improper Fractions:",
+          zh: "步驟1：化假分數：",
+          ja: "ステップ 1: 仮分数にする:",
+          ko: "단계 1: 가분수로 변환:",
+          es: "Paso 1: Fracciones impropias:",
+          de: "Schritt 1: Unechte Brüche:",
+          fi: "Vaihe 1: Murtoluvuiksi:",
+          fr: "Étape 1 : Fractions impropres :",
+          ar: "الخطوة 1: كسور غير حقيقية:",
+          it: "Passo 1: Frazioni improprie:",
+        },
+        step2: {
+          en: "Step 2: Common Denominator:",
+          zh: "步驟2：通分：",
+          ja: "ステップ 2: 通分:",
+          ko: "단계 2: 통분:",
+          es: "Paso 2: Denominador común:",
+          de: "Schritt 2: Gemeinsamer Nenner:",
+          fi: "Vaihe 2: Yhteinen nimittäjä:",
+          fr: "Étape 2 : Dénominateur commun :",
+          ar: "الخطوة 2: توحيد المقامات:",
+          it: "Passo 2: Denominatore comune:",
+        },
+        step3: {
+          en: "Step 3: Subtract:",
+          zh: "步驟3：相減：",
+          ja: "ステップ 3: 引く:",
+          ko: "단계 3: 빼기:",
+          es: "Paso 3: Restar:",
+          de: "Schritt 3: Subtrahieren:",
+          fi: "Vaihe 3: Vähennä:",
+          fr: "Étape 3 : Soustraire :",
+          ar: "الخطوة 3: الطرح:",
+          it: "Passo 3: Sottrai:",
+        },
+        answer: {
+          en: "Answer",
+          zh: "答案",
+          ja: "答え",
+          ko: "답",
+          es: "Respuesta",
+          de: "Antwort",
+          fi: "Vastaus",
+          fr: "Réponse",
+          ar: "إجابة",
+          it: "Risposta",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const [w1, setW1] = useState(3);
+        const [n1, setN1] = useState(1);
+        const [d1, setD1] = useState(2);
+        const [w2, setW2] = useState(1);
+        const [n2, setN2] = useState(2);
+        const [d2, setD2] = useState(3);
+
+        const gcd = (a, b) => (b === 0 ? a : gcd(b, a % b));
+        const lcm = (a, b) => (a * b) / gcd(a, b);
+        const imp1 = w1 * d1 + n1;
+        const imp2 = w2 * d2 + n2;
+        const commonDenom = lcm(d1, d2);
+        const newN1 = imp1 * (commonDenom / d1);
+        const newN2 = imp2 * (commonDenom / d2);
+        const diffN = newN1 - newN2;
+        const absDiffN = Math.abs(diffN);
+        const resultWhole = Math.floor(absDiffN / commonDenom);
+        const resultFrac = absDiffN % commonDenom;
+        const resultGcd = resultFrac > 0 ? gcd(resultFrac, commonDenom) : 1;
+        const simplifiedFrac = resultFrac / resultGcd;
+        const simplifiedDenom = commonDenom / resultGcd;
+
+        return (
+          <div className="min-h-screen p-4 md:p-8 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-amber-900 mb-2 mt-4 text-center">
+              ➖ {getText("title")}
+            </h1>
+
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-3xl w-full mt-6">
+              <div className="flex items-center justify-center gap-4 mb-8 flex-wrap">
+                <div className="bg-orange-50 p-4 rounded-xl border-2 border-orange-200 flex items-center gap-2">
+                  <input
+                    type="number"
+                    min="0"
+                    value={w1}
+                    onChange={(e) => setW1(parseInt(e.target.value) || 0)}
+                    className="w-12 text-2xl font-black text-center border-2 border-orange-300 rounded outline-none"
+                  />
+                  <div className="flex flex-col items-center">
+                    <input
+                      type="number"
+                      min="0"
+                      value={n1}
+                      onChange={(e) => setN1(parseInt(e.target.value) || 0)}
+                      className="w-10 text-xl font-black text-center border-b-2 border-orange-400 bg-transparent outline-none"
+                    />
+                    <input
+                      type="number"
+                      min="1"
+                      value={d1}
+                      onChange={(e) =>
+                        setD1(Math.max(1, parseInt(e.target.value) || 1))
+                      }
+                      className="w-10 text-xl font-black text-center bg-transparent outline-none"
+                    />
+                  </div>
+                </div>
+                <span className="text-4xl font-black text-amber-400">−</span>
+                <div className="bg-red-50 p-4 rounded-xl border-2 border-red-200 flex items-center gap-2">
+                  <input
+                    type="number"
+                    min="0"
+                    value={w2}
+                    onChange={(e) => setW2(parseInt(e.target.value) || 0)}
+                    className="w-12 text-2xl font-black text-center border-2 border-red-300 rounded outline-none"
+                  />
+                  <div className="flex flex-col items-center">
+                    <input
+                      type="number"
+                      min="0"
+                      value={n2}
+                      onChange={(e) => setN2(parseInt(e.target.value) || 0)}
+                      className="w-10 text-xl font-black text-center border-b-2 border-red-400 bg-transparent outline-none"
+                    />
+                    <input
+                      type="number"
+                      min="1"
+                      value={d2}
+                      onChange={(e) =>
+                        setD2(Math.max(1, parseInt(e.target.value) || 1))
+                      }
+                      className="w-10 text-xl font-black text-center bg-transparent outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="bg-slate-50 rounded-2xl p-6 space-y-2 text-center mb-6 text-lg">
+                <p>
+                  <b>{getText("step1")}</b> {imp1}/{d1} − {imp2}/{d2}
+                </p>
+                <p>
+                  <b>{getText("step2")}</b> {newN1}/{commonDenom} − {newN2}/
+                  {commonDenom}
+                </p>
+                <p>
+                  <b>{getText("step3")}</b> = {diffN}/{commonDenom}
+                </p>
+              </div>
+              <div
+                className={`rounded-2xl p-6 text-center border-4 ${
+                  diffN < 0
+                    ? "bg-red-100 border-red-300"
+                    : "bg-emerald-100 border-emerald-300"
+                }`}
+              >
+                <div className="font-bold mb-2">{getText("answer")}</div>
+                <div className="text-5xl font-black flex items-center justify-center gap-2">
+                  {diffN < 0 && <span>−</span>}
+                  {resultWhole > 0 && <span>{resultWhole}</span>}
+                  {simplifiedFrac > 0 && (
+                    <span className="text-3xl flex flex-col items-center">
+                      <span>{simplifiedFrac}</span>
+                      <span className="w-full h-0.5 bg-black"></span>
+                      <span>{simplifiedDenom}</span>
+                    </span>
+                  )}
+                  {resultWhole === 0 && simplifiedFrac === 0 && <span>0</span>}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小四數學：除法性質</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fecdd3 0%, #f43f5e 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      function App() {
+        // Demonstrate 12 / 4 != 4 / 12
+        const A = 12;
+        const B = 4;
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-5xl font-black text-rose-900 mb-8">
+              🚫 除法可以交換嗎？
+            </h1>
+
+            <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full flex flex-col gap-8">
+              {/* Case 1: 12 / 4 */}
+              <div className="bg-green-50 p-6 rounded-2xl border-2 border-green-200">
+                <h3 className="text-2xl font-black text-green-700 mb-4">
+                  情況一：{A} ÷ {B}
+                </h3>
+                <div className="flex flex-wrap gap-4 items-center">
+                  <div className="flex flex-wrap w-48 gap-1 p-2 bg-white rounded-lg border border-slate-200">
+                    {[...Array(A)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="w-6 h-6 bg-green-500 rounded-full"
+                      ></div>
+                    ))}
+                  </div>
+                  <div className="text-xl font-bold">分成 {B} 份 ➜</div>
+                  <div className="flex gap-4">
+                    {[...Array(B)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="p-2 border-2 border-green-400 rounded-lg bg-white"
+                      >
+                        {[...Array(A / B)].map((_, j) => (
+                          <div
+                            key={j}
+                            className="w-4 h-4 bg-green-500 rounded-full inline-block m-0.5"
+                          ></div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="text-2xl font-black text-green-800">
+                    = {A / B} (整數)
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-center text-4xl font-black text-rose-500">
+                ≠
+              </div>
+
+              {/* Case 2: 4 / 12 */}
+              <div className="bg-red-50 p-6 rounded-2xl border-2 border-red-200">
+                <h3 className="text-2xl font-black text-red-700 mb-4">
+                  情況二：{B} ÷ {A}
+                </h3>
+                <div className="flex flex-wrap gap-4 items-center">
+                  <div className="flex flex-wrap w-24 gap-1 p-2 bg-white rounded-lg border border-slate-200">
+                    {[...Array(B)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="w-6 h-6 bg-red-500 rounded-full"
+                      ></div>
+                    ))}
+                  </div>
+                  <div className="text-xl font-bold">分成 {A} 份？！</div>
+                  <div className="text-red-800 font-bold text-lg">
+                    不夠分！每份連一個也沒有！
+                    <br />
+                    {B} ÷ {A} = {(B / A).toFixed(2)}... (小數/分數)
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-center font-bold text-slate-600 text-xl">
+                結論：除法
+                <span className="text-red-600 font-black">不遵守</span>交換律！
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

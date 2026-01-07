@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小三數學：乘數表速記訓練</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      src="https://unpkg.com/react@18/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { Zap, Trophy, Star } = window.LucideReact;
+
+      function App() {
+        const [table, setTable] = useState(2);
+        const [question, setQuestion] = useState({ a: 2, b: 1 });
+        const [userAnswer, setUserAnswer] = useState("");
+        const [score, setScore] = useState(0);
+        const [streak, setStreak] = useState(0);
+        const [feedback, setFeedback] = useState(null);
+
+        const generateQuestion = () => {
+          const a = table;
+          const b = Math.floor(Math.random() * 12) + 1;
+          setQuestion({ a, b });
+          setUserAnswer("");
+          setFeedback(null);
+        };
+
+        const checkAnswer = () => {
+          const correct = question.a * question.b;
+          if (parseInt(userAnswer) === correct) {
+            setFeedback("correct");
+            setScore((s) => s + 10);
+            setStreak((s) => s + 1);
+            setTimeout(generateQuestion, 1000);
+          } else {
+            setFeedback("incorrect");
+            setStreak(0);
+          }
+        };
+
+        useEffect(() => {
+          generateQuestion();
+        }, [table]);
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center justify-center">
+            <h1 className="text-6xl font-black text-white mb-8">
+              乘數表速記訓練
+            </h1>
+
+            <div className="bg-white/95 backdrop-blur-md rounded-3xl p-12 shadow-2xl max-w-2xl w-full">
+              <div className="flex justify-between mb-8">
+                <div className="text-2xl font-black">得分: {score}</div>
+                <div className="text-2xl font-black text-orange-500">
+                  連勝: {streak} 🔥
+                </div>
+              </div>
+
+              <div className="grid grid-cols-6 gap-2 mb-8">
+                {[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((n) => (
+                  <button
+                    key={n}
+                    onClick={() => setTable(n)}
+                    className={`py-3 rounded-xl font-black transition-all ${
+                      table === n
+                        ? "bg-purple-600 text-white scale-110"
+                        : "bg-slate-100 hover:bg-slate-200"
+                    }`}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
+
+              <div className="text-center mb-8">
+                <div className="text-7xl font-black text-purple-600 mb-4">
+                  {question.a} × {question.b} = ?
+                </div>
+                <input
+                  type="number"
+                  value={userAnswer}
+                  onChange={(e) => setUserAnswer(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && checkAnswer()}
+                  className="w-64 px-8 py-4 text-4xl font-black text-center rounded-2xl border-4 border-purple-300 focus:border-purple-600 outline-none"
+                  placeholder="?"
+                  autoFocus
+                />
+              </div>
+
+              <button
+                onClick={checkAnswer}
+                className="w-full py-4 bg-purple-600 hover:bg-purple-700 text-white text-xl font-bold rounded-2xl shadow-lg transition-all"
+              >
+                確認答案
+              </button>
+
+              {feedback === "correct" && (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="mt-4 bg-green-100 text-green-700 p-4 rounded-xl text-center font-bold text-xl"
+                >
+                  ✓ 答對了！
+                </motion.div>
+              )}
+
+              {feedback === "incorrect" && (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="mt-4 bg-red-100 text-red-700 p-4 rounded-xl text-center font-bold text-xl"
+                >
+                  ✗ 答案: {question.a * question.b}
+                </motion.div>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HKDSE ICT - Array Accumulator</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.development.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #0f172a;
+        color: #e2e8f0;
+      }
+      .array-cell {
+        transition: all 0.5s ease-out;
+      }
+      .highlight-cell {
+        transform: scale(1.1);
+        box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+        border-color: #38bdf8;
+        z-index: 10;
+      }
+      .op-anim {
+        animation: float-up 1s ease-out;
+      }
+      @keyframes float-up {
+        0% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+      }
+    </style>
+  </head>
+  <body class="min-h-screen p-8 flex justify-center items-center bg-slate-900">
+    <div id="root" class="w-full max-w-4xl"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      // --- LUCIDE ICON SHIM ---
+      const LucideIcon = ({ name, size = 24, className = "" }) => {
+        const formatName = (n) =>
+          n
+            .split("-")
+            .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
+            .join("");
+        const iconName = formatName(name);
+
+        const [svgHtml, setSvgHtml] = useState("");
+
+        useEffect(() => {
+          if (
+            window.lucide &&
+            window.lucide.icons &&
+            window.lucide.icons[iconName] &&
+            typeof window.lucide.icons[iconName].toSvg === "function"
+          ) {
+            setSvgHtml(
+              window.lucide.icons[iconName].toSvg({
+                width: size,
+                height: size,
+                class: className,
+              })
+            );
+          }
+        }, [name, size, className, iconName]);
+
+        return (
+          <span
+            dangerouslySetInnerHTML={{ __html: svgHtml }}
+            style={{ display: "inline-flex" }}
+          />
+        );
+      };
+      const Calculator = (p) => <LucideIcon name="calculator" {...p} />;
+      const ArrowRight = (p) => <LucideIcon name="arrow-right" {...p} />;
+      const Play = (p) => <LucideIcon name="play" {...p} />;
+      const RefreshCw = (p) => <LucideIcon name="refresh-cw" {...p} />;
+      const Layers = (p) => <LucideIcon name="layers" {...p} />;
+      // --- END SHIM ---
+
+      const INITIAL_ARR = [0, 2, 0, 0, 0, 0];
+      const K = 3;
+
+      const App = () => {
+        const [arr, setArr] = useState([...INITIAL_ARR]);
+        const [i, setI] = useState(2);
+        const [done, setDone] = useState(false);
+        const [msg, setMsg] = useState(null);
+
+        const nextStep = () => {
+          if (i >= arr.length) {
+            setDone(true);
+            return;
+          }
+          const prevVal = arr[i - 1];
+          const newVal = prevVal + K;
+          showMsg(i, prevVal, K, newVal);
+          const newArr = [...arr];
+          newArr[i] = newVal;
+          setArr(newArr);
+          setI(i + 1);
+        };
+
+        const showMsg = (idx, prev, k, res) => {
+          setMsg({
+            text: `A[${idx}] = A[${idx - 1}] + K  =>  ${prev} + ${k} = ${res}`,
+            key: Math.random(),
+          });
+        };
+
+        const reset = () => {
+          setArr([...INITIAL_ARR]);
+          setI(2);
+          setDone(false);
+          setMsg(null);
+        };
+
+        return (
+          <div className="space-y-12 w-full text-center">
+            <header>
+              <h1 className="text-3xl font-bold text-white mb-2 flex justify-center items-center gap-2">
+                <Calculator className="text-cyan-400" /> Array Accumulator
+              </h1>
+              <p className="text-slate-400">Paper 1A Q34: A[i] = A[i-1] + K</p>
+            </header>
+            <div className="bg-slate-800 p-4 rounded-xl border border-slate-700 font-mono text-sm max-w-md mx-auto text-left shadow-lg">
+              <div className="text-slate-500">// Start</div>
+              <div className="text-cyan-300">A[1] = 2</div>
+              <div className="text-pink-300">K = 3</div>
+              <div className="text-white mt-2">For i = 2 to 5</div>
+              <div className="text-yellow-300 pl-4">A[i] = A[i-1] + K</div>
+            </div>
+            <div className="flex justify-center gap-2 md:gap-4 relative min-h-[140px]">
+              {arr.slice(1).map((val, idx) => {
+                const realIdx = idx + 1;
+                const isActive = i === realIdx && !done;
+                const isPrev = i - 1 === realIdx && !done;
+                return (
+                  <div key={realIdx} className="relative group">
+                    <div
+                      className={`w-16 h-16 md:w-20 md:h-20 border-4 rounded-xl flex items-center justify-center font-bold text-2xl array-cell ${
+                        isActive
+                          ? "bg-slate-900 border-yellow-400 text-yellow-300 highlight-cell"
+                          : "bg-slate-800 border-slate-700 text-white"
+                      } ${isPrev ? "border-pink-500" : ""}`}
+                    >
+                      {val}
+                    </div>
+                    <div className="absolute -bottom-8 w-full text-center text-xs font-mono font-bold text-slate-500">
+                      A[{realIdx}]
+                    </div>
+                    {isActive && (
+                      <div className="absolute -top-8 w-full flex justify-center text-yellow-400 animate-bounce font-bold">
+                        i
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            <div className="h-16 flex items-center justify-center">
+              {msg && (
+                <div
+                  key={msg.key}
+                  className="text-xl font-bold text-white bg-slate-800 border-2 border-slate-700 px-6 py-2 rounded-full op-anim shadow-xl"
+                >
+                  {msg.text}
+                </div>
+              )}
+              {done && (
+                <div className="text-xl font-bold text-green-400 flex items-center gap-2 animate-bounce">
+                  Loop Complete!
+                </div>
+              )}
+            </div>
+            <div className="flex justify-center">
+              {!done ? (
+                <button
+                  onClick={nextStep}
+                  className="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 text-xl shadow-lg shadow-cyan-900/40 transition-all hover:scale-105"
+                >
+                  Next Step (i = {i}) <ArrowRight size={20} />
+                </button>
+              ) : (
+                <button
+                  onClick={reset}
+                  className="bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 text-xl shadow-lg transition-all"
+                >
+                  Reset Trace <RefreshCw size={20} />
+                </button>
+              )}
+            </div>
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

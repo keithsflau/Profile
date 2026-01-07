@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Force and Motion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #f1f5f9;
+        overflow-x: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useRef } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Ramp Experiment",
+          zh: "斜面實驗",
+          ja: "斜面実験",
+          ko: "경사면 실험",
+          es: "Experimento de rampa",
+          de: "Rampenexperiment",
+          fi: "Ramppikoe",
+          fr: "Expérience de rampe",
+          ar: "تجربة المنحدر",
+          it: "Esperimento della Rampa",
+        },
+        instruction: {
+          en: "Adjust ramp height and launch the car!",
+          zh: "調整斜面高度並發射汽車！",
+          ja: "斜面の高さを調整して車を発車させよう！",
+          ko: "경사 높이를 조절하고 차를 출발시키세요!",
+          es: "¡Ajusta la altura de la rampa y lanza el coche!",
+          de: "Stelle die Rampenhöhe ein und starte das Auto!",
+          fi: "Säädä rampin korkeutta ja laukaise auto!",
+          fr: "Ajustez la hauteur de la rampe et lancez la voiture !",
+          ar: "اضبط ارتفاع المنحدر وأطلق السيارة!",
+          it: "Regola l'altezza della rampa e lancia l'auto!",
+        },
+        height: {
+          en: "Ramp Height",
+          zh: "斜面高度",
+          ja: "斜面の高さ",
+          ko: "경사면 높이",
+          es: "Altura de la rampa",
+          de: "Rampenhöhe",
+          fi: "Rampin korkeus",
+          fr: "Hauteur de la rampe",
+          ar: "ارتفاع المنحدر",
+          it: "Altezza Rampa",
+        },
+        launch: {
+          en: "Launch!",
+          zh: "發射！",
+          ja: "発車！",
+          ko: "발사!",
+          es: "¡Lanzar!",
+          de: "Start!",
+          fi: "Laukaise!",
+          fr: "Lancer !",
+          ar: "إطلاق!",
+          it: "Lancia!",
+        },
+        reset: {
+          en: "Reset",
+          zh: "重置",
+          ja: "リセット",
+          ko: "초기화",
+          es: "Reiniciar",
+          de: "Zurücksetzen",
+          fi: "Nollaa",
+          fr: "Réinitialiser",
+          ar: "إعادة تعيين",
+          it: "Ripristina",
+        },
+        distance: {
+          en: "Distance:",
+          zh: "距離：",
+          ja: "距離：",
+          ko: "거리:",
+          es: "Distancia:",
+          de: "Distanz:",
+          fi: "Etäisyys:",
+          fr: "Distance :",
+          ar: "المسافة:",
+          it: "Distanza:",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [height, setHeight] = useState(20); // 10 to 50
+        const [launched, setLaunched] = useState(false);
+        const [distance, setDistance] = useState(0);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const launch = () => {
+          setLaunched(true);
+          // Simple physics: Higher ramp = more potential energy = more kinetic energy = further distance.
+          // Distance ~ Height
+          const dist = height * 5;
+          setDistance(dist);
+        };
+
+        const reset = () => {
+          setLaunched(false);
+          setDistance(0);
+        };
+
+        // Ramp SVG Path calc
+        // Base is at (50, 250).
+        // New: High point at Left (50, top). Slopes down to Right (250, 250).
+        // Ramp Width = 200.
+        // Height factor = 3.
+        const rampHeightPx = height * 3;
+        const rampTopY = 250 - rampHeightPx;
+
+        // Path: Start Bottom-Right(250,250) -> Top-Left(50, top) -> Bottom-Left(50,250) -> Close
+        const rampPath = `M250,250 L50,${rampTopY} L50,250 Z`;
+
+        // Car Rotation
+        // Slope is down-right. Angle is positive atan(opp/adj).
+        const angleDeg = Math.atan(rampHeightPx / 200) * (180 / Math.PI);
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-blue-800">
+              {getText("title")}
+            </h1>
+
+            <div className="w-full max-w-4xl bg-white p-8 rounded-3xl shadow-xl overflow-hidden relative min-h-[400px]">
+              {/* Simulation Area */}
+              <div className="relative w-full h-[300px] border-b-4 border-slate-400">
+                {/* Ramp */}
+                <svg
+                  width="100%"
+                  height="100%"
+                  className="absolute inset-0 z-0"
+                >
+                  <path
+                    d={rampPath}
+                    fill="#cbd5e1"
+                    stroke="#64748b"
+                    strokeWidth="2"
+                  />
+                </svg>
+
+                {/* Car */}
+                <motion.div
+                  className="absolute text-5xl origin-bottom"
+                  initial={{
+                    x: 50,
+                    y: rampTopY - 40, // Sit on top
+                    rotate: angleDeg,
+                  }}
+                  animate={
+                    launched
+                      ? {
+                          x: [50, 250, 250 + distance], // Down ramp (50->250), then floor (->250+dist)
+                          y: [rampTopY - 40, 210, 210], // Follow slope then flat
+                          rotate: [angleDeg, 0, 0], // Rotate flat when on floor
+                        }
+                      : {
+                          x: 50,
+                          y: rampTopY - 40,
+                          rotate: angleDeg,
+                        }
+                  }
+                  transition={{ duration: 2, ease: "easeIn" }} // Make it smooth
+                >
+                  🏎️
+                </motion.div>
+
+                {/* Ruler markings on floor */}
+                <div className="absolute bottom-0 left-[50px] right-0 h-4 bg-yellow-100 flex">
+                  {[...Array(10)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="flex-1 border-r border-slate-300 text-[10px] text-slate-400"
+                    >
+                      {i * 30}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Controls */}
+              <div className="mt-8 flex gap-8 items-center justify-center">
+                <div className="flex flex-col w-64">
+                  <label className="font-bold text-slate-500 mb-2">
+                    {getText("height")}: {height}
+                  </label>
+                  <input
+                    type="range"
+                    min="10"
+                    max="60"
+                    value={height}
+                    onChange={(e) => {
+                      setHeight(Number(e.target.value));
+                      reset();
+                    }}
+                    className="w-full h-4 bg-slate-200 rounded-lg appearance-none cursor-pointer disabled:opacity-50"
+                    disabled={launched}
+                  />
+                </div>
+
+                <button
+                  onClick={launched ? reset : launch}
+                  className={`px-10 py-4 rounded-full font-black text-xl shadow-lg transition-transform active:scale-95 text-white
+                         ${
+                           launched
+                             ? "bg-slate-500 hover:bg-slate-600"
+                             : "bg-blue-600 hover:bg-blue-500"
+                         }
+                      `}
+                >
+                  {launched ? getText("reset") : getText("launch")}
+                </button>
+              </div>
+
+              {launched && distance > 0 && (
+                <div className="absolute top-8 right-8 bg-blue-100 text-blue-800 p-4 rounded-xl font-bold shadow animate-bounce">
+                  {getText("distance")} {distance} cm
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

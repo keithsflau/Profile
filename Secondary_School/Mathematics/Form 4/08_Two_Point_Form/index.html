@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Two Point Form 兩點式 | S4 Math</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-teal-50 text-slate-800 min-h-screen">
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+
+      const App = () => {
+        const [lang, setLang] = useState("en");
+        // Points
+        const [x1, setX1] = useState(-2);
+        const [y1, setY1] = useState(-3);
+        const [x2, setX2] = useState(4);
+        const [y2, setY2] = useState(5);
+
+        const t = {
+          title: { en: "Two Point Form", zh: "兩點式" },
+          point1: { en: "Point 1", zh: "點 1" },
+          point2: { en: "Point 2", zh: "點 2" },
+          slope: { en: "Slope (m)", zh: "斜率 (m)" },
+          back: { en: "Back to Dashboard", zh: "返回主頁" },
+        };
+
+        const slope = (y2 - y1) / (x2 - x1);
+
+        // Equation Generation
+        // y - y1 = m(x - x1)
+        // y = mx + (y1 - m*x1)
+        const intercept = y1 - slope * x1;
+
+        // To display integers nicely if applicable
+        const mDisplay = Number.isInteger(slope) ? slope : slope.toFixed(2);
+        const cDisplay = Number.isInteger(intercept)
+          ? Math.abs(intercept)
+          : Math.abs(intercept).toFixed(2);
+        const sign = intercept >= 0 ? "+" : "-";
+
+        // Coordinates for SVG
+        const toSvgX = (x) => 200 + x * 20;
+        const toSvgY = (y) => 200 - y * 20;
+
+        // Extended Line Points
+        // x = -10, x = 10
+        const ly1 = slope * -10 + intercept;
+        const ly2 = slope * 10 + intercept;
+
+        return (
+          <div className="p-6 max-w-4xl mx-auto min-h-screen flex flex-col">
+            <header className="mb-6 flex justify-between items-center">
+              <div>
+                <div className="text-teal-600 font-bold uppercase text-xs tracking-widest mb-1">
+                  S4 Math
+                </div>
+                <h1 className="text-3xl font-extrabold text-slate-900">
+                  {t.title[lang]}
+                </h1>
+              </div>
+              <button
+                onClick={() => setLang(lang === "en" ? "zh" : "en")}
+                className="px-3 py-1 bg-white border border-teal-200 rounded-lg text-sm font-bold hover:bg-teal-100"
+              >
+                {lang === "en" ? "中文" : "ENG"}
+              </button>
+            </header>
+
+            <div className="bg-white p-6 rounded-2xl border border-teal-100 mb-6 flex flex-col items-center shadow-sm">
+              <div className="text-lg text-slate-400 font-serif italic mb-2">
+                (y - y₁) = m(x - x₁)
+              </div>
+              <div className="text-3xl font-mono font-bold text-teal-600">
+                y = {mDisplay}x {sign} {cDisplay}
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8 items-start mb-6">
+              <div
+                className="bg-white rounded-2xl border border-teal-100 shadow-sm overflow-hidden relative"
+                style={{ height: "400px" }}
+              >
+                <svg viewBox="0 0 400 400" className="w-full h-full">
+                  <pattern
+                    id="grid"
+                    width="20"
+                    height="20"
+                    patternUnits="userSpaceOnUse"
+                  >
+                    <path
+                      d="M 20 0 L 0 0 0 20"
+                      fill="none"
+                      stroke="#f1f5f9"
+                      strokeWidth="1"
+                    />
+                  </pattern>
+                  <rect width="100%" height="100%" fill="url(#grid)" />
+
+                  <line
+                    x1="0"
+                    y1="200"
+                    x2="400"
+                    y2="200"
+                    stroke="#94a3b8"
+                    strokeWidth="2"
+                  />
+                  <line
+                    x1="200"
+                    y1="0"
+                    x2="200"
+                    y2="400"
+                    stroke="#94a3b8"
+                    strokeWidth="2"
+                  />
+
+                  {isFinite(slope) ? (
+                    <line
+                      x1={toSvgX(-10)}
+                      y1={toSvgY(ly1)}
+                      x2={toSvgX(10)}
+                      y2={toSvgY(ly2)}
+                      stroke="#0d9488"
+                      strokeWidth="3"
+                    />
+                  ) : (
+                    // Vertical line case
+                    <line
+                      x1={toSvgX(x1)}
+                      y1="0"
+                      x2={toSvgX(x1)}
+                      y2="400"
+                      stroke="#0d9488"
+                      strokeWidth="3"
+                    />
+                  )}
+
+                  {/* Points */}
+                  <circle
+                    cx={toSvgX(x1)}
+                    cy={toSvgY(y1)}
+                    r="6"
+                    fill="#14b8a6"
+                    stroke="white"
+                    strokeWidth="2"
+                  />
+                  <text
+                    x={toSvgX(x1) + 10}
+                    y={toSvgY(y1)}
+                    className="text-xs font-bold fill-teal-700"
+                  >
+                    P1
+                  </text>
+
+                  <circle
+                    cx={toSvgX(x2)}
+                    cy={toSvgY(y2)}
+                    r="6"
+                    fill="#0f766e"
+                    stroke="white"
+                    strokeWidth="2"
+                  />
+                  <text
+                    x={toSvgX(x2) + 10}
+                    y={toSvgY(y2)}
+                    className="text-xs font-bold fill-teal-800"
+                  >
+                    P2
+                  </text>
+                </svg>
+              </div>
+
+              <div className="space-y-6">
+                <div className="bg-white p-6 rounded-2xl border border-teal-100 shadow-sm">
+                  <h3 className="text-sm font-bold text-slate-400 uppercase mb-4">
+                    {t.point1[lang]} (x₁, y₁)
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs text-teal-600 font-bold block mb-1">
+                        x₁: {x1}
+                      </label>
+                      <input
+                        type="range"
+                        min="-8"
+                        max="8"
+                        step="1"
+                        value={x1}
+                        onChange={(e) => setX1(Number(e.target.value))}
+                        className="w-full accent-teal-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-teal-600 font-bold block mb-1">
+                        y₁: {y1}
+                      </label>
+                      <input
+                        type="range"
+                        min="-8"
+                        max="8"
+                        step="1"
+                        value={y1}
+                        onChange={(e) => setY1(Number(e.target.value))}
+                        className="w-full accent-teal-500"
+                      />
+                    </div>
+                  </div>
+
+                  <h3 className="text-sm font-bold text-slate-400 uppercase mt-6 mb-4">
+                    {t.point2[lang]} (x₂, y₂)
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs text-teal-800 font-bold block mb-1">
+                        x₂: {x2}
+                      </label>
+                      <input
+                        type="range"
+                        min="-8"
+                        max="8"
+                        step="1"
+                        value={x2}
+                        onChange={(e) => setX2(Number(e.target.value))}
+                        className="w-full accent-teal-700"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-teal-800 font-bold block mb-1">
+                        y₂: {y2}
+                      </label>
+                      <input
+                        type="range"
+                        min="-8"
+                        max="8"
+                        step="1"
+                        value={y2}
+                        onChange={(e) => setY2(Number(e.target.value))}
+                        className="w-full accent-teal-700"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-teal-50 p-4 rounded-xl border border-teal-100">
+                  <div className="text-xs uppercase text-slate-500 mb-1">
+                    {t.slope[lang]} Calculation
+                  </div>
+                  <div className="font-mono text-lg">
+                    m = (y₂ - y₁) / (x₂ - x₁) <br />m = ({y2} - {y1}) / ({x2} -{" "}
+                    {x1}) <br />m = {y2 - y1} / {x2 - x1} ={" "}
+                    <strong>
+                      {isFinite(slope) ? slope.toFixed(2) : "Undefined"}
+                    </strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <footer className="mt-auto pt-8">
+              <a
+                href="../index.html"
+                className="text-teal-600 hover:text-teal-700 font-bold"
+              >
+                <i className="fa-solid fa-arrow-left mr-2"></i>
+                {t.back[lang]}
+              </a>
+            </footer>
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

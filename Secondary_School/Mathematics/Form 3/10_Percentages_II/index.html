@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Percentage Change & Multipliers | S3 Math</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-cyan-50 text-slate-800 min-h-screen">
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+
+      const App = () => {
+        const [lang, setLang] = useState("en");
+        const [original, setOriginal] = useState(100);
+        const [change, setChange] = useState(20); // Percentage
+        const [isIncrease, setIsIncrease] = useState(true);
+
+        const t = {
+          title: { en: "Percentage Multipliers", zh: "百分數增減" },
+          original: { en: "Original Value", zh: "原值" },
+          change: { en: "Percentage Change", zh: "百分數改變" },
+          multiplier: { en: "Multiplier", zh: "倍數 (因子)" },
+          newVal: { en: "New Value", zh: "新值" },
+          inc: { en: "Increase", zh: "增加" },
+          dec: { en: "Decrease", zh: "減少" },
+          back: { en: "Back to Dashboard", zh: "返回主頁" },
+        };
+
+        const factor = isIncrease ? 1 + change / 100 : 1 - change / 100;
+        const final = original * factor;
+
+        return (
+          <div className="p-6 max-w-4xl mx-auto min-h-screen flex flex-col">
+            <header className="mb-6 flex justify-between items-center">
+              <div>
+                <div className="text-cyan-600 font-bold uppercase text-xs tracking-widest mb-1">
+                  S3 Math
+                </div>
+                <h1 className="text-3xl font-extrabold text-slate-900">
+                  {t.title[lang]}
+                </h1>
+              </div>
+              <button
+                onClick={() => setLang(lang === "en" ? "zh" : "en")}
+                className="px-3 py-1 bg-white border border-cyan-200 rounded-lg text-sm font-bold hover:bg-cyan-100"
+              >
+                {lang === "en" ? "中文" : "ENG"}
+              </button>
+            </header>
+
+            <div className="flex justify-center gap-4 mb-8">
+              <button
+                onClick={() => setIsIncrease(true)}
+                className={`px-6 py-2 rounded-xl font-bold transition ${
+                  isIncrease
+                    ? "bg-cyan-500 text-white shadow-lg"
+                    : "bg-white text-cyan-600"
+                }`}
+              >
+                <i className="fa-solid fa-plus mr-2"></i>
+                {t.inc[lang]}
+              </button>
+              <button
+                onClick={() => setIsIncrease(false)}
+                className={`px-6 py-2 rounded-xl font-bold transition ${
+                  !isIncrease
+                    ? "bg-rose-500 text-white shadow-lg"
+                    : "bg-white text-rose-600"
+                }`}
+              >
+                <i className="fa-solid fa-minus mr-2"></i>
+                {t.dec[lang]}
+              </button>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8 items-center mb-6">
+              <div className="space-y-6">
+                <div className="bg-white p-6 rounded-2xl border border-cyan-100 shadow-sm">
+                  <label className="text-xs font-bold text-slate-400 block mb-1">
+                    {t.original[lang]}
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <input
+                      type="number"
+                      value={original}
+                      onChange={(e) => setOriginal(Number(e.target.value))}
+                      className="font-mono text-xl font-bold w-24 border-b-2 border-slate-200 focus:outline-none focus:border-cyan-500"
+                    />
+                    <input
+                      type="range"
+                      min="0"
+                      max="500"
+                      value={original}
+                      onChange={(e) => setOriginal(Number(e.target.value))}
+                      className="flex-1 accent-cyan-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="bg-white p-6 rounded-2xl border border-cyan-100 shadow-sm">
+                  <label className="text-xs font-bold text-slate-400 block mb-1">
+                    {t.change[lang]} (%)
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <span
+                      className={`font-mono text-xl font-bold w-16 text-right ${
+                        isIncrease ? "text-cyan-600" : "text-rose-600"
+                      }`}
+                    >
+                      {change}%
+                    </span>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={change}
+                      onChange={(e) => setChange(Number(e.target.value))}
+                      className={`flex-1 ${
+                        isIncrease ? "accent-cyan-500" : "accent-rose-500"
+                      }`}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-slate-800 text-white p-8 rounded-3xl shadow-xl space-y-6 relative overflow-hidden">
+                <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-3xl"></div>
+
+                <div className="flex justify-between items-end border-b border-white/10 pb-4">
+                  <div>
+                    <div className="text-xs uppercase opacity-60 mb-1">
+                      {t.multiplier[lang]}
+                    </div>
+                    <div className="text-3xl font-mono font-bold text-yellow-400">
+                      × {factor.toFixed(2)}
+                    </div>
+                  </div>
+                  <div className="text-right text-xs opacity-50">
+                    1 {isIncrease ? "+" : "-"} {change / 100}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-xs uppercase opacity-60 mb-2">
+                    {t.newVal[lang]}
+                  </div>
+                  <div className="text-5xl font-mono font-bold">
+                    {final.toFixed(2)}
+                  </div>
+                  <div className="text-sm opacity-50 mt-1">
+                    {original} × {factor.toFixed(2)}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              className="bg-white p-6 rounded-2xl border border-cyan-100 shadow-sm flex items-center justify-center gap-4"
+              style={{ minHeight: "150px" }}
+            >
+              <div className="relative">
+                <div className="w-20 h-20 bg-slate-200 rounded-lg flex items-center justify-center font-bold text-slate-500">
+                  {original}
+                </div>
+                <div className="absolute -bottom-6 w-full text-center text-xs font-bold text-slate-400">
+                  Original
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center">
+                <i
+                  className={`fa-solid fa-arrow-right-long text-2xl ${
+                    isIncrease ? "text-cyan-500" : "text-rose-500"
+                  }`}
+                ></i>
+                <span className="text-xs font-bold bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full mt-1">
+                  × {factor.toFixed(2)}
+                </span>
+              </div>
+
+              <div className="relative">
+                <div
+                  className={`w-20 h-20 rounded-lg flex items-center justify-center font-bold text-white transition-all duration-300 ${
+                    isIncrease ? "bg-cyan-500" : "bg-rose-500"
+                  }`}
+                  style={{
+                    transform: `scale(${Math.min(1.5, Math.max(0.5, factor))})`,
+                  }}
+                >
+                  {final.toFixed(0)}
+                </div>
+                <div className="absolute -bottom-6 w-full text-center text-xs font-bold text-slate-400">
+                  New
+                </div>
+              </div>
+            </div>
+
+            <footer className="mt-auto pt-8">
+              <a
+                href="../index.html"
+                className="text-cyan-600 hover:text-cyan-700 font-bold"
+              >
+                <i className="fa-solid fa-arrow-left mr-2"></i>
+                {t.back[lang]}
+              </a>
+            </footer>
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

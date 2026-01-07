@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>S5 Math Master Class | Band 1A Interactive Labs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Plus+Jakarta+Sans:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              outfit: ["Outfit", "sans-serif"],
+              jakarta: ["Plus Jakarta Sans", "sans-serif"],
+            },
+            colors: {
+              math: {
+                50: "#fff1f2", // Rose 50
+                100: "#ffe4e6",
+                500: "#f43f5e",
+                600: "#e11d48",
+                900: "#881337",
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        background-color: #fff1f2;
+        background-image: radial-gradient(
+            at 100% 0%,
+            rgba(244, 63, 94, 0.1) 0px,
+            transparent 50%
+          ),
+          radial-gradient(
+            at 0% 100%,
+            rgba(225, 29, 72, 0.1) 0px,
+            transparent 50%
+          );
+        background-attachment: fixed;
+      }
+      .glossy-card {
+        background: rgba(255, 255, 255, 0.82);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      }
+      .glossy-card:hover {
+        background: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+        transform: translateY(-2px);
+      }
+      .status-badge {
+        font-size: 0.65rem;
+        letter-spacing: 0.05em;
+      }
+    </style>
+  </head>
+  <body class="font-jakarta text-slate-800 antialiased">
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState } = React;
+
+      const curriculum = [
+        {
+          id: "unit1",
+          title: "Unit 1: Sequences & Series",
+          color: "text-rose-600",
+          bg: "bg-rose-50",
+          border: "border-rose-200",
+          icon: "fa-arrow-down-1-9",
+          apps: [
+            {
+              id: "01",
+              title: "Arithmetic Sequences",
+              path: "01_AS_Seq/index.html",
+              status: "live",
+              icon: "fa-layer-group",
+            },
+            {
+              id: "02",
+              title: "Geometric Sequences",
+              path: "02_GS_Seq/index.html",
+              status: "live",
+              icon: "fa-arrow-up-right-dots",
+            },
+            {
+              id: "06",
+              title: "Summation of Series",
+              path: "06_Series_Sum/index.html",
+              status: "live",
+              icon: "fa-sigma",
+            },
+          ],
+        },
+        {
+          id: "unit2",
+          title: "Unit 2: Equations of Circle",
+          color: "text-orange-600",
+          bg: "bg-orange-50",
+          border: "border-orange-200",
+          icon: "fa-circle-notch",
+          apps: [
+            {
+              id: "03",
+              title: "Equation of Circle",
+              path: "03_Circle_Eq/index.html",
+              status: "live",
+              icon: "fa-bullseye",
+            },
+            {
+              id: "22",
+              title: "General Form",
+              path: "22_Eq_Circle_Gen/index.html",
+              status: "live",
+              icon: "fa-ring",
+            },
+            {
+              id: "23",
+              title: "Line & Circle Intersection",
+              path: "23_Line_Circle_Inter/index.html",
+              status: "live",
+              icon: "fa-arrows-to-circle",
+            },
+          ],
+        },
+        {
+          id: "unit3",
+          title: "Unit 3: Trigonometry & Geometry",
+          color: "text-blue-600",
+          bg: "bg-blue-50",
+          border: "border-blue-200",
+          icon: "fa-cubes",
+          apps: [
+            {
+              id: "04",
+              title: "Sine & Cosine Rule",
+              path: "04_Sine_Cosine/index.html",
+              status: "live",
+              icon: "fa-draw-polygon",
+            },
+            {
+              id: "09",
+              title: "Heron's Formula",
+              path: "09_Herons_Formula/index.html",
+              status: "live",
+              icon: "fa-triangle",
+            },
+            {
+              id: "10",
+              title: "Radians & Degrees",
+              path: "10_Radians_Deg/index.html",
+              status: "live",
+              icon: "fa-circle-half-stroke",
+            },
+            {
+              id: "11",
+              title: "Arc Length & Sector Area",
+              path: "11_Arc_Sector/index.html",
+              status: "live",
+              icon: "fa-pizza-slice",
+            },
+            {
+              id: "14",
+              title: "3D Trigonometry",
+              path: "14_3D_Trig/index.html",
+              status: "live",
+              icon: "fa-box-open",
+            },
+            {
+              id: "08",
+              title: "Elevation & Depression",
+              path: "08_Elevation_Dep/index.html",
+              status: "live",
+              icon: "fa-mountain",
+            },
+            {
+              id: "24",
+              title: "Trig Identities",
+              path: "24_Trig_Identities/index.html",
+              status: "live",
+              icon: "fa-equals",
+            },
+            {
+              id: "25",
+              title: "Solving Trig Equations",
+              path: "25_Solve_Trig/index.html",
+              status: "live",
+              icon: "fa-calculator",
+            },
+          ],
+        },
+        {
+          id: "unit4",
+          title: "Unit 4: Geometry Properties",
+          color: "text-indigo-600",
+          bg: "bg-indigo-50",
+          border: "border-indigo-200",
+          icon: "fa-shapes",
+          apps: [
+            {
+              id: "15",
+              title: "Angle at Center",
+              path: "15_Circle_Prop1/index.html",
+              status: "live",
+              icon: "fa-circle-dot",
+            },
+            {
+              id: "16",
+              title: "Circle Properties II",
+              path: "16_Circle_Prop2/index.html",
+              status: "live",
+              icon: "fa-shapes",
+            },
+            {
+              id: "17",
+              title: "Cyclic Quadrilaterals",
+              path: "17_Cyclic_Quad/index.html",
+              status: "live",
+              icon: "fa-vector-square",
+            },
+            {
+              id: "18",
+              title: "Tangent & Radius",
+              path: "18_Tangent_Circle_Prop/index.html",
+              status: "live",
+              icon: "fa-t",
+            },
+            {
+              id: "19",
+              title: "Tangents from Ext. Point",
+              path: "19_Tangents_Ext_Point/index.html",
+              status: "live",
+              icon: "fa-share-nodes",
+            },
+            {
+              id: "20",
+              title: "Alt. Segment Angles",
+              path: "20_Alt_Segment/index.html",
+              status: "live",
+              icon: "fa-angle-right",
+            },
+            {
+              id: "21",
+              title: "Chord Bisector",
+              path: "21_Chord_Prop/index.html",
+              status: "live",
+              icon: "fa-slash",
+            },
+          ],
+        },
+        {
+          id: "unit5",
+          title: "Unit 5: Locus & Linear Prog",
+          color: "text-emerald-600",
+          bg: "bg-emerald-50",
+          border: "border-emerald-200",
+          icon: "fa-bezier-curve",
+          apps: [
+            {
+              id: "05",
+              title: "Locus Visualizer",
+              path: "05_Locus_Visual/index.html",
+              status: "live",
+              icon: "fa-bezier-curve",
+            },
+            {
+              id: "07",
+              title: "Linear Programming",
+              path: "07_Linear_Prog/index.html",
+              status: "live",
+              icon: "fa-chart-area",
+            },
+            {
+              id: "26",
+              title: "Linear Inequalities",
+              path: "26_Ineq_2Var/index.html",
+              status: "live",
+              icon: "fa-less-than-equal",
+            },
+            {
+              id: "27",
+              title: "System of Inequalities",
+              path: "27_Linear_Prog_Sys/index.html",
+              status: "live",
+              icon: "fa-layer-group",
+            },
+          ],
+        },
+        {
+          id: "unit6",
+          title: "Unit 6: Matrices & Vectors",
+          color: "text-purple-600",
+          bg: "bg-purple-50",
+          border: "border-purple-200",
+          icon: "fa-vector-square",
+          apps: [
+            {
+              id: "12",
+              title: "Matrix Operations",
+              path: "12_Matrix_Ops/index.html",
+              status: "live",
+              icon: "fa-table-cells",
+            },
+            {
+              id: "29",
+              title: "Determinant & Area",
+              path: "29_Matrix_Det/index.html",
+              status: "live",
+              icon: "fa-expand",
+            },
+            {
+              id: "30",
+              title: "Transformation Matrices",
+              path: "30_Matrix_Trans/index.html",
+              status: "live",
+              icon: "fa-rotate",
+            },
+            {
+              id: "13",
+              title: "Vectors in 2D",
+              path: "13_Vectors_2D/index.html",
+              status: "live",
+              icon: "fa-arrow-right-long",
+            },
+            {
+              id: "28",
+              title: "Vector Dot Product",
+              path: "28_Vector_Dot/index.html",
+              status: "live",
+              icon: "fa-x-marks-lines",
+            },
+          ],
+        },
+      ];
+
+      const Header = () => (
+        <header className="relative py-12 px-6 mb-8 text-center bg-white/50 backdrop-blur-sm border-b border-white/40">
+          <div className="max-w-4xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-math-100 text-math-600 text-xs font-bold uppercase tracking-wider rounded-full mb-4 border border-math-500">
+              <span className="w-2 h-2 rounded-full bg-math-500 animate-pulse"></span>
+              Secondary 5
+            </div>
+            <h1 className="font-outfit text-4xl md:text-6xl font-extrabold text-slate-900 tracking-tight mb-4">
+              Advanced Math{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-orange-600">
+                Pro Labs
+              </span>
+            </h1>
+            <p className="text-lg text-slate-500 max-w-2xl mx-auto font-jakarta">
+              Mastering Sequences, Advanced Geometry, and Calculus Foundations.
+            </p>
+          </div>
+        </header>
+      );
+
+      const AppCard = ({ app, colorBase }) => {
+        const isLive = app.status === "live";
+        return (
+          <a
+            href={isLive ? app.path : "#"}
+            className={`block group relative h-full p-5 rounded-2xl transition-all duration-300 ${
+              isLive
+                ? "glossy-card cursor-pointer"
+                : "bg-slate-50 border border-slate-100 opacity-60 cursor-not-allowed"
+            }`}
+            onClick={(e) => !isLive && e.preventDefault()}
+          >
+            <div className="flex justify-between items-start mb-4">
+              <div
+                className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${
+                  isLive
+                    ? "bg-white shadow-sm " + colorBase
+                    : "bg-slate-200 text-slate-400"
+                }`}
+              >
+                <i className={`fa-solid ${app.icon}`}></i>
+              </div>
+              <span
+                className={`status-badge px-2 py-1 rounded-md font-bold uppercase ${
+                  isLive
+                    ? "bg-emerald-100 text-emerald-700"
+                    : "bg-slate-200 text-slate-500"
+                }`}
+              >
+                {isLive ? "Active" : "Coming Soon"}
+              </span>
+            </div>
+            <h3
+              className={`font-outfit font-bold text-lg leading-tight mb-1 ${
+                isLive
+                  ? "text-slate-800 group-hover:text-blue-600 transition-colors"
+                  : "text-slate-400"
+              }`}
+            >
+              {app.title}
+            </h3>
+            <p className="text-xs text-slate-400 font-mono">APP-{app.id}</p>
+          </a>
+        );
+      };
+
+      const UnitSection = ({ unit }) => (
+        <div className="mb-12">
+          <div className="flex items-center gap-3 mb-6 pl-2">
+            <div
+              className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl shadow-sm ${unit.bg} ${unit.color} border ${unit.border}`}
+            >
+              <i className={`fa-solid ${unit.icon}`}></i>
+            </div>
+            <div>
+              <h2 className="font-outfit text-2xl font-bold text-slate-800">
+                {unit.title}
+              </h2>
+              <div className="h-1 w-20 bg-gradient-to-r from-slate-200 to-transparent mt-1 rounded-full"></div>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {unit.apps.map((app) => (
+              <AppCard key={app.id} app={app} colorBase={unit.color} />
+            ))}
+          </div>
+        </div>
+      );
+
+      const Dashboard = () => (
+        <div className="min-h-screen pb-20">
+          <Header />
+          <main className="container mx-auto px-6 max-w-7xl">
+            {curriculum.map((unit) => (
+              <UnitSection key={unit.id} unit={unit} />
+            ))}
+          </main>
+          <footer className="text-center py-10 text-slate-400 text-sm">
+            <a href="../index.html" className="hover:text-blue-600 transition">
+              Back to Main Portal
+            </a>
+          </footer>
+        </div>
+      );
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<Dashboard />);
+    </script>
+  </body>
+</html>

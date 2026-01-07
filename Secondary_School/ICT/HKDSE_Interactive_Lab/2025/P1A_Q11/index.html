@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HKDSE 2025 Paper 1A Q11 - DBMS Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.development.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #0f172a;
+        color: #e2e8f0;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+    <div id="root" class="w-full max-w-5xl"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      // Lucide Icon Shim
+      const LucideIcon = ({ name, size = 20, className = "" }) => {
+        const formatName = (n) =>
+          n
+            .split("-")
+            .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
+            .join("");
+        const iconName = formatName(name);
+        const [svgHtml, setSvgHtml] = useState("");
+        useEffect(() => {
+          if (window.lucide?.icons[iconName]?.toSvg) {
+            setSvgHtml(
+              window.lucide.icons[iconName].toSvg({
+                width: size,
+                height: size,
+                class: className,
+              })
+            );
+          }
+        }, [name]);
+        return (
+          <span
+            dangerouslySetInnerHTML={{ __html: svgHtml }}
+            style={{ display: "inline-flex" }}
+          />
+        );
+      };
+
+      const App = () => {
+        const [viewMode, setViewMode] = useState("TABLE"); // 'TABLE' or 'FORM'
+        const [feedback, setFeedback] = useState(null);
+
+        const handleSelect = (mode) => {
+          setViewMode(mode);
+          if (mode === "FORM") {
+            setFeedback({
+              type: "success",
+              msg: "Correct Answer!",
+              detail:
+                "Using a Form creates a 'User-Friendly Interface' (Statement 2). It guides the user, reducing errors compared to the raw table view.",
+            });
+          } else {
+            setFeedback({
+              type: "info",
+              msg: "Raw Table View",
+              detail:
+                "This view is cluttered and confusing for normal users. It's efficient for admins but not 'User Friendly' for data entry.",
+            });
+          }
+        };
+
+        return (
+          <div className="space-y-8 animate-fade-in w-full max-w-5xl mx-auto">
+            <header className="text-center space-y-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-900/30 border border-cyan-500/30 text-cyan-400 text-sm font-bold mb-4">
+                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                HKDSE 2025 Paper 1A Q11
+              </div>
+              <h1 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">
+                DBMS Form vs Table
+              </h1>
+              <p className="text-slate-400 max-w-xl mx-auto">
+                Why did Mr. Wong build a Database Form for his colleagues?
+              </p>
+            </header>
+
+            <div className="flex justify-center gap-4 mb-4">
+              <button
+                onClick={() => handleSelect("TABLE")}
+                className={`px-6 py-3 rounded-lg font-bold flex items-center gap-2 transition-all ${
+                  viewMode === "TABLE"
+                    ? "bg-slate-700 text-white ring-2 ring-slate-500"
+                    : "bg-slate-800 text-slate-400 hover:bg-slate-700"
+                }`}
+              >
+                <LucideIcon name="table" /> Raw Table View
+              </button>
+              <button
+                onClick={() => handleSelect("FORM")}
+                className={`px-6 py-3 rounded-lg font-bold flex items-center gap-2 transition-all ${
+                  viewMode === "FORM"
+                    ? "bg-purple-600 text-white shadow-lg shadow-purple-500/30 ring-2 ring-purple-400"
+                    : "bg-slate-800 text-slate-400 hover:bg-slate-700"
+                }`}
+              >
+                <LucideIcon name="layout-template" /> Form View
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+              {/* View Container */}
+              <div className="bg-slate-900 p-1 rounded-xl shadow-2xl overflow-hidden border border-slate-700 h-[400px] relative">
+                {/* Window Bar */}
+                <div className="bg-slate-950 p-2 flex items-center gap-2 border-b border-slate-800">
+                  <div className="flex gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                    <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                  </div>
+                  <div className="flex-1 text-center text-xs text-slate-500 font-mono">
+                    {viewMode === "TABLE"
+                      ? "tbl_Students (Datasheet View)"
+                      : "frm_StudentEntry (Form View)"}
+                  </div>
+                </div>
+
+                <div className="p-0 h-full overflow-auto bg-white text-slate-900">
+                  {viewMode === "TABLE" ? (
+                    <table className="w-full text-xs font-mono border-collapse">
+                      <thead className="bg-slate-100 border-b">
+                        <tr>
+                          <th className="p-2 text-left border-r">ID</th>
+                          <th className="p-2 text-left border-r">Surname</th>
+                          <th className="p-2 text-left border-r">GivenName</th>
+                          <th className="p-2 text-left border-r">DOB</th>
+                          <th className="p-2 text-left">Class</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[...Array(15)].map((_, i) => (
+                          <tr key={i} className="border-b hover:bg-blue-50">
+                            <td className="p-1 border-r">{1000 + i}</td>
+                            <td className="p-1 border-r text-slate-400">
+                              Loading...
+                            </td>
+                            <td className="p-1 border-r text-slate-400">...</td>
+                            <td className="p-1 border-r text-slate-400">
+                              --/--/--
+                            </td>
+                            <td className="p-1"></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <div className="p-8 bg-slate-50 h-full flex flex-col items-center justify-center">
+                      <div className="w-full max-w-sm bg-white p-6 rounded-lg shadow-lg border border-slate-200 space-y-4">
+                        <h2 className="text-xl font-bold text-purple-600 flex items-center gap-2 mb-4 border-b pb-2">
+                          <LucideIcon name="user-plus" /> Student Entry
+                        </h2>
+                        <div className="space-y-3">
+                          <div>
+                            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
+                              Full Name
+                            </label>
+                            <input
+                              type="text"
+                              className="w-full p-2 border rounded focus:ring-2 focus:ring-purple-400 outline-none"
+                              placeholder="e.g. Chan Tai Man"
+                            />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
+                                Class
+                              </label>
+                              <select className="w-full p-2 border rounded">
+                                <option>6A</option>
+                                <option>6B</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
+                                Date of Birth
+                              </label>
+                              <input
+                                type="date"
+                                className="w-full p-2 border rounded"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <button className="w-full bg-purple-600 text-white py-2 rounded font-bold hover:bg-purple-700 transition">
+                          Save Record
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Overlay for "Wait" in Table mode to simulate ugliness/rawness */}
+                  {viewMode === "TABLE" && (
+                    <div className="absolute bottom-4 right-4 bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded border border-yellow-300 shadow-sm">
+                      *Warning: Direct Table Access
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Analysis Panel */}
+              <div className="space-y-6">
+                <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
+                  <h3 className="text-white font-bold mb-4 flex items-center gap-2">
+                    <LucideIcon name="check-square" className="text-cyan-400" />{" "}
+                    Why use a Form?
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-slate-950/50 border border-slate-800">
+                      <div className="bg-red-900/30 p-2 rounded text-red-400">
+                        <LucideIcon name="x" />
+                      </div>
+                      <div>
+                        <h4 className="text-slate-300 font-bold text-sm">
+                          (1) Data not important?
+                        </h4>
+                        <p className="text-xs text-slate-500">
+                          Incorrect. Student data is critical. Forms actually
+                          PROTECT data integrity.
+                        </p>
+                      </div>
+                    </div>
+                    <div
+                      className={`flex items-start gap-3 p-3 rounded-lg border transition-all ${
+                        viewMode === "FORM"
+                          ? "bg-purple-900/20 border-purple-500/50"
+                          : "bg-slate-950/50 border-slate-800"
+                      }`}
+                    >
+                      <div
+                        className={`${
+                          viewMode === "FORM"
+                            ? "bg-purple-600 text-white"
+                            : "bg-slate-800 text-slate-500"
+                        } p-2 rounded transition-colors`}
+                      >
+                        <LucideIcon name="check" />
+                      </div>
+                      <div>
+                        <h4
+                          className={`${
+                            viewMode === "FORM"
+                              ? "text-purple-300"
+                              : "text-slate-300"
+                          } font-bold text-sm`}
+                        >
+                          (2) User-Friendly Interface?
+                        </h4>
+                        <p className="text-xs text-slate-500">
+                          Correct. As you can see, the Form view is cleaner,
+                          validated, and easier for humans to process.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-slate-950/50 border border-slate-800">
+                      <div className="bg-slate-800 p-2 rounded text-slate-500">
+                        <LucideIcon name="help-circle" />
+                      </div>
+                      <div>
+                        <h4 className="text-slate-300 font-bold text-sm">
+                          (3) Online Access?
+                        </h4>
+                        <p className="text-xs text-slate-500">
+                          Not necessarily. A desktop DBMS (like Access) uses
+                          forms locally. "Online" is not the defining feature of
+                          a Form object.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {feedback && (
+                  <div
+                    className={`p-6 rounded-xl border flex items-start gap-4 animate-fade-in ${
+                      feedback.type === "success"
+                        ? "bg-green-900/20 border-green-500/30 text-green-300"
+                        : "bg-blue-900/20 border-blue-500/30 text-blue-300"
+                    }`}
+                  >
+                    <LucideIcon
+                      name={feedback.type === "success" ? "trophy" : "info"}
+                      size={24}
+                      className="shrink-0 mt-1"
+                    />
+                    <div>
+                      <div className="font-bold text-lg">{feedback.msg}</div>
+                      <p className="opacity-90 leading-snug">
+                        {feedback.detail}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Puberty Changes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #fdf2f8;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Changes in Puberty",
+          zh: "青春期的變化",
+          ja: "思春期の変化",
+          ko: "사춘기의 변화",
+          es: "Cambios en la pubertad",
+          de: "Veränderungen in der Pubertät",
+          fi: "Murrosiän muutokset",
+          fr: "Changements à la puberté",
+          ar: "التغيرات في سن البلوغ",
+          it: "Cambiamenti nella Pubertà",
+        },
+        instruction: {
+          en: "Who experiences this change? (Boy, Girl, or Both)",
+          zh: "誰會經歷這個變化？(男生、女生或兩者)",
+          ja: "誰がこの変化を経験しますか？（男の子、女の子、または両方）",
+          ko: "누가 이 변화를 겪나요? (남자, 여자 또는 둘 다)",
+          es: "¿Quién experimenta este cambio? (Chico, Chica o Ambos)",
+          de: "Wer erlebt diese Veränderung? (Junge, Mädchen oder beide)",
+          fi: "Kuka kokee tämän muutoksen? (Poika, tyttö tai molemmat)",
+          fr: "Qui vit ce changement ? (Garçon, Fille ou les deux)",
+          ar: "من يختبر هذا التغيير؟ (صبي، فتاة، أو كلاهما)",
+          it: "Chi sperimenta questo cambiamento? (Ragazzo, Ragazza o Entrambi)",
+        },
+        boy: {
+          en: "Boy",
+          zh: "男生",
+          ja: "男の子",
+          ko: "남자",
+          es: "Chico",
+          de: "Junge",
+          fi: "Poika",
+          fr: "Garçon",
+          ar: "صبي",
+          it: "Ragazzo",
+        },
+        girl: {
+          en: "Girl",
+          zh: "女生",
+          ja: "女の子",
+          ko: "여자",
+          es: "Chica",
+          de: "Mädchen",
+          fi: "Tyttö",
+          fr: "Fille",
+          ar: "فتاة",
+          it: "Ragazza",
+        },
+        both: {
+          en: "Both",
+          zh: "兩者皆是",
+          ja: "両方",
+          ko: "둘 다",
+          es: "Ambos",
+          de: "Beide",
+          fi: "Molemmat",
+          fr: "Les deux",
+          ar: "كلاهما",
+          it: "Entrambi",
+        },
+        correct: {
+          en: "Correct!",
+          zh: "正確！",
+          ja: "正解！",
+          ko: "정답!",
+          es: "¡Correcto!",
+          de: "Richtig!",
+          fi: "Oikein!",
+          fr: "Correct !",
+          ar: "صحيح!",
+          it: "Corretto!",
+        },
+
+        c1: {
+          en: "Voice deepens (Adam's Apple)",
+          zh: "聲音變低沉 (喉結)",
+          ja: "声が低くなる（喉仏）",
+          ko: "목소리가 굵어짐 (울대뼈)",
+          es: "La voz se agrava (Nuez de Adán)",
+          de: "Stimme wird tiefer (Adamsapfel)",
+          fi: "Ääni madaltuu (Aataminomena)",
+          fr: "La voix devient grave (Pomme d'Adam)",
+          ar: "يتعمق الصوت (تفاحة آدم)",
+          it: "La voce si approfondisce (Pomo d'Adamo)",
+        },
+        c2: {
+          en: "Breasts develop",
+          zh: "乳房發育",
+          ja: "胸が発達する",
+          ko: "가슴 발달",
+          es: "Senos se desarrollan",
+          de: "Brüste entwickeln sich",
+          fi: "Rinnat kehittyvät",
+          fr: "Les seins se développent",
+          ar: "تطور الثدي",
+          it: "Seni sviluppati",
+        },
+        c3: {
+          en: "Growth spurt (Taller)",
+          zh: "快速長高",
+          ja: "急激な成長（背が伸びる）",
+          ko: "급성장 (키가 큼)",
+          es: "Estirón (Más alto)",
+          de: "Wachstumsschub (Größer)",
+          fi: "Kasvupyrähdys (Pidempi)",
+          fr: "Poussée de croissance (Plus grand)",
+          ar: "طفرة النمو (أطول)",
+          it: "Scatto di crescita (Più alto)",
+        },
+        c4: {
+          en: "Acne / Pimples",
+          zh: "暗瘡 / 青春痘",
+          ja: "ニキビ",
+          ko: "여드름",
+          es: "Acné / Granos",
+          de: "Akne / Pickel",
+          fi: "Akne / Finnejä",
+          fr: "Acné / Boutons",
+          ar: "حب الشباب / البثور",
+          it: "Acne / Brufoli",
+        },
+        c5: {
+          en: "Menstruation (Period)",
+          zh: "月經來潮",
+          ja: "月経（生理）",
+          ko: "월경 (생리)",
+          es: "Menstruación (Periodo)",
+          de: "Menstruation (Periode)",
+          fi: "Kuukautiset",
+          fr: "Menstruation (Règles)",
+          ar: "الحيض (الدورة الشهرية)",
+          it: "Mestruazioni (Ciclo)",
+        },
+        c6: {
+          en: "Facial hair grows",
+          zh: "生長鬍鬚",
+          ja: "ひげが生える",
+          ko: "수염이 자람",
+          es: "Crece vello facial",
+          de: "Gesichtshaar wächst",
+          fi: "Kasvokarvat kasvavat",
+          fr: "Les poils du visage poussent",
+          ar: "ينمو شعر الوجه",
+          it: "Crescono i peli del viso",
+        },
+      };
+
+      const changes = [
+        { id: "c1", type: "boy", icon: "🗣️" },
+        { id: "c2", type: "girl", icon: "👙" },
+        { id: "c3", type: "both", icon: "📏" },
+        { id: "c4", type: "both", icon: "😣" },
+        { id: "c5", type: "girl", icon: "📅" },
+        { id: "c6", type: "boy", icon: "🧔" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [index, setIndex] = useState(0);
+        const [feedback, setFeedback] = useState(null);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+        const current = changes[index];
+
+        const handleAnswer = (ans) => {
+          if (feedback) return;
+          if (ans === current.type) {
+            setFeedback("correct");
+            setTimeout(() => {
+              setFeedback(null);
+              setIndex((index + 1) % changes.length);
+            }, 1000);
+          } else {
+            setFeedback("wrong");
+            setTimeout(() => setFeedback(null), 500);
+          }
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col items-center justify-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-indigo-600">
+              {getText("title")}
+            </h1>
+
+            <div className="w-full max-w-lg bg-white p-8 rounded-3xl shadow-xl border-4 border-indigo-100 text-center relative overflow-hidden">
+              {/* Question Card */}
+              <div className="bg-indigo-50 p-8 rounded-2xl mb-8 flex flex-col items-center">
+                <div className="text-8xl mb-4 animate-bounce-slow filter drop-shadow">
+                  {current.icon}
+                </div>
+                <div className="text-2xl font-bold text-slate-800 min-h-[4rem] flex items-center justify-center">
+                  {getText(current.id)}
+                </div>
+              </div>
+
+              <div className="font-bold text-slate-400 mb-6">
+                {getText("instruction")}
+              </div>
+
+              <div className="flex gap-4">
+                <button
+                  onClick={() => handleAnswer("boy")}
+                  className="flex-1 bg-blue-100 hover:bg-blue-200 text-blue-800 py-4 rounded-xl font-bold border-2 border-blue-300 transition-colors"
+                >
+                  👦 {getText("boy")}
+                </button>
+                <button
+                  onClick={() => handleAnswer("both")}
+                  className="flex-1 bg-purple-100 hover:bg-purple-200 text-purple-800 py-4 rounded-xl font-bold border-2 border-purple-300 transition-colors"
+                >
+                  👫 {getText("both")}
+                </button>
+                <button
+                  onClick={() => handleAnswer("girl")}
+                  className="flex-1 bg-pink-100 hover:bg-pink-200 text-pink-800 py-4 rounded-xl font-bold border-2 border-pink-300 transition-colors"
+                >
+                  👧 {getText("girl")}
+                </button>
+              </div>
+
+              {feedback && (
+                <div
+                  className={`absolute inset-0 bg-white/90 flex items-center justify-center z-10`}
+                >
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className={`text-4xl font-black px-8 py-4 rounded-xl shadow-2xl ${
+                      feedback === "correct"
+                        ? "bg-green-500 text-white"
+                        : "bg-red-500 text-white"
+                    }`}
+                  >
+                    {feedback === "correct" ? getText("correct") : "Oops!"}
+                  </motion.div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小一常識：天氣報告員 | Weather Reporter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Weather Reporter",
+          zh: "天氣報告員",
+          ja: "天気予報",
+        },
+        instruction: {
+          en: "Which warning signal is this?",
+          zh: "這是哪一個天氣警告信號？",
+          ja: "これはどの気象警報ですか？",
+        },
+        correct: { en: "Correct!", zh: "答對了！" },
+        wrong: { en: "Try Again", zh: "再試一次" },
+        score: { en: "Score", zh: "分數" },
+        next: { en: "Next", zh: "下一題" },
+
+        // Signals
+        amber: { en: "Amber Rainstorm", zh: "黃色暴雨警告" },
+        red: { en: "Red Rainstorm", zh: "紅色暴雨警告" },
+        black: { en: "Black Rainstorm", zh: "黑色暴雨警告" },
+        t1: { en: "Typhoon No. 1", zh: "一號戒備信號" },
+        t3: { en: "Typhoon No. 3", zh: "三號強風信號" },
+        t8: { en: "Typhoon No. 8", zh: "八號烈風或暴風信號" },
+        cold: { en: "Cold Weather", zh: "寒冷天氣警告" },
+        hot: { en: "Very Hot Weather", zh: "酷熱天氣警告" },
+        thunder: { en: "Thunderstorm", zh: "雷暴警告" },
+      };
+
+      const signals = [
+        {
+          id: "amber",
+          color: "text-amber-400",
+          label: "Amber",
+          icon: "🌧️⚡ (Y)",
+        }, // Using abstraction as I lack images
+        { id: "red", color: "text-red-600", label: "Red", icon: "🌧️⚡ (R)" },
+        {
+          id: "black",
+          color: "text-slate-900 bg-white rounded px-1",
+          label: "Black",
+          icon: "🌧️⚡ (B)",
+        },
+        { id: "t1", color: "text-slate-300", label: "T1", icon: "1️⃣" },
+        { id: "t3", color: "text-slate-300", label: "T3", icon: "3️⃣" },
+        { id: "t8", color: "text-slate-300", label: "T8", icon: "8️⃣" },
+        { id: "cold", color: "text-blue-300", label: "Cold", icon: "❄️" },
+        { id: "hot", color: "text-orange-500", label: "Hot", icon: "🌡️🔥" },
+        {
+          id: "thunder",
+          color: "text-yellow-400",
+          label: "Thunder",
+          icon: "🌩️",
+        },
+      ];
+
+      // Let's make "Cards" for them using CSS to mimic HK Observatory style roughly
+      const renderSignal = (id) => {
+        switch (id) {
+          case "amber":
+            return (
+              <div className="w-24 h-24 bg-amber-400 text-black flex items-center justify-center font-black text-xs p-2 text-center rounded">
+                AMBER
+                <br />黃
+              </div>
+            );
+          case "red":
+            return (
+              <div className="w-24 h-24 bg-red-600 text-white flex items-center justify-center font-black text-xs p-2 text-center rounded">
+                RED
+                <br />紅
+              </div>
+            );
+          case "black":
+            return (
+              <div className="w-24 h-24 bg-black text-white flex items-center justify-center font-black text-xs p-2 text-center rounded border-2 border-white">
+                BLACK
+                <br />黑
+              </div>
+            );
+          case "t1":
+            return (
+              <div className="w-24 h-24 bg-white text-black flex items-center justify-center font-black text-4xl border-2 border-black rounded">
+                1
+              </div>
+            );
+          case "t3":
+            return (
+              <div className="w-24 h-24 bg-white text-black flex items-center justify-center font-black text-4xl border-2 border-black rounded">
+                3
+              </div>
+            );
+          case "t8":
+            return (
+              <div className="w-24 h-24 bg-white text-black flex items-center justify-center font-black text-4xl border-2 border-black rounded">
+                8
+              </div>
+            );
+          case "cold":
+            return (
+              <div className="w-24 h-24 bg-blue-500 text-white flex items-center justify-center font-black text-xs p-2 text-center rounded border-2 border-white">
+                COLD
+                <br />寒
+              </div>
+            );
+          case "hot":
+            return (
+              <div className="w-24 h-24 bg-red-500 text-white flex items-center justify-center font-black text-xs p-2 text-center rounded border-2 border-white">
+                HOT
+                <br />熱
+              </div>
+            );
+          case "thunder":
+            return (
+              <div className="w-24 h-24 bg-black text-yellow-400 flex items-center justify-center font-black text-4xl border-2 border-yellow-400 rounded">
+                ⚡
+              </div>
+            );
+          default:
+            return null;
+        }
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [target, setTarget] = useState(null);
+        const [options, setOptions] = useState([]);
+        const [score, setScore] = useState(0);
+        const [feedback, setFeedback] = useState(null);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        useEffect(() => {
+          nextQuestion();
+        }, []);
+
+        const nextQuestion = () => {
+          const tIdx = Math.floor(Math.random() * signals.length);
+          const tgt = signals[tIdx];
+
+          // Pick 3 distractors
+          let pool = signals
+            .filter((s) => s.id !== tgt.id)
+            .sort(() => Math.random() - 0.5)
+            .slice(0, 3);
+          let opts = [tgt, ...pool].sort(() => Math.random() - 0.5);
+
+          setTarget(tgt);
+          setOptions(opts);
+          setFeedback(null);
+        };
+
+        const handleAnswer = (s) => {
+          if (feedback) return;
+          if (s.id === target.id) {
+            setFeedback("correct");
+            setScore(score + 10);
+            setTimeout(nextQuestion, 1500);
+          } else {
+            setFeedback("wrong");
+            setScore(Math.max(0, score - 5));
+            setTimeout(() => setFeedback(null), 1000);
+          }
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-sky-400 mb-4 mt-8 drop-shadow-md">
+              🎙️ {getText("title")}
+            </h1>
+            <div className="text-xl font-bold text-white mb-8 border border-white/20 px-4 py-1 rounded-full">
+              {getText("score")}: {score}
+            </div>
+
+            {target && (
+              <div className="w-full max-w-2xl bg-slate-800/80 p-8 rounded-3xl border border-slate-700 shadow-2xl backdrop-blur flex flex-col items-center">
+                <p className="text-slate-400 font-bold mb-4">
+                  {getText("instruction")}
+                </p>
+
+                <motion.div
+                  key={target.id}
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="bg-slate-900 border-2 border-slate-600 w-full p-8 rounded-2xl text-center mb-8 flex flex-col items-center justify-center min-h-[150px]"
+                >
+                  <span className="text-3xl font-black text-white">
+                    "{getText(target.id)}"
+                  </span>
+                </motion.div>
+
+                {feedback && (
+                  <motion.div
+                    initial={{ y: 10, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    className={`text-3xl font-black mb-6 ${
+                      feedback === "correct" ? "text-green-400" : "text-red-400"
+                    }`}
+                  >
+                    {getText(feedback)}
+                  </motion.div>
+                )}
+
+                <div className="grid grid-cols-2 gap-6">
+                  {options.map((opt) => (
+                    <motion.button
+                      key={opt.id}
+                      onClick={() => handleAnswer(opt)}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="bg-slate-700 hover:bg-slate-600 p-6 rounded-2xl flex items-center justify-center shadow-lg border border-slate-500"
+                    >
+                      {renderSignal(opt.id)}
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

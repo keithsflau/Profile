@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小五數學：多位數乘法 | Multi-Digit Multiplication</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+
+      function App() {
+        const [n1, setN1] = useState(234);
+        const [n2, setN2] = useState(56);
+        const [step, setStep] = useState(0);
+
+        const s1 = n1.toString();
+        const s2 = n2.toString();
+
+        // Calculate partial products for each digit of n2
+        const partials = s2
+          .split("")
+          .reverse()
+          .map((d, i) => {
+            return parseInt(d) * n1 * Math.pow(10, i);
+          })
+          .reverse();
+
+        const total = n1 * n2;
+
+        const nextStep = () => setStep((s) => Math.min(s + 1, partials.length));
+        const reset = () => setStep(0);
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-5xl font-black text-sky-900 mb-2">
+              ✖️ 多位數乘法
+            </h1>
+            <p className="text-xl text-sky-700 font-bold mb-8">
+              Multi-Digit Multiplication
+            </p>
+
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-3xl w-full">
+              <div className="flex justify-center gap-6 mb-8">
+                <input
+                  type="number"
+                  value={n1}
+                  onChange={(e) => {
+                    setN1(parseInt(e.target.value) || 0);
+                    reset();
+                  }}
+                  className="w-32 text-4xl font-black text-center border-4 border-sky-200 rounded-xl p-2 focus:border-sky-500 outline-none"
+                />
+                <span className="text-4xl font-black text-sky-400">×</span>
+                <input
+                  type="number"
+                  value={n2}
+                  onChange={(e) => {
+                    setN2(parseInt(e.target.value) || 0);
+                    reset();
+                  }}
+                  className="w-24 text-4xl font-black text-center border-4 border-sky-200 rounded-xl p-2 focus:border-sky-500 outline-none"
+                />
+              </div>
+
+              {/* Step-by-step breakdown */}
+              <div className="bg-slate-50 rounded-2xl p-6 mb-6 font-mono text-xl">
+                <div className="text-right text-3xl font-black text-slate-700 mb-2">
+                  {n1}
+                </div>
+                <div className="text-right text-3xl font-black text-slate-700 border-b-4 border-slate-400 pb-2 mb-4">
+                  × {n2}
+                </div>
+
+                <AnimatePresence>
+                  {partials.map(
+                    (p, i) =>
+                      step > i && (
+                        <motion.div
+                          key={i}
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          className="text-right text-2xl font-bold text-sky-600 mb-2"
+                        >
+                          {p.toLocaleString()}
+                          <span className="text-sm text-slate-400 ml-2">
+                            ({n1} × {s2[i]} × {Math.pow(10, s2.length - 1 - i)})
+                          </span>
+                        </motion.div>
+                      )
+                  )}
+                </AnimatePresence>
+
+                {step >= partials.length && (
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="text-right text-4xl font-black text-emerald-600 border-t-4 border-slate-400 pt-4 mt-4"
+                  >
+                    {total.toLocaleString()}
+                  </motion.div>
+                )}
+              </div>
+
+              <div className="flex justify-center gap-4">
+                <button
+                  onClick={nextStep}
+                  disabled={step >= partials.length}
+                  className="px-8 py-3 bg-sky-500 text-white rounded-xl font-bold hover:bg-sky-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                >
+                  下一步 Next Step
+                </button>
+                <button
+                  onClick={reset}
+                  className="px-8 py-3 bg-slate-200 text-slate-700 rounded-xl font-bold hover:bg-slate-300 shadow-lg"
+                >
+                  重置 Reset
+                </button>
+              </div>
+
+              <div className="mt-8 bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
+                <h3 className="font-black mb-2">💡 學習重點 Learning Tips:</h3>
+                <ul className="list-disc list-inside space-y-1 text-sm">
+                  <li>
+                    多位數乘法可拆解為多個部分積 Break down into partial
+                    products
+                  </li>
+                  <li>
+                    每一位數字代表不同的位值 Each digit represents different
+                    place values
+                  </li>
+                  <li>
+                    最後將所有部分積相加 Sum all partial products for final
+                    answer
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小二常識：參觀博物館 | Museum Manners</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #f5f5f5 0%, #e5e5e5 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Museum Manners",
+          zh: "參觀博物館",
+          ja: "博物館のマナー",
+        },
+        instruction: {
+          en: "Is this behavior allowed?",
+          zh: "這種行為允許嗎？",
+          ja: "この行動は許可されていますか？",
+        },
+        yes: { en: "Yes", zh: "允許" },
+        no: { en: "No", zh: "禁止" },
+
+        photo: { en: "Flash Photography", zh: "使用閃光燈拍照" },
+        touch: { en: "Touch Exhibits", zh: "觸摸展品" },
+        run: { en: "Running", zh: "奔跑" },
+        eat: { en: "Eating / Drinking", zh: "飲食" },
+        quiet: { en: "Quiet Viewing", zh: "安靜參觀" },
+        photos_no_flash: { en: "No-Flash Photo", zh: "不開閃光燈拍照" },
+        listen: { en: "Listen to Guide", zh: "聆聽講解" },
+
+        correct: { en: "Correct!", zh: "答對了！" },
+        wrong: { en: "Think again!", zh: "想一想！" },
+        score: { en: "Score", zh: "分數" },
+        completed: { en: "Great Visitor!", zh: "乖巧的參觀者！" },
+        restart: { en: "Start Over", zh: "重新開始" },
+      };
+
+      const tasks = [
+        { id: "photo", type: "bad", icon: "📸⚡" },
+        { id: "touch", type: "bad", icon: "✋🏺" },
+        { id: "run", type: "bad", icon: "🏃‍♂️" },
+        { id: "eat", type: "bad", icon: "🍔🥤" },
+        { id: "quiet", type: "good", icon: "👀🤫" },
+        { id: "photos_no_flash", type: "good", icon: "📷👌" },
+        { id: "listen", type: "good", icon: "👂🤵" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [queue, setQueue] = useState([]);
+        const [current, setCurrent] = useState(null);
+        const [score, setScore] = useState(0);
+        const [feedback, setFeedback] = useState(null);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        useEffect(() => {
+          restart();
+        }, []);
+
+        const restart = () => {
+          const q = [...tasks].sort(() => Math.random() - 0.5);
+          setQueue(q);
+          setCurrent(q[0]);
+          setScore(0);
+          setFeedback(null);
+        };
+
+        const handleAnswer = (ans) => {
+          // 'yes' or 'no'
+          if (feedback) return;
+
+          const isGood = current.type === "good";
+          const isCorrect =
+            (isGood && ans === "yes") || (!isGood && ans === "no");
+
+          if (isCorrect) {
+            setFeedback("correct");
+            setScore((s) => s + 10);
+          } else {
+            setFeedback("wrong");
+          }
+
+          setTimeout(() => {
+            setFeedback(null);
+            const nextIdx = queue.indexOf(current) + 1;
+            if (nextIdx < queue.length) setCurrent(queue[nextIdx]);
+            else setCurrent(null);
+          }, 1000);
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center select-none">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-slate-800 mb-4 mt-8 drop-shadow-sm bg-white/50 px-6 py-2 rounded-full">
+              🏛️ {getText("title")}
+            </h1>
+
+            {current ? (
+              <div className="w-full max-w-md flex flex-col items-center">
+                <div className="font-bold text-slate-600 mb-4 bg-white px-4 py-1 rounded-full shadow">
+                  {getText("score")}: {score}
+                </div>
+
+                {/* Card */}
+                <motion.div
+                  key={current.id}
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="bg-white p-8 rounded-3xl shadow-2xl border-b-8 border-slate-200 w-full aspect-square flex flex-col items-center justify-center relative"
+                >
+                  <div className="text-9xl mb-6">{current.icon}</div>
+                  <h2 className="text-2xl font-black text-slate-700 text-center">
+                    {getText(current.id)}
+                  </h2>
+
+                  {feedback && (
+                    <div
+                      className={`absolute inset-0 bg-white/90 flex items-center justify-center text-4xl font-black rounded-3xl ${
+                        feedback === "correct"
+                          ? "text-green-600"
+                          : "text-red-500"
+                      }`}
+                    >
+                      {getText(feedback)}
+                    </div>
+                  )}
+                </motion.div>
+
+                <p className="font-bold text-slate-500 my-6 text-center text-xl">
+                  {getText("instruction")}
+                </p>
+
+                <div className="flex gap-6 w-full">
+                  <button
+                    onClick={() => handleAnswer("yes")}
+                    className="flex-1 bg-green-500 hover:bg-green-600 text-white text-2xl font-black py-6 rounded-2xl shadow-xl border-b-8 border-green-700 active:border-b-0 active:translate-y-2 flex flex-col items-center"
+                  >
+                    <span>⭕</span>
+                    <span className="text-sm mt-1">{getText("yes")}</span>
+                  </button>
+                  <button
+                    onClick={() => handleAnswer("no")}
+                    className="flex-1 bg-red-500 hover:bg-red-600 text-white text-2xl font-black py-6 rounded-2xl shadow-xl border-b-8 border-red-700 active:border-b-0 active:translate-y-2 flex flex-col items-center"
+                  >
+                    <span>❌</span>
+                    <span className="text-sm mt-1">{getText("no")}</span>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white/90 p-12 rounded-3xl shadow-xl text-center mt-12">
+                <div className="text-8xl mb-4">🏆</div>
+                <h2 className="text-3xl font-black text-slate-800 mb-6">
+                  {getText("completed")}
+                </h2>
+                <p className="text-xl mb-8 font-bold text-slate-600">
+                  {getText("score")}: {score}
+                </p>
+                <button
+                  onClick={restart}
+                  className="bg-slate-700 text-white px-10 py-4 rounded-full font-black text-xl hover:bg-slate-800 shadow-xl"
+                >
+                  {getText("restart")} 🔄
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

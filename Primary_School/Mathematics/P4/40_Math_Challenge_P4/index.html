@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小四數學：數學終極挑戰</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #111827 0%, #4c1d95 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+
+      function App() {
+        const [gameState, setGameState] = useState("menu"); // menu, playing, end
+        const [score, setScore] = useState(0);
+        const [qIdx, setQIdx] = useState(0);
+
+        // Randomly generated questions pool concept
+        const questions = [
+          { q: "12 的因數有幾個？", options: ["4", "5", "6", "8"], ans: "6" }, // 1,2,3,4,6,12
+          {
+            q: "15 和 20 的最小公倍數 (L.C.M.) 是？",
+            options: ["30", "60", "45", "100"],
+            ans: "60",
+          },
+          {
+            q: "正方形周界是 36cm，邊長是？",
+            options: ["6cm", "9cm", "12cm", "4cm"],
+            ans: "9cm",
+          },
+          { q: "½ + ¼ = ?", options: ["¾", "2/6", "3/8", "1"], ans: "¾" },
+          {
+            q: "7.5 - 2.3 = ?",
+            options: ["5.2", "5.8", "4.2", "9.8"],
+            ans: "5.2",
+          },
+          {
+            q: "下列哪個是質數？",
+            options: ["9", "15", "17", "21"],
+            ans: "17",
+          },
+          {
+            q: "長方形面積 40cm²，長 8cm，闊是？",
+            options: ["5cm", "32cm", "4cm", "12cm"],
+            ans: "5cm",
+          },
+          {
+            q: "MMXXIV 代表？",
+            options: ["2024", "2023", "2025", "2124"],
+            ans: "2024",
+          },
+        ];
+
+        const handleAnswer = (opt) => {
+          if (opt === questions[qIdx].ans) {
+            setScore((s) => s + 100);
+          }
+          if (qIdx < questions.length - 1) {
+            setQIdx((prev) => prev + 1);
+          } else {
+            setGameState("end");
+          }
+        };
+
+        const startGame = () => {
+          setScore(0);
+          setQIdx(0);
+          setGameState("playing");
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center justify-center text-white">
+            {gameState === "menu" && (
+              <div className="text-center">
+                <h1 className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-pink-500 mb-8 drop-shadow-lg">
+                  🏆 P4 數學終極挑戰
+                </h1>
+                <button
+                  onClick={startGame}
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-12 py-6 rounded-full text-4xl font-black hover:scale-110 transition-transform shadow-2xl ring-4 ring-white/20"
+                >
+                  開始挑戰
+                </button>
+              </div>
+            )}
+
+            {gameState === "playing" && (
+              <div className="w-full max-w-2xl bg-white/10 backdrop-blur-xl rounded-3xl p-12 border border-white/20">
+                <div className="flex justify-between items-center mb-8">
+                  <div className="text-2xl font-bold text-purple-300">
+                    問題 {qIdx + 1}/{questions.length}
+                  </div>
+                  <div className="text-4xl font-black text-yellow-400">
+                    {score} 分
+                  </div>
+                </div>
+
+                <h2 className="text-4xl font-black mb-12 text-center h-32 flex items-center justify-center">
+                  {questions[qIdx].q}
+                </h2>
+
+                <div className="grid grid-cols-2 gap-6">
+                  {questions[qIdx].options.map((opt, i) => (
+                    <motion.button
+                      key={i}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleAnswer(opt)}
+                      className="bg-white/20 hover:bg-white/30 p-6 rounded-2xl text-2xl font-bold border-2 border-white/10 transition-colors"
+                    >
+                      {opt}
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {gameState === "end" && (
+              <div className="text-center bg-white/10 backdrop-blur-xl p-12 rounded-3xl border border-white/20">
+                <h2 className="text-5xl font-black mb-4">挑戰完成！</h2>
+                <div className="text-8xl font-black text-yellow-400 mb-8">
+                  {score}
+                </div>
+                <button
+                  onClick={() => setGameState("menu")}
+                  className="bg-white text-purple-900 px-8 py-3 rounded-full font-black text-xl hover:bg-gray-200"
+                >
+                  回主選單
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

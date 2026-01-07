@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HKDSE ICT - Swap Logic</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.development.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #0f172a;
+        color: #e2e8f0;
+      }
+      .var-box {
+        transition: all 0.5s ease-in-out;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen p-8 flex justify-center items-center bg-slate-900">
+    <div id="root" class="w-full max-w-4xl"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      // --- LUCIDE ICON SHIM ---
+      const LucideIcon = ({ name, size = 24, className = "" }) => {
+        const formatName = (n) =>
+          n
+            .split("-")
+            .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
+            .join("");
+        const iconName = formatName(name);
+
+        const [svgHtml, setSvgHtml] = useState("");
+
+        useEffect(() => {
+          if (
+            window.lucide &&
+            window.lucide.icons &&
+            window.lucide.icons[iconName] &&
+            typeof window.lucide.icons[iconName].toSvg === "function"
+          ) {
+            setSvgHtml(
+              window.lucide.icons[iconName].toSvg({
+                width: size,
+                height: size,
+                class: className,
+              })
+            );
+          }
+        }, [name, size, className, iconName]);
+
+        return (
+          <span
+            dangerouslySetInnerHTML={{ __html: svgHtml }}
+            style={{ display: "inline-flex" }}
+          />
+        );
+      };
+      const ArrowRightLeft = (p) => (
+        <LucideIcon name="arrow-right-left" {...p} />
+      );
+      const RefreshCw = (p) => <LucideIcon name="refresh-cw" {...p} />;
+      const Box = (p) => <LucideIcon name="box" {...p} />;
+      const Copy = (p) => <LucideIcon name="copy" {...p} />;
+      // --- END SHIM ---
+
+      const App = () => {
+        const [vars, setVars] = useState({ A: "Red", B: "Blue", Temp: null });
+        const [step, setStep] = useState(0);
+
+        const COLORS = {
+          Red: "bg-red-500",
+          Blue: "bg-blue-500",
+          null: "bg-slate-800 border-2 border-dashed border-slate-600",
+        };
+
+        const reset = () => {
+          setVars({ A: "Red", B: "Blue", Temp: null });
+          setStep(0);
+        };
+
+        const nextStep = () => {
+          if (step >= 3) return;
+          const next = step + 1;
+          const newVars = { ...vars };
+          if (next === 1) newVars.Temp = newVars.A;
+          else if (next === 2) newVars.A = newVars.B;
+          else if (next === 3) newVars.B = newVars.Temp;
+          setVars(newVars);
+          setStep(next);
+        };
+
+        const VarContainer = ({ name, val }) => (
+          <div className="flex flex-col items-center">
+            <div className="text-slate-400 font-bold mb-2 text-xl">{name}</div>
+            <div
+              className={`w-32 h-32 rounded-2xl flex items-center justify-center text-white font-bold shadow-2xl relative ${
+                val ? COLORS[val] : COLORS["null"]
+              }`}
+            >
+              {val || "Empty"}
+              {step === 1 && name === "Temp" && (
+                <div className="absolute inset-0 border-4 border-yellow-400 rounded-2xl animate-ping opacity-50"></div>
+              )}
+              {step === 2 && name === "A" && (
+                <div className="absolute inset-0 border-4 border-yellow-400 rounded-2xl animate-ping opacity-50"></div>
+              )}
+              {step === 3 && name === "B" && (
+                <div className="absolute inset-0 border-4 border-yellow-400 rounded-2xl animate-ping opacity-50"></div>
+              )}
+            </div>
+          </div>
+        );
+
+        return (
+          <div className="space-y-12 w-full text-center">
+            <header>
+              <h1 className="text-3xl font-bold text-white mb-2 flex justify-center items-center gap-2">
+                <ArrowRightLeft className="text-yellow-400" /> Swap Algorithm
+                Visualizer
+              </h1>
+              <p className="text-slate-400">
+                Paper 1A Q37 Logic (Using Temp Variable)
+              </p>
+            </header>
+            <div className="bg-slate-800 p-6 rounded-xl border border-slate-700 max-w-lg mx-auto text-left font-mono text-lg shadow-xl">
+              <div
+                className={`p-2 rounded transition-colors ${
+                  step === 1
+                    ? "bg-yellow-900/40 text-yellow-300 font-bold"
+                    : "text-slate-400"
+                }`}
+              >
+                1. Temp ← A
+              </div>
+              <div
+                className={`p-2 rounded transition-colors ${
+                  step === 2
+                    ? "bg-yellow-900/40 text-yellow-300 font-bold"
+                    : "text-slate-400"
+                }`}
+              >
+                2. A ← B
+              </div>
+              <div
+                className={`p-2 rounded transition-colors ${
+                  step === 3
+                    ? "bg-yellow-900/40 text-yellow-300 font-bold"
+                    : "text-slate-400"
+                }`}
+              >
+                3. B ← Temp
+              </div>
+            </div>
+            <div className="flex justify-center items-end gap-8 md:gap-24 relative min-h-[200px]">
+              <VarContainer name="A" val={vars.A} />
+              <div className="mb-[-20px]">
+                <VarContainer name="Temp" val={vars.Temp} />
+              </div>
+              <VarContainer name="B" val={vars.B} />
+            </div>
+            <div className="flex justify-center gap-4 pt-8">
+              {step < 3 ? (
+                <button
+                  onClick={nextStep}
+                  className="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 text-xl shadow-lg transition-all transform hover:scale-105 active:scale-95"
+                >
+                  Next Step <ArrowRightLeft size={20} />
+                </button>
+              ) : (
+                <button
+                  onClick={reset}
+                  className="bg-green-600 hover:bg-green-500 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 text-xl shadow-lg transition-all"
+                >
+                  Reset / Swap Again <RefreshCw size={20} />
+                </button>
+              )}
+            </div>
+            {step === 3 && (
+              <div className="mt-8 bg-green-900/20 border border-green-500/30 p-4 rounded-lg inline-block animate-bounce">
+                <div className="text-green-400 font-bold">Swap Complete!</div>
+                <div className="text-slate-400 text-sm">
+                  A is now Blue, B is now Red.
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

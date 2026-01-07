@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小五數學：小數四捨五入 | Decimal Rounding</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #e0e7ff 0%, #6366f1 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Decimal Rounding",
+          zh: "小數四捨五入",
+          ja: "小数の四捨五入",
+          ko: "소수 반올림",
+          es: "Redondeo de Decimales",
+          de: "Dezimalzahlen runden",
+          fi: "Desimaalien pyöristys",
+          fr: "Arrondi décimal",
+          ar: "تقريب الكسور العشرية",
+          it: "Arrotondamento decimale",
+        },
+        decimalPlaces: {
+          en: "{p} d.p.",
+          zh: "{p} 位小數",
+          ja: "小数第 {p} 位",
+          ko: "소수점 {p} 자리",
+          es: "{p} decimales",
+          de: "{p} Dezimalst.",
+          fi: "{p} desimaalia",
+          fr: "{p} décimales",
+          ar: "{p} منازل عشرية",
+          it: "{p} cifre dec.",
+        },
+        correctTo: {
+          en: "Correct to <b>{places}</b> decimal place(s)",
+          zh: "準確至 <b>{places}</b> 位小數",
+          ja: "小数第 <b>{places}</b> 位まで",
+          ko: "소수점 <b>{places}</b> 자리까지 반올림",
+          es: "Correcto a <b>{places}</b> lugar(es) decimal(es)",
+          de: "Auf <b>{places}</b> Dezimalstelle(n) runden",
+          fi: "Tarkkuus <b>{places}</b> desimaaliin",
+          fr: "Arrondir à <b>{places}</b> décimale(s)",
+          ar: "تقريب إلى <b>{places}</b> منازل عشرية",
+          it: "Arrotonda a <b>{places}</b> cifre decimali",
+        },
+        checkDigit: {
+          en: "Check <b>{n}</b>th decimal place =",
+          zh: "看第 <b>{n}</b> 位小數 =",
+          ja: "小数第 <b>{n}</b> 位を見る =",
+          ko: "소수점 <b>{n}</b> 자리를 확인 =",
+          es: "Verificar el <b>{n}</b>° lugar decimal =",
+          de: "Prüfe <b>{n}</b>. Dezimalstelle =",
+          fi: "Tarkista <b>{n}</b>. desimaalipaikka =",
+          fr: "Vérifier la <b>{n}</b>e décimale =",
+          ar: "تحقق من المنزلة العشرية <b>{n}</b> =",
+          it: "Controlla la <b>{n}</b>ª cifra decimale =",
+        },
+        roundUp: {
+          en: "≥ 5, Round Up",
+          zh: "≥ 5，進位",
+          ja: "≥ 5、切り上げ",
+          ko: "≥ 5, 올림",
+          es: "≥ 5, Redondeo hacia arriba",
+          de: "≥ 5, Aufrunden",
+          fi: "≥ 5, Pyöristä ylöspäin",
+          fr: "≥ 5, Arrondir au supérieur",
+          ar: "≥ 5، تقريب للأعلى",
+          it: "≥ 5, Arrotonda per eccesso",
+        },
+        roundDown: {
+          en: "< 5, Round Down",
+          zh: "< 5，捨去",
+          ja: "< 5、切り捨て",
+          ko: "< 5, 내림",
+          es: "< 5, Redondeo hacia abajo",
+          de: "< 5, Abrunden",
+          fi: "< 5, Pyöristä alaspäin",
+          fr: "< 5, Arrondir à l'inférieur",
+          ar: "< 5، تقريب للأسفل",
+          it: "< 5, Arrotonda per difetto",
+        },
+        afterRounding: {
+          en: "After Rounding",
+          zh: "四捨五入後",
+          ja: "四捨五入後",
+          ko: "반올림 후",
+          es: "Después de Redondear",
+          de: "Nach dem Runden",
+          fi: "Pyöristyksen jälkeen",
+          fr: "Après l'arrondi",
+          ar: "بعد التقريب",
+          it: "Dopo l'arrotondamento",
+        },
+        ruleTitle: {
+          en: "Rounding Rule:",
+          zh: "四捨五入規則:",
+          ja: "四捨五入のルール:",
+          ko: "반올림 규칙:",
+          es: "Regla de Redondeo:",
+          de: "Rundungsregel:",
+          fi: "Pyöristyssääntö:",
+          fr: "Règle d'arrondi :",
+          ar: "قاعدة التقريب:",
+          it: "Regola di arrotondamento:",
+        },
+        ruleText: {
+          en: "Look at the next digit after the place you are keeping: 0-4 Round Down, 5-9 Round Up.",
+          zh: "看保留位數的下一位：0-4 捨去，5-9 進位。",
+          ja: "残す位の次の数字を見ます：0-4 は切り捨て、5-9 は切り上げ。",
+          ko: "유지하려는 자리의 다음 숫자를 보세요: 0-4는 내림, 5-9는 올림.",
+          es: "Mira el siguiente dígito después del lugar que estás conservando: 0-4 Redondeo abajo, 5-9 Redondeo arriba.",
+          de: "Schaue auf die Ziffer nach der Stelle, die du behältst: 0-4 Abrunden, 5-9 Aufrunden.",
+          fi: "Katso seuraavaa numeroa säilytettävän paikan jälkeen: 0-4 pyöristä alaspäin, 5-9 pyöristä ylöspäin.",
+          fr: "Regardez le chiffre suivant après la place que vous gardez : 0-4 Arrondir à l'inférieur, 5-9 Arrondir au supérieur.",
+          ar: "انظر إلى الرقم التالي بعد المنزلة التي تحتفظ بها: 0-4 تقريب للأسفل، 5-9 تقريب للأعلى.",
+          it: "Guarda la cifra successiva alla posizione che stai mantenendo: 0-4 Arrotonda per difetto, 5-9 Arrotonda per eccesso.",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const [num, setNum] = useState(3.4567);
+        const [places, setPlaces] = useState(2);
+
+        const rounded = parseFloat(num.toFixed(places));
+        const digitToCheck = num.toString().split(".")[1]?.[places] || "0";
+        const action = parseInt(digitToCheck) >= 5 ? "入" : "捨";
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-5xl font-black text-indigo-100 mb-2 mt-8">
+              🔢 {getText("title")}
+            </h1>
+
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-2xl w-full mt-8">
+              <div className="flex items-center justify-center gap-4 mb-8 flex-wrap">
+                <input
+                  type="number"
+                  step="0.0001"
+                  value={num}
+                  onChange={(e) => setNum(parseFloat(e.target.value) || 0)}
+                  className="w-32 text-3xl font-mono font-black text-center border-4 border-indigo-300 rounded-xl p-2"
+                />
+              </div>
+
+              <div className="flex justify-center gap-4 mb-6">
+                {[0, 1, 2, 3].map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => setPlaces(p)}
+                    className={`px-4 py-2 rounded-xl font-bold ${
+                      places === p ? "bg-indigo-500 text-white" : "bg-slate-100"
+                    }`}
+                  >
+                    {getText("decimalPlaces").replace("{p}", p)}
+                  </button>
+                ))}
+              </div>
+
+              <div className="bg-slate-50 rounded-2xl p-6 text-center mb-6">
+                <p
+                  className="text-lg"
+                  dangerouslySetInnerHTML={{
+                    __html: getText("correctTo").replace("{places}", places),
+                  }}
+                ></p>
+                <p className="text-lg mt-2">
+                  <span
+                    dangerouslySetInnerHTML={{
+                      __html: getText("checkDigit").replace("{n}", places + 1),
+                    }}
+                  ></span>{" "}
+                  <span
+                    className={`text-2xl font-black ${
+                      parseInt(digitToCheck) >= 5
+                        ? "text-red-500"
+                        : "text-blue-500"
+                    }`}
+                  >
+                    {digitToCheck}
+                  </span>
+                </p>
+                <p className="text-xl mt-2">
+                  {parseInt(digitToCheck) >= 5
+                    ? getText("roundUp")
+                    : getText("roundDown")}
+                </p>
+              </div>
+
+              <div className="bg-emerald-100 rounded-2xl p-6 text-center border-4 border-emerald-300">
+                <div className="text-emerald-600 font-bold">
+                  {getText("afterRounding")}
+                </div>
+                <div className="text-5xl font-black text-emerald-800">
+                  {rounded}
+                </div>
+              </div>
+
+              <div className="mt-6 bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
+                <p className="font-bold">💡 {getText("ruleTitle")}</p>
+                <p className="text-sm">{getText("ruleText")}</p>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

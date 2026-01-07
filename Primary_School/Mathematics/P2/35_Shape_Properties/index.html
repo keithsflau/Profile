@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小二數學：圖形特性 | Shape Properties</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fff1f2 0%, #e11d48 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "📐 Shape Properties",
+          zh: "📐 圖形特性",
+          ja: "📐 図形の性質",
+          ko: "📐 도형 속성",
+          es: "📐 Propiedades de las formas",
+          de: "📐 Formeigenschaften",
+          fi: "📐 Muodon ominaisuudet",
+          fr: "📐 Propriétés des formes",
+          ar: "📐 خصائص الشكل",
+          it: "📐 Proprietà della forma",
+        },
+        check: {
+          en: "Check",
+          zh: "檢查",
+          ja: "確認",
+          ko: "확인",
+          es: "Comprobar",
+          de: "Prüfen",
+          fi: "Tarkista",
+          fr: "Vérifier",
+          ar: "تحقق",
+          it: "Controlla",
+        },
+      };
+
+      const shapesLabels = {
+        cube: { zh: "正方體", en: "Cube", ja: "立方体" },
+        cuboid: { zh: "長方體", en: "Cuboid", ja: "直方体" },
+        cylinder: { zh: "圓柱體", en: "Cylinder", ja: "円柱" },
+        cone: { zh: "圓錐體", en: "Cone", ja: "円錐" },
+        sphere: { zh: "球體", en: "Sphere", ja: "球" },
+      };
+
+      const propertiesLabels = {
+        faces: { zh: "面", en: "Faces", ja: "面" },
+        vertices: { zh: "頂", en: "Vertices", ja: "頂点" },
+        edges: { zh: "邊", en: "Edges", ja: "辺" },
+        bases: { zh: "底面", en: "Bases", ja: "底面" },
+        curvedFaces: { zh: "彎面", en: "Curved Faces", ja: "曲面" },
+      };
+
+      const questionsData = [
+        { labelKey: "cube", icon: "🎲", qKey: "faces", ans: 6 },
+        { labelKey: "cube", icon: "🎲", qKey: "vertices", ans: 8 },
+        { labelKey: "cube", icon: "🎲", qKey: "edges", ans: 12 },
+
+        { labelKey: "cuboid", icon: "📦", qKey: "faces", ans: 6 },
+        { labelKey: "cuboid", icon: "📦", qKey: "vertices", ans: 8 },
+
+        { labelKey: "cylinder", icon: "🛢️", qKey: "bases", ans: 2 },
+        { labelKey: "cylinder", icon: "🛢️", qKey: "curvedFaces", ans: 1 },
+
+        { labelKey: "cone", icon: "🎉", qKey: "bases", ans: 1 },
+        { labelKey: "cone", icon: "🎉", qKey: "vertices", ans: 1 },
+
+        { labelKey: "sphere", icon: "⚽", qKey: "faces", ans: 1 }, // 1 curved face (simplification)
+        { labelKey: "sphere", icon: "⚽", qKey: "vertices", ans: 0 },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [q, setQ] = useState(null);
+        const [input, setInput] = useState("");
+        const [feedback, setFeedback] = useState("");
+
+        const next = () => {
+          setFeedback("");
+          setInput("");
+          setQ(questionsData[Math.floor(Math.random() * questionsData.length)]);
+        };
+
+        useEffect(next, []);
+
+        const check = () => {
+          if (parseInt(input) === q.ans) {
+            setFeedback("CORRECT");
+            setTimeout(next, 2000);
+          } else {
+            setFeedback("WRONG");
+          }
+        };
+
+        if (!q) return null;
+
+        const getShapeLabel = () =>
+          shapesLabels[q.labelKey][lang] || shapesLabels[q.labelKey]["en"];
+        const getPropLabel = () =>
+          propertiesLabels[q.qKey][lang] || propertiesLabels[q.qKey]["en"];
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center justify-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+
+            <h1 className="text-4xl md:text-5xl font-black text-rose-900 mb-8 max-w-2xl text-center">
+              {t.title[lang] || t.title["en"]}
+            </h1>
+
+            <div className="bg-white/90 rounded-3xl p-8 shadow-2xl w-full max-w-xl text-center border-4 border-rose-300">
+              <div className="flex flex-col items-center mb-10">
+                <div className="text-[8rem] animate-pulse-slow">{q.icon}</div>
+                <div className="text-2xl font-bold text-slate-600 bg-rose-50 px-6 py-2 rounded-full border border-rose-100">
+                  {getShapeLabel()}
+                </div>
+              </div>
+
+              <div className="text-3xl font-bold text-slate-700 mb-8 flex items-center justify-center flex-wrap gap-4">
+                {getPropLabel()}:
+                <input
+                  type="number"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  className="w-24 text-center border-b-4 border-rose-500 bg-rose-50 focus:outline-none rounded-t-lg text-4xl font-black text-rose-700"
+                  autoFocus
+                />
+              </div>
+
+              <div className="text-center">
+                <button
+                  onClick={check}
+                  className="px-10 py-3 bg-rose-500 text-white rounded-full font-black text-2xl shadow-xl hover:bg-rose-600 active:scale-95 transition-transform"
+                >
+                  {t.check[lang] || t.check["en"]}
+                </button>
+              </div>
+
+              <div className="h-16 mt-8">
+                {feedback === "CORRECT" && (
+                  <div>
+                    <div className="text-center text-4xl font-black text-green-500 animate-bounce">
+                      {get("correct", lang)}
+                    </div>
+                    <div className="text-slate-400 mt-2 font-bold">
+                      {q.ans} {getPropLabel()}
+                    </div>
+                  </div>
+                )}
+                {feedback === "WRONG" && (
+                  <div className="text-center text-4xl font-black text-red-500 animate-shake">
+                    {get("wrong", lang)}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+    <style>
+      @keyframes pulse-slow {
+        50% {
+          transform: scale(1.05);
+        }
+      }
+      .animate-pulse-slow {
+        animation: pulse-slow 3s infinite ease-in-out;
+      }
+    </style>
+  </body>
+</html>

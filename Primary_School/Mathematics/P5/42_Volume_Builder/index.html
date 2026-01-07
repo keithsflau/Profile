@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小五數學：3D 立體體積建造器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      src="https://unpkg.com/react@18/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.min.js"></script>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+      #canvas-container {
+        width: 100%;
+        height: 500px;
+        border-radius: 24px;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect, useRef } = React;
+      const { motion } = window.Motion;
+      const { Box, Cube, RotateCcw } = window.LucideReact;
+
+      function App() {
+        const [length, setLength] = useState(5);
+        const [width, setWidth] = useState(4);
+        const [height, setHeight] = useState(3);
+        const [shape, setShape] = useState("cuboid"); // cuboid, cube
+        const canvasRef = useRef(null);
+        const sceneRef = useRef(null);
+        const meshRef = useRef(null);
+        const rendererRef = useRef(null);
+
+        const volume = length * width * height;
+        const surfaceArea =
+          shape === "cube"
+            ? 6 * length * length
+            : 2 * (length * width + width * height + height * length);
+
+        useEffect(() => {
+          // Three.js Setup
+          const scene = new THREE.Scene();
+          scene.background = new THREE.Color(0xf0f0f0);
+
+          const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+          camera.position.set(8, 8, 12);
+          camera.lookAt(0, 0, 0);
+
+          const renderer = new THREE.WebGLRenderer({ antialias: true });
+          renderer.setSize(500, 500);
+          if (canvasRef.current) {
+            canvasRef.current.innerHTML = "";
+            canvasRef.current.appendChild(renderer.domElement);
+          }
+
+          // Lighting
+          const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+          scene.add(ambientLight);
+
+          const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+          directionalLight.position.set(10, 10, 10);
+          scene.add(directionalLight);
+
+          // Grid
+          const gridHelper = new THREE.GridHelper(20, 20, 0x888888, 0xcccccc);
+          scene.add(gridHelper);
+
+          // Initial Box
+          const geometry = new THREE.BoxGeometry(length, height, width);
+          const material = new THREE.MeshStandardMaterial({
+            color: 0x667eea,
+            transparent: true,
+            opacity: 0.9,
+          });
+          const mesh = new THREE.Mesh(geometry, material);
+          mesh.position.y = height / 2;
+          scene.add(mesh);
+
+          // Edges
+          const edges = new THREE.EdgesGeometry(geometry);
+          const lineMaterial = new THREE.LineBasicMaterial({
+            color: 0x000000,
+            linewidth: 2,
+          });
+          const wireframe = new THREE.LineSegments(edges, lineMaterial);
+          mesh.add(wireframe);
+
+          sceneRef.current = scene;
+          meshRef.current = mesh;
+          rendererRef.current = renderer;
+
+          // Animation Loop
+          let animationId;
+          const animate = () => {
+            animationId = requestAnimationFrame(animate);
+            mesh.rotation.y += 0.005;
+            renderer.render(scene, camera);
+          };
+          animate();
+
+          return () => {
+            cancelAnimationFrame(animationId);
+            renderer.dispose();
+          };
+        }, []);
+
+        useEffect(() => {
+          // Update box dimensions
+          if (meshRef.current && sceneRef.current) {
+            const oldMesh = meshRef.current;
+            sceneRef.current.remove(oldMesh);
+
+            const geometry = new THREE.BoxGeometry(length, height, width);
+            const material = new THREE.MeshStandardMaterial({
+              color: shape === "cube" ? 0x10b981 : 0x667eea,
+              transparent: true,
+              opacity: 0.9,
+            });
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.position.y = height / 2;
+            mesh.rotation.y = oldMesh.rotation.y;
+
+            const edges = new THREE.EdgesGeometry(geometry);
+            const lineMaterial = new THREE.LineBasicMaterial({
+              color: 0x000000,
+              linewidth: 2,
+            });
+            const wireframe = new THREE.LineSegments(edges, lineMaterial);
+            mesh.add(wireframe);
+
+            sceneRef.current.add(mesh);
+            meshRef.current = mesh;
+          }
+        }, [length, width, height, shape]);
+
+        const setCube = () => {
+          setShape("cube");
+          const size = 5;
+          setLength(size);
+          setWidth(size);
+          setHeight(size);
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <header className="text-center mb-8">
+              <div className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-md px-6 py-3 rounded-full mb-4">
+                <Cube className="text-white" size={24} />
+                <span className="text-white font-bold text-lg">小五數學</span>
+              </div>
+              <h1 className="text-5xl md:text-6xl font-black text-white mb-2 tracking-tight">
+                3D 立體體積探索
+              </h1>
+              <p className="text-xl text-white/80 font-medium">
+                長方體 × 正方體
+              </p>
+            </header>
+
+            <main className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8">
+              {/* 3D Viewer */}
+              <div className="lg:col-span-8 bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl">
+                <div
+                  id="canvas-container"
+                  ref={canvasRef}
+                  className="bg-slate-100 mb-6 shadow-inner"
+                />
+
+                {/* Measurements Display */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="bg-blue-50 rounded-2xl p-4 text-center">
+                    <div className="text-sm font-bold text-slate-600 mb-1">
+                      長 (L)
+                    </div>
+                    <div className="text-3xl font-black text-blue-600">
+                      {length}
+                    </div>
+                    <div className="text-xs text-slate-500">cm</div>
+                  </div>
+                  <div className="bg-green-50 rounded-2xl p-4 text-center">
+                    <div className="text-sm font-bold text-slate-600 mb-1">
+                      闊 (W)
+                    </div>
+                    <div className="text-3xl font-black text-green-600">
+                      {width}
+                    </div>
+                    <div className="text-xs text-slate-500">cm</div>
+                  </div>
+                  <div className="bg-purple-50 rounded-2xl p-4 text-center">
+                    <div className="text-sm font-bold text-slate-600 mb-1">
+                      高 (H)
+                    </div>
+                    <div className="text-3xl font-black text-purple-600">
+                      {height}
+                    </div>
+                    <div className="text-xs text-slate-500">cm</div>
+                  </div>
+                  <div className="bg-gradient-to-br from-yellow-100 to-orange-100 rounded-2xl p-4 text-center border-2 border-yellow-300">
+                    <div className="text-sm font-bold text-orange-700 mb-1">
+                      體積
+                    </div>
+                    <div className="text-3xl font-black text-orange-600">
+                      {volume}
+                    </div>
+                    <div className="text-xs text-orange-500">cm³</div>
+                  </div>
+                </div>
+
+                {/* Formula Display */}
+                <div className="mt-6 bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-6">
+                  <h3 className="text-lg font-black text-purple-600 mb-3">
+                    📐 體積公式
+                  </h3>
+                  <div className="text-2xl font-bold text-slate-800 mb-2">
+                    體積 = 長 × 闊 × 高
+                  </div>
+                  <div className="text-xl font-mono text-slate-600">
+                    V = {length} × {width} × {height} ={" "}
+                    <span className="text-purple-600 font-black">
+                      {volume} cm³
+                    </span>
+                  </div>
+
+                  <div className="mt-4 pt-4 border-t border-purple-200">
+                    <div className="text-lg font-bold text-slate-700 mb-2">
+                      表面積 = 2(LW + WH + HL)
+                    </div>
+                    <div className="text-lg font-mono text-slate-600">
+                      SA = 2({length}×{width} + {width}×{height} + {height}×
+                      {length}) ={" "}
+                      <span className="text-blue-600 font-black">
+                        {surfaceArea} cm²
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Controls */}
+              <div className="lg:col-span-4 flex flex-col gap-6">
+                <div className="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-lg">
+                  <h3 className="text-xl font-black text-purple-600 mb-4">
+                    調整尺寸
+                  </h3>
+
+                  <div className="mb-4">
+                    <label className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-bold text-slate-600">
+                        長度 (L)
+                      </span>
+                      <span className="text-xl font-black text-blue-600">
+                        {length} cm
+                      </span>
+                    </label>
+                    <input
+                      type="range"
+                      min="1"
+                      max="10"
+                      value={length}
+                      onChange={(e) => {
+                        setLength(parseInt(e.target.value));
+                        setShape("cuboid");
+                      }}
+                      className="w-full"
+                    />
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-bold text-slate-600">
+                        闊度 (W)
+                      </span>
+                      <span className="text-xl font-black text-green-600">
+                        {width} cm
+                      </span>
+                    </label>
+                    <input
+                      type="range"
+                      min="1"
+                      max="10"
+                      value={width}
+                      onChange={(e) => {
+                        setWidth(parseInt(e.target.value));
+                        setShape("cuboid");
+                      }}
+                      className="w-full"
+                    />
+                  </div>
+
+                  <div className="mb-6">
+                    <label className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-bold text-slate-600">
+                        高度 (H)
+                      </span>
+                      <span className="text-xl font-black text-purple-600">
+                        {height} cm
+                      </span>
+                    </label>
+                    <input
+                      type="range"
+                      min="1"
+                      max="10"
+                      value={height}
+                      onChange={(e) => {
+                        setHeight(parseInt(e.target.value));
+                        setShape("cuboid");
+                      }}
+                      className="w-full"
+                    />
+                  </div>
+
+                  <button
+                    onClick={setCube}
+                    className="w-full py-3 bg-green-500 hover:bg-green-600 text-white rounded-2xl font-bold transition-all mb-2"
+                  >
+                    變成正方體
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setLength(5);
+                      setWidth(4);
+                      setHeight(3);
+                      setShape("cuboid");
+                    }}
+                    className="w-full py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-2xl font-bold transition-all flex items-center justify-center gap-2"
+                  >
+                    <RotateCcw size={18} /> 重設
+                  </button>
+                </div>
+
+                <div className="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-lg">
+                  <h3 className="text-lg font-black text-slate-800 mb-3">
+                    💡 學習重點
+                  </h3>
+                  <div className="text-sm text-slate-600 leading-relaxed space-y-2">
+                    <p>
+                      <strong>體積</strong>：物體所佔的空間大小
+                    </p>
+                    <p>
+                      <strong>單位</strong>：立方厘米 (cm³)
+                    </p>
+                    <p className="bg-yellow-50 p-2 rounded">
+                      <strong>長方體</strong>：長、闊、高都可以不同
+                    </p>
+                    <p className="bg-green-50 p-2 rounded">
+                      <strong>正方體</strong>：長、闊、高都相同
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </main>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

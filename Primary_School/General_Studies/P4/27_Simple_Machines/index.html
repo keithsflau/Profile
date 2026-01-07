@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Simple Machines</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #fffbeb;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Simple Machines Hunt",
+          zh: "簡單機械尋寶",
+          ja: "単純機械ハント",
+          ko: "간단한 기계 찾기",
+          es: "Caza de máquinas simples",
+          de: "Suche nach einfachen Maschinen",
+          fi: "Yksinkertaisten koneiden metsästys",
+          fr: "Chasse aux machines simples",
+          ar: "البحث عن الآلات البسيطة",
+          it: "Caccia alle Macchine Semplici",
+        },
+        instruction: {
+          en: "Identify the simple machine used.",
+          zh: "辨認所使用的簡單機械。",
+          ja: "使用されている単純機械を特定します。",
+          ko: "사용된 간단한 기계를 식별하세요.",
+          es: "Identificar la máquina simple utilizada.",
+          de: "Identifiziere die verwendete einfache Maschine.",
+          fi: "Tunnista käytetty yksinkertainen kone.",
+          fr: "Identifiez la machine simple utilisée.",
+          ar: "التعرف على الآلة البسيطة المستخدمة.",
+          it: "Identifica la macchina semplice usata.",
+        },
+        lever: {
+          en: "Lever",
+          zh: "槓桿",
+          ja: "てこ",
+          ko: "레버",
+          es: "Palanca",
+          de: "Hebel",
+          fi: "Vipu",
+          fr: "Levier",
+          ar: "رافعة",
+          it: "Leva",
+        },
+        pulley: {
+          en: "Pulley",
+          zh: "滑輪",
+          ja: "滑車",
+          ko: "도르래",
+          es: "Polea",
+          de: "Flaschenzug",
+          fi: "Väkipyörä",
+          fr: "Poulie",
+          ar: "بكرة",
+          it: "Puleggia",
+        },
+        ramp: {
+          en: "Inclined Plane (Ramp)",
+          zh: "斜面",
+          ja: "斜面",
+          ko: "빗면",
+          es: "Plano inclinado",
+          de: "Schiefe Ebene",
+          fi: "Kalteva taso",
+          fr: "Plan incliné",
+          ar: "مستوى مائل",
+          it: "Piano Inclinato",
+        },
+        wheel: {
+          en: "Wheel & Axle",
+          zh: "輪軸",
+          ja: "輪軸",
+          ko: "축바퀴",
+          es: "Rueda y eje",
+          de: "Rad & Achse",
+          fi: "Pyörä ja akseli",
+          fr: "Roue et essieu",
+          ar: "عجلة ومحور",
+          it: "Ruota e Asse",
+        },
+        scissors: {
+          en: "Scissors",
+          zh: "剪刀",
+          ja: "はさみ",
+          ko: "가위",
+          es: "Tijeras",
+          de: "Schere",
+          fi: "Sakset",
+          fr: "Ciseaux",
+          ar: "مقص",
+          it: "Forbici",
+        },
+        flagpole: {
+          en: "Flagpole",
+          zh: "旗桿",
+          ja: "旗竿",
+          ko: "깃대",
+          es: "Asta de bandera",
+          de: "Fahnenmast",
+          fi: "Lipputanko",
+          fr: "Mât de drapeau",
+          ar: "سارية العلم",
+          it: "Pennone",
+        },
+        slide: {
+          en: "Slide",
+          zh: "滑梯",
+          ja: "滑り台",
+          ko: "미끄럼틀",
+          es: "Tobogán",
+          de: "Rutsche",
+          fi: "Liukumäki",
+          fr: "Toboggan",
+          ar: "زحليقة",
+          it: "Scivolo",
+        },
+        doorknob: {
+          en: "Door Knob",
+          zh: "門把",
+          ja: "ドアノブ",
+          ko: "문손잡이",
+          es: "Pomo de la puerta",
+          de: "Türknauf",
+          fi: "Ovenkahva",
+          fr: "Poignée de porte",
+          ar: "مقبض الباب",
+          it: "Maniglia",
+        },
+        correct: {
+          en: "Correct!",
+          zh: "正確！",
+          ja: "正解！",
+          ko: "정답!",
+          es: "¡Correcto!",
+          de: "Richtig!",
+          fi: "Oikein!",
+          fr: "Correct !",
+          ar: "صحيح!",
+          it: "Corretto!",
+        },
+      };
+
+      const items = [
+        { id: "scissors", type: "lever", icon: "✂️" },
+        { id: "flagpole", type: "pulley", icon: "🚩" },
+        { id: "slide", type: "ramp", icon: "🎢" }, // Closest slide icon
+        { id: "doorknob", type: "wheel", icon: "🚪" },
+        { id: "seesaw", type: "lever", icon: "⚖️" }, // Seesaw proxy
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [qIndex, setQIndex] = useState(0);
+        const [feedback, setFeedback] = useState(null);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+        const currentItem = items[qIndex];
+
+        const handleAnswer = (type) => {
+          if (feedback) return;
+          if (currentItem.type === type) {
+            setFeedback("correct");
+            setTimeout(() => {
+              setFeedback(null);
+              setQIndex((qIndex + 1) % items.length);
+            }, 1000);
+          } else {
+            setFeedback("wrong");
+            setTimeout(() => setFeedback(null), 500);
+          }
+        };
+
+        const options = ["lever", "pulley", "ramp", "wheel"];
+
+        return (
+          <div className="min-h-screen flex flex-col items-center justify-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-amber-600">
+              {getText("title")}
+            </h1>
+
+            <div className="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-lg text-center border-4 border-amber-200">
+              <div className="mb-8 p-10 bg-amber-50 rounded-2xl flex flex-col items-center">
+                <div className="text-9xl mb-4 animate-bounce-slow">
+                  {currentItem.icon}
+                </div>
+                <div className="text-2xl font-bold text-slate-700">
+                  {getText(currentItem.id)}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                {options.map((opt) => (
+                  <button
+                    key={opt}
+                    onClick={() => handleAnswer(opt)}
+                    className="bg-amber-100 hover:bg-amber-200 text-amber-900 py-4 rounded-xl font-bold transition-colors border-b-4 border-amber-300 active:border-b-0 active:translate-y-1"
+                  >
+                    {getText(opt)}
+                  </button>
+                ))}
+              </div>
+
+              {feedback && (
+                <div
+                  className={`mt-6 text-2xl font-black ${
+                    feedback === "correct" ? "text-green-500" : "text-red-500"
+                  }`}
+                >
+                  {getText(feedback)}
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

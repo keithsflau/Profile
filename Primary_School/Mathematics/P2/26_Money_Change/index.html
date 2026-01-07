@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小二數學：購物找贖 | Buying & Change</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fefce8 0%, #facc15 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "🛒 Buying & Change",
+          zh: "🛒 購物找贖",
+          ja: "🛒 買い物とお釣り",
+          ko: "🛒 구매 및 거스름돈",
+          es: "🛒 Compra y cambio",
+          de: "🛒 Kaufen & Wechselgeld",
+          fi: "🛒 Ostokset ja vaihtoraha",
+          fr: "🛒 Achat et monnaie",
+          ar: "🛒 الشراء والتغيير",
+          it: "🛒 Acquisto e resto",
+        },
+        price: {
+          en: "Price",
+          zh: "價錢",
+          ja: "価格",
+          ko: "가격",
+          es: "Precio",
+          de: "Preis",
+          fi: "Hinta",
+          fr: "Prix",
+          ar: "السعر",
+          it: "Prezzo",
+        },
+        payment: {
+          en: "Payment",
+          zh: "付款",
+          ja: "支払い",
+          ko: "지불",
+          es: "Pago",
+          de: "Zahlung",
+          fi: "Maksu",
+          fr: "Paiement",
+          ar: "الدفع",
+          it: "Pagamento",
+        },
+        change: {
+          en: "How much change?",
+          zh: "應找回多少元？",
+          ja: "お釣りはいくらですか？",
+          ko: "거스름돈은 얼마입니까?",
+          es: "¿Cuánto cambio?",
+          de: "Wie viel Wechselgeld?",
+          fi: "Paljonko vaihtorahaa?",
+          fr: "Combien de monnaie ?",
+          ar: "كم الباقي؟",
+          it: "Quanto resto?",
+        },
+        check: {
+          en: "Check",
+          zh: "檢查",
+          ja: "確認",
+          ko: "확인",
+          es: "Comprobar",
+          de: "Prüfen",
+          fi: "Tarkista",
+          fr: "Vérifier",
+          ar: "تحقق",
+          it: "Controlla",
+        },
+      };
+
+      const Coin = ({ val }) => {
+        let css = "",
+          label = "";
+        if (val === 1) {
+          css = "bg-slate-300 w-12 h-12 rounded-full border-4 border-slate-400";
+          label = "$1";
+        }
+        if (val === 2) {
+          css =
+            "bg-slate-300 w-14 h-14 rounded-[18px] border-4 border-slate-400";
+          label = "$2";
+        }
+        if (val === 5) {
+          css =
+            "bg-slate-300 w-16 h-16 rounded-full border-[5px] border-slate-400";
+          label = "$5";
+        }
+        if (val === 10) {
+          css =
+            "bg-yellow-100 w-16 h-16 rounded-full border-[6px] border-yellow-600 text-yellow-800";
+          label = "$10";
+        }
+        // Notes approximation
+        if (val === 20) {
+          css =
+            "bg-blue-200 w-32 h-16 rounded-lg border-2 border-blue-400 flex items-center justify-center text-blue-800";
+          label = "$20";
+        }
+        if (val === 50) {
+          css =
+            "bg-green-200 w-32 h-16 rounded-lg border-2 border-green-400 flex items-center justify-center text-green-800";
+          label = "$50";
+        }
+        if (val === 100) {
+          css =
+            "bg-red-200 w-32 h-16 rounded-lg border-2 border-red-400 flex items-center justify-center text-red-800";
+          label = "$100";
+        } // 100 is red
+
+        return (
+          <div
+            className={`${css} flex items-center justify-center font-bold text-lg shadow-lg`}
+          >
+            {label}
+          </div>
+        );
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [price, setPrice] = useState(12);
+        const [payment, setPayment] = useState(20);
+        const [input, setInput] = useState("");
+        const [feedback, setFeedback] = useState("");
+
+        const newProb = () => {
+          setInput("");
+          setFeedback("");
+
+          const prices = [
+            3, 4, 6, 7, 8, 9, 11, 12, 13, 15, 18, 24, 35, 42, 65, 88,
+          ];
+          const p = prices[Math.floor(Math.random() * prices.length)];
+          setPrice(p);
+
+          // Choose payment > price
+          const pays = [10, 20, 50, 100];
+          const validPays = pays.filter((x) => x > p);
+          const pay =
+            validPays[Math.floor(Math.random() * validPays.length)] || 100;
+          setPayment(pay);
+        };
+
+        useEffect(newProb, []);
+
+        const check = () => {
+          if (parseInt(input) === payment - price) {
+            setFeedback("CORRECT");
+            setTimeout(newProb, 2000);
+          } else {
+            setFeedback("WRONG");
+          }
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center justify-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+
+            <h1 className="text-4xl md:text-5xl font-black text-yellow-900 mb-8 max-w-2xl text-center">
+              {t.title[lang] || t.title["en"]}
+            </h1>
+
+            <div className="bg-white/90 rounded-3xl p-8 shadow-2xl w-full max-w-2xl text-center border-4 border-yellow-300">
+              <div className="flex justify-between items-center mb-12 px-8">
+                <div className="flex flex-col items-center gap-2">
+                  <span className="text-slate-500 font-bold">
+                    {t.price[lang] || t.price["en"]}
+                  </span>
+                  <div className="bg-white p-4 rounded-xl border-2 border-slate-200 text-3xl font-black text-slate-700 shadow-sm relative">
+                    ${price}
+                    <div className="absolute -top-6 text-4xl">🧸</div>
+                  </div>
+                </div>
+
+                <div className="text-3xl text-slate-300 font-black">-</div>
+
+                <div className="flex flex-col items-center gap-2">
+                  <span className="text-slate-500 font-bold">
+                    {t.payment[lang] || t.payment["en"]}
+                  </span>
+                  <Coin val={payment} />
+                </div>
+              </div>
+
+              <div className="text-2xl font-bold text-slate-600 mb-6">
+                {t.change[lang] || t.change["en"]}
+              </div>
+
+              <div className="flex items-center justify-center gap-4 text-4xl mb-8 font-black text-yellow-900">
+                ${payment} - ${price} = $
+                <input
+                  type="number"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  className="w-24 text-center border-b-4 border-yellow-500 bg-yellow-50 focus:outline-none rounded-t-lg"
+                  autoFocus
+                />
+              </div>
+
+              <button
+                onClick={check}
+                className="px-10 py-3 bg-yellow-500 text-white rounded-full font-black text-2xl shadow-xl hover:bg-yellow-600 active:scale-95 transition-transform"
+              >
+                {t.check[lang] || t.check["en"]}
+              </button>
+
+              <div className="h-16 mt-8">
+                {feedback === "CORRECT" && (
+                  <div className="text-4xl font-black text-green-500 animate-bounce">
+                    {get("correct", lang)} (${payment - price})
+                  </div>
+                )}
+                {feedback === "WRONG" && (
+                  <div className="text-4xl font-black text-red-500 animate-shake">
+                    {get("wrong", lang)}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

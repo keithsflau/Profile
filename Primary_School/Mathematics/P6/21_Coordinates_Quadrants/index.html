@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小六數學：四象限坐標 | Four Quadrants</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #ecfccb 0%, #84cc16 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      function App() {
+        const [point, setPoint] = useState({ x: 3, y: 4 });
+
+        const getQuadrant = (x, y) => {
+          if (x > 0 && y > 0) return "I (第一象限)";
+          if (x < 0 && y > 0) return "II (第二象限)";
+          if (x < 0 && y < 0) return "III (第三象限)";
+          if (x > 0 && y < 0) return "IV (第四象限)";
+          return "軸上 On Axis";
+        };
+
+        const handleClick = (e) => {
+          const svg = e.currentTarget;
+          const pt = svg.createSVGPoint();
+          pt.x = e.clientX;
+          pt.y = e.clientY;
+          const cursorPt = pt.matrixTransform(svg.getScreenCTM().inverse());
+          // Map 0-300 to -10 to 10
+          const x = Math.round((cursorPt.x - 150) / 15);
+          const y = Math.round((150 - cursorPt.y) / 15);
+          // limit to -9 to 9
+          if (Math.abs(x) < 10 && Math.abs(y) < 10) {
+            setPoint({ x, y });
+          }
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-5xl font-black text-lime-900 mb-2">
+              🌐 四象限坐標
+            </h1>
+            <p className="text-xl text-lime-700 font-bold mb-8">
+              Four Quadrants Coordinates
+            </p>
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-4xl w-full flex flex-col md:flex-row gap-8">
+              <div className="flex-1">
+                <svg
+                  viewBox="0 0 300 300"
+                  className="w-full h-full bg-slate-50 border-4 border-lime-300 rounded-xl cursor-crosshair shadow-inner"
+                  onClick={handleClick}
+                >
+                  {/* Grid Lines */}
+                  {Array.from({ length: 19 }, (_, i) => i + 1).map((i) => (
+                    <g key={i}>
+                      <line
+                        x1={i * 15}
+                        y1="0"
+                        x2={i * 15}
+                        y2="300"
+                        stroke="#e2e8f0"
+                        strokeWidth="1"
+                      />
+                      <line
+                        x1="0"
+                        y1={i * 15}
+                        x2="300"
+                        y2={i * 15}
+                        stroke="#e2e8f0"
+                        strokeWidth="1"
+                      />
+                    </g>
+                  ))}
+                  {/* Axes */}
+                  <line
+                    x1="150"
+                    y1="0"
+                    x2="150"
+                    y2="300"
+                    stroke="#65a30d"
+                    strokeWidth="2"
+                  />
+                  <line
+                    x1="0"
+                    y1="150"
+                    x2="300"
+                    y2="150"
+                    stroke="#65a30d"
+                    strokeWidth="2"
+                  />
+
+                  {/* Point */}
+                  <circle
+                    cx={150 + point.x * 15}
+                    cy={150 - point.y * 15}
+                    r="6"
+                    fill="#ef4444"
+                    stroke="white"
+                    strokeWidth="2"
+                  />
+                  {/* Labels */}
+                  <text
+                    x="280"
+                    y="140"
+                    className="text-xs font-bold fill-lime-800"
+                  >
+                    x
+                  </text>
+                  <text
+                    x="160"
+                    y="20"
+                    className="text-xs font-bold fill-lime-800"
+                  >
+                    y
+                  </text>
+                </svg>
+              </div>
+
+              <div className="flex-1 flex flex-col justify-center space-y-6">
+                <div className="bg-lime-50 rounded-2xl p-6 border-2 border-lime-200 text-center">
+                  <div className="text-lg font-bold text-lime-800 mb-2">
+                    當前坐標 Current Point
+                  </div>
+                  <div className="text-6xl font-black text-lime-600 font-mono">
+                    ({point.x}, {point.y})
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 rounded-2xl p-6 border-2 border-blue-200 text-center">
+                  <div className="text-lg font-bold text-blue-800 mb-2">
+                    所屬象限 Quadrant
+                  </div>
+                  <div className="text-4xl font-black text-blue-600">
+                    {getQuadrant(point.x, point.y)}
+                  </div>
+                </div>
+
+                <div className="bg-amber-50 rounded-xl p-4 border border-amber-200 text-amber-900 text-sm">
+                  <p>
+                    <b>提示:</b> 點擊左側網格來改變坐標位置！
+                  </p>
+                  <p className="mt-1">
+                    Click on the grid to perform point location.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

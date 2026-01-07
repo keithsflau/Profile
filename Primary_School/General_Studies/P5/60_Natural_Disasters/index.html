@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Natural Disasters</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #f1f5f9;
+        color: #334155;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Disaster Preparedness",
+          zh: "防災準備",
+          ja: "災害への備え",
+          ko: "재난 대비",
+          es: "Preparación para desastres",
+          de: "Katastrophenvorsorge",
+          fi: "Katastrofivalmius",
+          fr: "Préparation aux catastrophes",
+          ar: "الاستعداد للكوارث",
+          it: "Preparazione ai Disastri",
+        },
+        instruction: {
+          en: "Pack the Emergency Kit for a Typhoon!",
+          zh: "為颱風收拾急救包！",
+          ja: "台風に備えて非常用持ち出し袋を詰めよう！",
+          ko: "태풍에 대비해 비상 키트를 챙기세요!",
+          es: "¡Prepara el kit de emergencia para un tifón!",
+          de: "Packe das Notfallkit für einen Taifun!",
+          fi: "Pakkaa hätäpakkaus taifuunia varten!",
+          fr: "Préparez le kit d'urgence pour un typhon !",
+          ar: "جهز مجموعة الطوارئ للإعصار!",
+          it: "Prepara il kit di emergenza per un tifone!",
+        },
+        water: { en: "Water", zh: "水", ja: "水", ko: "물" },
+        food: { en: "Canned Food", zh: "罐頭食品", ja: "缶詰", ko: "통조림" },
+        torch: { en: "Flashlight", zh: "手電筒", ja: "懐中電灯", ko: "손전등" },
+        radio: { en: "Radio", zh: "收音機", ja: "ラジオ", ko: "라디오" },
+        aid: {
+          en: "First Aid Kit",
+          zh: "急救箱",
+          ja: "救急箱",
+          ko: "구급상자",
+        },
+        money: { en: "Cash", zh: "現金", ja: "現金", ko: "현금" },
+
+        toy: {
+          en: "Toys (Not priority)",
+          zh: "玩具 (非優先)",
+          ja: "おもちゃ (優先ではない)",
+          ko: "장난감 (우선 아님)",
+        },
+        game: {
+          en: "Video Game (No power!)",
+          zh: "電子遊戲 (沒電!)",
+          ja: "ゲーム (電気がない!)",
+          ko: "비디오 게임 (전기 없음!)",
+        },
+
+        packed: {
+          en: "Packed: ",
+          zh: "已打包：",
+          ja: "梱包済み：",
+          ko: "포장됨: ",
+        },
+        ready: {
+          en: "Ready for Typhoon!",
+          zh: "颱風準備就緒！",
+          ja: "台風の準備完了！",
+          ko: "태풍 준비 완료!",
+        },
+      };
+
+      const items = [
+        { id: "water", icon: "💧", needed: true },
+        { id: "food", icon: "🥫", needed: true },
+        { id: "torch", icon: "🔦", needed: true },
+        { id: "radio", icon: "📻", needed: true },
+        { id: "aid", icon: "❤️‍🩹", needed: true },
+        { id: "money", icon: "💵", needed: true },
+        { id: "toy", icon: "🧸", needed: false },
+        { id: "game", icon: "🎮", needed: false },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [backpack, setBackpack] = useState([]);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const togglePack = (id, needed) => {
+          if (backpack.includes(id)) {
+            setBackpack(backpack.filter((i) => i !== id));
+          } else {
+            setBackpack([...backpack, id]);
+          }
+        };
+
+        const essentialCount = items.filter((i) => i.needed).length;
+        const packedEssentials = backpack.filter(
+          (id) => items.find((i) => i.id === id).needed
+        ).length;
+        const isReady = packedEssentials === essentialCount;
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-slate-700">
+              {getText("title")}
+            </h1>
+            <p className="mb-8 font-bold text-slate-500">
+              {getText("instruction")}
+            </p>
+
+            <div className="flex flex-col md:flex-row gap-8 w-full max-w-5xl">
+              {/* Shelf */}
+              <div className="flex-1 grid grid-cols-2 gap-4">
+                {items.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => togglePack(item.id, item.needed)}
+                    className={`p-4 rounded-xl border-2 flex items-center gap-4 transition-all hover:bg-white shadow-sm ${
+                      backpack.includes(item.id)
+                        ? "opacity-30"
+                        : "bg-slate-100 hover:scale-105"
+                    }`}
+                    disabled={backpack.includes(item.id)}
+                  >
+                    <div className="text-4xl">{item.icon}</div>
+                    <div className="font-bold text-left">
+                      {getText(item.id)}
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              {/* Backpack */}
+              <div className="w-full md:w-1/3 bg-orange-100 border-4 border-orange-300 rounded-3xl p-6 min-h-[400px] flex flex-col relative">
+                <div className="text-center font-bold text-orange-800 text-xl mb-4">
+                  🎒 Backpack
+                </div>
+
+                <div className="flex flex-wrap gap-2 content-start flex-1">
+                  {backpack.map((id) => {
+                    const item = items.find((i) => i.id === id);
+                    return (
+                      <motion.div
+                        key={id}
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className={`w-12 h-12 flex items-center justify-center bg-white rounded-full shadow ${
+                          !item.needed ? "border-2 border-red-400" : ""
+                        }`}
+                        onClick={() => togglePack(id)}
+                      >
+                        {item.icon}
+                      </motion.div>
+                    );
+                  })}
+                </div>
+
+                {isReady && (
+                  <div className="mt-4 bg-green-500 text-white p-4 rounded-xl font-bold text-center animate-bounce shadow-lg">
+                    {getText("ready")}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

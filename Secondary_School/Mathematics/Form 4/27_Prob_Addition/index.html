@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Probability Addition Rule | S4 Math 概率加法法則</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script
+      type="text/javascript"
+      id="MathJax-script"
+      async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+    ></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Sans+TC:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-blue-50 text-slate-800 min-h-screen">
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      const translations = {
+        en: {
+          unit: "Unit 8: Probability",
+          title: "Addition Rule of Probability",
+          desc: "Visualize P(A ∪ B) = P(A) + P(B) - P(A ∩ B) with Venn diagrams.",
+          eventA: "P(A)",
+          eventB: "P(B)",
+          intersection: "P(A ∩ B)",
+          union: "P(A ∪ B)",
+          formula: "Addition Rule",
+        },
+        zh: {
+          unit: "單元八：概率論",
+          title: "概率加法法則",
+          desc: "使用韋恩圖視像化 P(A ∪ B) = P(A) + P(B) - P(A ∩ B)。",
+          eventA: "P(A)",
+          eventB: "P(B)",
+          intersection: "P(A ∩ B)",
+          union: "P(A ∪ B)",
+          formula: "加法法則",
+        },
+      };
+
+      const App = () => {
+        const [lang, setLang] = useState("en");
+        const t = translations[lang];
+
+        const [pA, setPA] = useState(0.4);
+        const [pB, setPB] = useState(0.3);
+        const [pIntersect, setPIntersect] = useState(0.1);
+
+        // Validate: intersection cannot exceed either
+        const maxIntersect = Math.min(pA, pB);
+        const validIntersect = Math.min(pIntersect, maxIntersect);
+
+        // P(A ∪ B) = P(A) + P(B) - P(A ∩ B)
+        const pUnion = pA + pB - validIntersect;
+
+        // Venn Diagram
+        const w = 400,
+          h = 250;
+        const r = 80;
+        const cxA = w / 2 - 40;
+        const cxB = w / 2 + 40;
+        const cy = h / 2;
+
+        useEffect(() => {
+          if (window.MathJax) window.MathJax.typesetPromise();
+        }, [pA, pB, pIntersect, lang]);
+
+        return (
+          <div className="p-8 max-w-4xl mx-auto min-h-screen flex flex-col items-center select-none">
+            <header className="mb-8 text-center w-full relative">
+              <button
+                onClick={() => setLang(lang === "en" ? "zh" : "en")}
+                className="absolute right-0 top-0 px-4 py-2 bg-white rounded-full shadow border border-blue-200 text-sm font-bold text-blue-600 hover:bg-blue-50 transition"
+              >
+                <i className="fa-solid fa-globe mr-2"></i>
+                {lang === "en" ? "中文" : "ENG"}
+              </button>
+              <div className="text-blue-600 font-bold uppercase text-xs tracking-widest mb-2">
+                {t.unit}
+              </div>
+              <h1 className="text-4xl font-extrabold text-slate-900 mb-2">
+                {t.title}
+              </h1>
+              <p className="text-slate-500">{t.desc}</p>
+            </header>
+
+            <div className="bg-white p-6 rounded-3xl shadow-xl border border-blue-100 w-full mb-8">
+              {/* Venn Diagram */}
+              <div className="bg-slate-50 p-4 rounded-xl mb-6">
+                <svg width={w} height={h} className="mx-auto">
+                  {/* Universal Set Box */}
+                  <rect
+                    x="20"
+                    y="20"
+                    width={w - 40}
+                    height={h - 40}
+                    fill="none"
+                    stroke="#94a3b8"
+                    strokeWidth="2"
+                    rx="10"
+                  />
+                  <text x="30" y="40" className="text-xs fill-slate-400">
+                    U
+                  </text>
+
+                  {/* Circle A */}
+                  <circle
+                    cx={cxA}
+                    cy={cy}
+                    r={r}
+                    fill="rgba(59, 130, 246, 0.3)"
+                    stroke="#3b82f6"
+                    strokeWidth="2"
+                  />
+                  <text
+                    x={cxA - 30}
+                    y={cy}
+                    className="text-lg fill-blue-600 font-bold"
+                  >
+                    A
+                  </text>
+
+                  {/* Circle B */}
+                  <circle
+                    cx={cxB}
+                    cy={cy}
+                    r={r}
+                    fill="rgba(34, 197, 94, 0.3)"
+                    stroke="#22c55a"
+                    strokeWidth="2"
+                  />
+                  <text
+                    x={cxB + 30}
+                    y={cy}
+                    className="text-lg fill-green-600 font-bold"
+                  >
+                    B
+                  </text>
+
+                  {/* Intersection Highlight */}
+                  <clipPath id="clipA">
+                    <circle cx={cxA} cy={cy} r={r} />
+                  </clipPath>
+                  <circle
+                    cx={cxB}
+                    cy={cy}
+                    r={r}
+                    fill="rgba(168, 85, 247, 0.5)"
+                    clipPath="url(#clipA)"
+                  />
+
+                  {/* Labels */}
+                  <text
+                    x={cxA - 50}
+                    y={cy + 5}
+                    className="text-sm fill-blue-500 font-mono"
+                  >
+                    {(pA - validIntersect).toFixed(2)}
+                  </text>
+                  <text
+                    x={(cxA + cxB) / 2}
+                    y={cy + 5}
+                    textAnchor="middle"
+                    className="text-sm fill-purple-600 font-mono font-bold"
+                  >
+                    {validIntersect.toFixed(2)}
+                  </text>
+                  <text
+                    x={cxB + 50}
+                    y={cy + 5}
+                    className="text-sm fill-green-500 font-mono"
+                  >
+                    {(pB - validIntersect).toFixed(2)}
+                  </text>
+                </svg>
+              </div>
+
+              {/* Controls */}
+              <div className="grid md:grid-cols-3 gap-6 mb-6">
+                <div>
+                  <label className="text-sm font-bold text-blue-500 block mb-2">
+                    {t.eventA}
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="0.8"
+                    step="0.05"
+                    value={pA}
+                    onChange={(e) => setPA(Number(e.target.value))}
+                    className="w-full accent-blue-500"
+                  />
+                  <div className="text-right font-mono text-blue-600 font-bold">
+                    {pA.toFixed(2)}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-bold text-green-500 block mb-2">
+                    {t.eventB}
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="0.8"
+                    step="0.05"
+                    value={pB}
+                    onChange={(e) => setPB(Number(e.target.value))}
+                    className="w-full accent-green-500"
+                  />
+                  <div className="text-right font-mono text-green-600 font-bold">
+                    {pB.toFixed(2)}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-bold text-purple-500 block mb-2">
+                    {t.intersection}
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max={maxIntersect}
+                    step="0.05"
+                    value={validIntersect}
+                    onChange={(e) => setPIntersect(Number(e.target.value))}
+                    className="w-full accent-purple-500"
+                  />
+                  <div className="text-right font-mono text-purple-600 font-bold">
+                    {validIntersect.toFixed(2)}
+                  </div>
+                </div>
+              </div>
+
+              {/* Formula */}
+              <div className="bg-blue-50 p-4 rounded-xl mb-6 text-center border border-blue-100">
+                <div className="text-sm font-bold text-blue-400 uppercase mb-2">
+                  {t.formula}
+                </div>
+                <div className="text-xl font-mono">
+                  \[ P(A \cup B) = P(A) + P(B) - P(A \cap B) = {pA.toFixed(2)} +{" "}
+                  {pB.toFixed(2)} - {validIntersect.toFixed(2)} \]
+                </div>
+              </div>
+
+              {/* Result */}
+              <div className="bg-rose-50 p-6 rounded-2xl text-center border border-rose-100">
+                <div className="text-sm font-bold text-rose-500 uppercase mb-2">
+                  {t.union}
+                </div>
+                <div className="text-5xl font-extrabold text-rose-700 font-mono">
+                  {pUnion.toFixed(2)}
+                </div>
+              </div>
+            </div>
+
+            <footer className="mt-8">
+              <a
+                href="../index.html"
+                className="text-blue-500 hover:text-blue-700 font-bold"
+              >
+                <i className="fa-solid fa-arrow-left mr-2"></i> Back to
+                Dashboard
+              </a>
+            </footer>
+          </div>
+        );
+      };
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

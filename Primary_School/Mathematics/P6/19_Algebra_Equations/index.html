@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小六數學：方程求解 | Solving Equations</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fef3c7 0%, #f59e0b 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      function App() {
+        const calculateProblem = () => {
+          const type = Math.floor(Math.random() * 4); // 0:add, 1:sub, 2:mul, 3:div
+          let valX = Math.floor(Math.random() * 20) + 1;
+          let operand = Math.floor(Math.random() * 10) + 1;
+          let result;
+          let expr = "";
+
+          if (type === 0) {
+            // x + a = b
+            result = valX + operand;
+            expr = `x + ${operand} = ${result}`;
+          } else if (type === 1) {
+            // x - a = b
+            valX = valX + operand; // ensure x > a
+            result = valX - operand;
+            expr = `x - ${operand} = ${result}`;
+          } else if (type === 2) {
+            // ax = b
+            result = valX * operand;
+            expr = `${operand}x = ${result}`;
+          } else {
+            // x / a = b
+            result = valX;
+            valX = result * operand;
+            expr = `x / ${operand} = ${result}`;
+          }
+
+          return { expr, ans: valX, type };
+        };
+
+        const [problem, setProblem] = useState(calculateProblem());
+        const [input, setInput] = useState("");
+        const [feedback, setFeedback] = useState("");
+
+        const checkAnswer = () => {
+          if (parseInt(input) === problem.ans) {
+            setFeedback("CORRECT");
+          } else {
+            setFeedback("WRONG");
+          }
+        };
+
+        const next = () => {
+          setProblem(calculateProblem());
+          setInput("");
+          setFeedback("");
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-5xl font-black text-amber-900 mb-2">
+              ⚖️ 方程求解
+            </h1>
+            <p className="text-xl text-amber-700 font-bold mb-8">
+              Solving Single-Step Equations
+            </p>
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-xl w-full text-center">
+              <div className="bg-amber-100 rounded-2xl p-12 mb-8 border-4 border-amber-300">
+                <div className="text-5xl font-black text-amber-900 font-mono tracking-wider">
+                  {problem.expr}
+                </div>
+                <div className="text-amber-700 mt-4 text-lg">
+                  求 x 的值 Solve for x
+                </div>
+              </div>
+
+              <div className="flex justify-center items-center gap-4 mb-6">
+                <span className="text-3xl font-bold text-amber-800">x = </span>
+                <input
+                  type="number"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  className="w-32 text-4xl p-2 text-center font-bold border-4 border-amber-400 rounded-xl focus:outline-none focus:border-amber-600"
+                />
+              </div>
+
+              {feedback === "" && (
+                <button
+                  onClick={checkAnswer}
+                  className="w-full py-4 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-2xl font-black transition-transform active:scale-95 shadow-lg"
+                >
+                  檢查 Check
+                </button>
+              )}
+
+              {feedback === "CORRECT" && (
+                <div className="space-y-4">
+                  <div className="bg-green-100 text-green-700 p-4 rounded-xl text-2xl font-black border-2 border-green-400 animate-bounce">
+                    答對了！ Correct!
+                  </div>
+                  <button
+                    onClick={next}
+                    className="w-full py-4 bg-green-500 hover:bg-green-600 text-white rounded-xl text-2xl font-black transition-transform active:scale-95 shadow-lg"
+                  >
+                    下一題 Next
+                  </button>
+                </div>
+              )}
+
+              {feedback === "WRONG" && (
+                <div className="space-y-4">
+                  <div className="bg-red-100 text-red-700 p-4 rounded-xl text-2xl font-black border-2 border-red-400">
+                    再試一次 Try Again
+                  </div>
+                  <button
+                    onClick={() => setFeedback("")}
+                    className="w-full py-4 bg-slate-400 hover:bg-slate-500 text-white rounded-xl text-2xl font-black"
+                  >
+                    返回 Back
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

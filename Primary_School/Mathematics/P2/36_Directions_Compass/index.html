@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小二數學：四個方向 | 4 Directions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #ecfeff 0%, #06b6d4 100%);
+      }
+      .compass-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+      }
+      .cell {
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100px;
+        font-weight: bold;
+        border: 3px solid #cffafe;
+      }
+      .center-cell {
+        background: #bae6fd;
+        border-color: #0ea5e9;
+        color: #0369a1;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "🧭 4 Directions",
+          zh: "🧭 四個方向",
+          ja: "🧭 4つの方向",
+          ko: "🧭 4가지 방향",
+          es: "🧭 4 Direcciones",
+          de: "🧭 4 Richtungen",
+          fi: "🧭 4 Suuntaa",
+          fr: "🧭 4 Directions",
+          ar: "🧭 4 اتجاهات",
+          it: "🧭 4 Direzioni",
+        },
+        north: {
+          en: "North",
+          zh: "北方",
+          ja: "北",
+          ko: "북쪽",
+          es: "Norte",
+          de: "Norden",
+          fi: "Pohjoinen",
+          fr: "Nord",
+          ar: "شمال",
+          it: "Nord",
+        },
+        east: {
+          en: "East",
+          zh: "東方",
+          ja: "東",
+          ko: "동쪽",
+          es: "Este",
+          de: "Osten",
+          fi: "Itä",
+          fr: "Est",
+          ar: "شرق",
+          it: "Est",
+        },
+        south: {
+          en: "South",
+          zh: "南方",
+          ja: "南",
+          ko: "남쪽",
+          es: "Sur",
+          de: "Süden",
+          fi: "Etelä",
+          fr: "Sud",
+          ar: "جنوب",
+          it: "Sud",
+        },
+        west: {
+          en: "West",
+          zh: "西方",
+          ja: "西",
+          ko: "서쪽",
+          es: "Oeste",
+          de: "Westen",
+          fi: "Länsi",
+          fr: "Ouest",
+          ar: "غرب",
+          it: "Ovest",
+        },
+        whereIs: {
+          en: "Where is the",
+          zh: "在我的哪一方？",
+          ja: "は私のどの方角ですか？",
+          ko: "은/는 나의 어느 쪽에 있습니까?",
+          es: "¿Dónde está",
+          de: "Wo ist",
+          fi: "Missä on",
+          fr: "Où est",
+          ar: "أين يقع",
+          it: "Dov'è",
+        },
+        me: {
+          en: "Me",
+          zh: "我",
+          ja: "私",
+          ko: "나",
+          es: "Yo",
+          de: "Ich",
+          fi: "Minä",
+          fr: "Moi",
+          ar: "أنا",
+          it: "Io",
+        },
+        check: {
+          en: "Check",
+          zh: "檢查",
+          ja: "確認",
+          ko: "확인",
+          es: "Comprobar",
+          de: "Prüfen",
+          fi: "Tarkista",
+          fr: "Vérifier",
+          ar: "تحقق",
+          it: "Controlla",
+        },
+      };
+
+      const itemsData = [
+        { name: { zh: "公園", en: "Park", ja: "公園" }, icon: "🌳" },
+        { name: { zh: "學校", en: "School", ja: "学校" }, icon: "🏫" },
+        { name: { zh: "圖書館", en: "Library", ja: "図書館" }, icon: "📚" },
+        { name: { zh: "動物園", en: "Zoo", ja: "動物園" }, icon: "🦁" },
+        {
+          name: { zh: "超級市場", en: "Supermarket", ja: "スーパー" },
+          icon: "🛒",
+        },
+        { name: { zh: "醫院", en: "Hospital", ja: "病院" }, icon: "🏥" },
+        { name: { zh: "郵局", en: "Post Office", ja: "郵便局" }, icon: "📮" },
+        { name: { zh: "巴士站", en: "Bus Stop", ja: "バス停" }, icon: "🚏" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [grid, setGrid] = useState(Array(9).fill(null));
+        const [target, setTarget] = useState(null);
+        const [answerDir, setAnswerDir] = useState("");
+        const [feedback, setFeedback] = useState("");
+        const [renderKey, setRenderKey] = useState(0);
+
+        const newProb = () => {
+          setFeedback("");
+
+          // Shuffle items
+          let shuffled = [...itemsData].sort(() => 0.5 - Math.random());
+
+          // Fill N, E, S, W (indices 1, 5, 7, 3)
+          // 0 1 2
+          // 3 4 5
+          // 6 7 8
+          let newGrid = Array(9).fill(null);
+          let positions = [1, 5, 7, 3]; // N, E, S, W relative to 4
+          let dirKeys = ["north", "east", "south", "west"];
+          let targets = [];
+
+          positions.forEach((pos, i) => {
+            newGrid[pos] = shuffled[i];
+            targets.push({ item: shuffled[i], dirKey: dirKeys[i], dirCode: i }); // 0:N, 1:E, 2:S, 3:W
+          });
+
+          newGrid[4] = {
+            name: { zh: "我", en: "Me", ja: "私" },
+            icon: "🧒",
+            isMe: true,
+          };
+
+          const t = targets[Math.floor(Math.random() * targets.length)];
+          setTarget(t);
+          setGrid(newGrid);
+          setAnswerDir(t.dirKey);
+          setRenderKey((k) => k + 1);
+        };
+
+        useEffect(newProb, []);
+
+        const check = (dirKey) => {
+          if (dirKey === answerDir) {
+            setFeedback("CORRECT");
+            setTimeout(newProb, 1500);
+          } else {
+            setFeedback("WRONG");
+          }
+        };
+
+        if (!target) return null;
+
+        const getItemName = (item) => item.name[lang] || item.name["en"];
+        const getDirName = (key) => t[key][lang] || t[key]["en"];
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center justify-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+
+            <h1 className="text-4xl md:text-5xl font-black text-cyan-900 mb-8 max-w-2xl text-center">
+              {t.title[lang] || t.title["en"]}
+            </h1>
+
+            <div className="bg-white/90 rounded-3xl p-8 shadow-2xl w-full max-w-2xl text-center border-4 border-cyan-300">
+              <div className="compass-grid mb-8 max-w-md mx-auto">
+                {grid.map((cell, i) => (
+                  <div
+                    key={i}
+                    className={`cell ${
+                      i === 4 ? "center-cell" : ""
+                    } transition-all duration-300 transform ${
+                      cell && target && cell.name === target.item.name // Simple comparison by ref or name
+                        ? "scale-110 shadow-lg border-yellow-400 bg-yellow-50"
+                        : ""
+                    }`}
+                  >
+                    {cell && (
+                      <>
+                        <div className="text-4xl">{cell.icon}</div>
+                        <div className="text-xs mt-1 text-center">
+                          {cell.isMe
+                            ? t.me[lang] || t.me["en"]
+                            : getItemName(cell)}
+                        </div>
+                      </>
+                    )}
+                    {/* Compass rose on empty diagonal cells? Optional */}
+                    {!cell && i === 0 && (
+                      <div className="text-4xl opacity-10">↖</div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <div className="text-xl md:text-2xl font-bold text-slate-700 mb-8 bg-white p-4 rounded-xl border-2 border-slate-100">
+                <span className="text-cyan-600 text-3xl mr-2">
+                  {target.item.icon}
+                </span>
+                {lang === "zh" ? (
+                  <>
+                    {getItemName(target.item)}{" "}
+                    {t.whereIs[lang] || t.whereIs["en"]}
+                  </>
+                ) : (
+                  <>
+                    {t.whereIs[lang] || t.whereIs["en"]}{" "}
+                    {getItemName(target.item)}?
+                  </>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto">
+                {["north", "east", "south", "west"].map((dir) => (
+                  <button
+                    key={dir}
+                    onClick={() => check(dir)}
+                    className="bg-cyan-100 hover:bg-cyan-200 p-4 rounded-xl font-bold text-cyan-800 border-2 border-cyan-200"
+                  >
+                    {getDirName(dir)}
+                  </button>
+                ))}
+              </div>
+
+              <div className="h-16 mt-6">
+                {feedback === "CORRECT" && (
+                  <div className="text-4xl font-black text-green-500 animate-bounce">
+                    {get("correct", lang)}
+                  </div>
+                )}
+                {feedback === "WRONG" && (
+                  <div className="text-4xl font-black text-red-500 animate-shake">
+                    {get("wrong", lang)}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

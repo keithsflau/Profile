@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小四數學：容量加法</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #ecfeff 0%, #06b6d4 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      function App() {
+        const [l1, setL1] = useState(1);
+        const [ml1, setMl1] = useState(500);
+
+        const [l2, setL2] = useState(0);
+        const [ml2, setMl2] = useState(800);
+
+        const totalMl = ml1 + ml2;
+        const extraL = Math.floor(totalMl / 1000);
+        const finalMl = totalMl % 1000;
+        const finalL = l1 + l2 + extraL;
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-5xl font-black text-cyan-900 mb-8">
+              💧 容量加法 (L & mL)
+            </h1>
+
+            <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full flex flex-col gap-8">
+              <div className="flex justify-center items-center gap-4 text-3xl font-black text-cyan-800">
+                <div className="flex flex-col items-center">
+                  <input
+                    type="number"
+                    value={l1}
+                    onChange={(e) => setL1(parseInt(e.target.value) || 0)}
+                    className="w-20 text-center bg-cyan-50 rounded-lg"
+                  />
+                  <span className="text-sm">L</span>
+                </div>
+                <div className="flex flex-col items-center">
+                  <input
+                    type="number"
+                    value={ml1}
+                    onChange={(e) => setMl1(parseInt(e.target.value) || 0)}
+                    className="w-24 text-center bg-cyan-50 rounded-lg"
+                  />
+                  <span className="text-sm">mL</span>
+                </div>
+                <div>+</div>
+                <div className="flex flex-col items-center">
+                  <input
+                    type="number"
+                    value={l2}
+                    onChange={(e) => setL2(parseInt(e.target.value) || 0)}
+                    className="w-20 text-center bg-cyan-50 rounded-lg"
+                  />
+                  <span className="text-sm">L</span>
+                </div>
+                <div className="flex flex-col items-center">
+                  <input
+                    type="number"
+                    value={ml2}
+                    onChange={(e) => setMl2(parseInt(e.target.value) || 0)}
+                    className="w-24 text-center bg-cyan-50 rounded-lg"
+                  />
+                  <span className="text-sm">mL</span>
+                </div>
+              </div>
+
+              <div className="border-t-4 border-cyan-200 py-8 flex justify-center items-center gap-8">
+                <div className="bg-cyan-100 p-6 rounded-2xl text-center">
+                  <div className="text-sm font-bold text-cyan-700">
+                    毫升總和
+                  </div>
+                  <div className="text-4xl font-black text-cyan-900">
+                    {totalMl} mL
+                  </div>
+                  {totalMl >= 1000 && (
+                    <div className="text-red-500 font-bold mt-2 animate-bounce">
+                      進位! ({extraL} L)
+                    </div>
+                  )}
+                </div>
+                <div className="text-5xl text-cyan-300">➜</div>
+                <div className="bg-cyan-500 text-white p-6 rounded-2xl text-center shadow-lg transform scale-110">
+                  <div className="text-sm font-bold opacity-80">最終結果</div>
+                  <div className="text-5xl font-black">
+                    {finalL} L {finalMl} mL
+                  </div>
+                </div>
+              </div>
+
+              {/* Visual Jugs simplified */}
+              <div className="flex justify-center gap-4 items-end h-40">
+                <div className="w-20 bg-blue-200 relative rounded-b-xl border-2 border-blue-400 overflow-hidden h-full">
+                  <div
+                    className="absolute bottom-0 w-full bg-blue-500 transition-all duration-1000"
+                    style={{
+                      height: `${Math.min(100, (l1 * 1000 + ml1) / 30)}%`,
+                    }}
+                  ></div>
+                </div>
+                <div className="text-3xl font-black text-slate-400">+</div>
+                <div className="w-20 bg-blue-200 relative rounded-b-xl border-2 border-blue-400 overflow-hidden h-full">
+                  <div
+                    className="absolute bottom-0 w-full bg-blue-500 transition-all duration-1000"
+                    style={{
+                      height: `${Math.min(100, (l2 * 1000 + ml2) / 30)}%`,
+                    }}
+                  ></div>
+                </div>
+                <div className="text-3xl font-black text-slate-400">=</div>
+                <div className="w-24 bg-blue-200 relative rounded-b-xl border-2 border-blue-400 overflow-hidden h-full">
+                  <div
+                    className="absolute bottom-0 w-full bg-blue-600 transition-all duration-1000"
+                    style={{
+                      height: `${Math.min(
+                        100,
+                        (finalL * 1000 + finalMl) / 30
+                      )}%`,
+                    }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

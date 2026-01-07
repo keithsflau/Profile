@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Body Systems Map</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #fff1f2;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Human Body Systems",
+          zh: "人體系統地圖",
+          ja: "人体システム",
+          ko: "인체 시스템",
+          es: "Sistemas del cuerpo humano",
+          de: "Menschliche Körpersysteme",
+          fi: "Ihmiskehon järjestelmät",
+          fr: "Systèmes du corps humain",
+          ar: "أنظمة جسم الإنسان",
+          it: "Sistemi del Corpo Umano",
+        },
+        instruction: {
+          en: "Drag the organ to the correct position.",
+          zh: "將器官拖到正確的位置。",
+          ja: "臓器を正しい位置にドラッグしてください。",
+          ko: "장기를 올바른 위치로 드래그하세요.",
+          es: "Arrastra el órgano a la posición correcta.",
+          de: "Ziehe das Organ an die richtige Position.",
+          fi: "Vedä elin oikeaan asentoon.",
+          fr: "Faites glisser l'organe à la bonne position.",
+          ar: "اسحب العضو إلى الموضع الصحيح.",
+          it: "Trascina l'organo nella posizione corretta.",
+        },
+        brain: {
+          en: "Brain (Nervous)",
+          zh: "心臟 (神經系統)",
+          ja: "脳 (神経系)",
+          ko: "뇌 (신경계)",
+          es: "Cerebro (Nervioso)",
+          de: "Gehirn (Nervensystem)",
+          fi: "Aivot (Hermo)",
+          fr: "Cerveau (Nerveux)",
+          ar: "دماغ (عصبي)",
+          it: "Cervello (Nervoso)",
+        },
+        lungs: {
+          en: "Lungs (Respiratory)",
+          zh: "肺 (呼吸系統)",
+          ja: "肺 (呼吸器系)",
+          ko: "폐 (호흡기계)",
+          es: "Pulmones (Respiratorio)",
+          de: "Lungen (Atmungssystem)",
+          fi: "Keuhkot (Hengitys)",
+          fr: "Poumons (Respiratoire)",
+          ar: "رئتين (تنفسي)",
+          it: "Polmoni (Respiratorio)",
+        },
+        heart: {
+          en: "Heart (Circulatory)",
+          zh: "心臟 (循環系統)",
+          ja: "心臓 (循環器系)",
+          ko: "심장 (순환계)",
+          es: "Corazón (Circulatorio)",
+          de: "Herz (Kreislaufsystem)",
+          fi: "Sydän (Verenkierto)",
+          fr: "Cœur (Circulatoire)",
+          ar: "قلب (دوري)",
+          it: "Cuore (Circolatorio)",
+        },
+        stomach: {
+          en: "Stomach (Digestive)",
+          zh: "胃 (消化系統)",
+          ja: "胃 (消化器系)",
+          ko: "위 (소화계)",
+          es: "Estómago (Digestivo)",
+          de: "Magen (Verdauungssystem)",
+          fi: "Maha (Ruuansulatus)",
+          fr: "Estomac (Digestif)",
+          ar: "معدة (هضمي)",
+          it: "Stomaco (Digerente)",
+        },
+        intestine: {
+          en: "Intestines (Digestive)",
+          zh: "腸 (消化系統)",
+          ja: "腸 (消化器系)",
+          ko: "장 (소화계)",
+          es: "Intestinos (Digestivo)",
+          de: "Darm (Verdauungssystem)",
+          fi: "Suolisto (Ruuansulatus)",
+          fr: "Intestins (Digestif)",
+          ar: "أمعاء (هضمي)",
+          it: "Intestino (Digerente)",
+        },
+        bones: {
+          en: "Bones (Skeletal)",
+          zh: "骨骼 (骨骼系統)",
+          ja: "骨 (骨格系)",
+          ko: "뼈 (골격계)",
+          es: "Huesos (Esquelético)",
+          de: "Knochen (Skelettsystem)",
+          fi: "Luut (Luuranko)",
+          fr: "Os (Squelettique)",
+          ar: "عظام (هيكلي)",
+          it: "Ossa (Scheletrico)",
+        },
+
+        nervous: {
+          en: "Nervous System",
+          zh: "神經系統",
+          ja: "神経系",
+          ko: "신경계",
+          es: "Sistema nervioso",
+          de: "Nervensystem",
+          fi: "Hermojärjestelmä",
+          fr: "Système nerveux",
+          ar: "جهاز عصبي",
+          it: "Sistema Nervoso",
+        },
+        respiratory: {
+          en: "Respiratory System",
+          zh: "呼吸系統",
+          ja: "呼吸器系",
+          ko: "호흡기계",
+          es: "Sistema respiratorio",
+          de: "Atmungssystem",
+          fi: "Hengityselimistö",
+          fr: "Système respiratoire",
+          ar: "جهاز تنفسي",
+          it: "Sistema Respiratorio",
+        },
+        circulatory: {
+          en: "Circulatory System",
+          zh: "循環系統",
+          ja: "循環器系",
+          ko: "순환계",
+          es: "Sistema circulatorio",
+          de: "Kreislaufsystem",
+          fi: "Verenkiertoelimistö",
+          fr: "Système circulatoire",
+          ar: "جهاز دوري",
+          it: "Sistema Circolatorio",
+        },
+        digestive: {
+          en: "Digestive System",
+          zh: "消化系統",
+          ja: "消化器系",
+          ko: "소화계",
+          es: "Sistema digestivo",
+          de: "Verdauungssystem",
+          fi: "Ruuansulatuselimistö",
+          fr: "Système digestif",
+          ar: "جهاز هضمي",
+          it: "Sistema Digerente",
+        },
+      };
+
+      const organs = [
+        { id: "brain", icon: "🧠", top: 5, left: 45, system: "nervous" },
+        { id: "lungs", icon: "🫁", top: 25, left: 35, system: "respiratory" }, // Slightly left/right
+        { id: "heart", icon: "❤️", top: 28, left: 48, system: "circulatory" },
+        { id: "stomach", icon: "🥟", top: 40, left: 45, system: "digestive" }, // Dumpling as stomach proxy
+        { id: "intestine", icon: "🌭", top: 50, left: 45, system: "digestive" }, // Hotdog as proxy
+        { id: "bones", icon: "🦴", top: 70, left: 45, system: "skeletal" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [placed, setPlaced] = useState([]);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const handleDrop = (e, targetId) => {
+          e.preventDefault();
+          const draggedId = e.dataTransfer.getData("id");
+          if (draggedId === targetId) {
+            setPlaced([...placed, targetId]);
+          }
+        };
+
+        const handleDragStart = (e, id) => {
+          e.dataTransfer.setData("id", id);
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-4 text-rose-600">
+              {getText("title")}
+            </h1>
+            <p className="mb-4 text-slate-500 font-bold">
+              {getText("instruction")}
+            </p>
+
+            <div className="flex flex-col md:flex-row gap-8 w-full max-w-4xl items-start">
+              {/* Body Outline */}
+              <div className="relative w-full md:w-[400px] h-[600px] bg-rose-50 rounded-[4rem] border-4 border-rose-200 shadow-xl mx-auto flex justify-center">
+                {/* Human Silhouette (Simple SVG) */}
+                <svg
+                  className="absolute inset-0 w-full h-full opacity-20 pointer-events-none"
+                  viewBox="0 0 100 200"
+                >
+                  <path
+                    d="M50,10 A10,10 0 0,1 50,30 A10,10 0 0,1 50,10 M50,30 L50,90 M20,40 L80,40 M50,90 L30,190 M50,90 L70,190"
+                    stroke="#f43f5e"
+                    strokeWidth="2"
+                    fill="none"
+                    strokeLinecap="round"
+                  />
+                </svg>
+
+                {/* Drop Zones */}
+                {organs.map((o) => (
+                  <div
+                    key={o.id}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => handleDrop(e, o.id)}
+                    className={`absolute w-16 h-16 rounded-full border-2 border-dashed border-rose-300 flex items-center justify-center transition-all bg-white/50
+                            ${
+                              placed.includes(o.id)
+                                ? "border-solid border-green-500 bg-white shadow-lg"
+                                : ""
+                            }
+                         `}
+                    style={{ top: `${o.top}%`, left: `${o.left}%` }}
+                  >
+                    {placed.includes(o.id) ? (
+                      <div className="text-4xl">{o.icon}</div>
+                    ) : (
+                      <div className="text-[10px] text-center text-rose-400 font-bold leading-tight px-1 break-words w-full">
+                        {getText(o.id).split(" ")[0]}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Inventory */}
+              <div className="w-full md:w-1/3 flex flex-col gap-4 bg-white p-6 rounded-2xl shadow-xl">
+                <h2 className="font-bold border-b pb-2 mb-2 text-rose-800">
+                  Organs
+                </h2>
+                <div className="grid grid-cols-2 gap-4">
+                  {organs.map(
+                    (o) =>
+                      !placed.includes(o.id) && (
+                        <div
+                          key={o.id}
+                          draggable
+                          onDragStart={(e) => handleDragStart(e, o.id)}
+                          className="p-4 bg-rose-50 rounded-xl cursor-grab active:cursor-grabbing border border-rose-100 hover:bg-rose-100 flex flex-col items-center gap-2"
+                        >
+                          <div className="text-4xl">{o.icon}</div>
+                          <div className="text-xs font-bold text-slate-700 text-center">
+                            {getText(o.id)}
+                          </div>
+                        </div>
+                      )
+                  )}
+                </div>
+                {placed.length === organs.length && (
+                  <div className="mt-4 bg-green-100 text-green-800 p-4 rounded-xl font-bold text-center animate-bounce">
+                    Complete! Great Job.
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

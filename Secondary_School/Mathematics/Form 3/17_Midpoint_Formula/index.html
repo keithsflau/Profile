@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Midpoint Formula 中點公式 | S3 Math</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-orange-50 text-slate-800 min-h-screen">
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+
+      const App = () => {
+        const [lang, setLang] = useState("en");
+        const [x1, setX1] = useState(2);
+        const [y1, setY1] = useState(3);
+        const [x2, setX2] = useState(8);
+        const [y2, setY2] = useState(7);
+
+        const t = {
+          title: { en: "Midpoint Formula", zh: "中點公式" },
+          point1: { en: "Point A", zh: "A點" },
+          point2: { en: "Point B", zh: "B點" },
+          midpoint: { en: "Midpoint M", zh: "中點 M" },
+          back: { en: "Back to Dashboard", zh: "返回主頁" },
+        };
+
+        const mx = (x1 + x2) / 2;
+        const my = (y1 + y2) / 2;
+
+        // SVG scaling
+        const toSvgX = (x) => 20 + x * 25;
+        const toSvgY = (y) => 180 - y * 18;
+
+        return (
+          <div className="p-6 max-w-4xl mx-auto min-h-screen flex flex-col">
+            <header className="mb-6 flex justify-between items-center">
+              <div>
+                <div className="text-orange-600 font-bold uppercase text-xs tracking-widest mb-1">
+                  S3 Math
+                </div>
+                <h1 className="text-3xl font-extrabold text-slate-900">
+                  {t.title[lang]}
+                </h1>
+              </div>
+              <button
+                onClick={() => setLang(lang === "en" ? "zh" : "en")}
+                className="px-3 py-1 bg-white border border-orange-200 rounded-lg text-sm font-bold hover:bg-orange-100"
+              >
+                {lang === "en" ? "中文" : "ENG"}
+              </button>
+            </header>
+
+            {/* Formula */}
+            <div className="bg-white p-4 rounded-xl border border-orange-100 mb-6 text-center">
+              <div className="text-xl font-mono font-bold text-orange-600">
+                M = ((x₁+x₂)/2, (y₁+y₂)/2)
+              </div>
+            </div>
+
+            {/* Controls */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+              <div className="bg-white p-3 rounded-xl shadow-sm border border-orange-100">
+                <label className="block text-xs font-bold text-slate-400 mb-1">
+                  x₁ = {x1}
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="10"
+                  value={x1}
+                  onChange={(e) => setX1(Number(e.target.value))}
+                  className="w-full accent-orange-500"
+                />
+              </div>
+              <div className="bg-white p-3 rounded-xl shadow-sm border border-orange-100">
+                <label className="block text-xs font-bold text-slate-400 mb-1">
+                  y₁ = {y1}
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="10"
+                  value={y1}
+                  onChange={(e) => setY1(Number(e.target.value))}
+                  className="w-full accent-orange-500"
+                />
+              </div>
+              <div className="bg-white p-3 rounded-xl shadow-sm border border-orange-100">
+                <label className="block text-xs font-bold text-slate-400 mb-1">
+                  x₂ = {x2}
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="10"
+                  value={x2}
+                  onChange={(e) => setX2(Number(e.target.value))}
+                  className="w-full accent-orange-500"
+                />
+              </div>
+              <div className="bg-white p-3 rounded-xl shadow-sm border border-orange-100">
+                <label className="block text-xs font-bold text-slate-400 mb-1">
+                  y₂ = {y2}
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="10"
+                  value={y2}
+                  onChange={(e) => setY2(Number(e.target.value))}
+                  className="w-full accent-orange-500"
+                />
+              </div>
+            </div>
+
+            {/* Graph */}
+            <div className="bg-white p-6 rounded-2xl border border-orange-100 mb-6">
+              <svg viewBox="0 0 300 200" className="w-full h-48">
+                {/* Grid */}
+                {[0, 2, 4, 6, 8, 10].map((x) => (
+                  <line
+                    key={`gx${x}`}
+                    x1={toSvgX(x)}
+                    y1="0"
+                    x2={toSvgX(x)}
+                    y2="200"
+                    stroke="#f1f5f9"
+                    strokeWidth="1"
+                  />
+                ))}
+                {[0, 2, 4, 6, 8, 10].map((y) => (
+                  <line
+                    key={`gy${y}`}
+                    x1="0"
+                    y1={toSvgY(y)}
+                    x2="300"
+                    y2={toSvgY(y)}
+                    stroke="#f1f5f9"
+                    strokeWidth="1"
+                  />
+                ))}
+
+                {/* Line segment */}
+                <line
+                  x1={toSvgX(x1)}
+                  y1={toSvgY(y1)}
+                  x2={toSvgX(x2)}
+                  y2={toSvgY(y2)}
+                  stroke="#f97316"
+                  strokeWidth="3"
+                />
+
+                {/* Points */}
+                <circle cx={toSvgX(x1)} cy={toSvgY(y1)} r="6" fill="#ef4444" />
+                <circle cx={toSvgX(x2)} cy={toSvgY(y2)} r="6" fill="#22c55e" />
+                <circle
+                  cx={toSvgX(mx)}
+                  cy={toSvgY(my)}
+                  r="8"
+                  fill="#f97316"
+                  stroke="white"
+                  strokeWidth="2"
+                />
+
+                {/* Labels */}
+                <text
+                  x={toSvgX(x1) - 15}
+                  y={toSvgY(y1) + 5}
+                  className="text-xs font-bold fill-red-500"
+                >
+                  A
+                </text>
+                <text
+                  x={toSvgX(x2) + 8}
+                  y={toSvgY(y2) + 5}
+                  className="text-xs font-bold fill-emerald-500"
+                >
+                  B
+                </text>
+                <text
+                  x={toSvgX(mx) + 8}
+                  y={toSvgY(my) - 8}
+                  className="text-xs font-bold fill-orange-500"
+                >
+                  M
+                </text>
+              </svg>
+            </div>
+
+            {/* Results */}
+            <div className="grid grid-cols-3 gap-4">
+              <div className="bg-red-500 text-white p-4 rounded-xl text-center">
+                <div className="text-xs opacity-80">A</div>
+                <div className="font-bold">
+                  ({x1}, {y1})
+                </div>
+              </div>
+              <div className="bg-orange-500 text-white p-4 rounded-xl text-center">
+                <div className="text-xs opacity-80">M</div>
+                <div className="text-xl font-bold">
+                  ({mx}, {my})
+                </div>
+              </div>
+              <div className="bg-emerald-500 text-white p-4 rounded-xl text-center">
+                <div className="text-xs opacity-80">B</div>
+                <div className="font-bold">
+                  ({x2}, {y2})
+                </div>
+              </div>
+            </div>
+
+            <footer className="mt-auto pt-8">
+              <a
+                href="../index.html"
+                className="text-orange-600 hover:text-orange-700 font-bold"
+              >
+                <i className="fa-solid fa-arrow-left mr-2"></i>
+                {t.back[lang]}
+              </a>
+            </footer>
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

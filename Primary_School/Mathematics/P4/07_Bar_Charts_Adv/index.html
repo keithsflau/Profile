@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小四數學：棒形圖（一格代表多個單位）</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #e0f2fe 0%, #0284c7 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      function App() {
+        const [scale, setScale] = useState(10); // 1, 2, 5, 10, 100
+        const maxVal = 100;
+        const data = [
+          { name: "A班", val: 40, color: "bg-red-500" },
+          { name: "B班", val: 70, color: "bg-green-500" },
+          { name: "C班", val: 55, color: "bg-yellow-500" },
+          { name: "D班", val: 90, color: "bg-purple-500" },
+        ];
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-5xl font-black text-sky-900 mb-8">
+              📊 棒形圖：一格代表？
+            </h1>
+
+            <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl w-full max-w-5xl flex flex-col md:flex-row gap-8">
+              <div className="w-full md:w-1/4">
+                <h3 className="text-2xl font-bold text-sky-800 mb-4">
+                  設定刻度
+                </h3>
+                <div className="space-y-3">
+                  {[1, 2, 5, 10, 20].map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => setScale(s)}
+                      className={`w-full py-3 rounded-xl font-bold text-xl transition-all ${
+                        scale === s
+                          ? "bg-sky-600 text-white shadow-lg"
+                          : "bg-sky-100 text-sky-700 hover:bg-sky-200"
+                      }`}
+                    >
+                      1 格代表 {s} 人
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex-1 bg-slate-50 p-8 rounded-2xl border-2 border-slate-200 relative">
+                {/* Grid Lines */}
+                <div className="absolute inset-0 p-8 flex flex-col-reverse justify-between pointer-events-none">
+                  {[...Array(11)].map((_, i) => (
+                    <div key={i} className="w-full h-px bg-slate-300 relative">
+                      <span className="absolute -left-8 -top-3 text-sm font-bold text-slate-500 w-6 text-right">
+                        {i *
+                        (100 / 10) *
+                        (scale / 10) *
+                        ((((100 / maxVal) * 10) / scale) * scale)
+                          ? Math.round(i * 10 * (scale / 10))
+                          : i * (scale >= 10 ? scale : 10)}
+                        {/* Logic fix: We want visual height to remain constant, but axis labels change.
+                                                Let's fix logic: The chart height is fixed (e.g. 500px).
+                                                If max chart value visual is 100.
+                                                If scale is 10, axis should be 0, 10, 20... 100.
+                                                If scale is 20, axis should be 0, 20, 40... 200.
+                                            */}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Axis Labels override logic */}
+                <div className="h-[400px] border-l-4 border-b-4 border-slate-600 flex items-end justify-around relative pl-2">
+                  {/* Y-Axis Numbers */}
+                  <div className="absolute -left-12 top-0 bottom-0 flex flex-col-reverse justify-between py-0 text-slate-600 font-bold text-sm">
+                    {[...Array(11)].map((_, i) => (
+                      <div key={i}>
+                        {(i * scale * (100 / scale / 10)).toFixed(0)}? No.
+                      </div>
+                    ))}
+                  </div>
+                  {/* Correct approach: Fixed 10 grid lines. Value = index * scale */}
+                  <div className="absolute left-[-50px] top-0 bottom-0 flex flex-col-reverse justify-between h-full">
+                    {[...Array(11)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="text-right w-10 text-slate-500 font-bold text-sm"
+                        style={{ transform: "translateY(50%)" }}
+                      >
+                        {i * scale}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Bars */}
+                  {data.map((d, i) => {
+                    // Height calc: Value / (TopScaleValue) * 100%
+                    // TopScaleValue = 10 * scale
+                    const hPercent = (d.val / (10 * scale)) * 100;
+
+                    return (
+                      <div
+                        key={i}
+                        className="w-16 flex flex-col justify-end h-full group relative"
+                      >
+                        {hPercent > 100 ? (
+                          <div className="w-full bg-red-800 text-white text-center font-bold text-xs py-1 rounded-t-lg animate-pulse">
+                            爆表了!
+                          </div>
+                        ) : (
+                          <div
+                            className={`w-full ${d.color} rounded-t-lg transition-all duration-500 relative group-hover:opacity-80`}
+                            style={{ height: `${hPercent}%` }}
+                          >
+                            <div className="absolute -top-8 w-full text-center font-black text-slate-700 opacity-0 group-hover:opacity-100 transition-opacity">
+                              {d.val}
+                            </div>
+                          </div>
+                        )}
+                        <div className="text-center font-bold text-slate-700 mt-2">
+                          {d.name}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

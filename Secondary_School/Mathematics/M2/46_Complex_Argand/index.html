@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Argand Diagram | M2 Algebra</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+      body {
+        font-family: "Outfit", sans-serif;
+        background: #0f172a;
+        color: #e2e8f0;
+      }
+      .glass {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .draggable {
+        cursor: grab;
+      }
+      .draggable:active {
+        cursor: grabbing;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <div id="root" class="flex-grow flex flex-col"></div>
+    <script type="text/babel">
+      const { useState, useRef } = React;
+
+      const translations = {
+        en: {
+          header: "Unit 1: Algebra",
+          title: "Argand Diagram",
+          subtitle: "Dragging Vectors",
+          controls: "Controls",
+          add: "Add (+)",
+          sub: "Subtract (-)",
+          instr: {
+            part1: "Drag the ",
+            blue: "Blue",
+            part2: " and ",
+            red: "Red",
+            part3: " dots.",
+          },
+          paraTitle: "Parallelogram Law",
+          paraDesc:
+            "Complex addition corresponds to vector addition in the plane. The sum is the diagonal of the parallelogram formed by z1 and z2.",
+          langBtn: "中文",
+        },
+        zh: {
+          header: "第一單元：代數",
+          title: "阿根圖",
+          subtitle: "拖曳向量",
+          controls: "控制",
+          add: "加法 (+)",
+          sub: "減法 (-)",
+          instr: {
+            part1: "拖動 ",
+            blue: "藍色",
+            part2: " 和 ",
+            red: "紅色",
+            part3: " 圓點。",
+          },
+          paraTitle: "平行四邊形法則",
+          paraDesc:
+            "複數加法對應於平面上的向量加法。其和為 z1 與 z2 所形成的平行四邊形的對角線。",
+          langBtn: "English",
+        },
+      };
+
+      const App = () => {
+        // State
+        const [z1, setZ1] = useState({ r: 2, i: 1 });
+        const [z2, setZ2] = useState({ r: 1, i: -2 });
+        const [op, setOp] = useState("add"); // add, sub
+        const [dragging, setDragging] = useState(null); // 'z1', 'z2'
+        const [lang, setLang] = useState("en");
+        const t = translations[lang];
+
+        // Calc Result
+        let res = { r: 0, i: 0 };
+        if (op === "add") res = { r: z1.r + z2.r, i: z1.i + z2.i };
+        if (op === "sub") res = { r: z1.r - z2.r, i: z1.i - z2.i };
+
+        // Coords
+        const w = 600,
+          h = 600;
+        const range = 6;
+        const scale = w / (2 * range);
+        const originX = w / 2;
+        const originY = h / 2;
+
+        const toScreen = (r, i) => ({
+          x: originX + r * scale,
+          y: originY - i * scale,
+        });
+        const fromScreen = (sx, sy) => ({
+          r: (sx - originX) / scale,
+          i: (originY - sy) / scale,
+        });
+
+        // Handlers
+        const handleMouseMove = (e) => {
+          if (!dragging) return;
+          const rect = e.currentTarget.getBoundingClientRect();
+          const pt = fromScreen(e.clientX - rect.left, e.clientY - rect.top);
+          if (dragging === "z1") setZ1(pt);
+          if (dragging === "z2") setZ2(pt);
+        };
+
+        const Arrow = ({ start, end, color, label, dashed }) => {
+          const s = start || { x: originX, y: originY };
+          return (
+            <g>
+              <line
+                x1={s.x}
+                y1={s.y}
+                x2={end.x}
+                y2={end.y}
+                stroke={color}
+                strokeWidth="3"
+                strokeDasharray={dashed ? "5,5" : ""}
+                markerEnd={`url(#head-${color.replace("#", "")})`}
+              />
+              {/* We don't put text here, clutter. */}
+            </g>
+          );
+        };
+
+        const Dot = ({ pt, color, id, label }) => {
+          const sp = toScreen(pt.r, pt.i);
+          return (
+            <g
+              className={id ? "draggable" : ""}
+              onMouseDown={id ? () => setDragging(id) : undefined}
+            >
+              <circle
+                cx={sp.x}
+                cy={sp.y}
+                r={id ? 15 : 6}
+                fill={color}
+                opacity={id ? 0.3 : 1}
+              />
+              <circle
+                cx={sp.x}
+                cy={sp.y}
+                r="6"
+                fill={color}
+                stroke="white"
+                strokeWidth="2"
+              />
+              <text
+                x={sp.x + 10}
+                y={sp.y - 10}
+                fill={color}
+                fontWeight="bold"
+                fontSize="14"
+                style={{ pointerEvents: "none" }}
+              >
+                {label}
+              </text>
+            </g>
+          );
+        };
+
+        return (
+          <div
+            className="flex-grow flex flex-col items-center justify-center p-8 select-none"
+            onMouseUp={() => setDragging(null)}
+          >
+            <div className="absolute top-4 right-4">
+              <button
+                onClick={() => setLang((l) => (l === "en" ? "zh" : "en"))}
+                className="px-3 py-1 bg-slate-800 border border-slate-600 rounded-full text-xs font-bold text-emerald-400 hover:bg-slate-700 hover:text-white transition flex items-center gap-2"
+              >
+                <i className="fa-solid fa-language"></i>
+                {t.langBtn}
+              </button>
+            </div>
+
+            <header className="mb-8 text-center">
+              <div className="text-emerald-500 font-bold uppercase tracking-widest text-xs mb-2">
+                {t.header}
+              </div>
+              <h1 className="text-4xl font-extrabold text-white mb-2">
+                {t.title}
+              </h1>
+              <p className="text-slate-400 font-mono text-lg">{t.subtitle}</p>
+            </header>
+
+            <div className="flex flex-col lg:flex-row gap-12 w-full max-w-6xl">
+              <div className="flex-1 glass p-6 rounded-3xl relative flex items-center justify-center aspect-square">
+                <svg
+                  width="100%"
+                  height="100%"
+                  viewBox="0 0 600 600"
+                  className="overflow-visible bg-slate-900 rounded-xl cursor-crosshair"
+                  onMouseMove={handleMouseMove}
+                >
+                  <defs>
+                    <marker
+                      id="head-38bdf8"
+                      markerWidth="6"
+                      markerHeight="6"
+                      refX="5"
+                      refY="3"
+                      orient="auto"
+                    >
+                      <path d="M0,0 L6,3 L0,6" fill="#38bdf8" />
+                    </marker>
+                    <marker
+                      id="head-f43f5e"
+                      markerWidth="6"
+                      markerHeight="6"
+                      refX="5"
+                      refY="3"
+                      orient="auto"
+                    >
+                      <path d="M0,0 L6,3 L0,6" fill="#f43f5e" />
+                    </marker>
+                    <marker
+                      id="head-10b981"
+                      markerWidth="6"
+                      markerHeight="6"
+                      refX="5"
+                      refY="3"
+                      orient="auto"
+                    >
+                      <path d="M0,0 L6,3 L0,6" fill="#10b981" />
+                    </marker>
+                  </defs>
+
+                  {/* Grid */}
+                  <line
+                    x1={originX}
+                    y1="0"
+                    x2={originX}
+                    y2={h}
+                    stroke="#475569"
+                    strokeWidth="2"
+                  />
+                  <line
+                    x1="0"
+                    y1={originY}
+                    x2={w}
+                    y2={originY}
+                    stroke="#475569"
+                    strokeWidth="2"
+                  />
+                  <circle
+                    cx={originX}
+                    cy={originY}
+                    r={scale * 1}
+                    fill="none"
+                    stroke="#334155"
+                  />
+                  <circle
+                    cx={originX}
+                    cy={originY}
+                    r={scale * 2}
+                    fill="none"
+                    stroke="#334155"
+                  />
+                  <circle
+                    cx={originX}
+                    cy={originY}
+                    r={scale * 3}
+                    fill="none"
+                    stroke="#334155"
+                  />
+
+                  {/* Parallelogram Guides */}
+                  <path
+                    d={`M ${toScreen(z1.r, z1.i).x},${
+                      toScreen(z1.r, z1.i).y
+                    } L ${toScreen(res.r, res.i).x},${
+                      toScreen(res.r, res.i).y
+                    } L ${toScreen(z2.r, z2.i).x},${toScreen(z2.r, z2.i).y}`}
+                    fill="rgba(255,255,255,0.05)"
+                    stroke="white"
+                    strokeDasharray="4,4"
+                    opacity="0.5"
+                  />
+
+                  <Arrow end={toScreen(z1.r, z1.i)} color="#38bdf8" />
+                  <Arrow end={toScreen(z2.r, z2.i)} color="#f43f5e" />
+                  <Arrow end={toScreen(res.r, res.i)} color="#10b981" />
+
+                  <Dot pt={z1} color="#38bdf8" id="z1" label="z1" />
+                  <Dot pt={z2} color="#f43f5e" id="z2" label="z2" />
+                  <Dot
+                    pt={res}
+                    color="#10b981"
+                    label={op === "add" ? "z1+z2" : "z1-z2"}
+                  />
+                </svg>
+              </div>
+
+              <div className="w-full lg:w-80 space-y-6">
+                <div className="glass p-6 rounded-2xl">
+                  <h3 className="text-lg font-bold text-white mb-4">
+                    {t.controls}
+                  </h3>
+                  <div className="grid grid-cols-2 gap-2 mb-6">
+                    <button
+                      onClick={() => setOp("add")}
+                      className={`py-3 rounded-xl font-bold ${
+                        op === "add"
+                          ? "bg-emerald-600 text-white"
+                          : "bg-slate-800 text-slate-400"
+                      }`}
+                    >
+                      {t.add}
+                    </button>
+                    <button
+                      onClick={() => setOp("sub")}
+                      className={`py-3 rounded-xl font-bold ${
+                        op === "sub"
+                          ? "bg-emerald-600 text-white"
+                          : "bg-slate-800 text-slate-400"
+                      }`}
+                    >
+                      {t.sub}
+                    </button>
+                  </div>
+
+                  <p className="text-sm text-slate-400 mb-2">
+                    {t.instr.part1}
+                    <strong className="text-sky-400">{t.instr.blue}</strong>
+                    {t.instr.part2}
+                    <strong className="text-rose-400">{t.instr.red}</strong>
+                    {t.instr.part3}
+                  </p>
+
+                  <div className="space-y-2 font-mono text-sm bg-slate-800 p-4 rounded-xl">
+                    <div className="flex justify-between">
+                      <span className="text-sky-400">z1:</span>
+                      <span>
+                        {z1.r.toFixed(1)} {z1.i >= 0 ? "+" : ""}{" "}
+                        {z1.i.toFixed(1)}i
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-rose-400">z2:</span>
+                      <span>
+                        {z2.r.toFixed(1)} {z2.i >= 0 ? "+" : ""}{" "}
+                        {z2.i.toFixed(1)}i
+                      </span>
+                    </div>
+                    <div className="border-t border-slate-600 my-1"></div>
+                    <div className="flex justify-between font-bold text-emerald-400">
+                      <span>Res:</span>
+                      <span>
+                        {res.r.toFixed(1)} {res.i >= 0 ? "+" : ""}{" "}
+                        {res.i.toFixed(1)}i
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="glass p-6 rounded-2xl">
+                  <h4 className="text-xs uppercase font-bold text-slate-500 mb-2">
+                    {t.paraTitle}
+                  </h4>
+                  <p className="text-xs text-slate-400">{t.paraDesc}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      };
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

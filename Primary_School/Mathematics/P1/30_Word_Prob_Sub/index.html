@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小一數學：減法應用題 | Subtraction Word Problems</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fff1f2 0%, #fb7185 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      function App() {
+        const [total, setTotal] = useState(5);
+        const [take, setTake] = useState(2);
+        const [input, setInput] = useState("");
+        const [feedback, setFeedback] = useState("");
+
+        // Just one generic template for simplicity or vary
+        const problems = [
+          {
+            t1: "碟上有",
+            t2: "塊曲奇",
+            w1: "There are",
+            w2: "cookies",
+            icon: "🍪",
+          },
+          {
+            t1: "店裡有",
+            t2: "個氣球",
+            w1: "The shop has",
+            w2: "balloons",
+            icon: "🎈",
+          },
+        ];
+        const [p, setP] = useState(problems[0]);
+
+        const next = () => {
+          let t = Math.floor(Math.random() * 5) + 4;
+          let tk = Math.floor(Math.random() * (t - 1)) + 1;
+          setTotal(t);
+          setTake(tk);
+          setP(problems[Math.floor(Math.random() * problems.length)]);
+          setInput("");
+          setFeedback("");
+        };
+
+        useEffect(next, []);
+
+        const check = () => {
+          if (parseInt(input) === total - take) {
+            setFeedback("CORRECT");
+            setTimeout(next, 2000);
+          } else {
+            setFeedback("WRONG");
+          }
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center justify-center">
+            <h1 className="text-5xl font-black text-rose-900 mb-8">
+              📉 減法應用題 Word Problems
+            </h1>
+
+            <div className="bg-white/90 rounded-3xl p-8 shadow-2xl w-full max-w-3xl text-center border-4 border-rose-300">
+              <div className="text-2xl font-bold text-slate-700 mb-8 leading-loose bg-rose-50 p-6 rounded-2xl border-2 border-rose-100">
+                <p className="mb-4">
+                  {p.t1}{" "}
+                  <span className="text-rose-600 font-black text-4xl mx-2">
+                    {total}
+                  </span>{" "}
+                  {p.t2}，<br />
+                  {p.w1}{" "}
+                  <span className="text-rose-600 font-black text-4xl mx-2">
+                    {total}
+                  </span>{" "}
+                  {p.w2},
+                </p>
+                <p>
+                  拿走了{" "}
+                  <span className="text-rose-600 font-black text-4xl mx-2">
+                    {take}
+                  </span>{" "}
+                  個。
+                  <br />
+                  Took away{" "}
+                  <span className="text-rose-600 font-black text-4xl mx-2">
+                    {take}
+                  </span>
+                  .
+                </p>
+                <hr className="my-4 border-rose-200" />
+                <p className="text-rose-800 font-black">
+                  還剩下多少個？
+                  <br />
+                  How many left?
+                </p>
+              </div>
+
+              <div className="flex justify-center gap-2 mb-8 text-4xl min-h-[60px]">
+                {[...Array(total)].map((_, i) => (
+                  <span
+                    key={i}
+                    className={`transition-all ${
+                      feedback === "CORRECT" && i >= total - take
+                        ? "opacity-20 grayscale"
+                        : ""
+                    }`}
+                  >
+                    {p.icon}
+                  </span>
+                ))}
+              </div>
+
+              <div className="flex justify-center gap-4 mb-6">
+                <input
+                  type="number"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  className="w-32 text-center text-4xl font-black p-2 border-4 border-rose-400 rounded-xl"
+                  placeholder="?"
+                />
+                <button
+                  onClick={check}
+                  className="px-8 bg-rose-500 text-white rounded-xl font-bold text-xl hover:bg-rose-600"
+                >
+                  確定 OK
+                </button>
+              </div>
+
+              {feedback === "CORRECT" && (
+                <div className="text-4xl font-black text-green-500 animate-bounce">
+                  正確！ {total} - {take} = {total - take}
+                </div>
+              )}
+              {feedback === "WRONG" && (
+                <div className="text-3xl font-black text-red-500">
+                  再想想... Think again
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

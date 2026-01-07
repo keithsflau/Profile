@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小五數學：圓形圖入門 | Introduction to Pie Charts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #e0e7ff 0%, #6366f1 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Introduction to Pie Charts",
+          zh: "圓形圖入門",
+          ja: "円グラフ入門",
+          ko: "원형 차트 소개",
+          es: "Introducción a los Gráficos Circulares",
+          de: "Einführung in Kreisdiagramme",
+          fi: "Johdatus ympyräkaavioihin",
+          fr: "Introduction aux diagrammes circulaires",
+          ar: "مقدمة في الرسوم البيانية الدائرية",
+          it: "Introduzione ai grafici a torta",
+        },
+        chartTitle: {
+          en: "Favorite Sports",
+          zh: "最喜歡的運動",
+          ja: "好きなスポーツ",
+          ko: "좋아하는 스포츠",
+          es: "Deportes Favoritos",
+          de: "Lieblingssportarten",
+          fi: "Suosikkiurheilulajit",
+          fr: "Sports préférés",
+          ar: "الرياضات المفضلة",
+          it: "Sport preferiti",
+        },
+        football: {
+          en: "Football",
+          zh: "足球",
+          ja: "サッカー",
+          ko: "축구",
+          es: "Fútbol",
+          de: "Fußball",
+          fi: "Jalkapallo",
+          fr: "Football",
+          ar: "كرة القدم",
+          it: "Calcio",
+        },
+        basketball: {
+          en: "Basketball",
+          zh: "籃球",
+          ja: "バスケットボール",
+          ko: "농구",
+          es: "Baloncesto",
+          de: "Basketball",
+          fi: "Koripallo",
+          fr: "Basket-ball",
+          ar: "كرة السلة",
+          it: "Pallacanestro",
+        },
+        swimming: {
+          en: "Swimming",
+          zh: "游泳",
+          ja: "水泳",
+          ko: "수영",
+          es: "Natación",
+          de: "Schwimmen",
+          fi: "Uinti",
+          fr: "Natation",
+          ar: "السباحة",
+          it: "Nuoto",
+        },
+        running: {
+          en: "Running",
+          zh: "跑步",
+          ja: "ランニング",
+          ko: "달리기",
+          es: "Correr",
+          de: "Laufen",
+          fi: "Juoksu",
+          fr: "Course à pied",
+          ar: "الجري",
+          it: "Corsa",
+        },
+        others: {
+          en: "Others",
+          zh: "其他",
+          ja: "その他",
+          ko: "기타",
+          es: "Otros",
+          de: "Andere",
+          fi: "Muut",
+          fr: "Autres",
+          ar: "أخرى",
+          it: "Altri",
+        },
+        people: {
+          en: "people",
+          zh: "人",
+          ja: "人",
+          ko: "명",
+          es: "personas",
+          de: "Personen",
+          fi: "hlö",
+          fr: "personnes",
+          ar: "شخص",
+          it: "persone",
+        },
+        tip: {
+          en: "Pie charts show the proportion of each part to the whole.",
+          zh: "圓形圖顯示各部分佔整體的比例",
+          ja: "円グラフは、全体に対する各部分の割合を示します。",
+          ko: "원형 차트는 전체에 대한 각 부분의 비율을 보여줍니다.",
+          es: "Los gráficos circulares muestran la proporción de cada parte con respecto al todo.",
+          de: "Kreisdiagramme zeigen den Anteil jedes Teils am Ganzen.",
+          fi: "Ympyräkaaviot osoittavat kunkin osan osuuden kokonaisuudesta.",
+          fr: "Les diagrammes circulaires montrent la proportion de chaque partie par rapport à l'ensemble.",
+          ar: "تظهر الرسوم البيانية الدائرية نسبة كل جزء إلى الكل.",
+          it: "I grafici a torta mostrano la proporzione di ogni parte rispetto al tutto.",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const data = [
+          { id: "football", value: 30, color: "#3b82f6" },
+          { id: "basketball", value: 25, color: "#ef4444" },
+          { id: "swimming", value: 20, color: "#22c55e" },
+          { id: "running", value: 15, color: "#f59e0b" },
+          { id: "others", value: 10, color: "#8b5cf6" },
+        ];
+        const total = data.reduce((s, d) => s + d.value, 0);
+        const [selected, setSelected] = useState(null);
+
+        // Calculate pie slices
+        let cumulative = 0;
+        const slices = data.map((d) => {
+          const start = cumulative;
+          cumulative += (d.value / total) * 360;
+          return { ...d, startAngle: start, endAngle: cumulative };
+        });
+
+        const describeArc = (cx, cy, r, startAngle, endAngle) => {
+          const start = polarToCartesian(cx, cy, r, endAngle);
+          const end = polarToCartesian(cx, cy, r, startAngle);
+          const largeArc = endAngle - startAngle <= 180 ? 0 : 1;
+          return `M ${cx} ${cy} L ${start.x} ${start.y} A ${r} ${r} 0 ${largeArc} 0 ${end.x} ${end.y} Z`;
+        };
+
+        const polarToCartesian = (cx, cy, r, angle) => {
+          const rad = ((angle - 90) * Math.PI) / 180;
+          return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-5xl font-black text-indigo-100 mb-2 mt-8">
+              🥧 {getText("title")}
+            </h1>
+
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-4xl w-full mt-8">
+              <h3 className="text-xl font-bold text-center text-slate-700 mb-4">
+                {getText("chartTitle")}
+              </h3>
+
+              <div className="flex flex-col md:flex-row gap-8 items-center">
+                <svg viewBox="0 0 220 220" className="w-64 h-64">
+                  {slices.map((s, i) => (
+                    <path
+                      key={i}
+                      d={describeArc(110, 110, 100, s.startAngle, s.endAngle)}
+                      fill={s.color}
+                      stroke="white"
+                      strokeWidth="2"
+                      onClick={() => setSelected(i)}
+                      className={`cursor-pointer transition-transform ${
+                        selected === i ? "scale-105" : ""
+                      }`}
+                      style={{ transformOrigin: "110px 110px" }}
+                    />
+                  ))}
+                </svg>
+                <div className="flex-1 space-y-2">
+                  {data.map((d, i) => (
+                    <div
+                      key={i}
+                      onClick={() => setSelected(i)}
+                      className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer ${
+                        selected === i
+                          ? "bg-slate-100 ring-2 ring-indigo-400"
+                          : ""
+                      }`}
+                    >
+                      <div
+                        className="w-6 h-6 rounded"
+                        style={{ backgroundColor: d.color }}
+                      ></div>
+                      <span className="font-bold flex-1">{getText(d.id)}</span>
+                      <span className="font-mono">
+                        {d.value}
+                        {getText("people")}
+                      </span>
+                      <span className="text-slate-500">
+                        ({Math.round((d.value / total) * 100)}%)
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-6 bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
+                <p className="font-bold">💡 {getText("tip")}</p>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

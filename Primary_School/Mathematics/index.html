@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>數學科互動學習平台 | Mathematics Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background-color: #f0f9ff;
+        background-image: radial-gradient(
+            at 0% 0%,
+            hsla(253, 16%, 7%, 1) 0,
+            transparent 50%
+          ),
+          radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
+          radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
+        min-height: 100vh;
+      }
+      .glass-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      }
+    </style>
+  </head>
+  <body class="p-8 flex items-center justify-center min-h-screen">
+    <div class="max-w-6xl w-full">
+      <header class="text-center mb-16 text-white">
+        <h1 class="text-5xl md:text-7xl font-black tracking-tight mb-4">
+          數學科互動園地
+        </h1>
+        <p class="text-xl md:text-2xl opacity-90 font-medium">
+          Interactive Mathematics Platform
+        </p>
+      </header>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <!-- P3 -->
+        <a
+          href="./P3/index.html"
+          class="glass-card rounded-3xl p-8 transform hover:scale-105 transition-all duration-300 group"
+        >
+          <div
+            class="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg group-hover:rotate-12 transition-transform"
+          >
+            <i data-lucide="blocks" size="32"></i>
+          </div>
+          <h2 class="text-3xl font-black text-slate-800 mb-2">小三數學</h2>
+          <h3 class="text-lg font-bold text-slate-400 mb-4">Primary 3</h3>
+          <div
+            class="h-1 w-12 bg-blue-500 rounded-full mb-4 group-hover:w-full transition-all"
+          ></div>
+          <p class="text-slate-600 font-medium">
+            五位數、加減乘除、毫米公里、時間、圖形...
+          </p>
+          <div class="mt-6 inline-flex items-center text-blue-600 font-bold">
+            進入課程 <i data-lucide="arrow-right" class="ml-2 w-4"></i>
+          </div>
+        </a>
+
+        <!-- P4 -->
+        <a
+          href="./P4/index.html"
+          class="glass-card rounded-3xl p-8 transform hover:scale-105 transition-all duration-300 group"
+        >
+          <div
+            class="w-16 h-16 bg-emerald-500 rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg"
+          >
+            <i data-lucide="calculator" size="32"></i>
+          </div>
+          <h2 class="text-3xl font-black text-slate-800 mb-2">小四數學</h2>
+          <h3 class="text-lg font-bold text-slate-400 mb-4">Primary 4</h3>
+          <div class="h-1 w-12 bg-emerald-500 rounded-full mb-4"></div>
+          <p class="text-slate-600 font-medium">
+            乘除法進階、周界面積、分數小數、棒形圖...
+          </p>
+          <div class="mt-6 inline-flex items-center text-emerald-600 font-bold">
+            進入課程 <i data-lucide="arrow-right" class="ml-2 w-4"></i>
+          </div>
+        </a>
+
+        <!-- P5 -->
+        <a
+          href="./P5/index.html"
+          class="glass-card rounded-3xl p-8 transform hover:scale-105 transition-all duration-300 group"
+        >
+          <div
+            class="w-16 h-16 bg-amber-500 rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg"
+          >
+            <i data-lucide="compass" size="32"></i>
+          </div>
+          <h2 class="text-3xl font-black text-slate-800 mb-2">小五數學</h2>
+          <h3 class="text-lg font-bold text-slate-400 mb-4">Primary 5</h3>
+          <div class="h-1 w-12 bg-amber-500 rounded-full mb-4"></div>
+          <p class="text-slate-600 font-medium">
+            多位數、分數加減乘除、面積體積、代數初步...
+          </p>
+          <div class="mt-6 inline-flex items-center text-amber-600 font-bold">
+            進入課程 <i data-lucide="arrow-right" class="ml-2 w-4"></i>
+          </div>
+        </a>
+
+        <!-- P6 -->
+        <a
+          href="./P6/index.html"
+          class="glass-card rounded-3xl p-8 transform hover:scale-105 transition-all duration-300 group"
+        >
+          <div
+            class="w-16 h-16 bg-purple-500 rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg"
+          >
+            <i data-lucide="bar-chart-3" size="32"></i>
+          </div>
+          <h2 class="text-3xl font-black text-slate-800 mb-2">小六數學</h2>
+          <h3 class="text-lg font-bold text-slate-400 mb-4">Primary 6</h3>
+          <div class="h-1 w-12 bg-purple-500 rounded-full mb-4"></div>
+          <p class="text-slate-600 font-medium">
+            百分數、圓周、速度、平均數、幾何進階...
+          </p>
+          <div class="mt-6 inline-flex items-center text-purple-600 font-bold">
+            進入課程 <i data-lucide="arrow-right" class="ml-2 w-4"></i>
+          </div>
+        </a>
+      </div>
+
+      <footer class="mt-16 text-center text-white/60 font-medium">
+        <p>&copy; 2025 Band 1A Interactive Learning Division</p>
+      </footer>
+    </div>
+
+    <script>
+      lucide.createIcons();
+    </script>
+  </body>
+</html>

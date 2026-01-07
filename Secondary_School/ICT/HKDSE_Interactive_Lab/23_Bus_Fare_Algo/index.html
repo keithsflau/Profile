@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HKDSE ICT - Bus Fare Algorithm</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.development.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #0f172a;
+        color: #e2e8f0;
+      }
+      .logic-block {
+        transition: all 0.2s;
+      }
+      .logic-active {
+        border-left-color: #f59e0b;
+        background: rgba(245, 158, 11, 0.1);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen p-8 flex justify-center items-center bg-slate-900">
+    <div id="root" class="w-full max-w-5xl"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      // --- LUCIDE ICON SHIM ---
+      const LucideIcon = ({ name, size = 24, className = "" }) => {
+        const formatName = (n) =>
+          n
+            .split("-")
+            .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
+            .join("");
+        const iconName = formatName(name);
+
+        const [svgHtml, setSvgHtml] = useState("");
+
+        useEffect(() => {
+          if (
+            window.lucide &&
+            window.lucide.icons &&
+            window.lucide.icons[iconName] &&
+            typeof window.lucide.icons[iconName].toSvg === "function"
+          ) {
+            setSvgHtml(
+              window.lucide.icons[iconName].toSvg({
+                width: size,
+                height: size,
+                class: className,
+              })
+            );
+          }
+        }, [name, size, className, iconName]);
+
+        return (
+          <span
+            dangerouslySetInnerHTML={{ __html: svgHtml }}
+            style={{ display: "inline-flex" }}
+          />
+        );
+      };
+      const Bus = (p) => <LucideIcon name="bus" {...p} />;
+      const Coins = (p) => <LucideIcon name="coins" {...p} />;
+      const UserCircle2 = (p) => <LucideIcon name="user-circlet-2" {...p} />;
+      const ArrowRight = (p) => <LucideIcon name="arrow-right" {...p} />;
+      // --- END SHIM ---
+
+      const FULL_FARE = 10.0;
+
+      const App = () => {
+        const [age, setAge] = useState(15);
+        const [fare, setFare] = useState(0);
+        const [activeLine, setActiveLine] = useState(0);
+
+        useEffect(() => {
+          if (age < 3) {
+            setFare(0);
+            setActiveLine(1);
+          } else if (age < 12) {
+            setFare(FULL_FARE / 2);
+            setActiveLine(2);
+          } else if (age >= 65) {
+            setFare(2);
+            setActiveLine(4);
+          } else {
+            setFare(FULL_FARE);
+            setActiveLine(3);
+          }
+        }, [age]);
+
+        return (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 w-full">
+            <div className="space-y-8">
+              <header>
+                <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-2">
+                  <Bus className="text-yellow-400" /> Bus Fare Calculator
+                </h1>
+                <p className="text-slate-400">
+                  Paper 1A Q30: Nested IF-THEN-ELSE
+                </p>
+              </header>
+              <div className="bg-slate-800 p-8 rounded-3xl border border-slate-700 shadow-xl">
+                <div className="flex items-center justify-between mb-8">
+                  <div className="text-center">
+                    <div className="w-20 h-20 bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-2 border-4 border-slate-600">
+                      <UserCircle2 size={40} className="text-slate-400" />
+                    </div>
+                    <div className="text-slate-400 font-bold uppercase text-xs">
+                      Passenger
+                    </div>
+                  </div>
+                  <div className="flex-1 px-8">
+                    <label className="text-slate-400 font-bold text-xs uppercase mb-2 block">
+                      Age Input
+                    </label>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={age}
+                      onChange={(e) => setAge(parseInt(e.target.value))}
+                      className="w-full accent-yellow-500 mb-2"
+                    />
+                    <div className="text-center bg-slate-900 border border-slate-700 rounded py-2 font-mono text-xl text-white font-bold">
+                      Age: {age}
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-slate-900 rounded-2xl p-6 border-2 border-yellow-500/50 flex items-center justify-between">
+                  <div className="text-slate-400 font-bold">
+                    Calculated Fare
+                  </div>
+                  <div className="text-4xl font-bold text-yellow-400 font-mono flex items-center gap-2">
+                    <Coins size={28} /> ${fare.toFixed(1)}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-slate-950 p-8 rounded-3xl border border-slate-800 font-mono text-sm relative overflow-hidden">
+              <div className="absolute top-0 right-0 bg-slate-900 text-slate-500 text-xs px-3 py-1 rounded-bl-lg font-bold border-l border-b border-slate-800">
+                Pseudocode Trace
+              </div>
+              <div className="space-y-2 mt-4">
+                <div className="text-slate-500 mb-4">
+                  // Full Fare = ${FULL_FARE}
+                </div>
+                <div
+                  className={`p-3 border-l-4 rounded logic-block ${
+                    activeLine === 1
+                      ? "logic-active text-yellow-200"
+                      : "border-slate-800 text-slate-500"
+                  }`}
+                >
+                  <span className="text-purple-400">IF</span> (Age &lt; 3){" "}
+                  <span className="text-purple-400">THEN</span>
+                  <br />
+                  &nbsp;&nbsp;Fare = 0{" "}
+                  <span className="text-slate-500">// Free</span>
+                </div>
+                <div
+                  className={`p-3 border-l-4 rounded logic-block ${
+                    activeLine === 2
+                      ? "logic-active text-yellow-200"
+                      : "border-slate-800 text-slate-500"
+                  }`}
+                >
+                  <span className="text-purple-400">ELSE IF</span> (Age &lt; 12){" "}
+                  <span className="text-purple-400">THEN</span>
+                  <br />
+                  &nbsp;&nbsp;Fare = Full / 2{" "}
+                  <span className="text-slate-500">// Child Half Fare</span>
+                </div>
+                <div
+                  className={`p-3 border-l-4 rounded logic-block ${
+                    activeLine === 4
+                      ? "logic-active text-yellow-200"
+                      : "border-slate-800 text-slate-500"
+                  }`}
+                >
+                  <span className="text-purple-400">ELSE IF</span> (Age &gt;=
+                  65) <span className="text-purple-400">THEN</span>
+                  <br />
+                  &nbsp;&nbsp;Fare = 2.0{" "}
+                  <span className="text-slate-500">// Elderly $2 Scheme</span>
+                </div>
+                <div
+                  className={`p-3 border-l-4 rounded logic-block ${
+                    activeLine === 3
+                      ? "logic-active text-yellow-200"
+                      : "border-slate-800 text-slate-500"
+                  }`}
+                >
+                  <span className="text-purple-400">ELSE</span>
+                  <br />
+                  &nbsp;&nbsp;Fare = Full{" "}
+                  <span className="text-slate-500">// Adult</span>
+                </div>
+              </div>
+              <div className="mt-8 pt-4 border-t border-slate-800 text-slate-400 text-xs">
+                <ArrowRight size={14} className="inline mr-2 text-yellow-500" />
+                Current Path:
+                <span className="text-white font-bold ml-2">
+                  {activeLine === 1
+                    ? "Toddler (Free)"
+                    : activeLine === 2
+                    ? "Child (Half)"
+                    : activeLine === 4
+                    ? "Elderly ($2)"
+                    : "Adult (Full)"}
+                </span>
+              </div>
+            </div>
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

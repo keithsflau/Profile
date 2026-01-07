@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cross-Sections & Uniform Cross-Section | S3 Math</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-amber-50 text-slate-800 min-h-screen">
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+
+      const App = () => {
+        const [lang, setLang] = useState("en");
+        const [shape, setShape] = useState("cylinder"); // cylinder, cone, cube
+        const [cutPos, setCutPos] = useState(50); // 0 to 100
+
+        const t = {
+          title: { en: "Cross-Sections", zh: "橫切面" },
+          uniform: { en: "Uniform Cross-Section", zh: "均勻橫切面" },
+          nonUniform: { en: "Non-Uniform", zh: "非均勻" },
+          cylinder: { en: "Cylinder", zh: "圓柱體" },
+          cone: { en: "Cone", zh: "圓錐體" },
+          cube: { en: "Cube/Prism", zh: "正方體/柱體" },
+          cut: { en: "Cut Position", zh: "切割位置" },
+          back: { en: "Back to Dashboard", zh: "返回主頁" },
+        };
+
+        const isUniform = shape !== "cone";
+
+        // SVG Drawing
+        const w = 300,
+          h = 300;
+        const cx = w / 2,
+          cy = h / 2;
+
+        const drawShape = () => {
+          const cutY = 50 + 200 * (cutPos / 100); // Map 0-100 to y=50-250
+
+          if (shape === "cylinder") {
+            return (
+              <g>
+                {/* Top Ellipse */}
+                <ellipse
+                  cx={cx}
+                  cy="50"
+                  rx="80"
+                  ry="20"
+                  fill="#fcd34d"
+                  stroke="#d97706"
+                  strokeWidth="2"
+                />
+                {/* Body */}
+                <path
+                  d={`M ${cx - 80} 50 L ${cx - 80} 250 A 80 20 0 0 0 ${
+                    cx + 80
+                  } 250 L ${cx + 80} 50`}
+                  fill="rgba(252, 211, 77, 0.3)"
+                  stroke="#d97706"
+                  strokeWidth="2"
+                />
+                {/* Bottom Ellipse (Front part) */}
+                <path
+                  d={`M ${cx - 80} 250 A 80 20 0 0 0 ${cx + 80} 250`}
+                  fill="none"
+                  stroke="#d97706"
+                  strokeWidth="2"
+                />
+
+                {/* Cross Section */}
+                <ellipse
+                  cx={cx}
+                  cy={cutY}
+                  rx="80"
+                  ry="20"
+                  fill="rgba(239, 68, 68, 0.4)"
+                  stroke="#ef4444"
+                  strokeWidth="3"
+                />
+                <text
+                  x={cx + 90}
+                  y={cutY}
+                  fill="#ef4444"
+                  className="text-xs font-bold"
+                >
+                  Area = πr²
+                </text>
+              </g>
+            );
+          } else if (shape === "cone") {
+            // Triangle profile
+            // Top (150, 20) -> Bottom (70, 280) to (230, 280)
+            // Radius at y: proportional
+            // h_total = 260
+            // r_base = 80
+            // r_cut = r_base * (curr_h / total_h)
+            const totalH = 260;
+            const rBase = 80;
+            const currentDistFromTop = cutY - 20; // apex at y=20
+            const rCut = Math.max(0.1, rBase * (currentDistFromTop / totalH));
+
+            return (
+              <g>
+                {/* Cone Body */}
+                <path
+                  d="M 150 20 L 70 280 A 80 20 0 0 0 230 280 Z"
+                  fill="rgba(252, 211, 77, 0.3)"
+                  stroke="#d97706"
+                  strokeWidth="2"
+                />
+
+                {/* Cross Section */}
+                {currentDistFromTop > 0 && (
+                  <ellipse
+                    cx={150}
+                    cy={cutY}
+                    rx={rCut}
+                    ry={rCut * 0.25}
+                    fill="rgba(239, 68, 68, 0.4)"
+                    stroke="#ef4444"
+                    strokeWidth="3"
+                  />
+                )}
+                <text
+                  x={150 + rCut + 10}
+                  y={cutY}
+                  fill="#ef4444"
+                  className="text-xs font-bold"
+                >
+                  r = {rCut.toFixed(1)}
+                </text>
+              </g>
+            );
+          } else {
+            // Cube
+            return (
+              <g>
+                {/* Cube Outline (Front 2D square mostly) */}
+                <rect
+                  x="70"
+                  y="50"
+                  width="160"
+                  height="200"
+                  fill="rgba(252, 211, 77, 0.3)"
+                  stroke="#d97706"
+                  strokeWidth="2"
+                />
+                {/* 3D lines */}
+                <path
+                  d="M 70 50 L 100 20 M 230 50 L 260 20 M 230 250 L 260 220 M 260 20 L 260 220 L 100 220 M 100 20 L 260 20"
+                  fill="none"
+                  stroke="#d97706"
+                  strokeWidth="2"
+                />
+
+                {/* Cross section plane */}
+                <path
+                  d={`M 70 ${cutY} L 230 ${cutY} L 260 ${cutY - 30} L 100 ${
+                    cutY - 30
+                  } Z`}
+                  fill="rgba(239, 68, 68, 0.4)"
+                  stroke="#ef4444"
+                  strokeWidth="3"
+                />
+              </g>
+            );
+          }
+        };
+
+        return (
+          <div className="p-6 max-w-4xl mx-auto min-h-screen flex flex-col">
+            <header className="mb-6 flex justify-between items-center">
+              <div>
+                <div className="text-amber-600 font-bold uppercase text-xs tracking-widest mb-1">
+                  S3 Math
+                </div>
+                <h1 className="text-3xl font-extrabold text-slate-900">
+                  {t.title[lang]}
+                </h1>
+              </div>
+              <button
+                onClick={() => setLang(lang === "en" ? "zh" : "en")}
+                className="px-3 py-1 bg-white border border-amber-200 rounded-lg text-sm font-bold hover:bg-amber-100"
+              >
+                {lang === "en" ? "中文" : "ENG"}
+              </button>
+            </header>
+
+            <div className="grid md:grid-cols-2 gap-8 mb-6">
+              <div className="order-2 md:order-1 bg-white rounded-2xl border border-amber-100 shadow-sm relative h-[400px] flex justify-center items-center overflow-hidden">
+                <svg viewBox="0 0 300 300" className="w-[300px] h-[300px]">
+                  {drawShape()}
+                </svg>
+
+                <div className="absolute top-4 left-4 bg-white/80 p-2 rounded backdrop-blur border border-amber-100 text-xs font-bold text-amber-800 uppercase">
+                  {isUniform ? t.uniform[lang] : t.nonUniform[lang]}
+                </div>
+              </div>
+
+              <div className="order-1 md:order-2 space-y-6">
+                <div className="bg-white p-6 rounded-2xl border border-amber-100 shadow-sm">
+                  <h3 className="text-sm font-bold text-slate-400 uppercase mb-4">
+                    Select Shape
+                  </h3>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setShape("cylinder")}
+                      className={`flex-1 py-2 rounded-lg font-bold border ${
+                        shape === "cylinder"
+                          ? "bg-amber-500 text-white border-amber-600"
+                          : "bg-white text-slate-600 border-slate-200"
+                      }`}
+                    >
+                      {t.cylinder[lang]}
+                    </button>
+                    <button
+                      onClick={() => setShape("cube")}
+                      className={`flex-1 py-2 rounded-lg font-bold border ${
+                        shape === "cube"
+                          ? "bg-amber-500 text-white border-amber-600"
+                          : "bg-white text-slate-600 border-slate-200"
+                      }`}
+                    >
+                      {t.cube[lang]}
+                    </button>
+                    <button
+                      onClick={() => setShape("cone")}
+                      className={`flex-1 py-2 rounded-lg font-bold border ${
+                        shape === "cone"
+                          ? "bg-amber-500 text-white border-amber-600"
+                          : "bg-white text-slate-600 border-slate-200"
+                      }`}
+                    >
+                      {t.cone[lang]}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="bg-white p-6 rounded-2xl border border-amber-100 shadow-sm">
+                  <h3 className="text-sm font-bold text-slate-400 uppercase mb-4">
+                    {t.cut[lang]}
+                  </h3>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={cutPos}
+                    onChange={(e) => setCutPos(Number(e.target.value))}
+                    className="w-full accent-red-500 h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer"
+                  />
+                  <div className="text-center mt-2 text-red-500 font-bold">
+                    y = {cutPos}%
+                  </div>
+                </div>
+
+                <div className="bg-amber-100 p-6 rounded-2xl border border-amber-200">
+                  <div className="text-lg font-bold text-amber-900 mb-2">
+                    Definition
+                  </div>
+                  <p className="text-sm text-amber-800 leading-relaxed">
+                    {isUniform
+                      ? "A prism (or cylinder) has a uniform cross-section. The area of the cross-section is the same at any height."
+                      : "A cone (or pyramid) has a non-uniform cross-section. The area changes as you move from the base to the apex."}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <footer className="mt-auto pt-8">
+              <a
+                href="../index.html"
+                className="text-amber-600 hover:text-amber-700 font-bold"
+              >
+                <i className="fa-solid fa-arrow-left mr-2"></i>
+                {t.back[lang]}
+              </a>
+            </footer>
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

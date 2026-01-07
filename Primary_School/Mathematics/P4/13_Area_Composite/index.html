@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小四數學：面積計算大挑戰</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fff1f2 0%, #f43f5e 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      function App() {
+        // U-shape
+        const W = 10,
+          H = 10,
+          thickness = 2; // 2 legs and bottom
+        // Area = Base(10x2) + LeftLeg(2x8) + RightLeg(2x8) = 20 + 16 + 16 = 52
+        // Or Outer(10x10) - Inner(6x8) = 100 - 48 = 52
+
+        const [method, setMethod] = useState(""); // split, subtract
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-5xl font-black text-rose-900 mb-8">
+              🏰 面積計算大挑戰
+            </h1>
+
+            <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full flex flex-col lg:flex-row gap-12">
+              <div className="flex-1 flex flex-col items-center">
+                <div className="relative w-[300px] h-[300px] bg-white border-2 border-slate-200 grid grid-cols-10 grid-rows-10">
+                  {/* Shape Render */}
+                  {[...Array(100)].map((_, i) => {
+                    const r = Math.floor(i / 10);
+                    const c = i % 10;
+                    // U Shape Logic:
+                    // r>=8 (bottom 2 rows, index 8,9)
+                    // OR c<2 (left 2 cols)
+                    // OR c>=8 (right 2 cols)
+                    const filled = r >= 8 || c < 2 || c >= 8;
+
+                    // Visualization Logic for Methods
+                    let color = "bg-rose-500";
+                    if (method === "split") {
+                      if (r >= 8) color = "bg-rose-600"; // Base
+                      else color = "bg-rose-400"; // Legs
+                    } else if (method === "subtract") {
+                      if (!filled)
+                        color = "bg-blue-100 opacity-50"; // Inner empty
+                      else color = "bg-rose-500";
+                    }
+
+                    return (
+                      <div
+                        key={i}
+                        className={`border border-rose-900/10 ${
+                          filled
+                            ? color
+                            : method === "subtract"
+                            ? "bg-blue-100/50"
+                            : "transparent"
+                        }`}
+                      />
+                    );
+                  })}
+
+                  <div className="absolute -top-6 left-0 right-0 text-center font-bold text-slate-500">
+                    10cm
+                  </div>
+                  <div
+                    className="absolute top-0 bottom-0 -left-6 flex items-center font-bold text-slate-500"
+                    style={{ writingMode: "vertical-lr" }}
+                  >
+                    10cm
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex-1 space-y-6">
+                <h2 className="text-2xl font-bold text-rose-800">
+                  選擇計算方法：
+                </h2>
+
+                <button
+                  onClick={() => setMethod("split")}
+                  className={`w-full p-6 text-left rounded-2xl border-2 transition-all ${
+                    method === "split"
+                      ? "border-rose-500 bg-rose-50 shadow-lg"
+                      : "border-slate-200 bg-white hover:border-rose-300"
+                  }`}
+                >
+                  <div className="font-black text-xl mb-2 text-rose-700">
+                    分割法 (Adding)
+                  </div>
+                  <div className="text-slate-600">
+                    將圖形分割成三個長方形：
+                    <br />左 + 右 + 下
+                  </div>
+                  {method === "split" && (
+                    <div className="mt-4 font-mono font-bold text-rose-600 bg-white p-3 rounded-lg border border-rose-200">
+                      (2×8) + (2×8) + (10×2)
+                      <br />= 16 + 16 + 20
+                      <br />= 52 cm²
+                    </div>
+                  )}
+                </button>
+
+                <button
+                  onClick={() => setMethod("subtract")}
+                  className={`w-full p-6 text-left rounded-2xl border-2 transition-all ${
+                    method === "subtract"
+                      ? "border-blue-500 bg-blue-50 shadow-lg"
+                      : "border-slate-200 bg-white hover:border-blue-300"
+                  }`}
+                >
+                  <div className="font-black text-xl mb-2 text-blue-700">
+                    填補法 (Subtracting)
+                  </div>
+                  <div className="text-slate-600">大正方形 - 中間空白部分</div>
+                  {method === "subtract" && (
+                    <div className="mt-4 font-mono font-bold text-blue-600 bg-white p-3 rounded-lg border border-blue-200">
+                      (10×10) - (6×8)
+                      <br />= 100 - 48
+                      <br />= 52 cm²
+                    </div>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小三數學：重量天秤</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      src="https://unpkg.com/react@18/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { motion } = window.Motion;
+      function App() {
+        const [leftWeight, setLeftWeight] = useState(500);
+        const [rightWeight, setRightWeight] = useState(500);
+        const diff = leftWeight - rightWeight;
+
+        // Calculate tilt with minimum threshold for visibility
+        let calculatedTilt = -diff / 5; // Higher sensitivity
+        if (diff !== 0 && Math.abs(calculatedTilt) < 5) {
+          calculatedTilt = diff < 0 ? 5 : -5; // Min tilt for small diffs
+        }
+        const tilt = Math.max(-30, Math.min(30, calculatedTilt));
+
+        const items = [
+          { name: "蘋果", emoji: "🍎", weight: 200 },
+          { name: "橙", emoji: "🍊", weight: 150 },
+          { name: "西瓜", emoji: "🍉", weight: 2000 },
+          { name: "書本", emoji: "📚", weight: 500 },
+          { name: "水樽", emoji: "💧", weight: 250 },
+        ];
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-6xl font-black text-orange-900 mb-4">
+              ⚖️ 重量天秤
+            </h1>
+            <p className="text-xl text-orange-700 font-bold mb-8">
+              認識克(g)與千克(kg)
+            </p>
+
+            <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-5xl w-full">
+              <div className="flex items-center justify-center mb-8">
+                <motion.div
+                  className="relative w-full max-w-2xl"
+                  animate={{ rotate: tilt }}
+                  transition={{ type: "spring", stiffness: 100 }}
+                >
+                  <div className="h-4 bg-gradient-to-r from-orange-600 to-red-600 rounded-full"></div>
+                  <div
+                    className="absolute top-0 left-0 w-40 h-24 bg-orange-400 rounded-2xl border-4 border-orange-600 flex items-center justify-center text-4xl font-black"
+                    style={{ transform: "translateY(-100px)" }}
+                  >
+                    {leftWeight}g
+                  </div>
+                  <div
+                    className="absolute top-0 right-0 w-40 h-24 bg-orange-400 rounded-2xl border-4 border-orange-600 flex items-center justify-center text-4xl font-black"
+                    style={{ transform: "translateY(-100px)" }}
+                  >
+                    {rightWeight}g
+                  </div>
+                </motion.div>
+              </div>
+
+              <div
+                className={`text-center text-2xl font-black mb-8 ${
+                  diff === 0 ? "text-green-600" : "text-red-600"
+                }`}
+              >
+                {diff === 0
+                  ? "⚖️ 平衡！"
+                  : diff > 0
+                  ? "⬅️ 左邊較重"
+                  : "➡️ 右邊較重"}
+              </div>
+
+              <div className="grid grid-cols-2 gap-8">
+                <div>
+                  <h3 className="text-2xl font-black text-orange-800 mb-4">
+                    左邊重量
+                  </h3>
+                  <input
+                    type="range"
+                    min="0"
+                    max="3000"
+                    value={leftWeight}
+                    onChange={(e) => setLeftWeight(parseInt(e.target.value))}
+                    className="w-full mb-4"
+                  />
+                  <input
+                    type="number"
+                    value={leftWeight}
+                    onChange={(e) =>
+                      setLeftWeight(parseInt(e.target.value) || 0)
+                    }
+                    className="w-full px-4 py-3 text-2xl font-black text-center rounded-xl border-4 border-orange-300"
+                  />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-black text-orange-800 mb-4">
+                    右邊重量
+                  </h3>
+                  <input
+                    type="range"
+                    min="0"
+                    max="3000"
+                    value={rightWeight}
+                    onChange={(e) => setRightWeight(parseInt(e.target.value))}
+                    className="w-full mb-4"
+                  />
+                  <input
+                    type="number"
+                    value={rightWeight}
+                    onChange={(e) =>
+                      setRightWeight(parseInt(e.target.value) || 0)
+                    }
+                    className="w-full px-4 py-3 text-2xl font-black text-center rounded-xl border-4 border-orange-300"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-8 grid grid-cols-5 gap-3">
+                {items.map((item, i) => (
+                  <button
+                    key={i}
+                    onClick={() => {
+                      setLeftWeight(item.weight);
+                      setRightWeight(item.weight);
+                    }}
+                    className="py-4 bg-gradient-to-r from-yellow-100 to-orange-100 hover:from-yellow-200 hover:to-orange-200 rounded-xl transition-all"
+                  >
+                    <div className="text-4xl mb-2">{item.emoji}</div>
+                    <div className="text-sm font-bold">{item.name}</div>
+                    <div className="text-xs text-orange-600">
+                      {item.weight}g
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              <div className="mt-8 bg-blue-50 p-4 rounded-xl">
+                <div className="font-bold text-blue-800 mb-2">💡 重量單位</div>
+                <div className="grid grid-cols-2 gap-3 text-sm text-blue-700">
+                  <div className="bg-white p-2 rounded">
+                    1 千克 (kg) = 1000 克 (g)
+                  </div>
+                  <div className="bg-white p-2 rounded">
+                    1000 克 (g) = 1 千克 (kg)
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

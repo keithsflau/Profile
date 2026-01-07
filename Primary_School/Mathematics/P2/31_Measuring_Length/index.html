@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小二數學：量度長度 (cm) | Measuring Length</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #ecfccb 0%, #a3e635 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "📏 Measuring Length",
+          zh: "📏 量度長度",
+          ja: "📏 長さの測定",
+          ko: "📏 길이 측정",
+          es: "📏 Medición de longitud",
+          de: "📏 Länge messen",
+          fi: "📏 Pituuden mittaus",
+          fr: "📏 Mesure de la longueur",
+          ar: "📏 قياس الطول",
+          it: "📏 Misurazione della lunghezza",
+        },
+        length: {
+          en: "Length",
+          zh: "長度",
+          ja: "長さ",
+          ko: "길이",
+          es: "Longitud",
+          de: "Länge",
+          fi: "Pituus",
+          fr: "Longueur",
+          ar: "الطول",
+          it: "Lunghezza",
+        },
+        check: {
+          en: "Check",
+          zh: "檢查",
+          ja: "確認",
+          ko: "확인",
+          es: "Comprobar",
+          de: "Prüfen",
+          fi: "Tarkista",
+          fr: "Vérifier",
+          ar: "تحقق",
+          it: "Controlla",
+        },
+      };
+
+      const itemsData = [
+        {
+          name: { zh: "鉛筆", en: "Pencil", ja: "鉛筆" },
+          emoji: "✏️",
+          color: "text-orange-500",
+        },
+        {
+          name: { zh: "畫筆", en: "Paintbrush", ja: "絵筆" },
+          emoji: "🖌️",
+          color: "text-blue-500",
+        },
+        {
+          name: { zh: "叉子", en: "Fork", ja: "フォーク" },
+          emoji: "🍴",
+          color: "text-slate-400",
+        },
+        {
+          name: { zh: "匙羹", en: "Spoon", ja: "スプーン" },
+          emoji: "🥄",
+          color: "text-slate-400",
+        },
+        {
+          name: { zh: "朱古力", en: "Chocolate", ja: "チョコレート" },
+          emoji: "🍫",
+          color: "text-amber-700",
+        },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [length, setLength] = useState(5);
+        const [objType, setObjType] = useState(0);
+        const [input, setInput] = useState("");
+        const [feedback, setFeedback] = useState("");
+
+        const newProb = () => {
+          setLength(Math.floor(Math.random() * 8) + 3); // 3 to 10 cm
+          setObjType(Math.floor(Math.random() * itemsData.length));
+          setInput("");
+          setFeedback("");
+        };
+
+        useEffect(newProb, []);
+
+        const check = () => {
+          if (parseInt(input) === length) {
+            setFeedback("CORRECT");
+            setTimeout(newProb, 2000);
+          } else {
+            setFeedback("WRONG");
+          }
+        };
+
+        // Ruler rendering
+        const scale = 40;
+        const currentItem = itemsData[objType];
+        const getItemName = () =>
+          currentItem.name[lang] || currentItem.name["en"];
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center justify-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+
+            <h1 className="text-4xl md:text-5xl font-black text-lime-900 mb-8 max-w-2xl text-center">
+              {t.title[lang] || t.title["en"]}
+            </h1>
+
+            <div className="bg-white/90 rounded-3xl p-8 shadow-2xl w-full max-w-4xl border-4 border-lime-300 relative overflow-hidden">
+              <div className="flex flex-col items-center min-h-[300px] justify-center relative">
+                {/* Object */}
+                <div
+                  className="absolute left-[100px] top-[40px] flex items-center"
+                  style={{ width: `${length * scale}px`, height: "60px" }}
+                >
+                  <div
+                    className={`w-full h-8 rounded-full ${currentItem.color.replace(
+                      "text",
+                      "bg"
+                    )} opacity-80 shadow-md flex items-center justify-end pr-2`}
+                  >
+                    <span className="text-3xl -mr-4 drop-shadow-md">
+                      {currentItem.emoji}
+                    </span>
+                  </div>
+                </div>
+                <div className="absolute left-[100px] top-[10px] text-lg font-bold text-slate-500">
+                  {getItemName()}
+                </div>
+
+                {/* Ruler */}
+                <div
+                  className="absolute left-[60px] top-[100px] h-24 bg-yellow-200 border-2 border-yellow-500 flex shadow-xl rounded-md"
+                  style={{ width: "550px" }}
+                >
+                  {[...Array(13)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="relative h-full border-l border-slate-400"
+                      style={{ width: `${scale}px` }}
+                    >
+                      <div className="absolute top-0 left-[-8px] w-4 text-center text-sm font-bold text-slate-600 mt-1">
+                        {i}
+                      </div>
+                      {/* mm lines */}
+                      <div className="absolute bottom-0 h-4 border-l border-slate-400 left-[20px] opacity-50"></div>
+                    </div>
+                  ))}
+                  <div className="absolute right-2 bottom-2 font-bold text-slate-500">
+                    cm
+                  </div>
+                </div>
+
+                {/* Guide lines (dashed) */}
+                <div className="absolute left-[100px] top-[40px] w-0.5 h-[100px] border-l-2 border-dashed border-red-400"></div>
+                <div
+                  className="absolute top-[40px] w-0.5 h-[100px] border-l-2 border-dashed border-red-400"
+                  style={{ left: `${100 + length * scale}px` }}
+                ></div>
+              </div>
+
+              <div className="flex items-center justify-center gap-4 text-4xl mb-8 font-black text-lime-900 mt-8">
+                {t.length[lang] || t.length["en"]}:
+                <input
+                  type="number"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  className="w-24 text-center border-b-4 border-lime-500 bg-lime-50 focus:outline-none rounded-t-lg"
+                  autoFocus
+                />
+                cm
+              </div>
+
+              <div className="text-center">
+                <button
+                  onClick={check}
+                  className="px-10 py-3 bg-lime-500 text-white rounded-full font-black text-2xl shadow-xl hover:bg-lime-600 active:scale-95 transition-transform"
+                >
+                  {t.check[lang] || t.check["en"]}
+                </button>
+              </div>
+
+              <div className="h-16 mt-8">
+                {feedback === "CORRECT" && (
+                  <div className="text-center text-4xl font-black text-green-500 animate-bounce">
+                    {get("correct", lang)}
+                  </div>
+                )}
+                {feedback === "WRONG" && (
+                  <div className="text-center text-4xl font-black text-red-500 animate-shake">
+                    {get("wrong", lang)}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

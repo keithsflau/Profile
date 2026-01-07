@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Sound Transmission</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #eef2ff;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Travel of Sound",
+          zh: "聲音的傳播",
+          ja: "音の伝わり方",
+          ko: "소리의 이동",
+          es: "Propagación del sonido",
+          de: "Ausbreitung von Schall",
+          fi: "Äänen leviäminen",
+          fr: "Propagation du son",
+          ar: "انتشار الصوت",
+          it: "Propagazione del Suono",
+        },
+        instruction: {
+          en: "Tap to make a sound and see how fast it travels!",
+          zh: "點擊發出聲音，看看它的傳播速度！",
+          ja: "タップして音を出し、どれくらい速く伝わるか見てみよう！",
+          ko: "탭하여 소리를 내고 이동 속도를 확인하세요!",
+          es: "¡Toca para hacer un sonido y ver qué tan rápido viaja!",
+          de: "Tippe, um ein Geräusch zu machen und zu sehen, wie schnell es sich ausbreitet!",
+          fi: "Napauta tehdäksesi äänen ja näe kuinka nopeasti se kulkee!",
+          fr: "Tapez pour faire un son et voir à quelle vitesse il voyage !",
+          ar: "اضغط لإصدار صوت وشاهد سرعة انتقاله!",
+          it: "Tocca per fare un suono e vedi quanto viaggia veloce!",
+        },
+        gas: {
+          en: "Gas (Air)",
+          zh: "氣體 (空氣)",
+          ja: "気体 (空気)",
+          ko: "기체 (공기)",
+          es: "Gas (Aire)",
+          de: "Gas (Luft)",
+          fi: "Kaasu (Ilma)",
+          fr: "Gaz (Air)",
+          ar: "غاز (هواء)",
+          it: "Gas (Aria)",
+        },
+        liquid: {
+          en: "Liquid (Water)",
+          zh: "液體 (水)",
+          ja: "液体 (水)",
+          ko: "액체 (물)",
+          es: "Líquido (Agua)",
+          de: "Flüssigkeit (Wasser)",
+          fi: "Neste (Vesi)",
+          fr: "Liquide (Eau)",
+          ar: "سائل (ماء)",
+          it: "Liquido (Acqua)",
+        },
+        solid: {
+          en: "Solid (Wood/Metal)",
+          zh: "固體 (木/金屬)",
+          ja: "固体 (木/金属)",
+          ko: "고체 (나무/금속)",
+          es: "Sólido (Madera/Metal)",
+          de: "Feststoff (Holz/Metall)",
+          fi: "Kiinteä (Puu/Metalli)",
+          fr: "Solide (Bois/Métal)",
+          ar: "صلب (خشب/معدن)",
+          it: "Solido (Legno/Metallo)",
+        },
+        speed: {
+          en: "Speed",
+          zh: "速度",
+          ja: "速度",
+          ko: "속도",
+          es: "Velocidad",
+          de: "Geschwindigkeit",
+          fi: "Nopeus",
+          fr: "Vitesse",
+          ar: "سرعة",
+          it: "Velocità",
+        },
+      };
+
+      const media = [
+        { id: "gas", speed: 2, particles: 10, color: "bg-sky-100" }, // Slowest, few particles
+        { id: "liquid", speed: 1, particles: 40, color: "bg-blue-300" }, // Medium
+        { id: "solid", speed: 0.2, particles: 100, color: "bg-amber-800" }, // Very fast, dense particles
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [activeMedium, setActiveMedium] = useState("gas");
+        const [wave, setWave] = useState(false);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+        const currentM = media.find((m) => m.id === activeMedium);
+
+        const playSound = () => {
+          setWave(false);
+          setTimeout(() => setWave(true), 50);
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-indigo-700">
+              {getText("title")}
+            </h1>
+
+            <div className="flex gap-4 mb-8">
+              {media.map((m) => (
+                <button
+                  key={m.id}
+                  onClick={() => {
+                    setActiveMedium(m.id);
+                    setWave(false);
+                  }}
+                  className={`px-6 py-3 rounded-full font-bold border-4 transition-transform active:scale-95
+                         ${
+                           activeMedium === m.id
+                             ? "border-indigo-500 bg-indigo-100"
+                             : "border-transparent bg-white"
+                         }
+                      `}
+                >
+                  {getText(m.id)}
+                </button>
+              ))}
+            </div>
+
+            <div
+              className="w-full max-w-4xl h-[400px] border-8 border-slate-700 rounded-3xl relative overflow-hidden bg-white shadow-xl cursor-pointer"
+              onClick={playSound}
+            >
+              {/* Background Particles representing density */}
+              <div
+                className={`absolute inset-0 transition-colors duration-500 ${currentM.color}`}
+              >
+                {[...Array(currentM.particles)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="absolute w-2 h-2 rounded-full bg-black/20"
+                    style={{
+                      left: Math.random() * 100 + "%",
+                      top: Math.random() * 100 + "%",
+                    }}
+                  />
+                ))}
+              </div>
+
+              {/* Speaker Icon / Source */}
+              <div className="absolute left-10 top-1/2 -translate-y-1/2 text-6xl z-10">
+                🔊
+              </div>
+
+              {/* Helper Text */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-slate-500 font-bold opacity-70 animate-pulse pointer-events-none">
+                {getText("instruction")}
+              </div>
+
+              {/* Sound Wave Animation */}
+              {wave && (
+                <motion.div
+                  className="absolute left-28 top-0 bottom-0 w-2 bg-indigo-500/50 shadow-[0_0_20px_indigo]"
+                  initial={{ x: 0, opacity: 1, scaleX: 1 }}
+                  animate={{ x: 800, opacity: 0, scaleX: 5 }}
+                  transition={{ duration: currentM.speed, ease: "linear" }}
+                  onAnimationComplete={() => setWave(false)}
+                />
+              )}
+            </div>
+
+            <div className="mt-8 text-2xl font-bold">
+              {getText("speed")}:
+              <span className="ml-2 text-indigo-600">
+                {activeMedium === "gas" && "Low 🐢"}
+                {activeMedium === "liquid" && "Medium 🚶"}
+                {activeMedium === "solid" && "High 🐇"}
+              </span>
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

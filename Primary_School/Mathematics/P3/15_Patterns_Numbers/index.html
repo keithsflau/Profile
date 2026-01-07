@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小三數學：數字規律</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fef3c7 0%, #fde047 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { motion } = window.Motion;
+      function App() {
+        const patterns = [
+          { name: "加2", seq: [2, 4, 6, 8, 10, 12, 14], rule: "+2" },
+          { name: "加5", seq: [5, 10, 15, 20, 25, 30, 35], rule: "+5" },
+          { name: "加10", seq: [10, 20, 30, 40, 50, 60, 70], rule: "+10" },
+          { name: "減3", seq: [30, 27, 24, 21, 18, 15, 12], rule: "-3" },
+          { name: "乘2", seq: [2, 4, 8, 16, 32, 64, 128], rule: "×2" },
+        ];
+        const [current, setCurrent] = useState(0);
+        const p = patterns[current];
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-6xl font-black text-yellow-900 mb-8">
+              🔢 數字規律
+            </h1>
+            <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-5xl w-full">
+              <div className="grid grid-cols-5 gap-4 mb-8">
+                {patterns.map((pat, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrent(i)}
+                    className={`py-3 rounded-xl font-bold transition-all ${
+                      current === i
+                        ? "bg-yellow-500 text-white scale-105"
+                        : "bg-yellow-100 hover:bg-yellow-200"
+                    }`}
+                  >
+                    {pat.name}
+                  </button>
+                ))}
+              </div>
+              <div className="text-center mb-8">
+                <div className="text-3xl font-black text-yellow-800 mb-4">
+                  規律：{p.rule}
+                </div>
+                <div className="flex justify-center gap-4 flex-wrap">
+                  {p.seq.map((num, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: i * 0.1 }}
+                      className="w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-2xl flex items-center justify-center text-3xl font-black text-white shadow-lg"
+                    >
+                      {num}
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+              <div className="bg-yellow-50 p-6 rounded-xl">
+                <div className="font-bold text-yellow-800 text-lg mb-3">
+                  💡 試試找出下一個數字
+                </div>
+                <div className="text-2xl font-black text-yellow-900">
+                  下一個數字是：
+                  {p.rule.includes("+")
+                    ? p.seq[p.seq.length - 1] + parseInt(p.rule.slice(1))
+                    : p.rule.includes("-")
+                    ? p.seq[p.seq.length - 1] - parseInt(p.rule.slice(1))
+                    : p.seq[p.seq.length - 1] * 2}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

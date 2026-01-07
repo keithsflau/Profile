@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小二數學：貨幣兌換 | Money Exchange</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fef3c7 0%, #d97706 100%);
+      }
+      .coin {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: inset -2px -2px 5px rgba(0, 0, 0, 0.1),
+          2px 2px 5px rgba(0, 0, 0, 0.2);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "🔄 Money Exchange",
+          zh: "🔄 貨幣兌換",
+          ja: "🔄 両替",
+          ko: "🔄 환전",
+          es: "🔄 Cambio de dinero",
+          de: "🔄 Geldwechsel",
+          fi: "🔄 Rahanvaihto",
+          fr: "🔄 Change d'argent",
+          ar: "🔄 صرف العملات",
+          it: "🔄 Cambio valuta",
+        },
+        pieces: {
+          en: "pieces",
+          zh: "個",
+          ja: "枚",
+          ko: "개",
+          es: "piezas",
+          de: "Stück",
+          fi: "kpl",
+          fr: "pièces",
+          ar: "قطع",
+          it: "pezzi",
+        },
+        check: {
+          en: "Check",
+          zh: "檢查",
+          ja: "確認",
+          ko: "확인",
+          es: "Comprobar",
+          de: "Prüfen",
+          fi: "Tarkista",
+          fr: "Vérifier",
+          ar: "تحقق",
+          it: "Controlla",
+        },
+      };
+
+      const Coin = ({ val, size = "md", lang = "zh" }) => {
+        let css = "";
+        let label = "";
+        const sz = size === "lg" ? "w-20 h-20 text-xl" : "w-14 h-14 text-sm";
+
+        if (val === 1) {
+          css = "bg-slate-300 border-4 border-slate-400 rounded-full";
+          label = "$1";
+        }
+        if (val === 2) {
+          css = "bg-slate-300 border-4 border-slate-400 rounded-[18px]";
+          label = "$2";
+        }
+        if (val === 5) {
+          css = "bg-slate-300 border-[5px] border-slate-400 rounded-full";
+          label = "$5";
+        }
+        if (val === 10) {
+          css =
+            "bg-yellow-100 border-[6px] border-yellow-600 rounded-full text-yellow-800";
+          label = "$10";
+        }
+
+        if (val === 0.1) {
+          css =
+            "bg-amber-600 border-2 border-amber-800 rounded-full text-white";
+          label = lang === "zh" ? "1毫" : "10¢";
+        }
+        if (val === 0.2) {
+          css =
+            "bg-amber-600 border-2 border-amber-800 rounded-[14px] text-white";
+          label = lang === "zh" ? "2毫" : "20¢";
+        }
+        if (val === 0.5) {
+          css =
+            "bg-amber-700 border-2 border-amber-900 rounded-full text-white";
+          label = lang === "zh" ? "5毫" : "50¢";
+        }
+
+        return (
+          <div className={`coin ${css} ${sz} font-bold select-none`}>
+            {label}
+          </div>
+        );
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [q, setQ] = useState({});
+        const [input, setInput] = useState("");
+        const [feedback, setFeedback] = useState("");
+
+        const problems = [
+          {
+            big: 2,
+            small: 1,
+            text: {
+              zh: "1個 $2 可換多少個 $1？",
+              en: "How many $1 coins make $2?",
+              ja: "$2は$1コイン何枚ですか？",
+            },
+          },
+          {
+            big: 5,
+            small: 1,
+            text: {
+              zh: "1個 $5 可換多少個 $1？",
+              en: "How many $1 coins make $5?",
+              ja: "$5は$1コイン何枚ですか？",
+            },
+          },
+          {
+            big: 10,
+            small: 1,
+            text: {
+              zh: "1個 $10 可換多少個 $1？",
+              en: "How many $1 coins make $10?",
+              ja: "$10は$1コイン何枚ですか？",
+            },
+          },
+          {
+            big: 10,
+            small: 2,
+            text: {
+              zh: "1個 $10 可換多少個 $2？",
+              en: "How many $2 coins make $10?",
+              ja: "$10は$2コイン何枚ですか？",
+            },
+          },
+          {
+            big: 10,
+            small: 5,
+            text: {
+              zh: "1個 $10 可換多少個 $5？",
+              en: "How many $5 coins make $10?",
+              ja: "$10は$5コイン何枚ですか？",
+            },
+          },
+          {
+            big: 1,
+            small: 0.5,
+            text: {
+              zh: "1個 $1 可換多少個 5毫？",
+              en: "How many 50 cents make $1?",
+              ja: "$1は50セント何枚ですか？",
+            },
+          },
+          {
+            big: 1,
+            small: 0.2,
+            text: {
+              zh: "1個 $1 可換多少個 2毫？",
+              en: "How many 20 cents make $1?",
+              ja: "$1は20セント何枚ですか？",
+            },
+          },
+          {
+            big: 1,
+            small: 0.1,
+            text: {
+              zh: "1個 $1 可換多少個 1毫？",
+              en: "How many 10 cents make $1?",
+              ja: "$1は10セント何枚ですか？",
+            },
+          },
+        ];
+
+        const next = () => {
+          const p = problems[Math.floor(Math.random() * problems.length)];
+          setQ(p);
+          setInput("");
+          setFeedback("");
+        };
+
+        useEffect(next, []);
+
+        const check = () => {
+          if (parseInt(input) === Math.round(q.big / q.small)) {
+            setFeedback("CORRECT");
+            setTimeout(next, 2000);
+          } else {
+            setFeedback("WRONG");
+          }
+        };
+
+        if (!q.big) return null;
+
+        const ansCount = Math.round(q.big / q.small);
+        const getQuestionText = () =>
+          q.text[lang] || q.text["en"] || q.text["zh"];
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center justify-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+
+            <h1 className="text-4xl md:text-5xl font-black text-amber-900 mb-8 max-w-xl text-center">
+              {t.title[lang] || t.title["en"]}
+            </h1>
+
+            <div className="bg-white/95 rounded-3xl p-8 shadow-2xl w-full max-w-2xl text-center border-4 border-amber-300">
+              <div className="flex items-center justify-center gap-8 mb-8 bg-amber-50 p-6 rounded-2xl">
+                <div className="flex flex-col items-center">
+                  <Coin val={q.big} size="lg" lang={lang} />
+                </div>
+                <div className="text-4xl font-black text-amber-400">➔</div>
+                <div className="flex flex-col items-center gap-2">
+                  <div className="flex gap-2 flex-wrap justify-center text-4xl font-bold bg-white px-4 py-2 rounded-xl border-b-4 border-amber-200">
+                    <input
+                      type="number"
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      className="w-16 text-center outline-none bg-transparent"
+                      placeholder="?"
+                      autoFocus
+                    />
+                    <span className="text-slate-400 text-lg flex items-center">
+                      {t.pieces[lang] || t.pieces["en"]}
+                    </span>
+                  </div>
+                  <Coin val={q.small} size="md" lang={lang} />
+                </div>
+              </div>
+
+              <div className="text-xl md:text-2xl font-bold text-slate-700 mb-8 leading-loose">
+                {getQuestionText()}
+              </div>
+
+              <button
+                onClick={check}
+                className="px-10 py-3 bg-amber-500 text-white rounded-full font-black text-2xl shadow-xl hover:bg-amber-600 active:scale-95 transition-transform"
+              >
+                {t.check[lang] || t.check["en"]}
+              </button>
+
+              <div className="h-16 mt-8">
+                {feedback === "CORRECT" && (
+                  <div className="text-4xl font-black text-green-500 animate-bounce">
+                    {get("correct", lang)}
+                  </div>
+                )}
+                {feedback === "WRONG" && (
+                  <div className="text-4xl font-black text-red-500 animate-shake">
+                    {get("wrong", lang)}
+                  </div>
+                )}
+              </div>
+
+              {feedback === "CORRECT" && (
+                <div className="flex justify-center flex-wrap gap-2 mt-4 max-w-md mx-auto animate-fade-in">
+                  {[...Array(ansCount)].map((_, i) => (
+                    <Coin key={i} val={q.small} lang={lang} />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

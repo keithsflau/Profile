@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小一常識：五官對對碰 | My Five Senses</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #f0abfc 0%, #c084fc 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "My Five Senses",
+          zh: "五官對對碰",
+          ja: "五感マッチング",
+        },
+        instruction: {
+          en: "Match the sense organ to the object!",
+          zh: "把感覺器官和對應的物體連起來！",
+          ja: "感覚器官を物体に合わせましょう！",
+        },
+        eye: { en: "Eyes", zh: "眼" },
+        ear: { en: "Ears", zh: "耳" },
+        nose: { en: "Nose", zh: "鼻" },
+        mouth: { en: "Tongue", zh: "舌" },
+        hand: { en: "Skin (Hand)", zh: "皮膚(手)" },
+
+        rainbow: { en: "Rainbow (See)", zh: "彩虹 (看)" },
+        bell: { en: "Bell (Hear)", zh: "鈴聲 (聽)" },
+        flower: { en: "Flower (Smell)", zh: "花朵 (聞)" },
+        icecream: { en: "Ice Cream (Taste)", zh: "雪糕 (嚐)" },
+        cactus: { en: "Cactus (Touch)", zh: "仙人掌 (觸)" },
+
+        matched: { en: "Matched!", zh: "配對成功！" },
+        completed: { en: "All Matched!", zh: "全部配對完成！" },
+        restart: { en: "Play Again", zh: "再玩一次" },
+      };
+
+      const pairs = [
+        {
+          id: "p1",
+          organ: "eye",
+          organIcon: "👀",
+          object: "rainbow",
+          objectIcon: "🌈",
+        },
+        {
+          id: "p2",
+          organ: "ear",
+          organIcon: "👂",
+          object: "bell",
+          objectIcon: "🔔",
+        },
+        {
+          id: "p3",
+          organ: "nose",
+          organIcon: "👃",
+          object: "flower",
+          objectIcon: "🌹",
+        },
+        {
+          id: "p4",
+          organ: "mouth",
+          organIcon: "👅",
+          object: "icecream",
+          objectIcon: "🍦",
+        },
+        {
+          id: "p5",
+          organ: "hand",
+          organIcon: "✋",
+          object: "cactus",
+          objectIcon: "🌵",
+        },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [selectedOrgan, setSelectedOrgan] = useState(null); // id
+        const [matched, setMatched] = useState([]); // list of pair ids
+        const [shuffledObjects, setShuffledObjects] = useState([]);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        useEffect(() => {
+          setShuffledObjects([...pairs].sort(() => Math.random() - 0.5));
+        }, []);
+
+        const handleOrganClick = (pairId) => {
+          if (matched.includes(pairId)) return;
+          setSelectedOrgan(pairId);
+        };
+
+        const handleObjectClick = (pairId) => {
+          if (matched.includes(pairId)) return;
+          if (selectedOrgan === pairId) {
+            setMatched([...matched, pairId]);
+            setSelectedOrgan(null);
+          } else {
+            // Wrong
+            setSelectedOrgan(null); // Simple reset
+          }
+        };
+
+        const restart = () => {
+          setMatched([]);
+          setSelectedOrgan(null);
+          setShuffledObjects([...pairs].sort(() => Math.random() - 0.5));
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-purple-900 mb-4 mt-8 drop-shadow-sm">
+              👀 {getText("title")}
+            </h1>
+            <p className="text-xl font-bold text-white mb-8">
+              {getText("instruction")}
+            </p>
+
+            <div className="flex w-full max-w-4xl justify-between gap-8 md:gap-16">
+              {/* Organs Column */}
+              <div className="flex flex-col gap-4 flex-1">
+                {pairs.map((p) => {
+                  const isMatched = matched.includes(p.id);
+                  const isSelected = selectedOrgan === p.id;
+                  return (
+                    <motion.button
+                      key={p.id}
+                      onClick={() => handleOrganClick(p.id)}
+                      whileHover={{ scale: 1.05 }}
+                      className={`p-4 rounded-2xl flex items-center justify-between border-4 shadow-lg h-24 transition-colors ${
+                        isMatched
+                          ? "bg-green-400 border-green-600 opacity-50"
+                          : isSelected
+                          ? "bg-yellow-300 border-yellow-500"
+                          : "bg-white border-purple-200 hover:border-purple-400"
+                      }`}
+                    >
+                      <span className="text-4xl">{p.organIcon}</span>
+                      <span className="text-lg font-bold text-slate-700">
+                        {getText(p.organ)}
+                      </span>
+                    </motion.button>
+                  );
+                })}
+              </div>
+
+              {/* Objects Column */}
+              <div className="flex flex-col gap-4 flex-1">
+                {shuffledObjects.map((p) => {
+                  const isMatched = matched.includes(p.id);
+                  return (
+                    <motion.button
+                      key={p.id}
+                      onClick={() => handleObjectClick(p.id)}
+                      whileHover={{ scale: 1.05 }}
+                      className={`p-4 rounded-2xl flex items-center justify-between border-4 shadow-lg h-24 transition-colors ${
+                        isMatched
+                          ? "bg-green-400 border-green-600 opacity-50"
+                          : "bg-white border-blue-200 hover:border-blue-400"
+                      }`}
+                    >
+                      <span className="text-lg font-bold text-slate-700">
+                        {getText(p.object)}
+                      </span>
+                      <span className="text-4xl">{p.objectIcon}</span>
+                    </motion.button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {matched.length === pairs.length && (
+              <div className="fixed inset-0 bg-black/50 backdrop-blur flex items-center justify-center p-4">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="bg-white rounded-3xl p-8 text-center max-w-sm w-full"
+                >
+                  <div className="text-8xl mb-4">🎉</div>
+                  <h2 className="text-3xl font-black text-purple-600 mb-6">
+                    {getText("completed")}
+                  </h2>
+                  <button
+                    onClick={restart}
+                    className="bg-purple-500 text-white px-8 py-3 rounded-full font-black text-xl hover:bg-purple-600 shadow-xl"
+                  >
+                    {getText("restart")} 🔄
+                  </button>
+                </motion.div>
+              </div>
+            )}
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

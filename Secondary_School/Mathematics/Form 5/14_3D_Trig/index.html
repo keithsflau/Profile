@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3D Trigonometry | S5 Math</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script
+      type="text/javascript"
+      id="MathJax-script"
+      async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+    ></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", sans-serif;
+        background: #ecfeff; /* cyan-50 */
+        color: #1e293b;
+      }
+      .glass {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <div id="root" class="flex-grow flex flex-col"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      const translations = {
+        en: {
+          unit: "Unit 3: Trigonometry",
+          title: "3D Trigonometry - Cuboid",
+          desc: "Find space diagonals and angles in 3D shapes.",
+          length: "Length (a)",
+          width: "Width (b)",
+          height: "Height (c)",
+          baseDiag: "Base Diagonal (AC)",
+          spaceDiag: "Space Diagonal (AG)",
+          angleDiag: "Angle with Base (θ)",
+          langBtn: "中文",
+        },
+        zh: {
+          unit: "單元三：三角學",
+          title: "立體三角學 - 長方體",
+          desc: "計算立體形狀的空間對角線和角度。",
+          length: "長 (a)",
+          width: "寬 (b)",
+          height: "高 (c)",
+          baseDiag: "底面對角線 (AC)",
+          spaceDiag: "空間對角線 (AG)",
+          angleDiag: "與底面夾角 (θ)",
+          langBtn: "English",
+        },
+      };
+
+      const App = () => {
+        const [lang, setLang] = useState("en");
+        const t = translations[lang];
+
+        const [a, setA] = useState(4);
+        const [b, setB] = useState(3);
+        const [c, setC] = useState(5);
+
+        // Calculations
+        const baseDiag = Math.sqrt(a * a + b * b); // AC
+        const spaceDiag = Math.sqrt(a * a + b * b + c * c); // AG
+        const angle = (Math.atan(c / baseDiag) * 180) / Math.PI;
+
+        // 3D Isometric-ish view
+        const w = 400,
+          h = 350;
+        const scale = 25;
+
+        // Isometric projection (simplified)
+        const iso = (x, y, z) => ({
+          x: 100 + (x - y) * 0.866 * scale,
+          y: 280 - (x + y) * 0.5 * scale - z * scale,
+        });
+
+        // Vertices
+        const A = iso(0, 0, 0);
+        const B = iso(a, 0, 0);
+        const C = iso(a, b, 0);
+        const D = iso(0, b, 0);
+        const E = iso(0, 0, c);
+        const F = iso(a, 0, c);
+        const G = iso(a, b, c);
+        const H = iso(0, b, c);
+
+        useEffect(() => {
+          if (window.MathJax) window.MathJax.typesetPromise();
+        }, [a, b, c, lang]);
+
+        return (
+          <div className="flex-grow flex flex-col items-center justify-center p-8 select-none">
+            <div className="absolute top-4 right-4">
+              <button
+                onClick={() => setLang((l) => (l === "en" ? "zh" : "en"))}
+                className="px-3 py-1 bg-white border border-cyan-200 rounded-full text-xs font-bold text-cyan-600 hover:bg-cyan-50 transition flex items-center gap-2 shadow-sm"
+              >
+                <i className="fa-solid fa-language"></i>
+                {t.langBtn}
+              </button>
+            </div>
+
+            <header className="mb-8 text-center">
+              <div className="text-cyan-600 font-bold uppercase tracking-widest text-xs mb-2">
+                {t.unit}
+              </div>
+              <h1 className="text-4xl font-extrabold text-slate-900 mb-2">
+                {t.title}
+              </h1>
+              <p className="text-slate-500 font-mono text-lg">{t.desc}</p>
+            </header>
+
+            <div className="glass p-8 rounded-3xl w-full max-w-5xl mb-8 flex flex-col lg:flex-row gap-8 shadow-xl border border-cyan-100/50">
+              {/* 3D Diagram */}
+              <div className="bg-white rounded-3xl shadow-sm border border-slate-100 flex-1 flex items-center justify-center overflow-hidden min-h-[400px]">
+                <svg width={w} height={h} className="overflow-visible">
+                  {/* Back edges (dashed) */}
+                  <line
+                    x1={A.x}
+                    y1={A.y}
+                    x2={D.x}
+                    y2={D.y}
+                    stroke="#cbd5e1"
+                    strokeWidth="2"
+                    strokeDasharray="5"
+                  />
+                  <line
+                    x1={D.x}
+                    y1={D.y}
+                    x2={H.x}
+                    y2={H.y}
+                    stroke="#cbd5e1"
+                    strokeWidth="2"
+                    strokeDasharray="5"
+                  />
+                  <line
+                    x1={D.x}
+                    y1={D.y}
+                    x2={C.x}
+                    y2={C.y}
+                    stroke="#cbd5e1"
+                    strokeWidth="2"
+                    strokeDasharray="5"
+                  />
+
+                  {/* Bottom face */}
+                  <line
+                    x1={A.x}
+                    y1={A.y}
+                    x2={B.x}
+                    y2={B.y}
+                    stroke="#0891b2"
+                    strokeWidth="3"
+                  />
+                  <line
+                    x1={B.x}
+                    y1={B.y}
+                    x2={C.x}
+                    y2={C.y}
+                    stroke="#0891b2"
+                    strokeWidth="3"
+                  />
+
+                  {/* Vertical edges */}
+                  <line
+                    x1={A.x}
+                    y1={A.y}
+                    x2={E.x}
+                    y2={E.y}
+                    stroke="#0891b2"
+                    strokeWidth="3"
+                  />
+                  <line
+                    x1={B.x}
+                    y1={B.y}
+                    x2={F.x}
+                    y2={F.y}
+                    stroke="#0891b2"
+                    strokeWidth="3"
+                  />
+                  <line
+                    x1={C.x}
+                    y1={C.y}
+                    x2={G.x}
+                    y2={G.y}
+                    stroke="#0891b2"
+                    strokeWidth="3"
+                  />
+
+                  {/* Top face */}
+                  <line
+                    x1={E.x}
+                    y1={E.y}
+                    x2={F.x}
+                    y2={F.y}
+                    stroke="#0891b2"
+                    strokeWidth="3"
+                  />
+                  <line
+                    x1={F.x}
+                    y1={F.y}
+                    x2={G.x}
+                    y2={G.y}
+                    stroke="#0891b2"
+                    strokeWidth="3"
+                  />
+                  <line
+                    x1={G.x}
+                    y1={G.y}
+                    x2={H.x}
+                    y2={H.y}
+                    stroke="#0891b2"
+                    strokeWidth="3"
+                  />
+                  <line
+                    x1={H.x}
+                    y1={H.y}
+                    x2={E.x}
+                    y2={E.y}
+                    stroke="#0891b2"
+                    strokeWidth="3"
+                  />
+
+                  {/* Base Diagonal */}
+                  <line
+                    x1={A.x}
+                    y1={A.y}
+                    x2={C.x}
+                    y2={C.y}
+                    stroke="#f59e0b"
+                    strokeWidth="3"
+                    strokeDasharray="8"
+                  />
+
+                  {/* Space Diagonal */}
+                  <line
+                    x1={A.x}
+                    y1={A.y}
+                    x2={G.x}
+                    y2={G.y}
+                    stroke="#f43f5e"
+                    strokeWidth="4"
+                  />
+
+                  {/* Vertices labels */}
+                  <circle cx={A.x} cy={A.y} r="5" fill="#06b6d4" />
+                  <text
+                    x={A.x - 20}
+                    y={A.y + 10}
+                    className="text-xs fill-cyan-700 font-bold"
+                  >
+                    A
+                  </text>
+                  <circle cx={B.x} cy={B.y} r="5" fill="#06b6d4" />
+                  <text
+                    x={B.x + 10}
+                    y={B.y + 10}
+                    className="text-xs fill-cyan-700 font-bold"
+                  >
+                    B
+                  </text>
+                  <circle cx={C.x} cy={C.y} r="5" fill="#06b6d4" />
+                  <text
+                    x={C.x + 10}
+                    y={C.y - 5}
+                    className="text-xs fill-cyan-700 font-bold"
+                  >
+                    C
+                  </text>
+                  <circle cx={G.x} cy={G.y} r="6" fill="#f43f5e" />
+                  <text
+                    x={G.x + 10}
+                    y={G.y - 10}
+                    className="text-xs fill-rose-600 font-bold"
+                  >
+                    G
+                  </text>
+
+                  {/* Dimension labels - Simplified */}
+                  <rect
+                    x={(A.x + B.x) / 2 - 20}
+                    y={A.y + 15}
+                    width="40"
+                    height="20"
+                    fill="white"
+                    opacity="0.8"
+                    rx="4"
+                  />
+                  <text
+                    x={(A.x + B.x) / 2}
+                    y={A.y + 28}
+                    textAnchor="middle"
+                    className="text-xs fill-cyan-700 font-mono font-bold"
+                  >
+                    a = {a}
+                  </text>
+                </svg>
+              </div>
+
+              {/* Controls */}
+              <div className="flex-1 space-y-8">
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-4">
+                  <div>
+                    <div className="flex justify-between text-xs font-bold text-slate-400 uppercase mb-2">
+                      <span>{t.length}</span>
+                      <span className="text-cyan-600 font-mono">{a}</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="1"
+                      max="8"
+                      step="0.5"
+                      value={a}
+                      onChange={(e) => setA(Number(e.target.value))}
+                      className="w-full accent-cyan-500 h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer"
+                    />
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-xs font-bold text-slate-400 uppercase mb-2">
+                      <span>{t.width}</span>
+                      <span className="text-cyan-600 font-mono">{b}</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="1"
+                      max="8"
+                      step="0.5"
+                      value={b}
+                      onChange={(e) => setB(Number(e.target.value))}
+                      className="w-full accent-cyan-500 h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer"
+                    />
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-xs font-bold text-slate-400 uppercase mb-2">
+                      <span>{t.height}</span>
+                      <span className="text-cyan-600 font-mono">{c}</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="1"
+                      max="8"
+                      step="0.5"
+                      value={c}
+                      onChange={(e) => setC(Number(e.target.value))}
+                      className="w-full accent-cyan-500 h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="bg-amber-50 p-4 rounded-xl border border-amber-100 flex items-center gap-4">
+                    <div className="bg-amber-100 w-10 h-10 rounded-full flex items-center justify-center text-amber-600">
+                      <i className="fa-solid fa-ruler"></i>
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-amber-400 uppercase">
+                        {t.baseDiag}
+                      </div>
+                      <div className="text-xl font-bold text-amber-700 font-mono">
+                        {baseDiag.toFixed(2)}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-rose-50 p-4 rounded-xl border border-rose-100 flex items-center gap-4">
+                    <div className="bg-rose-100 w-10 h-10 rounded-full flex items-center justify-center text-rose-600">
+                      <i className="fa-solid fa-ruler-combined"></i>
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-rose-400 uppercase">
+                        {t.spaceDiag}
+                      </div>
+                      <div className="text-xl font-bold text-rose-700 font-mono">
+                        {spaceDiag.toFixed(2)}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100 flex items-center gap-4">
+                    <div className="bg-emerald-100 w-10 h-10 rounded-full flex items-center justify-center text-emerald-600">
+                      <i className="fa-solid fa-angle-up"></i>
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-emerald-400 uppercase">
+                        {t.angleDiag}
+                      </div>
+                      <div className="text-xl font-bold text-emerald-700 font-mono">
+                        {angle.toFixed(1)}°
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <footer className="mt-8">
+              <a
+                href="../index.html"
+                className="text-cyan-500 hover:text-cyan-700 font-bold"
+              >
+                <i className="fa-solid fa-arrow-left mr-2"></i> Back to
+                Dashboard
+              </a>
+            </footer>
+          </div>
+        );
+      };
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

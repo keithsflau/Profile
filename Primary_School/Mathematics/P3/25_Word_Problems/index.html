@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>小三數學：應用題訓練</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #e0e7ff 0%, #818cf8 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      function App() {
+        const problems = [
+          { q: "小明有24個蘋果，吃了5個，還剩多少個？", a: 19, op: "-" },
+          { q: "書店有35本書，又進貨了18本，現在共有多少本？", a: 53, op: "+" },
+          { q: "一盒有6個蛋糕，8盒共有多少個？", a: 48, op: "×" },
+          { q: "36個糖果平均分給4個小朋友，每人得多少個？", a: 9, op: "÷" },
+        ];
+        const [current, setCurrent] = useState(0);
+        const [answer, setAnswer] = useState("");
+        const [feedback, setFeedback] = useState(null);
+        const [score, setScore] = useState(0);
+        const p = problems[current];
+        const check = () => {
+          if (parseInt(answer) === p.a) {
+            setFeedback("correct");
+            setScore((s) => s + 10);
+            setTimeout(() => {
+              setCurrent((current + 1) % problems.length);
+              setAnswer("");
+              setFeedback(null);
+            }, 1500);
+          } else {
+            setFeedback("incorrect");
+          }
+        };
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-6xl font-black text-white mb-8">
+              📝 應用題訓練
+            </h1>
+            <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-3xl w-full">
+              <div className="text-2xl font-bold text-indigo-600 mb-2">
+                題目 {current + 1}/{problems.length}
+              </div>
+              <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-8 mb-8 border-4 border-indigo-300">
+                <div className="text-3xl font-bold text-indigo-900 leading-relaxed">
+                  {p.q}
+                </div>
+              </div>
+              <div className="mb-6">
+                <input
+                  type="number"
+                  value={answer}
+                  onChange={(e) => setAnswer(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && check()}
+                  placeholder="輸入答案..."
+                  className="w-full px-8 py-6 text-5xl font-black text-center rounded-2xl border-4 border-indigo-300 focus:border-indigo-600 outline-none"
+                />
+              </div>
+              <button
+                onClick={check}
+                className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white text-2xl font-bold rounded-2xl mb-4"
+              >
+                提交答案
+              </button>
+              {feedback === "correct" && (
+                <div className="bg-green-100 text-green-700 p-4 rounded-xl text-center font-bold text-xl">
+                  ✓ 答對了！
+                </div>
+              )}
+              {feedback === "incorrect" && (
+                <div className="bg-red-100 text-red-700 p-4 rounded-xl text-center font-bold text-xl">
+                  ✗ 再想想！正確答案：{p.a}
+                </div>
+              )}
+              <div className="mt-6 text-center text-3xl font-black text-indigo-600">
+                總分：{score}
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

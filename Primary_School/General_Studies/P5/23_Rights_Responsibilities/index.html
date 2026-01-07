@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Rights and Responsibilities</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #f0f9ff;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Rights vs Responsibilities",
+          zh: "權利與義務",
+          ja: "権利と義務",
+          ko: "권리와 의무",
+          es: "Derechos vs Responsabilidades",
+          de: "Rechte vs Pflichten",
+          fi: "Oikeudet vs Velvollisuudet",
+          fr: "Droits vs Responsabilités",
+          ar: "الحقوق مقابل المسؤوليات",
+          it: "Diritti vs Responsabilità",
+        },
+        instruction: {
+          en: "Is this a Right or a Responsibility?",
+          zh: "這是權利還是義務 (責任)？",
+          ja: "これは権利ですか、それとも責任ですか？",
+          ko: "이것은 권리인가요, 아니면 의무인가요?",
+          es: "¿Es esto un derecho o una responsabilidad?",
+          de: "Ist das ein Recht oder eine Pflicht?",
+          fi: "Onko tämä oikeus vai velvollisuus?",
+          fr: "Est-ce un droit ou une responsabilité ?",
+          ar: "هل هذا حق أم مسؤولية؟",
+          it: "È un Diritto o una Responsabilità?",
+        },
+        right: {
+          en: "Right",
+          zh: "權利",
+          ja: "権利",
+          ko: "권리",
+          es: "Derecho",
+          de: "Recht",
+          fi: "Oikeus",
+          fr: "Droit",
+          ar: "حق",
+          it: "Diritto",
+        },
+        resp: {
+          en: "Responsibility",
+          zh: "義務 (責任)",
+          ja: "義務",
+          ko: "의무",
+          es: "Responsabilidad",
+          de: "Pflicht",
+          fi: "Velvollisuus",
+          fr: "Responsabilité",
+          ar: "مسؤولية",
+          it: "Responsabilità",
+        },
+
+        i1: {
+          en: "Vote in elections",
+          zh: "選舉投票",
+          ja: "選挙での投票",
+          ko: "선거 투표",
+        }, // Right
+        i2: {
+          en: "Pay taxes",
+          zh: "繳納稅款",
+          ja: "税金を払う",
+          ko: "세금 납부",
+        }, // Resp
+        i3: {
+          en: "Freedom of Speech",
+          zh: "言論自由",
+          ja: "言論の自由",
+          ko: "언론의 자유",
+        }, // Right
+        i4: {
+          en: "Obey the laws",
+          zh: "遵守法律",
+          ja: "法律を守る",
+          ko: "법률 준수",
+        }, // Resp
+        i5: {
+          en: "Education",
+          zh: "接受教育",
+          ja: "教育を受ける",
+          ko: "교육받을 권리",
+        }, // Right
+        i6: {
+          en: "Protect environment",
+          zh: "保護環境",
+          ja: "環境を保護する",
+          ko: "환경 보호",
+        }, // Resp
+
+        correct: { en: "Correct!", zh: "正確！", ja: "正解！", ko: "정답!" },
+        wrong: {
+          en: "Try Again",
+          zh: "再試一次",
+          ja: "もう一度",
+          ko: "다시 시도",
+        },
+      };
+
+      const items = [
+        { id: "i1", type: "right", icon: "🗳️" },
+        { id: "i2", type: "resp", icon: "💰" },
+        { id: "i3", type: "right", icon: "🗣️" },
+        { id: "i4", type: "resp", icon: "⚖️" },
+        { id: "i5", type: "right", icon: "📚" },
+        { id: "i6", type: "resp", icon: "♻️" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [index, setIndex] = useState(0);
+        const [feedback, setFeedback] = useState(null);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+        const current = items[index];
+
+        const handleAnswer = (ans) => {
+          if (feedback) return;
+          if (ans === current.type) {
+            setFeedback("correct");
+            setTimeout(() => {
+              setFeedback(null);
+              setIndex((index + 1) % items.length);
+            }, 1000);
+          } else {
+            setFeedback("wrong");
+            setTimeout(() => setFeedback(null), 500);
+          }
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col items-center justify-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-sky-800">
+              {getText("title")}
+            </h1>
+
+            <div className="w-full max-w-lg bg-white p-8 rounded-3xl shadow-xl text-center border-4 border-sky-100">
+              <div className="text-sky-500 font-bold mb-8">
+                {getText("instruction")}
+              </div>
+
+              <div className="bg-sky-50 p-10 rounded-2xl mb-8 flex flex-col items-center">
+                <div className="text-8xl mb-4 animate-bounce-slow">
+                  {current.icon}
+                </div>
+                <div className="text-3xl font-bold text-slate-800">
+                  {getText(current.id)}
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <button
+                  onClick={() => handleAnswer("right")}
+                  className="flex-1 bg-yellow-100 hover:bg-yellow-200 text-yellow-900 py-6 rounded-2xl font-black text-xl border-b-4 border-yellow-300 active:border-b-0 active:translate-y-1"
+                >
+                  {getText("right")}
+                </button>
+                <button
+                  onClick={() => handleAnswer("resp")}
+                  className="flex-1 bg-blue-100 hover:bg-blue-200 text-blue-900 py-6 rounded-2xl font-black text-xl border-b-4 border-blue-300 active:border-b-0 active:translate-y-1"
+                >
+                  {getText("resp")}
+                </button>
+              </div>
+
+              {feedback && (
+                <div
+                  className={`mt-6 text-3xl font-black ${
+                    feedback === "correct" ? "text-green-600" : "text-red-500"
+                  } animate-pulse`}
+                >
+                  {getText(feedback)}
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

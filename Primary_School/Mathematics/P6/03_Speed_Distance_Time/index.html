@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小六數學：速度、距離、時間模擬器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      src="https://unpkg.com/react@18/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.min.js"></script>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+      .road {
+        background: linear-gradient(
+          to bottom,
+          #4b5563 48%,
+          #fff 48%,
+          #fff 52%,
+          #4b5563 52%
+        );
+        background-size: 100% 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect, useRef } = React;
+      const { motion, useAnimation } = window.Motion;
+      const { Car, Timer, Ruler, Gauge, Play, Pause, RotateCcw } =
+        window.LucideReact;
+
+      function App() {
+        const [mode, setMode] = useState("calculator"); // calculator, animation
+        const [speed, setSpeed] = useState(60); // km/h
+        const [distance, setDistance] = useState(120); // km
+        const [time, setTime] = useState(2); // hours
+        const [solving, setSolving] = useState("time"); // speed, distance, time
+        const [isAnimating, setIsAnimating] = useState(false);
+        const controls = useAnimation();
+
+        const scenarios = [
+          { vehicle: "🚗", name: "汽車", speed: 60, emoji: "🚗" },
+          { vehicle: "🚄", name: "高鐵", speed: 300, emoji: "🚄" },
+          { vehicle: "🚲", name: "單車", speed: 15, emoji: "🚲" },
+          { vehicle: "🏃", name: "跑步", speed: 10, emoji: "🏃" },
+          { vehicle: "✈️", name: "飛機", speed: 800, emoji: "✈️" },
+        ];
+
+        const [selectedVehicle, setSelectedVehicle] = useState(scenarios[0]);
+
+        // S = D / T
+        // D = S × T
+        // T = D / S
+
+        const calculateSpeed = () => distance / time;
+        const calculateDistance = () => speed * time;
+        const calculateTime = () => distance / speed;
+
+        const startAnimation = async () => {
+          setIsAnimating(true);
+          const duration = (distance / speed) * 2; // Scale for visibility
+
+          await controls.start({
+            x: 600,
+            transition: { duration: duration, ease: "linear" },
+          });
+
+          setIsAnimating(false);
+        };
+
+        const resetAnimation = () => {
+          controls.set({ x: 0 });
+          setIsAnimating(false);
+        };
+
+        const getSolution = () => {
+          switch (solving) {
+            case "speed":
+              return {
+                formula: "S = D ÷ T",
+                calculation: `${distance} ÷ ${time}`,
+                answer: calculateSpeed().toFixed(2),
+                unit: "km/h",
+              };
+            case "distance":
+              return {
+                formula: "D = S × T",
+                calculation: `${speed} × ${time}`,
+                answer: calculateDistance().toFixed(2),
+                unit: "km",
+              };
+            case "time":
+              return {
+                formula: "T = D ÷ S",
+                calculation: `${distance} ÷ ${speed}`,
+                answer: calculateTime().toFixed(2),
+                unit: "hours",
+              };
+          }
+        };
+
+        const solution = getSolution();
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <header className="text-center mb-8">
+              <div className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-md px-6 py-3 rounded-full mb-4">
+                <Car className="text-white" size={24} />
+                <span className="text-white font-bold text-lg">小六數學</span>
+              </div>
+              <h1 className="text-4xl md:text-5xl font-black text-white mb-2 tracking-tight">
+                速度、距離、時間
+              </h1>
+              <p className="text-xl text-white/80 font-medium">
+                Speed, Distance, Time
+              </p>
+            </header>
+
+            {/* Mode Selector */}
+            <div className="flex gap-3 mb-8">
+              <button
+                onClick={() => setMode("calculator")}
+                className={`px-6 py-3 rounded-2xl font-bold transition-all ${
+                  mode === "calculator"
+                    ? "bg-white text-purple-600 shadow-lg"
+                    : "bg-white/20 text-white"
+                }`}
+              >
+                計算器模式
+              </button>
+              <button
+                onClick={() => setMode("animation")}
+                className={`px-6 py-3 rounded-2xl font-bold transition-all ${
+                  mode === "animation"
+                    ? "bg-white text-purple-600 shadow-lg"
+                    : "bg-white/20 text-white"
+                }`}
+              >
+                動畫模擬
+              </button>
+            </div>
+
+            <main className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8">
+              {/* Main Area */}
+              <div className="lg:col-span-8 bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl">
+                {mode === "calculator" && (
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-800 mb-6">
+                      公式計算器
+                    </h2>
+
+                    {/* Formula Triangle */}
+                    <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-8 mb-6 text-center">
+                      <div className="inline-block">
+                        <div className="text-6xl font-black text-blue-600 mb-4">
+                          D
+                        </div>
+                        <div className="border-t-4 border-slate-400 w-32 mb-4"></div>
+                        <div className="flex justify-between text-4xl font-black">
+                          <span className="text-green-600">S</span>
+                          <span className="text-slate-400 mx-4">×</span>
+                          <span className="text-orange-600">T</span>
+                        </div>
+                      </div>
+                      <div className="mt-6 text-sm text-slate-600 font-medium">
+                        蓋住要求的值，剩下的就是公式！
+                      </div>
+                    </div>
+
+                    {/* Solving Mode Selector */}
+                    <div className="grid grid-cols-3 gap-3 mb-6">
+                      <button
+                        onClick={() => setSolving("speed")}
+                        className={`py-4 rounded-2xl font-bold transition-all ${
+                          solving === "speed"
+                            ? "bg-green-500 text-white shadow-lg"
+                            : "bg-slate-100 text-slate-600"
+                        }`}
+                      >
+                        求速度 (S)
+                      </button>
+                      <button
+                        onClick={() => setSolving("distance")}
+                        className={`py-4 rounded-2xl font-bold transition-all ${
+                          solving === "distance"
+                            ? "bg-blue-500 text-white shadow-lg"
+                            : "bg-slate-100 text-slate-600"
+                        }`}
+                      >
+                        求距離 (D)
+                      </button>
+                      <button
+                        onClick={() => setSolving("time")}
+                        className={`py-4 rounded-2xl font-bold transition-all ${
+                          solving === "time"
+                            ? "bg-orange-500 text-white shadow-lg"
+                            : "bg-slate-100 text-slate-600"
+                        }`}
+                      >
+                        求時間 (T)
+                      </button>
+                    </div>
+
+                    {/* Input Fields */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                      {solving !== "speed" && (
+                        <div>
+                          <label className="block text-sm font-bold text-slate-600 mb-2">
+                            速度 (S)
+                          </label>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="number"
+                              value={speed}
+                              onChange={(e) =>
+                                setSpeed(parseFloat(e.target.value) || 0)
+                              }
+                              className="flex-1 px-4 py-3 rounded-xl border-2 border-green-200 focus:border-green-500 outline-none text-xl font-black text-center"
+                            />
+                            <span className="text-slate-600 font-bold">
+                              km/h
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
+                      {solving !== "distance" && (
+                        <div>
+                          <label className="block text-sm font-bold text-slate-600 mb-2">
+                            距離 (D)
+                          </label>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="number"
+                              value={distance}
+                              onChange={(e) =>
+                                setDistance(parseFloat(e.target.value) || 0)
+                              }
+                              className="flex-1 px-4 py-3 rounded-xl border-2 border-blue-200 focus:border-blue-500 outline-none text-xl font-black text-center"
+                            />
+                            <span className="text-slate-600 font-bold">km</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {solving !== "time" && (
+                        <div>
+                          <label className="block text-sm font-bold text-slate-600 mb-2">
+                            時間 (T)
+                          </label>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="number"
+                              value={time}
+                              onChange={(e) =>
+                                setTime(parseFloat(e.target.value) || 0)
+                              }
+                              className="flex-1 px-4 py-3 rounded-xl border-2 border-orange-200 focus:border-orange-500 outline-none text-xl font-black text-center"
+                            />
+                            <span className="text-slate-600 font-bold">
+                              小時
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Solution */}
+                    <div className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-6 border-2 border-purple-300">
+                      <h3 className="text-xl font-black text-purple-700 mb-4">
+                        計算結果
+                      </h3>
+                      <div className="bg-white rounded-xl p-4 mb-3">
+                        <div className="text-sm text-slate-600 mb-2">
+                          公式：
+                        </div>
+                        <div className="text-3xl font-black text-purple-600">
+                          {solution.formula}
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-xl p-4 mb-3">
+                        <div className="text-sm text-slate-600 mb-2">
+                          代入：
+                        </div>
+                        <div className="text-2xl font-mono font-bold text-slate-800">
+                          {solution.calculation}
+                        </div>
+                      </div>
+                      <div className="bg-gradient-to-r from-yellow-400 to-orange-400 rounded-xl p-6 text-center">
+                        <div className="text-white text-lg font-bold mb-2">
+                          答案
+                        </div>
+                        <div className="text-5xl font-black text-white">
+                          {solution.answer}{" "}
+                          <span className="text-3xl">{solution.unit}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {mode === "animation" && (
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-800 mb-6">
+                      動畫模擬
+                    </h2>
+
+                    {/* Vehicle Selector */}
+                    <div className="grid grid-cols-5 gap-3 mb-6">
+                      {scenarios.map((vehicle, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => {
+                            setSelectedVehicle(vehicle);
+                            setSpeed(vehicle.speed);
+                          }}
+                          className={`py-4 rounded-2xl font-bold transition-all ${
+                            selectedVehicle === vehicle
+                              ? "bg-blue-500 text-white shadow-lg scale-105"
+                              : "bg-slate-100 text-slate-600"
+                          }`}
+                        >
+                          <div className="text-3xl mb-1">{vehicle.emoji}</div>
+                          <div className="text-xs">{vehicle.name}</div>
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Animation Track */}
+                    <div
+                      className="road rounded-2xl p-8 mb-6 relative overflow-hidden"
+                      style={{ height: "200px" }}
+                    >
+                      <motion.div
+                        className="text-7xl absolute top-1/2 -translate-y-1/2"
+                        animate={controls}
+                        initial={{ x: 0 }}
+                      >
+                        {selectedVehicle.emoji}
+                      </motion.div>
+                    </div>
+
+                    {/* Controls */}
+                    <div className="grid grid-cols-3 gap-3 mb-6">
+                      <button
+                        onClick={startAnimation}
+                        disabled={isAnimating}
+                        className="py-4 bg-green-500 hover:bg-green-600 text-white rounded-2xl font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                      >
+                        <Play size={20} /> 開始
+                      </button>
+                      <button
+                        onClick={() => controls.stop()}
+                        className="py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-2xl font-bold transition-all flex items-center justify-center gap-2"
+                      >
+                        <Pause size={20} /> 暫停
+                      </button>
+                      <button
+                        onClick={resetAnimation}
+                        className="py-4 bg-slate-500 hover:bg-slate-600 text-white rounded-2xl font-bold transition-all flex items-center justify-center gap-2"
+                      >
+                        <RotateCcw size={20} /> 重設
+                      </button>
+                    </div>
+
+                    {/* Settings */}
+                    <div className="bg-slate-50 rounded-2xl p-6">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-bold mb-2">
+                            速度：{speed} km/h
+                          </label>
+                          <input
+                            type="range"
+                            min="10"
+                            max="300"
+                            value={speed}
+                            onChange={(e) => setSpeed(parseInt(e.target.value))}
+                            className="w-full"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-bold mb-2">
+                            距離：{distance} km
+                          </label>
+                          <input
+                            type="range"
+                            min="10"
+                            max="500"
+                            value={distance}
+                            onChange={(e) =>
+                              setDistance(parseInt(e.target.value))
+                            }
+                            className="w-full"
+                          />
+                        </div>
+                      </div>
+                      <div className="mt-4 text-center text-lg font-bold text-purple-600">
+                        預計時間：{calculateTime().toFixed(2)} 小時
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Info Panel */}
+              <div className="lg:col-span-4 flex flex-col gap-6">
+                <div className="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-lg">
+                  <h3 className="text-lg font-black text-purple-600 mb-3">
+                    💡 關鍵公式
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="bg-green-50 p-3 rounded-lg">
+                      <strong className="text-green-700">速度 =</strong>
+                      <div className="text-lg font-mono mt-1">距離 ÷ 時間</div>
+                    </div>
+                    <div className="bg-blue-50 p-3 rounded-lg">
+                      <strong className="text-blue-700">距離 =</strong>
+                      <div className="text-lg font-mono mt-1">速度 × 時間</div>
+                    </div>
+                    <div className="bg-orange-50 p-3 rounded-lg">
+                      <strong className="text-orange-700">時間 =</strong>
+                      <div className="text-lg font-mono mt-1">距離 ÷ 速度</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-lg">
+                  <h3 className="text-lg font-black text-slate-800 mb-3">
+                    🎯 實際例子
+                  </h3>
+                  <div className="text-sm text-slate-600 space-y-3">
+                    <div className="bg-slate-50 p-3 rounded-lg">
+                      <strong>問題：</strong>汽車以60km/h行駛120km，需時多久？
+                      <div className="mt-2 text-purple-600 font-bold">
+                        T = 120 ÷ 60 = 2 小時
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </main>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

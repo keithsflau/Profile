@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小一常識：植物生長日記 | Plant Growth</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Plant Growth Diary",
+          zh: "植物生長日記",
+          ja: "植物成長日記",
+        },
+        instruction: {
+          en: "Put the stages in the correct order!",
+          zh: "按正確順序排列生長過程！",
+          ja: "正しい順序に並べてください！",
+        },
+        stage1: { en: "Seed", zh: "種子" },
+        stage2: { en: "Sprout", zh: "發芽" },
+        stage3: { en: "Leaves", zh: "長葉" },
+        stage4: { en: "Flower", zh: "開花" },
+        stage5: { en: "Fruit", zh: "結果" },
+        check: { en: "Check", zh: "檢查" },
+        reset: { en: "Reset", zh: "重置" },
+        correct: {
+          en: "Correct! The plant grew well!",
+          zh: "答對了！植物長得很好！",
+        },
+        wrong: {
+          en: "Something is wrong. Try again!",
+          zh: "次序不對，再試一次！",
+        },
+      };
+
+      const stages = [
+        { id: 1, icon: "🟤", label: "stage1", correctPos: 0 },
+        { id: 2, icon: "🌱", label: "stage2", correctPos: 1 },
+        { id: 3, icon: "🌿", label: "stage3", correctPos: 2 },
+        { id: 4, icon: "🌼", label: "stage4", correctPos: 3 },
+        { id: 5, icon: "🍓", label: "stage5", correctPos: 4 },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [slots, setSlots] = useState([null, null, null, null, null]);
+        const [available, setAvailable] = useState([]);
+        const [status, setStatus] = useState(null); // 'correct', 'wrong'
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        useEffect(() => {
+          reset();
+        }, []);
+
+        const reset = () => {
+          setSlots([null, null, null, null, null]);
+          setAvailable([...stages].sort(() => Math.random() - 0.5));
+          setStatus(null);
+        };
+
+        const handleSelect = (stage) => {
+          // Find first empty slot
+          const firstEmpty = slots.findIndex((s) => s === null);
+          if (firstEmpty !== -1) {
+            const newSlots = [...slots];
+            newSlots[firstEmpty] = stage;
+            setSlots(newSlots);
+            setAvailable(available.filter((s) => s.id !== stage.id));
+            setStatus(null);
+          }
+        };
+
+        const handleRemove = (index) => {
+          const stage = slots[index];
+          if (!stage) return;
+          const newSlots = [...slots];
+          newSlots[index] = null;
+          setSlots(newSlots);
+          setAvailable([...available, stage]);
+          setStatus(null);
+        };
+
+        const checkOrder = () => {
+          const isFilled = slots.every((s) => s !== null);
+          if (!isFilled) {
+            setStatus("wrong"); // Or "Incomplete"
+            return;
+          }
+          const isCorrect = slots.every((s, i) => s.id === stages[i].id);
+          if (isCorrect) setStatus("correct");
+          else setStatus("wrong");
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-green-800 mb-4 mt-8 drop-shadow-sm">
+              🌻 {getText("title")}
+            </h1>
+            <p className="font-bold text-green-700 mb-8">
+              {getText("instruction")}
+            </p>
+
+            {/* Timeline Slots */}
+            <div className="flex gap-2 md:gap-4 mb-8 overflow-x-auto p-4 w-full justify-center">
+              {slots.map((s, i) => (
+                <div key={i} className="flex items-center">
+                  <div
+                    onClick={() => handleRemove(i)}
+                    className={`w-16 h-24 md:w-24 md:h-32 bg-white rounded-xl border-4 flex flex-col items-center justify-center shadow-inner cursor-pointer ${
+                      status === "correct"
+                        ? "border-green-500 bg-green-50"
+                        : "border-slate-300"
+                    }`}
+                  >
+                    {s ? (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="text-center"
+                      >
+                        <div className="text-4xl mb-1">{s.icon}</div>
+                        <div className="text-xs font-bold text-slate-500">
+                          {getText(s.label)}
+                        </div>
+                      </motion.div>
+                    ) : (
+                      <div className="text-slate-300 font-bold text-xl">
+                        {i + 1}
+                      </div>
+                    )}
+                  </div>
+                  {i < 4 && (
+                    <div className="text-green-300 text-2xl mx-1 font-black">
+                      ➜
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div className="flex gap-4 mb-8">
+              <button
+                onClick={checkOrder}
+                className="bg-green-600 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-green-700"
+              >
+                {getText("check")} ✅
+              </button>
+              <button
+                onClick={reset}
+                className="bg-white text-slate-500 px-8 py-3 rounded-full font-bold shadow-lg hover:bg-gray-100"
+              >
+                {getText("reset")} 🔄
+              </button>
+            </div>
+
+            {status && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className={`text-2xl font-black mb-6 ${
+                  status === "correct" ? "text-green-600" : "text-red-500"
+                }`}
+              >
+                {getText(status)}
+              </motion.div>
+            )}
+
+            {/* Available Staging */}
+            <div className="bg-white/80 p-6 rounded-3xl shadow-xl w-full max-w-3xl flex flex-wrap gap-4 justify-center min-h-[120px]">
+              {available.map((s) => (
+                <motion.button
+                  key={s.id}
+                  layoutId={s.id}
+                  onClick={() => handleSelect(s)}
+                  className="w-20 h-24 bg-green-50 rounded-xl border-2 border-green-200 flex flex-col items-center justify-center hover:scale-105 active:scale-95 shadow-md"
+                >
+                  <div className="text-4xl mb-1">{s.icon}</div>
+                  <div className="text-xs font-bold text-green-800">
+                    {getText(s.label)}
+                  </div>
+                </motion.button>
+              ))}
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

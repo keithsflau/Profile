@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Smart Shopper</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #fffbeb;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Smart Shopper",
+          zh: "精明消費者",
+          ja: "賢い買い物客",
+          ko: "현명한 쇼핑객",
+          es: "Comprador inteligente",
+          de: "Kluger Käufer",
+          fi: "Fiksu shoppailija",
+          fr: "Acheteur malin",
+          ar: "المتسوق الذكي",
+          it: "Acquirente Intelligente",
+        },
+        instruction: {
+          en: "Buy all items within budget!",
+          zh: "在預算內購買所有物品！",
+          ja: "予算内ですべてのアイテムを購入してください！",
+          ko: "예산 내에서 모든 물건을 구매하세요!",
+          es: "¡Compra todos los artículos dentro del presupuesto!",
+          de: "Kaufe alle Artikel innerhalb des Budgets!",
+          fi: "Osta kaikki tuotteet budjetin rajoissa!",
+          fr: "Achetez tous les articles dans le budget !",
+          ar: "شراء جميع العناصر في حدود الميزانية!",
+          it: "Compra tutti gli articoli nel budget!",
+        },
+        budget: {
+          en: "Budget",
+          zh: "預算",
+          ja: "予算",
+          ko: "예산",
+          es: "Presupuesto",
+          de: "Budget",
+          fi: "Budjetti",
+          fr: "Budget",
+          ar: "ميزانية",
+          it: "Budget",
+        },
+        total: {
+          en: "Total",
+          zh: "總計",
+          ja: "合計",
+          ko: "합계",
+          es: "Total",
+          de: "Gesamt",
+          fi: "Yhteensä",
+          fr: "Total",
+          ar: "المجموع",
+          it: "Totale",
+        },
+        cheap: {
+          en: "Cheaper Option",
+          zh: "較便宜的選擇",
+          ja: "安い方",
+          ko: "더 저렴한 옵션",
+          es: "Opción más barata",
+          de: "Günstigere Option",
+          fi: "Halvempi vaihtoehto",
+          fr: "Option moins chère",
+          ar: "خيار أرخص",
+          it: "Opzione più economica",
+        },
+        expensive: {
+          en: "Premium Option",
+          zh: "高級選擇",
+          ja: "高級な方",
+          ko: "프리미엄 옵션",
+          es: "Opción premium",
+          de: "Premium-Option",
+          fi: "Premium-vaihtoehto",
+          fr: "Option premium",
+          ar: "خيار ممتاز",
+          it: "Opzione Premium",
+        },
+        success: {
+          en: "Success!",
+          zh: "成功！",
+          ja: "成功！",
+          ko: "성공!",
+          es: "¡Éxito!",
+          de: "Erfolg!",
+          fi: "Onnistui!",
+          fr: "Succès !",
+          ar: "نجاح!",
+          it: "Successo!",
+        },
+        fail: {
+          en: "Over Budget!",
+          zh: "超出預算！",
+          ja: "予算オーバー！",
+          ko: "예산 초과!",
+          es: "¡Presupuesto excedido!",
+          de: "Über dem Budget!",
+          fi: "Budjetti ylitetty!",
+          fr: "Budget dépassé !",
+          ar: "الميزانية تجاوزت!",
+          it: "Fuori Budget!",
+        },
+        reset: {
+          en: "Try Again",
+          zh: "重試",
+          ja: "やり直す",
+          ko: "다시 시도",
+          es: "Intentar de nuevo",
+          de: "Nochmal versuchen",
+          fi: "Yritä uudelleen",
+          fr: "Réessayer",
+          ar: "حاول مرة أخرى",
+          it: "Riprova",
+        },
+      };
+
+      const shops = [
+        {
+          id: 1,
+          name: "Supermarket A",
+          items: [
+            { name: "Apple", price: 5 },
+            { name: "Milk", price: 20 },
+          ],
+        },
+        {
+          id: 2,
+          name: "Supermarket B",
+          items: [
+            { name: "Apple", price: 3 },
+            { name: "Milk", price: 25 },
+          ],
+        },
+      ];
+
+      const shoppingList = [
+        {
+          id: "apple",
+          icon: "🍎",
+          name: { en: "Apple", zh: "蘋果" },
+          opts: [
+            { price: 5, shop: "A" },
+            { price: 3, shop: "B" },
+          ],
+        },
+        {
+          id: "milk",
+          icon: "🥛",
+          name: { en: "Milk", zh: "牛奶" },
+          opts: [
+            { price: 22, shop: "A" },
+            { price: 18, shop: "B" },
+          ],
+        },
+        {
+          id: "bread",
+          icon: "🍞",
+          name: { en: "Bread", zh: "麵包" },
+          opts: [
+            { price: 12, shop: "A" },
+            { price: 15, shop: "B" },
+          ],
+        },
+      ];
+
+      // Target Budget: Need to pick cheaper options mostly
+      const BUDGET = 35;
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [cart, setCart] = useState({}); // { id: price }
+        const [finished, setFinished] = useState(false);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const totalCost = Object.values(cart).reduce((a, b) => a + b, 0);
+        const remaining = BUDGET - totalCost;
+
+        const selectItem = (itemId, price) => {
+          setCart((prev) => ({ ...prev, [itemId]: price }));
+        };
+
+        const checkResult = () => {
+          setFinished(true);
+        };
+
+        const reset = () => {
+          setCart({});
+          setFinished(false);
+        };
+
+        const allSelected = shoppingList.every(
+          (item) => cart[item.id] !== undefined
+        );
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-6 font-sans text-slate-800">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-4 text-amber-600">
+              🛒 {getText("title")}
+            </h1>
+
+            <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-2xl text-center mb-8 border-4 border-amber-200">
+              <div className="text-2xl font-bold mb-2">
+                {getText("budget")}: ${BUDGET}
+              </div>
+              <div
+                className={`text-4xl font-black ${
+                  remaining < 0 ? "text-red-500" : "text-green-500"
+                }`}
+              >
+                ${remaining}
+              </div>
+              <div className="text-sm text-slate-500 mt-2">
+                {getText("total")}: ${totalCost}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-6 w-full max-w-3xl">
+              {shoppingList.map((item) => (
+                <div
+                  key={item.id}
+                  className="bg-white p-4 rounded-xl shadow border border-slate-200 flex flex-col md:flex-row items-center gap-4"
+                >
+                  <div className="text-6xl">{item.icon}</div>
+                  <div className="flex-1 text-center md:text-left font-bold text-xl">
+                    {item.name[lang] || item.name["en"]}
+                  </div>
+
+                  <div className="flex gap-4">
+                    {item.opts.map((opt, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() =>
+                          !finished && selectItem(item.id, opt.price)
+                        }
+                        className={`px-6 py-4 rounded-xl border-2 font-bold text-lg transition-all
+                                 ${
+                                   cart[item.id] === opt.price
+                                     ? "bg-amber-100 border-amber-500 ring-2 ring-amber-300"
+                                     : "bg-slate-50 border-slate-200 hover:bg-slate-100"
+                                 }
+                              `}
+                        disabled={finished}
+                      >
+                        <div className="text-xs text-slate-500">
+                          Shop {opt.shop}
+                        </div>
+                        ${opt.price}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {!finished && allSelected && (
+              <button
+                onClick={checkResult}
+                className="mt-8 bg-green-500 text-white px-12 py-4 rounded-full font-black text-2xl shadow-xl hover:bg-green-600 animate-bounce"
+              >
+                {getText("total")} 🧾
+              </button>
+            )}
+
+            {finished && (
+              <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+                <div className="bg-white p-12 rounded-3xl text-center shadow-2xl animate-pop-in">
+                  <div className="text-8xl mb-4">
+                    {remaining >= 0 ? "🎉" : "💸"}
+                  </div>
+                  <h2
+                    className={`text-4xl font-black mb-4 ${
+                      remaining >= 0 ? "text-green-600" : "text-red-600"
+                    }`}
+                  >
+                    {remaining >= 0 ? getText("success") : getText("fail")}
+                  </h2>
+                  <p className="text-xl text-slate-600 mb-8">
+                    {getText("budget")}: ${BUDGET} <br />
+                    {getText("total")}: ${totalCost}
+                  </p>
+                  <button
+                    onClick={reset}
+                    className="bg-amber-500 text-white px-8 py-3 rounded-full font-bold text-xl hover:bg-amber-600"
+                  >
+                    {getText("reset")}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

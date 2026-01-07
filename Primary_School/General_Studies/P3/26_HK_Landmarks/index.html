@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小三常識：香港地標 | HK Landmarks</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #bae6fd 0%, #38bdf8 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "HK Landmarks",
+          zh: "香港地標",
+          ja: "香港のランドマーク",
+          ko: "홍콩 랜드마크",
+          es: "Hitos de Hong Kong",
+          de: "Wahrzeichen von Hongkong",
+          fi: "Hongkongin maamerkit",
+          fr: "Monuments de Hong Kong",
+          ar: "معالم هونغ كونغ",
+          it: "Luoghi d'interesse di Hong Kong",
+        },
+        instruction: {
+          en: "Drag the landmark to the map!",
+          zh: "將地標拖放到地圖上！",
+          ja: "ランドマークを地図にドラッグして！",
+          ko: "랜드마크를 지도로 드래그하세요!",
+          es: "¡Arrastra el hito al mapa!",
+          de: "Ziehe das Wahrzeichen auf die Karte!",
+          fi: "Vedä maamerkki kartalle!",
+          fr: "Faites glisser le monument sur la carte !",
+          ar: "اسحب المعلم إلى الخريطة!",
+          it: "Trascina il punto di riferimento sulla mappa!",
+        },
+
+        peak: {
+          en: "The Peak",
+          zh: "山頂凌霄閣",
+          ja: "ヴィクトリア・ピーク",
+          ko: "빅토리아 피크",
+          es: "El Pico",
+          de: "The Peak",
+          fi: "The Peak",
+          fr: "Le Pic",
+          ar: "القمة",
+          it: "Il Picco",
+        },
+        buddha: {
+          en: "Big Buddha",
+          zh: "天壇大佛",
+          ja: "天壇大仏",
+          ko: "천단대불",
+          es: "Gran Buda",
+          de: "Großer Buddha",
+          fi: "Iso Buddha",
+          fr: "Grand Bouddha",
+          ar: "بوذا الكبير",
+          it: "Grande Buddha",
+        },
+        clock: {
+          en: "Clock Tower",
+          zh: "尖沙咀鐘樓",
+          ja: "時計台",
+          ko: "시계탑",
+          es: "Torre del Reloj",
+          de: "Glockenturm",
+          fi: "Kellotorni",
+          fr: "Tour de l'Horloge",
+          ar: "برج الساعة",
+          it: "Torre dell'Orologio",
+        },
+        convention: {
+          en: "Convention Centre",
+          zh: "會展中心",
+          ja: "コンベンションセンター",
+          ko: "컨벤션 센터",
+          es: "Centro de Convenciones",
+          de: "Kongresszentrum",
+          fi: "Messukeskus",
+          fr: "Centre de conventions",
+          ar: "مركز المؤتمرات",
+          it: "Centro Congressi",
+        },
+        disney: {
+          en: "Disneyland",
+          zh: "迪士尼樂園",
+          ja: "ディズニーランド",
+          ko: "디즈니랜드",
+          es: "Disneyland",
+          de: "Disneyland",
+          fi: "Disneyland",
+          fr: "Disneyland",
+          ar: "ديزني لاند",
+          it: "Disneyland",
+        },
+        airport: {
+          en: "HK Airport",
+          zh: "香港國際機場",
+          ja: "香港国際空港",
+          ko: "홍콩 국제공항",
+          es: "Aeropuerto de HK",
+          de: "HK Flughafen",
+          fi: "HK Lentokenttä",
+          fr: "Aéroport de HK",
+          ar: "مطار هونغ كونغ",
+          it: "Aeroporto di HK",
+        },
+
+        island_hk: {
+          en: "Hong Kong Island",
+          zh: "香港島",
+          ja: "香港島",
+          ko: "홍콩섬",
+          es: "Isla de Hong Kong",
+          de: "Hongkong-Insel",
+          fi: "Hongkongin saari",
+          fr: "Île de Hong Kong",
+          ar: "جزيرة هونغ كونغ",
+          it: "Isola di Hong Kong",
+        },
+        island_kowloon: {
+          en: "Kowloon",
+          zh: "九龍",
+          ja: "九龍",
+          ko: "구룡",
+          es: "Kowloon",
+          de: "Kowloon",
+          fi: "Kowloon",
+          fr: "Kowloon",
+          ar: "كولون",
+          it: "Kowloon",
+        },
+        island_lantau: {
+          en: "Lantau Island",
+          zh: "大嶼山",
+          ja: "ランタオ島",
+          ko: "란타우섬",
+          es: "Isla Lantau",
+          de: "Lantau-Insel",
+          fi: "Lantaun saari",
+          fr: "Île de Lantau",
+          ar: "جزيرة لانتاو",
+          it: "Isola di Lantau",
+        },
+        island_nt: {
+          en: "New Territories",
+          zh: "新界",
+          ja: "新界",
+          ko: "신계",
+          es: "Nuevos Territorios",
+          de: "New Territories",
+          fi: "Uudet territoriot",
+          fr: "Nouveaux Territoires",
+          ar: "الأقاليم الجديدة",
+          it: "Nuovi Territori",
+        },
+
+        correct: {
+          en: "Correct Location!",
+          zh: "位置正確！",
+          ja: "正しい場所！",
+          ko: "정확한 위치!",
+          es: "¡Ubicación Correcta!",
+          de: "Richtiger Ort!",
+          fi: "Oikea sijainti!",
+          fr: "Emplacement correct !",
+          ar: "موقع صحيح!",
+          it: "Posizione Corretta!",
+        },
+        wrong: {
+          en: "Try Again!",
+          zh: "再試一次！",
+          ja: "もう一度！",
+          ko: "다시 시도하세요!",
+          es: "¡Inténtalo de nuevo!",
+          de: "Versuch es nochmal!",
+          fi: "Yritä uudelleen!",
+          fr: "Essayez encore !",
+          ar: "حاول مرة أخرى!",
+          it: "Riprova!",
+        },
+        completed: {
+          en: "Map Completed!",
+          zh: "地圖完成！",
+          ja: "地図完成！",
+          ko: "지도 완성!",
+          es: "¡Mapa Completado!",
+          de: "Karte vervollständigt!",
+          fi: "Kartta valmis!",
+          fr: "Carte terminée !",
+          ar: "اكتملت الخريطة!",
+          it: "Mappa Completata!",
+        },
+        reset: {
+          en: "Play Again",
+          zh: "再玩一次",
+          ja: "もう一度プレイ",
+          ko: "다시 하기",
+          es: "Jugar de Nuevo",
+          de: "Nochmal spielen",
+          fi: "Pelaa uudelleen",
+          fr: "Rejouer",
+          ar: "العب مرة أخرى",
+          it: "Gioca di Nuovo",
+        },
+      };
+
+      const landmarks = [
+        { id: "peak", region: "hk", x: 65, y: 70, icon: "🚠" }, // HK Island
+        { id: "buddha", region: "lantau", x: 25, y: 70, icon: "🧘" }, // Lantau
+        { id: "clock", region: "kowloon", x: 60, y: 55, icon: "🕰️" }, // Kowloon (TST)
+        { id: "convention", region: "hk", x: 70, y: 65, icon: "🏢" }, // HK Island (Wan Chai)
+        { id: "disney", region: "lantau", x: 40, y: 60, icon: "🏰" }, // Lantau
+        { id: "airport", region: "lantau", x: 20, y: 50, icon: "✈️" }, // Lantau (Chek Lap Kok)
+      ];
+
+      // Simplified Map Zones (Coordinates relative to map container)
+      // Visual approximations
+      const regions = [
+        {
+          id: "lantau",
+          label: "island_lantau",
+          x: 10,
+          y: 45,
+          w: 35,
+          h: 35,
+          color: "bg-green-300",
+        },
+        {
+          id: "kowloon",
+          label: "island_kowloon",
+          x: 50,
+          y: 40,
+          w: 25,
+          h: 20,
+          color: "bg-red-300",
+        },
+        {
+          id: "hk",
+          label: "island_hk",
+          x: 55,
+          y: 65,
+          w: 25,
+          h: 15,
+          color: "bg-blue-300",
+        },
+        {
+          id: "nt",
+          label: "island_nt",
+          x: 40,
+          y: 5,
+          w: 50,
+          h: 35,
+          color: "bg-emerald-300",
+        },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [placed, setPlaced] = useState([]);
+        const [queue, setQueue] = useState([]);
+        const [current, setCurrent] = useState(null);
+        const [feedback, setFeedback] = useState(null);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        useEffect(() => {
+          initGame();
+        }, []);
+
+        const initGame = () => {
+          const q = [...landmarks].sort(() => Math.random() - 0.5);
+          setQueue(q);
+          setCurrent(q[0]);
+          setPlaced([]);
+          setFeedback(null);
+        };
+
+        const handleDrop = (regionId) => {
+          if (feedback) return;
+          if (!current) return;
+
+          if (current.region === regionId) {
+            setFeedback("correct");
+            setPlaced((prev) => [...prev, current]);
+            setTimeout(() => {
+              setFeedback(null);
+              const nextIdx = queue.indexOf(current) + 1;
+              if (nextIdx < queue.length) setCurrent(queue[nextIdx]);
+              else setCurrent(null);
+            }, 1000);
+          } else {
+            setFeedback("wrong");
+            setTimeout(() => setFeedback(null), 800);
+          }
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center select-none font-sans overflow-hidden">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-sky-900 mb-2 mt-8 drop-shadow-sm bg-white/50 px-6 py-2 rounded-full">
+              🗺️ {getText("title")}
+            </h1>
+
+            {current ? (
+              <div className="w-full max-w-5xl flex flex-col md:flex-row gap-8 items-center md:items-start flex-1 mt-8">
+                {/* Map Area */}
+                <div className="relative w-full aspect-video bg-blue-100 rounded-3xl border-4 border-sky-300 shadow-xl overflow-hidden">
+                  {/* Water Pattern */}
+                  <div className="absolute inset-0 opacity-20 bg-[url('data:image/svg+xml;utf8,<svg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' xmlns=\'http://www.w3.org/2000/svg\'><circle cx=\'2\' cy=\'2\' r=\'2\' fill=\'#3b82f6\'/></svg>')]"></div>
+
+                  {/* Regions (Drop Zones) */}
+                  {regions.map((r) => (
+                    <div
+                      key={r.id}
+                      onClick={() => handleDrop(r.id)} // Click works too for simplicity on mobile
+                      className={`absolute ${r.color} rounded-2xl border-4 border-white/50 flex items-center justify-center shadow-lg transition-transform active:scale-95 cursor-pointer hover:brightness-110 opacity-80`}
+                      style={{
+                        left: `${r.x}%`,
+                        top: `${r.y}%`,
+                        width: `${r.w}%`,
+                        height: `${r.h}%`,
+                      }}
+                    >
+                      <span className="font-black text-white/90 text-sm md:text-xl text-center pointer-events-none drop-shadow-md px-2">
+                        {getText(r.label)}
+                      </span>
+                    </div>
+                  ))}
+
+                  {/* Placed Items */}
+                  {placed.map((p) => (
+                    <motion.div
+                      key={p.id}
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute z-20 flex flex-col items-center pointer-events-none"
+                      style={{
+                        left: `${p.x}%`,
+                        top: `${p.y}%`,
+                        transform: "translate(-50%, -50%)",
+                      }} // Approximate positions inside regions
+                    >
+                      <div className="text-4xl drop-shadow-lg">{p.icon}</div>
+                      <div className="bg-white/80 text-xs font-bold px-1 rounded shadow">
+                        {getText(p.id)}
+                      </div>
+                    </motion.div>
+                  ))}
+
+                  {feedback && (
+                    <div
+                      className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 px-6 py-4 rounded-3xl font-black text-3xl shadow-2xl whitespace-nowrap ${
+                        feedback === "correct"
+                          ? "bg-green-500 text-white"
+                          : "bg-red-500 text-white"
+                      }`}
+                    >
+                      {getText(feedback)}
+                    </div>
+                  )}
+                </div>
+
+                {/* Current Item Panel */}
+                <div className="w-full md:w-80 bg-white/60 p-6 rounded-3xl flex flex-col items-center shadow-lg">
+                  <p className="font-bold text-sky-900 mb-4">
+                    {getText("instruction")}
+                  </p>
+
+                  <motion.div
+                    key={current.id}
+                    initial={{ scale: 0, rotate: 10 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    exit={{ scale: 0 }}
+                    className="bg-white p-8 rounded-3xl shadow-xl w-full flex flex-col items-center aspect-square justify-center border-b-8 border-sky-200"
+                  >
+                    <div className="text-8xl mb-4">{current.icon}</div>
+                    <div className="text-xl font-black text-center leading-tight">
+                      {getText(current.id)}
+                    </div>
+                  </motion.div>
+
+                  <div className="text-sm font-bold opacity-60 mt-4 text-center">
+                    {placed.length} / {landmarks.length} Completed
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white/90 p-12 rounded-3xl shadow-xl text-center mt-20 backdrop-blur-md">
+                <div className="text-8xl mb-4">🇭🇰</div>
+                <h2 className="text-4xl font-black text-sky-800 mb-6">
+                  {getText("completed")}
+                </h2>
+                <button
+                  onClick={initGame}
+                  className="bg-sky-600 text-white px-10 py-4 rounded-full font-black text-2xl hover:bg-sky-700 shadow-xl"
+                >
+                  {getText("reset")} 🔄
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

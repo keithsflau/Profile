@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小一常識：孝順行動卡 | Filial Piety Acts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Filial Piety Matching",
+          zh: "孝順行動卡",
+          ja: "親孝行マッチング",
+        },
+        instruction: {
+          en: "Match the situation with the correct action!",
+          zh: "將情境與正確的行動配對！",
+          ja: "状況と正しい行動を合わせてください！",
+        },
+        restart: { en: "Play Again", zh: "再玩一次" },
+        completed: { en: "You are a good child!", zh: "你真是個好孩子！" },
+
+        s1: { en: "Mom is cooking", zh: "媽媽煮飯" },
+        r1: { en: "Help set the table", zh: "幫忙擺碗筷" },
+
+        s2: { en: "Dad is tired from work", zh: "爸爸工作累了" },
+        r2: { en: "Massage his shoulders", zh: "幫他在肩膀按摩" },
+
+        s3: { en: "Grandma is crossing street", zh: "嫲嫲過馬路" },
+        r3: { en: "Hold her hand", zh: "牽著她的手" },
+
+        s4: { en: "Parents give me a gift", zh: "父母送禮物給我" },
+        r4: { en: "Say 'Thank You'", zh: "說「謝謝」" },
+      };
+
+      const pairsData = [
+        {
+          id: 1,
+          type: "situation",
+          text: "s1",
+          pairId: 1,
+          color: "bg-orange-100",
+        },
+        {
+          id: 2,
+          type: "response",
+          text: "r1",
+          pairId: 1,
+          color: "bg-orange-200",
+        },
+        {
+          id: 3,
+          type: "situation",
+          text: "s2",
+          pairId: 2,
+          color: "bg-blue-100",
+        },
+        {
+          id: 4,
+          type: "response",
+          text: "r2",
+          pairId: 2,
+          color: "bg-blue-200",
+        },
+        {
+          id: 5,
+          type: "situation",
+          text: "s3",
+          pairId: 3,
+          color: "bg-purple-100",
+        },
+        {
+          id: 6,
+          type: "response",
+          text: "r3",
+          pairId: 3,
+          color: "bg-purple-200",
+        },
+        {
+          id: 7,
+          type: "situation",
+          text: "s4",
+          pairId: 4,
+          color: "bg-pink-100",
+        },
+        {
+          id: 8,
+          type: "response",
+          text: "r4",
+          pairId: 4,
+          color: "bg-pink-200",
+        },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [cards, setCards] = useState([]);
+        const [selected, setSelected] = useState(null); // card object
+        const [matched, setMatched] = useState([]); // list of card IDs
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        useEffect(() => {
+          shuffleCards();
+        }, []);
+
+        const shuffleCards = () => {
+          setCards([...pairsData].sort(() => Math.random() - 0.5));
+          setMatched([]);
+          setSelected(null);
+        };
+
+        const handleCardClick = (card) => {
+          if (matched.includes(card.id)) return;
+          if (selected && selected.id === card.id) {
+            setSelected(null);
+            return;
+          }
+
+          if (selected) {
+            // Check match
+            if (selected.pairId === card.pairId) {
+              setMatched((prev) => [...prev, selected.id, card.id]);
+              setSelected(null);
+            } else {
+              setSelected(card); // Logic choice: Switch selection or deselect?
+              // Let's switch selection for smoother UX, visually indicate change
+            }
+          } else {
+            setSelected(card);
+          }
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-3xl md:text-5xl font-black text-rose-800 mb-4 mt-8 drop-shadow-sm">
+              ❤️ {getText("title")}
+            </h1>
+            <p className="text-xl font-bold text-rose-600 mb-8">
+              {getText("instruction")}
+            </p>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-4xl">
+              {cards.map((card) => {
+                const isMatched = matched.includes(card.id);
+                const isSelected = selected?.id === card.id;
+
+                return (
+                  <motion.button
+                    key={card.id}
+                    onClick={() => handleCardClick(card)}
+                    layout
+                    className={`aspect-[4/3] rounded-2xl p-4 flex items-center justify-center text-center shadow-lg border-4 transition-all ${
+                      isMatched
+                        ? "bg-green-100 border-green-500 opacity-50 scale-95"
+                        : isSelected
+                        ? "bg-yellow-100 border-yellow-500 scale-105 z-10"
+                        : "bg-white border-rose-100 hover:border-rose-300"
+                    }`}
+                  >
+                    {isMatched ? (
+                      <span className="text-4xl text-green-500">✓</span>
+                    ) : (
+                      <div>
+                        <div className="text-sm font-bold text-slate-400 mb-1">
+                          {card.type === "situation" ? "👀" : "👉"}
+                        </div>
+                        <div className="text-lg md:text-xl font-black text-slate-700 leading-tight">
+                          {getText(card.text)}
+                        </div>
+                      </div>
+                    )}
+                  </motion.button>
+                );
+              })}
+            </div>
+
+            {matched.length === cards.length && (
+              <div className="mt-12 text-center bg-white/80 p-8 rounded-3xl shadow-xl backdrop-blur">
+                <div className="text-6xl mb-4">🥰</div>
+                <h2 className="text-3xl font-black text-rose-600 mb-6">
+                  {getText("completed")}
+                </h2>
+                <button
+                  onClick={shuffleCards}
+                  className="bg-rose-500 text-white px-8 py-3 rounded-full font-black text-xl hover:bg-rose-600 shadow-xl"
+                >
+                  {getText("restart")} 🔄
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

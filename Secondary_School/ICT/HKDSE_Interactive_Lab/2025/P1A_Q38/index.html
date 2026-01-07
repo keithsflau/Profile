@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HKDSE 2025 Paper 1A Q38 - Conditional Sum</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.development.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #0f172a;
+        color: #e2e8f0;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+    <div id="root" class="w-full max-w-5xl"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect, useRef } = React;
+
+      // Lucide Icon Shim
+      const LucideIcon = ({ name, size = 20, className = "" }) => {
+        const formatName = (n) =>
+          n
+            .split("-")
+            .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
+            .join("");
+        const iconName = formatName(name);
+        const [svgHtml, setSvgHtml] = useState("");
+        useEffect(() => {
+          if (window.lucide?.icons[iconName]?.toSvg) {
+            setSvgHtml(
+              window.lucide.icons[iconName].toSvg({
+                width: size,
+                height: size,
+                class: className,
+              })
+            );
+          }
+        }, [name]);
+        return (
+          <span
+            dangerouslySetInnerHTML={{ __html: svgHtml }}
+            style={{ display: "inline-flex" }}
+          />
+        );
+      };
+
+      const FlowNode = ({ active, label, subLabel, type }) => (
+        <div
+          className={`
+              px-4 py-3 rounded-xl border-2 flex flex-col items-center justify-center transition-all duration-300
+              ${
+                active
+                  ? type === "dec"
+                    ? "border-yellow-400 bg-yellow-900/30 scale-110 shadow-[0_0_15px_rgba(250,204,21,0.5)]"
+                    : type === "op"
+                    ? "border-blue-400 bg-blue-900/30 scale-105 shadow-lg"
+                    : "border-green-400 bg-green-900/30 font-bold"
+                  : "border-slate-700 bg-slate-800 opacity-60"
+              }
+          `}
+        >
+          <span
+            className={`font-mono font-bold ${
+              active ? "text-white" : "text-slate-400"
+            }`}
+          >
+            {label}
+          </span>
+          {subLabel && (
+            <span className="text-xs text-slate-500 mt-1">{subLabel}</span>
+          )}
+        </div>
+      );
+
+      const App = () => {
+        const [state, setState] = useState({
+          s: 0,
+          a: 3,
+          step: 0,
+          done: false,
+        });
+        const [logs, setLogs] = useState([]);
+
+        const steps = [
+          { id: "start", msg: "Start: S=0, A=3" },
+          // Loop 1
+          { id: "check", msg: "Check 3 <= 9: True" },
+          { id: "sum", msg: "S = 0 + 3 = 3" },
+          { id: "mod", msg: "Check 3 is odd: True" },
+          { id: "odd", msg: "A = 3 + 1 = 4" },
+          // Loop 2
+          { id: "check", msg: "Check 4 <= 9: True" },
+          { id: "sum", msg: "S = 3 + 4 = 7" },
+          { id: "mod", msg: "Check 4 is odd: False" },
+          { id: "even", msg: "A = 2 * 4 + 1 = 9" },
+          // Loop 3
+          { id: "check", msg: "Check 9 <= 9: True" },
+          { id: "sum", msg: "S = 7 + 9 = 16" },
+          { id: "mod", msg: "Check 9 is odd: True" },
+          { id: "odd", msg: "A = 9 + 1 = 10" },
+          // End
+          { id: "check", msg: "Check 10 <= 9: False" },
+          { id: "end", msg: "Output S = 16" },
+        ];
+
+        const traceStep = () => {
+          if (state.step >= steps.length - 1) return;
+
+          const nextIdx = state.step + 1;
+          const nextLog = steps[nextIdx];
+
+          // Update logic based on predefined steps
+          let update = {};
+          if (nextLog.id === "start") update = { s: 0, a: 3 };
+          if (nextLog.id === "sum") {
+            // parse logic for display
+            if (state.a === 3) update = { s: 3 };
+            if (state.a === 4) update = { s: 7 };
+            if (state.a === 9) update = { s: 16 };
+          }
+          if (nextLog.id === "odd") {
+            if (state.a === 3) update = { a: 4 };
+            if (state.a === 9) update = { a: 10 };
+          }
+          if (nextLog.id === "even") {
+            if (state.a === 4) update = { a: 9 };
+          }
+          if (nextLog.id === "end") {
+            update = { done: true };
+          }
+
+          setState((prev) => ({ ...prev, step: nextIdx, ...update }));
+          setLogs((prev) => [...prev, nextLog.msg]);
+        };
+
+        const reset = () => {
+          setState({ s: 0, a: 3, step: 0, done: false });
+          setLogs([]);
+        };
+
+        // Determine which node is active
+        const currentId = steps[state.step]?.id || "start";
+
+        return (
+          <div className="space-y-6 animate-fade-in w-full max-w-5xl mx-auto p-4 flex flex-col items-center">
+            <header className="text-center space-y-4 max-w-3xl w-full">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-900/30 border border-cyan-500/30 text-cyan-400 text-sm font-bold">
+                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                HKDSE 2025 Paper 1A Q38
+              </div>
+
+              <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 text-left flex flex-col md:flex-row gap-8 items-center">
+                <div className="font-mono bg-slate-950 p-4 rounded-lg border-l-4 border-yellow-500 text-xs md:text-sm shadow-inner whitespace-nowrap">
+                  S &larr; 0, A &larr; 3<br />
+                  <span className="text-pink-400">While</span> A &lt;= 9<br />
+                  &nbsp;&nbsp;S &larr; S + A<br />
+                  &nbsp;&nbsp;<span className="text-pink-400">If</span> A mod 2
+                  = 1<br />
+                  &nbsp;&nbsp;&nbsp;&nbsp;A &larr; A + 1<br />
+                  &nbsp;&nbsp;<span className="text-pink-400">Else</span>
+                  <br />
+                  &nbsp;&nbsp;&nbsp;&nbsp;A &larr; 2 * A + 1<br />
+                  <span className="text-green-400">Output</span> S
+                </div>
+
+                <div className="flex-1">
+                  <h2 className="text-lg font-bold text-white mb-2">
+                    Question (題目)
+                  </h2>
+                  <p className="text-slate-300 text-sm mb-4">
+                    What is the final output of S?
+                    <br />
+                    <span className="text-slate-500">S 的最終輸出是多少？</span>
+                  </p>
+                  <div className="flex gap-2">
+                    <div className="flex-1 bg-slate-900 p-3 rounded-lg border border-slate-700 text-center">
+                      <div className="text-xs text-slate-500">Current S</div>
+                      <div className="text-2xl font-bold text-green-400 font-mono">
+                        {state.s}
+                      </div>
+                    </div>
+                    <div className="flex-1 bg-slate-900 p-3 rounded-lg border border-slate-700 text-center">
+                      <div className="text-xs text-slate-500">Current A</div>
+                      <div className="text-2xl font-bold text-blue-400 font-mono">
+                        {state.a}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </header>
+
+            {/* Visualization Flow */}
+            <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Flowchart Representation */}
+              <div className="bg-slate-900/50 p-6 rounded-2xl border border-slate-700 flex flex-col gap-4 items-center">
+                <FlowNode label="Start" active={currentId === "start"} />
+                <LucideIcon name="arrow-down" className="text-slate-600" />
+                <FlowNode
+                  label="A <= 9 ?"
+                  type="dec"
+                  active={currentId === "check"}
+                />
+
+                <div className="flex gap-8 w-full justify-center">
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="text-xs text-green-500">Yes</div>
+                    <LucideIcon name="arrow-down" className="text-slate-600" />
+                    <FlowNode
+                      label="S = S + A"
+                      type="op"
+                      active={currentId === "sum"}
+                    />
+                    <LucideIcon name="arrow-down" className="text-slate-600" />
+                    <FlowNode
+                      label="A is Odd?"
+                      type="dec"
+                      subLabel="(A mod 2 = 1)"
+                      active={currentId === "mod"}
+                    />
+
+                    <div className="flex gap-4 mt-2">
+                      <div className="flex flex-col items-center">
+                        <div className="text-[10px] text-green-500">Yes</div>
+                        <FlowNode
+                          label="A = A + 1"
+                          type="op"
+                          active={currentId === "odd"}
+                        />
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <div className="text-[10px] text-red-500">No</div>
+                        <FlowNode
+                          label="A = 2*A + 1"
+                          type="op"
+                          active={currentId === "even"}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="text-xs text-red-500">No</div>
+                    <LucideIcon name="arrow-down" className="text-slate-600" />
+                    <FlowNode label="Output S" active={currentId === "end"} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Execution Log */}
+              <div className="flex flex-col gap-4">
+                <button
+                  onClick={traceStep}
+                  disabled={state.done}
+                  className="w-full py-4 bg-blue-600 hover:bg-blue-500 disabled:bg-green-600 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2 transition-all"
+                >
+                  {state.done ? (
+                    <>
+                      <LucideIcon name="check" /> Execution Complete
+                    </>
+                  ) : (
+                    <>
+                      <LucideIcon name="play" /> Next Step
+                    </>
+                  )}
+                </button>
+
+                <button
+                  onClick={reset}
+                  className="text-xs text-slate-500 underline hover:text-white"
+                >
+                  Reset Trace
+                </button>
+
+                <div className="flex-1 bg-black p-4 rounded-xl border border-slate-700 font-mono text-sm overflow-y-auto max-h-[300px]">
+                  <div className="text-slate-500 mb-2 border-b border-slate-800 pb-1">
+                    // Console Output
+                  </div>
+                  {logs.map((l, i) => (
+                    <div key={i} className="mb-1 text-slate-300">
+                      <span className="text-slate-600 mr-2">{i + 1}.</span>
+                      {l}
+                    </div>
+                  ))}
+                  {state.done && (
+                    <div className="mt-2 pt-2 border-t border-slate-800 text-green-400 font-bold">
+                      Final Answer: Option D (16)
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

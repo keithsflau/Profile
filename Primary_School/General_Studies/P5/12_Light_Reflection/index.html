@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Light Reflection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #0f0f0f;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Periscope Lab",
+          zh: "潛望鏡實驗室",
+          ja: "潜望鏡ラボ",
+          ko: "잠망경 실험실",
+          es: "Laboratorio de periscopios",
+          de: "Periskop-Labor",
+          fi: "Periskooppilaboratorio",
+          fr: "Laboratoire de périscope",
+          ar: "مختبر المنظار",
+          it: "Laboratorio Periscopio",
+        },
+        instruction: {
+          en: "Adjust the mirrors to see the flower!",
+          zh: "調整鏡子角度以看見花朵！",
+          ja: "鏡を調整して花を見てください！",
+          ko: "거울을 조정하여 꽃을 확인하세요!",
+          es: "¡Ajusta los espejos para ver la flor!",
+          de: "Stelle die Spiegel ein, um die Blume zu sehen!",
+          fi: "Säädä peilejä nähdäksesi kukan!",
+          fr: "Ajustez les miroirs pour voir la fleur !",
+          ar: "اضبط المرايا لرؤية الزهرة!",
+          it: "Regola gli specchi per vedere il fiore!",
+        },
+        success: {
+          en: "Success! You can see it.",
+          zh: "成功！你看見了。",
+          ja: "成功！見えます。",
+          ko: "성공! 보입니다.",
+          es: "¡Éxito! Puedes verla.",
+          de: "Erfolg! Du kannst sie sehen.",
+          fi: "Onnistui! Näet sen.",
+          fr: "Succès ! Vous pouvez la voir.",
+          ar: "نجاح! يمكنك رؤيتها.",
+          it: "Successo! Puoi vederlo.",
+        },
+        mirror: {
+          en: "Mirror Angle",
+          zh: "鏡子角度",
+          ja: "鏡の角度",
+          ko: "거울 각도",
+          es: "Ángulo del espejo",
+          de: "Spiegelwinkel",
+          fi: "Peilikulma",
+          fr: "Angle du miroir",
+          ar: "زاوية المرآة",
+          it: "Angolo Specchio",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [angle1, setAngle1] = useState(0); // Top mirror. Correct is 45.
+        const [angle2, setAngle2] = useState(0); // Bottom mirror. Correct is 45.
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        // Correct if both are close to 45 degrees
+        const isCorrect =
+          Math.abs(angle1 - 45) < 5 && Math.abs(angle2 - 45) < 5;
+
+        // Visual for Light Path
+        // Start: Top Left outside. (0, 50) -> Top Mirror (100, 50).
+        // Reflected: Should go DOWN to (100, 350).
+        // Then from Bottom Mirror (100, 350) -> Right Eye (200, 350).
+
+        // Ray logic simple visualization:
+        // Segment 1: Fixed. Input.
+        // Segment 2: Depends on angle1. If 45, goes down (90 deg reflection).
+        // Segment 3: Depends on angle2. If 45, goes right.
+
+        const r1 = (angle1 - 45) * 2; // Deviation from vertical for ray 2
+        const r2 = (angle2 - 45) * 2; // Deviation from horizontal for ray 3
+
+        // Let's keep it simple. If not correct, ray goes off canvas.
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-yellow-400">
+              {getText("title")}
+            </h1>
+            <p className="mb-8 font-bold text-slate-400">
+              {getText("instruction")}
+            </p>
+
+            <div className="flex gap-16 items-center flex-col md:flex-row">
+              {/* Periscope Visualization */}
+              <div className="relative w-[400px] h-[500px] bg-slate-800 rounded-3xl border-4 border-slate-600 overflow-hidden">
+                {/* Object (Flower) - Outside Top Left */}
+                <div className="absolute -left-16 top-10 text-6xl z-10 animate-bounce-slow">
+                  🌻
+                </div>
+                {/* Eye - Outside Bottom Right */}
+                <div className="absolute -right-6 bottom-20 text-6xl z-10">
+                  👁️
+                </div>
+                {/* Tube Structure */}
+                <div className="absolute top-10 left-0 w-[150px] h-[80px] bg-slate-700"></div>{" "}
+                {/* Top Horizontal */}
+                <div className="absolute top-10 left-[100px] w-[50px] h-[350px] bg-slate-700"></div>{" "}
+                {/* Vertical */}
+                <div className="absolute top-[310px] left-[100px] w-[200px] h-[80px] bg-slate-700"></div>{" "}
+                {/* Bottom Horizontal */}
+                {/* Mirrors */}
+                {/* Top Mirror at intersection */}
+                <div
+                  className="absolute w-20 h-2 bg-blue-300 shadow-[0_0_10px_white]"
+                  style={{
+                    top: "50px",
+                    left: "100px",
+                    transformOrigin: "center",
+                    rotate: `${-angle1}deg`, // 0 is horizontal. 45 tilts /
+                    // Wait, for periscope top mirror usually looks like \ to reflect Right -> Down?
+                    // Or / ? If coming from left, hits mirror, reflects down. Mirror needs to be \ (135 or -45)
+                    // Let's calibrate 0-90 slider to map visual correctly.
+                    // Let's say Slider 45 = / shape (Top right to bot left).
+                    // No, for Left -> Down, need \ shape. Normal is Left-Up. Bisector is Top-Left.
+                    // Actually visually, simplest is just rotate div.
+                    // Let's assume standard periscope configuration z-shape.
+                    // Light In -> Hit Mirror 1 (\) -> Down -> Hit Mirror 2 (/) -> Out.
+                    // Let's map Slider 0-90. 45 is ideal.
+                    transform: `translate(-50%, -50%) rotate(${
+                      angle1 - 90
+                    }deg)`, // \ shape approx
+                  }}
+                ></div>
+                {/* Bottom Mirror */}
+                <div
+                  className="absolute w-20 h-2 bg-blue-300 shadow-[0_0_10px_white]"
+                  style={{
+                    top: "350px",
+                    left: "100px",
+                    transformOrigin: "center",
+                    transform: `translate(-50%, -50%) rotate(${-angle2}deg)`, // / shape approx
+                  }}
+                ></div>
+                {/* Light Ray */}
+                <svg className="absolute inset-0 w-full h-full pointer-events-none z-20">
+                  <path
+                    d="M0,50 L100,50"
+                    stroke="yellow"
+                    strokeWidth="4"
+                    className="animate-pulse"
+                  />{" "}
+                  {/* Incoming */}
+                  {/* From Mirror 1 */}
+                  {/* Usually reflect angle = incident angle relative to normal.
+                          Visual hack: Just draw line to bottom mirror if angle is close to correct. Else draw off-screen.
+                      */}
+                  <line
+                    x1="100"
+                    y1="50"
+                    x2={100 + (angle1 - 45) * 5}
+                    y2={350}
+                    stroke={
+                      Math.abs(angle1 - 45) < 15 ? "yellow" : "transparent"
+                    }
+                    strokeWidth="4"
+                    className="animate-pulse"
+                  />
+                  {/* From Mirror 2 */}
+                  <line
+                    x1={100 + (angle1 - 45) * 5}
+                    y1="350"
+                    x2="400"
+                    y2={350 + (angle2 - 45) * 5}
+                    stroke={
+                      Math.abs(angle1 - 45) < 15 && Math.abs(angle2 - 45) < 15
+                        ? "yellow"
+                        : "transparent"
+                    }
+                    strokeWidth="4"
+                    className="animate-pulse"
+                  />
+                </svg>
+              </div>
+
+              {/* Controls */}
+              <div className="bg-slate-800 p-8 rounded-2xl w-64 shadow-xl border border-slate-600">
+                <div className="mb-6">
+                  <label className="block font-bold mb-2 text-blue-300">
+                    Top Mirror {angle1}°
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="90"
+                    value={angle1}
+                    onChange={(e) => setAngle1(Number(e.target.value))}
+                    className="w-full cursor-pointer accent-yellow-400"
+                  />
+                </div>
+
+                <div className="mb-6">
+                  <label className="block font-bold mb-2 text-blue-300">
+                    Bottom Mirror {angle2}°
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="90"
+                    value={angle2}
+                    onChange={(e) => setAngle2(Number(e.target.value))}
+                    className="w-full cursor-pointer accent-yellow-400"
+                  />
+                </div>
+
+                {isCorrect && (
+                  <div className="text-green-400 font-bold text-center animate-bounce">
+                    {getText("success")}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

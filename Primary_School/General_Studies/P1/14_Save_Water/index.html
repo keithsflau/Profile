@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小一常識：珍惜水資源 | Save Water</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #e0f2fe 0%, #0ea5e9 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect, useRef } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Save Water Challenge",
+          zh: "珍惜水資源",
+          ja: "節水チャレンジ",
+        },
+        instruction: {
+          en: "Tap the leaking faucets to close them!",
+          zh: "點擊漏水的水龍頭把它關緊！",
+          ja: "水漏れしている蛇口をタップして閉めよう！",
+        },
+        saved: { en: "Water Saved", zh: "已節省" },
+        time: { en: "Time", zh: "時間" },
+        gameover: { en: "Time's Up!", zh: "時間到！" },
+        liters: { en: "L", zh: "升" },
+        start: { en: "Start Saving", zh: "開始節水" },
+        restart: { en: "Play Again", zh: "再玩一次" },
+        final: { en: "Total Saved:", zh: "總共節省：" },
+      };
+
+      const GRID_SIZE = 9;
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [gameState, setGameState] = useState("menu"); // menu, playing, over
+        const [taps, setTaps] = useState(Array(GRID_SIZE).fill(false)); // false=closed, true=leaking
+        const [score, setScore] = useState(0);
+        const [timeLeft, setTimeLeft] = useState(30);
+
+        const timerRef = useRef(null);
+        const leakTimerRef = useRef(null);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        useEffect(() => {
+          if (gameState === "playing") {
+            timerRef.current = setInterval(() => {
+              setTimeLeft((t) => {
+                if (t <= 1) {
+                  endGame();
+                  return 0;
+                }
+                return t - 1;
+              });
+            }, 1000);
+
+            // Leaking Logic
+            leakTimerRef.current = setInterval(() => {
+              setTaps((prev) => {
+                const newTaps = [...prev];
+                // Pick random closed tap to leak
+                const closedIndices = newTaps
+                  .map((v, i) => (!v ? i : -1))
+                  .filter((i) => i !== -1);
+                if (closedIndices.length > 0 && Math.random() > 0.3) {
+                  const idx =
+                    closedIndices[
+                      Math.floor(Math.random() * closedIndices.length)
+                    ];
+                  newTaps[idx] = true;
+                }
+                return newTaps;
+              });
+            }, 800); // Difficulty speed
+          }
+          return () => {
+            clearInterval(timerRef.current);
+            clearInterval(leakTimerRef.current);
+          };
+        }, [gameState]);
+
+        const fixTap = (idx) => {
+          if (taps[idx]) {
+            const newTaps = [...taps];
+            newTaps[idx] = false;
+            setTaps(newTaps);
+            setScore((s) => s + 5);
+          }
+        };
+
+        const startGame = () => {
+          setScore(0);
+          setTimeLeft(30);
+          setTaps(Array(GRID_SIZE).fill(false));
+          setGameState("playing");
+        };
+
+        const endGame = () => {
+          setGameState("over");
+          clearInterval(timerRef.current);
+          clearInterval(leakTimerRef.current);
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-white mb-4 mt-8 drop-shadow-md">
+              🚰 {getText("title")}
+            </h1>
+
+            {gameState === "menu" && (
+              <div className="text-center mt-20 bg-white/90 p-12 rounded-3xl shadow-xl max-w-lg">
+                <p className="text-2xl font-bold text-sky-800 mb-8">
+                  {getText("instruction")}
+                </p>
+                <button
+                  onClick={startGame}
+                  className="bg-sky-500 text-white px-12 py-5 rounded-full font-black text-3xl hover:bg-sky-600 shadow-lg hover:scale-105 transition-transform"
+                >
+                  {getText("start")} ▶️
+                </button>
+              </div>
+            )}
+
+            {gameState === "playing" && (
+              <div className="w-full max-w-2xl">
+                <div className="flex justify-between items-center bg-white/20 p-4 rounded-xl mb-6 backdrop-blur">
+                  <div className="text-white font-black text-2xl">
+                    {getText("time")}: {timeLeft}s
+                  </div>
+                  <div className="text-white font-black text-2xl">
+                    {getText("saved")}: {score} {getText("liters")}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-4">
+                  {taps.map((isLeaking, idx) => (
+                    <motion.button
+                      key={idx}
+                      onClick={() => fixTap(idx)}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className={`aspect-square rounded-2xl flex flex-col items-center justify-center relative shadow-lg transition-colors border-4 ${
+                        isLeaking
+                          ? "bg-white border-blue-400"
+                          : "bg-slate-100 border-slate-300"
+                      }`}
+                    >
+                      <span className="text-6xl md:text-7xl z-10">🚰</span>
+                      {isLeaking ? (
+                        <>
+                          {/* Water Drops */}
+                          <motion.div
+                            animate={{ y: [0, 20], opacity: [1, 0] }}
+                            transition={{ repeat: Infinity, duration: 0.5 }}
+                            className="text-4xl absolute bottom-4 text-blue-500"
+                          >
+                            💧
+                          </motion.div>
+                          <motion.div
+                            className="absolute inset-0 bg-blue-500/10 rounded-xl"
+                            animate={{ opacity: [0.5, 1, 0.5] }}
+                            transition={{ repeat: Infinity, duration: 1 }}
+                          />
+                        </>
+                      ) : (
+                        <span className="absolute bottom-2 text-green-500 font-black">
+                          OK
+                        </span>
+                      )}
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {gameState === "over" && (
+              <div className="text-center mt-20 bg-white/90 p-12 rounded-3xl shadow-xl max-w-lg">
+                <h2 className="text-4xl font-black text-sky-800 mb-4">
+                  {getText("gameover")}
+                </h2>
+                <p className="text-2xl font-bold text-slate-600 mb-8">
+                  {getText("final")} {score} {getText("liters")}
+                </p>
+                <button
+                  onClick={startGame}
+                  className="bg-sky-500 text-white px-12 py-5 rounded-full font-black text-2xl hover:bg-sky-600 shadow-lg"
+                >
+                  {getText("restart")} 🔄
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小二數學：乘法概念 (組) | Multiplication Groups</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fefce8 0%, #ca8a04 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "✖️ Multiplication",
+          zh: "✖️ 乘法概念",
+          ja: "✖️ 掛け算",
+          ko: "✖️ 곱셈",
+          es: "✖️ Multiplicación",
+          de: "✖️ Multiplikation",
+          fi: "✖️ Kertolasku",
+          fr: "✖️ Multiplication",
+          ar: "✖️ الضرب",
+          it: "✖️ Moltiplicazione",
+        },
+        check: {
+          en: "Check",
+          zh: "檢查",
+          ja: "確認",
+          ko: "확인",
+          es: "Comprobar",
+          de: "Prüfen",
+          fi: "Tarkista",
+          fr: "Vérifier",
+          ar: "تحقق",
+          it: "Controlla",
+        },
+        desc: {
+          en: "{g} groups of {p} apples",
+          zh: "有 {g} 組蘋果，每組有 {p} 個。",
+          ja: "リンゴが {g} グループあり、各グループに {p} 個あります。",
+          ko: "사과가 {g} 그룹 있고, 각 그룹에 {p} 개씩 있습니다.",
+          es: "{g} grupos de {p} manzanas",
+          fr: "{g} groupes de {p} pommes",
+          de: "{g} Gruppen von {p} Äpfeln",
+        },
+        template: {
+          // Need a structured template for inputs since word order differs
+          // Simplified: "Groups: [ ]  Per Group: [ ]" labels?
+          // Or stick to sentence structure?
+          // "There are [ ] groups, each has [ ] apples."
+          zh: ["有", "組蘋果，每組有", "個。"],
+          en: ["There are", "groups, each having", "apples."],
+          ja: ["", "グループあり、各", "個です。"], // "X groups, each Y items" - "X グループあり、各 Y 個です"
+          // Let's use generic labels to avoid sentence structure complexity across all langs for input fields
+          // "Groups: [ ]  Items: [ ]"
+        },
+        Groups: {
+          en: "Groups:",
+          zh: "組數：",
+          ja: "グループ数:",
+          ko: "그룹:",
+          es: "Grupos:",
+          fr: "Groupes :",
+          de: "Gruppen:",
+        },
+        Items: {
+          en: "Items per group:",
+          zh: "每組數量：",
+          ja: "1グループあたり:",
+          ko: "그룹 당 개수:",
+          es: "Artículos por grupo:",
+          fr: "Articles par groupe :",
+          de: "Artikel pro Gruppe:",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [groups, setGroups] = useState(3);
+        const [perGroup, setPerGroup] = useState(2);
+        const [inputs, setInputs] = useState({ g: "", p: "" });
+        const [feedback, setFeedback] = useState("");
+
+        const newProb = () => {
+          setGroups(Math.floor(Math.random() * 4) + 2); // 2-5 groups
+          setPerGroup(Math.floor(Math.random() * 4) + 2); // 2-5 each
+          setInputs({ g: "", p: "" });
+          setFeedback("");
+        };
+
+        useEffect(newProb, []);
+
+        const check = () => {
+          if (
+            parseInt(inputs.g) === groups &&
+            parseInt(inputs.p) === perGroup
+          ) {
+            setFeedback("CORRECT");
+            setTimeout(newProb, 2000);
+          } else {
+            setFeedback("WRONG");
+          }
+        };
+
+        const getDesc = () => {
+          const tmpl = t.desc[lang] || t.desc["en"];
+          return tmpl
+            .replace("{g}", inputs.g || "?")
+            .replace("{p}", inputs.p || "?");
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center justify-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+
+            <h1 className="text-5xl font-black text-yellow-900 mb-8 max-w-2xl text-center">
+              {t.title[lang] || t.title["en"]}
+            </h1>
+
+            <div className="bg-white/90 rounded-3xl p-8 shadow-2xl w-full max-w-4xl text-center border-4 border-yellow-300">
+              <div className="flex justify-center flex-wrap gap-8 mb-12">
+                {[...Array(groups)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="bg-yellow-100 border-4 border-yellow-400 rounded-3xl p-4 flex flex-wrap w-32 justify-center gap-2 shadow-lg"
+                  >
+                    {[...Array(perGroup)].map((_, j) => (
+                      <div key={j} className="text-3xl">
+                        🍎
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex flex-col md:flex-row items-center justify-center gap-6 mb-8 bg-yellow-50 p-6 rounded-2xl border-2 border-yellow-200">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl font-bold text-slate-700">
+                    {t.Groups[lang] || t.Groups["en"]}
+                  </span>
+                  <input
+                    type="number"
+                    value={inputs.g}
+                    onChange={(e) =>
+                      setInputs({ ...inputs, g: e.target.value })
+                    }
+                    className="w-24 text-center border-b-4 border-yellow-500 bg-white text-4xl font-black focus:outline-none rounded"
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl font-bold text-slate-700">
+                    {t.Items[lang] || t.Items["en"]}
+                  </span>
+                  <input
+                    type="number"
+                    value={inputs.p}
+                    onChange={(e) =>
+                      setInputs({ ...inputs, p: e.target.value })
+                    }
+                    className="w-24 text-center border-b-4 border-yellow-500 bg-white text-4xl font-black focus:outline-none rounded"
+                  />
+                </div>
+              </div>
+
+              <div className="text-2xl font-bold text-slate-500 mb-8">
+                {getDesc()}
+              </div>
+
+              <button
+                onClick={check}
+                className="px-10 py-3 bg-yellow-500 text-white rounded-full font-black text-2xl shadow-xl hover:bg-yellow-600 transition-transform active:scale-95"
+              >
+                {t.check[lang] || t.check["en"]}
+              </button>
+
+              <div className="h-16 mt-8">
+                {feedback === "CORRECT" && (
+                  <div>
+                    <div className="text-4xl font-black text-green-500 animate-bounce">
+                      {get("correct", lang)}
+                    </div>
+                    <div className="text-2xl text-yellow-700 mt-2 font-bold">
+                      {groups} × {perGroup} = {groups * perGroup}
+                    </div>
+                  </div>
+                )}
+                {feedback === "WRONG" && (
+                  <div className="text-4xl font-black text-red-500 animate-shake">
+                    {get("wrong", lang)}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

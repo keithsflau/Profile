@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小五數學：相對位置 | Relative Position</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #f0fdf4 0%, #4ade80 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Relative Position",
+          zh: "相對位置",
+          ja: "相対位置",
+          ko: "상대 위치",
+          es: "Posición Relativa",
+          de: "Relative Position",
+          fi: "Suhteellinen sijainti",
+          fr: "Position relative",
+          ar: "الموقع النسبي",
+          it: "Posizione relativa",
+        },
+        from: {
+          en: "From:",
+          zh: "起點:",
+          ja: "出発点:",
+          ko: "출발점:",
+          es: "Desde:",
+          de: "Von:",
+          fi: "Lähtöpaikka:",
+          fr: "De :",
+          ar: "من:",
+          it: "Da:",
+        },
+        to: {
+          en: "To:",
+          zh: "終點:",
+          ja: "目的地:",
+          ko: "도착점:",
+          es: "A:",
+          de: "Nach:",
+          fi: "Kohde:",
+          fr: "À :",
+          ar: "إلى:",
+          it: "A:",
+        },
+        school: {
+          en: "School",
+          zh: "學校",
+          ja: "学校",
+          ko: "학교",
+          es: "Escuela",
+          de: "Schule",
+          fi: "Koulu",
+          fr: "École",
+          ar: "مدرسة",
+          it: "Scuola",
+        },
+        park: {
+          en: "Park",
+          zh: "公園",
+          ja: "公園",
+          ko: "공원",
+          es: "Parque",
+          de: "Park",
+          fi: "Puisto",
+          fr: "Parc",
+          ar: "حديقة",
+          it: "Parco",
+        },
+        shop: {
+          en: "Shop",
+          zh: "商店",
+          ja: "店",
+          ko: "가게",
+          es: "Tienda",
+          de: "Laden",
+          fi: "Kauppa",
+          fr: "Magasin",
+          ar: "متجر",
+          it: "Negozio",
+        },
+        home: {
+          en: "Home",
+          zh: "家",
+          ja: "家",
+          ko: "집",
+          es: "Casa",
+          de: "Zuhause",
+          fi: "Koti",
+          fr: "Maison",
+          ar: "منزل",
+          it: "Casa",
+        },
+        library: {
+          en: "Library",
+          zh: "圖書館",
+          ja: "図書館",
+          ko: "도서관",
+          es: "Biblioteca",
+          de: "Bibliothek",
+          fi: "Kirjasto",
+          fr: "Bibliothèque",
+          ar: "مكتبة",
+          it: "Biblioteca",
+        },
+        samePos: {
+          en: "Same Position",
+          zh: "同一位置",
+          ja: "同じ位置",
+          ko: "같은 위치",
+          es: "Misma Posición",
+          de: "Gleiche Position",
+          fi: "Sama sijainti",
+          fr: "Même position",
+          ar: "نفس الموقع",
+          it: "Stessa posizione",
+        },
+        unknown: {
+          en: "Unknown",
+          zh: "未知",
+          ja: "不明",
+          ko: "알 수 없음",
+          es: "Desconocido",
+          de: "Unbekannt",
+          fi: "Tuntematon",
+          fr: "Inconnu",
+          ar: "مجهول",
+          it: "Sconosciuto",
+        },
+        N: {
+          en: "North",
+          zh: "北方",
+          ja: "北",
+          ko: "북쪽",
+          es: "Norte",
+          de: "Norden",
+          fi: "Pohjoinen",
+          fr: "Nord",
+          ar: "شمال",
+          it: "Nord",
+        },
+        S: {
+          en: "South",
+          zh: "南方",
+          ja: "南",
+          ko: "남쪽",
+          es: "Sur",
+          de: "Süden",
+          fi: "Etelä",
+          fr: "Sud",
+          ar: "جنوب",
+          it: "Sud",
+        },
+        E: {
+          en: "East",
+          zh: "東方",
+          ja: "東",
+          ko: "동쪽",
+          es: "Este",
+          de: "Osten",
+          fi: "Itä",
+          fr: "Est",
+          ar: "شرق",
+          it: "Est",
+        },
+        W: {
+          en: "West",
+          zh: "西方",
+          ja: "西",
+          ko: "서쪽",
+          es: "Oeste",
+          de: "Westen",
+          fi: "Länsi",
+          fr: "Ouest",
+          ar: "غرب",
+          it: "Ovest",
+        },
+        NE: {
+          en: "Northeast",
+          zh: "東北方",
+          ja: "北東",
+          ko: "북동쪽",
+          es: "Noreste",
+          de: "Nordosten",
+          fi: "Koillinen",
+          fr: "Nord-est",
+          ar: "شمال شرق",
+          it: "Nord-est",
+        },
+        NW: {
+          en: "Northwest",
+          zh: "西北方",
+          ja: "北西",
+          ko: "북서쪽",
+          es: "Noroeste",
+          de: "Nordwesten",
+          fi: "Luode",
+          fr: "Nord-ouest",
+          ar: "شمال غرب",
+          it: "Nord-ovest",
+        },
+        SE: {
+          en: "Southeast",
+          zh: "東南方",
+          ja: "南東",
+          ko: "남동쪽",
+          es: "Sureste",
+          de: "Südosten",
+          fi: "Kaakko",
+          fr: "Sud-est",
+          ar: "جنوب شرق",
+          it: "Sud-est",
+        },
+        SW: {
+          en: "Southwest",
+          zh: "西南方",
+          ja: "南西",
+          ko: "남서쪽",
+          es: "Suroeste",
+          de: "Südwesten",
+          fi: "Lounas",
+          fr: "Sud-ouest",
+          ar: "جنوب غرب",
+          it: "Sud-ovest",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const places = [
+          { id: "school", x: 2, y: 2, emoji: "🏫" },
+          { id: "park", x: 4, y: 1, emoji: "🌳" },
+          { id: "shop", x: 1, y: 3, emoji: "🏪" },
+          { id: "home", x: 3, y: 4, emoji: "🏠" },
+          { id: "library", x: 4, y: 3, emoji: "📚" },
+        ];
+        const [from, setFrom] = useState("school");
+        const [to, setTo] = useState("park");
+
+        const fromPlace = places.find((p) => p.id === from);
+        const toPlace = places.find((p) => p.id === to);
+        const dx = toPlace.x - fromPlace.x;
+        const dy = toPlace.y - fromPlace.y;
+
+        const getDirectionKey = () => {
+          if (dx === 0 && dy === 0) return "samePos";
+          if (dy < 0 && dx === 0) return "N";
+          if (dy > 0 && dx === 0) return "S";
+          if (dy === 0 && dx > 0) return "E";
+          if (dy === 0 && dx < 0) return "W";
+          if (dy < 0 && dx > 0) return "NE";
+          if (dy < 0 && dx < 0) return "NW";
+          if (dy > 0 && dx > 0) return "SE";
+          if (dy > 0 && dx < 0) return "SW";
+          return "unknown";
+        };
+
+        const renderSentence = () => {
+          const toName = getText(toPlace.id);
+          const fromName = getText(fromPlace.id);
+          const dir = getText(getDirectionKey());
+
+          if (lang === "zh") {
+            return (
+              <>
+                <p className="text-2xl font-black text-green-800 mt-2">
+                  {toName} 在 {fromName} 的
+                </p>
+                <p className="text-4xl font-black text-green-600">{dir}</p>
+              </>
+            );
+          } else {
+            return (
+              <>
+                <p className="text-2xl font-black text-green-800 mt-2">
+                  {toName} relative to {fromName} is
+                </p>
+                <p className="text-4xl font-black text-green-600">{dir}</p>
+              </>
+            );
+          }
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-5xl font-black text-green-900 mb-2 mt-8">
+              📍 {getText("title")}
+            </h1>
+
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-4xl w-full mt-8">
+              <div className="flex flex-col md:flex-row gap-8">
+                <div className="flex-1">
+                  <div
+                    className="grid grid-cols-5 gap-1 bg-slate-100 p-4 rounded-2xl"
+                    style={{ aspectRatio: "1" }}
+                  >
+                    {[...Array(25)].map((_, i) => {
+                      const x = i % 5;
+                      const y = Math.floor(i / 5);
+                      const place = places.find((p) => p.x === x && p.y === y);
+                      const isFrom = fromPlace.x === x && fromPlace.y === y;
+                      const isTo = toPlace.x === x && toPlace.y === y;
+                      return (
+                        <div
+                          key={i}
+                          className={`aspect-square rounded-lg flex items-center justify-center text-2xl border-2 ${
+                            isFrom
+                              ? "border-blue-500 bg-blue-100"
+                              : isTo
+                              ? "border-red-500 bg-red-100"
+                              : "border-slate-200 bg-white"
+                          }`}
+                        >
+                          {place?.emoji}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div className="flex-1 space-y-4">
+                  <div>
+                    <label className="block font-bold text-green-800 mb-1">
+                      {getText("from")}
+                    </label>
+                    <select
+                      value={from}
+                      onChange={(e) => setFrom(e.target.value)}
+                      className="w-full p-3 border-2 border-green-300 rounded-xl font-bold"
+                    >
+                      {places.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.emoji} {getText(p.id)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block font-bold text-green-800 mb-1">
+                      {getText("to")}
+                    </label>
+                    <select
+                      value={to}
+                      onChange={(e) => setTo(e.target.value)}
+                      className="w-full p-3 border-2 border-green-300 rounded-xl font-bold"
+                    >
+                      {places.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.emoji} {getText(p.id)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="bg-green-100 rounded-2xl p-6 text-center border-4 border-green-300">
+                    <p className="text-green-600 font-bold">
+                      {getText("title")}
+                    </p>
+                    {renderSentence()}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

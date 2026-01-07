@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小六數學：多邊形內角 | Angles in Polygons</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #ecfccb 0%, #84cc16 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      function App() {
+        const [sides, setSides] = useState(3); // 3 to 10
+
+        const sumAngles = (sides - 2) * 180;
+        const oneAngle = sumAngles / sides;
+
+        const names = {
+          3: "三角形 Triangle",
+          4: "四邊形 Quadrilateral",
+          5: "五邊形 Pentagon",
+          6: "六邊形 Hexagon",
+          7: "七邊形 Heptagon",
+          8: "八邊形 Octagon",
+          9: "九邊形 Nonagon",
+          10: "十邊形 Decagon",
+        };
+
+        const renderPolygon = () => {
+          const r = 100;
+          const cx = 150;
+          const cy = 150;
+          const points = [];
+          for (let i = 0; i < sides; i++) {
+            // -90 to start at top
+            const angle = (((i * 360) / sides - 90) * Math.PI) / 180;
+            points.push(
+              `${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`
+            );
+          }
+
+          // Generate triangles from center
+          const triangles = [];
+          for (let i = 0; i < sides; i++) {
+            const p1 = points[i];
+            const p2 = points[(i + 1) % sides];
+            // Triangles from center would show sides, but formula uses (n-2) triangles from one vertex.
+            // Let's visualize the shape itself.
+          }
+
+          // Lines from vertex 0 to all others to show (n-2) triangles
+          const diagLines = [];
+          for (let i = 2; i < sides - 1; i++) {
+            const pTarget = points[i];
+            const pStart = points[0];
+            // diagLines.push(<line x1={pStart.split(',')[0]} y1={pStart.split(',')[1]} x2={pTarget.split(',')[0]} y2={pTarget.split(',')[1]} stroke="white" strokeDasharray="4" />);
+            // Visualizing diagonals sometimes confusing without animation. Let's just show shape.
+          }
+
+          return (
+            <svg
+              viewBox="0 0 300 300"
+              className="w-64 h-64 drop-shadow-xl mx-auto"
+            >
+              <polygon
+                points={points.join(" ")}
+                fill="#a3e635"
+                stroke="#4d7c0f"
+                strokeWidth="4"
+              />
+              {diagLines}
+            </svg>
+          );
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-5xl font-black text-lime-900 mb-2">
+              🔷 多邊形內角
+            </h1>
+            <p className="text-xl text-lime-700 font-bold mb-8">
+              Interior Angles of Polygons
+            </p>
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-3xl w-full flex flex-col md:flex-row gap-8 items-center">
+              <div className="flex-1 text-center">
+                {renderPolygon()}
+                <div className="mt-4 text-2xl font-black text-lime-800">
+                  {names[sides]}
+                </div>
+              </div>
+
+              <div className="flex-1 w-full space-y-6">
+                <div>
+                  <label className="block font-bold text-lime-800 mb-2">
+                    邊數 Number of Sides (n): {sides}
+                  </label>
+                  <input
+                    type="range"
+                    min="3"
+                    max="10"
+                    value={sides}
+                    onChange={(e) => setSides(parseInt(e.target.value))}
+                    className="w-full accent-lime-600 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+                  />
+                </div>
+
+                <div className="bg-lime-50 p-4 rounded-xl border border-lime-200">
+                  <h3 className="font-bold text-lime-900 border-b border-lime-200 pb-2 mb-2">
+                    內角和 Sum of Interior Angles
+                  </h3>
+                  <p className="font-mono text-lg text-slate-700">
+                    (n - 2) × 180°
+                  </p>
+                  <p className="font-mono text-xl font-bold text-lime-700 mt-1">
+                    ({sides} - 2) × 180° = {sumAngles}°
+                  </p>
+                </div>
+
+                <div className="bg-emerald-100 p-4 rounded-xl border border-emerald-300">
+                  <h3 className="font-bold text-emerald-900 border-b border-emerald-200 pb-2 mb-2">
+                    每個內角 (正多邊形) Each Angle
+                  </h3>
+                  <p className="font-mono text-lg text-slate-700">
+                    {sumAngles}° ÷ {sides}
+                  </p>
+                  <p className="font-mono text-3xl font-black text-emerald-700 mt-1">
+                    {oneAngle.toFixed(1)}°
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

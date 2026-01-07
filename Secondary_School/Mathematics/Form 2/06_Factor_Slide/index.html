@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Factorization Slider | S2 Math</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-rose-50 text-slate-800 min-h-screen">
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      const App = () => {
+        const [targetB, setTargetB] = useState(5);
+        const [targetC, setTargetC] = useState(6);
+
+        const [factor1, setFactor1] = useState(0); // User guess 1
+        const [factor2, setFactor2] = useState(0); // User guess 2
+
+        // Target Eq: x^2 + Bx + C
+
+        const check = () => {
+          return factor1 + factor2 === targetB && factor1 * factor2 === targetC;
+        };
+
+        const generate = () => {
+          // Generate solveable simple quadratics (x+m)(x+n)
+          const m = Math.floor(Math.random() * 6) + 1; // 1 to 6
+          const n = Math.floor(Math.random() * 6) + 1; // 1 to 6
+          setTargetB(m + n);
+          setTargetC(m * n);
+          setFactor1(0);
+          setFactor2(0);
+        };
+
+        useEffect(() => {
+          generate();
+        }, []);
+
+        const isSuccess = check();
+
+        return (
+          <div className="p-8 max-w-4xl mx-auto min-h-screen flex flex-col items-center">
+            <header className="mb-8 text-center">
+              <div className="text-rose-600 font-bold uppercase text-xs tracking-widest mb-2">
+                Unit 4: Algebra & Estimation
+              </div>
+              <h1 className="text-4xl font-extrabold text-slate-900">
+                Factorization Slider
+              </h1>
+              <p className="text-slate-500">
+                Find the lengh and width of the rectangle.
+              </p>
+            </header>
+
+            <div className="w-full max-w-2xl bg-white p-8 rounded-3xl shadow-xl border border-rose-100 flex flex-col items-center text-center">
+              <div className="mb-8">
+                <div className="text-xs font-bold text-slate-400 uppercase mb-4">
+                  Target Expression
+                </div>
+                <div className="bg-rose-50 px-8 py-4 rounded-xl text-3xl font-mono font-extrabold text-rose-600 border border-rose-200 inline-block shadow-sm">
+                  x² + {targetB}x + {targetC}
+                </div>
+              </div>
+
+              <div className="w-full flex justify-center mb-8 relative">
+                {/* Area Model Visualization of User Guess */}
+                <div className="grid w-64 h-64 border-4 border-slate-800 rounded-lg overflow-hidden bg-slate-100 relative">
+                  {/* Just symbolic grid */}
+                  <div className="absolute inset-0 grid grid-cols-2 grid-rows-2">
+                    <div className="bg-blue-200 flex items-center justify-center font-bold text-blue-800 text-xl border border-white">
+                      x²
+                    </div>
+                    <div
+                      className={`flex items-center justify-center font-bold text-xl border border-white transition-colors duration-500 ${
+                        factor2 === 0
+                          ? "bg-slate-200 text-slate-400"
+                          : "bg-emerald-200 text-emerald-800"
+                      }`}
+                    >
+                      {factor2 !== 0 ? `${factor2}x` : "?"}
+                    </div>
+                    <div
+                      className={`flex items-center justify-center font-bold text-xl border border-white transition-colors duration-500 ${
+                        factor1 === 0
+                          ? "bg-slate-200 text-slate-400"
+                          : "bg-emerald-200 text-emerald-800"
+                      }`}
+                    >
+                      {factor1 !== 0 ? `${factor1}x` : "?"}
+                    </div>
+                    <div
+                      className={`flex items-center justify-center font-bold text-xl border border-white transition-colors duration-500 ${
+                        factor1 !== 0 && factor2 !== 0
+                          ? "bg-purple-200 text-purple-800"
+                          : "bg-slate-200 text-slate-400"
+                      }`}
+                    >
+                      {factor1 !== 0 && factor2 !== 0 ? factor1 * factor2 : "?"}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Sliders Positioned around Grid */}
+                <div className="absolute -right-16 top-0 bottom-0 flex flex-col justify-center items-center w-8">
+                  <input
+                    type="range"
+                    min="-10"
+                    max="10"
+                    orient="vertical"
+                    value={factor1}
+                    onChange={(e) => setFactor1(Number(e.target.value))}
+                    className="h-48 w-2 bg-slate-200 rounded-full appearance-none cursor-pointer accent-emerald-500"
+                    style={{
+                      writingMode: "bt-lr",
+                      WebkitAppearance: "slider-vertical",
+                    }}
+                  />
+                  <div className="mt-2 font-bold text-emerald-600">
+                    {factor1}
+                  </div>
+                </div>
+
+                <div className="absolute -top-16 left-0 right-0 flex flex-col justify-center items-center h-8">
+                  <div className="mb-2 font-bold text-emerald-600">
+                    {factor2}
+                  </div>
+                  <input
+                    type="range"
+                    min="-10"
+                    max="10"
+                    value={factor2}
+                    onChange={(e) => setFactor2(Number(e.target.value))}
+                    className="w-48 h-2 bg-slate-200 rounded-full appearance-none cursor-pointer accent-emerald-500"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-8 mb-4">
+                <div className="text-sm font-bold text-slate-500 mb-2">
+                  Check Your Factored Form:
+                </div>
+                <div
+                  className={`text-2xl font-mono font-bold transition-all ${
+                    isSuccess ? "text-emerald-600 scale-110" : "text-slate-400"
+                  }`}
+                >
+                  (x {factor1 >= 0 ? "+" : ""}
+                  {factor1}) (x {factor2 >= 0 ? "+" : ""}
+                  {factor2})
+                </div>
+              </div>
+
+              {isSuccess && (
+                <div className="animate-bounce mt-4">
+                  <span className="inline-block px-4 py-2 bg-emerald-500 text-white font-bold rounded-full shadow-lg">
+                    Correct! <i className="fa-solid fa-check ml-1"></i>
+                  </span>
+                  <button
+                    onClick={generate}
+                    className="block mt-4 mx-auto text-sm font-bold text-rose-500 hover:text-rose-700 underline"
+                  >
+                    Next Problem
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <footer className="mt-8">
+              <a
+                href="../index.html"
+                className="text-rose-600 hover:text-rose-700 font-bold"
+              >
+                <i className="fa-solid fa-arrow-left mr-2"></i> Back to
+                Dashboard
+              </a>
+            </footer>
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

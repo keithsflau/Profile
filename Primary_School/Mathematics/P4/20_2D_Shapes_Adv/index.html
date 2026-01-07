@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小四數學：拼砌圖形</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #e0e7ff 0%, #a5b4fc 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { motion } = window.Motion;
+
+      function App() {
+        const [assembled, setAssembled] = useState(true);
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-5xl font-black text-indigo-900 mb-8">
+              🧩 圖形拼砌
+            </h1>
+
+            <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full flex flex-col items-center">
+              <div className="flex gap-4 mb-8">
+                <button
+                  onClick={() => setAssembled(true)}
+                  className="px-6 py-2 bg-indigo-500 text-white rounded-xl font-bold hover:bg-indigo-600 transition-all"
+                >
+                  拼合 (Assemble)
+                </button>
+                <button
+                  onClick={() => setAssembled(false)}
+                  className="px-6 py-2 bg-pink-500 text-white rounded-xl font-bold hover:bg-pink-600 transition-all"
+                >
+                  拆解 (Explode)
+                </button>
+              </div>
+
+              <div className="relative w-[400px] h-[400px] border-4 border-slate-200 rounded-3xl bg-slate-50 flex items-center justify-center overflow-hidden">
+                <div
+                  className="absolute inset-0 opacity-10"
+                  style={{
+                    backgroundImage:
+                      "radial-gradient(#64748b 1px, transparent 1px)",
+                    backgroundSize: "20px 20px",
+                  }}
+                ></div>
+
+                {/* Top Triangle */}
+                <motion.div
+                  className="absolute w-0 h-0 border-l-[100px] border-r-[100px] border-b-[100px] border-l-transparent border-r-transparent border-b-indigo-500 origin-bottom"
+                  animate={{
+                    y: assembled ? -50 : -120,
+                    x: assembled ? 0 : 0,
+                    rotate: assembled ? 0 : 180,
+                  }}
+                  transition={{ type: "spring", stiffness: 60 }}
+                />
+                {/* Bottom Triangle */}
+                <motion.div
+                  className="absolute w-0 h-0 border-l-[100px] border-r-[100px] border-t-[100px] border-l-transparent border-r-transparent border-t-emerald-500 origin-top"
+                  animate={{
+                    y: assembled ? 50 : 120,
+                    x: assembled ? 0 : 0,
+                    rotate: assembled ? 0 : 180,
+                  }}
+                  transition={{ type: "spring", stiffness: 60 }}
+                />
+                {/* Left Triangle */}
+                <motion.div
+                  className="absolute w-0 h-0 border-t-[100px] border-b-[100px] border-r-[100px] border-t-transparent border-b-transparent border-r-amber-500 origin-right"
+                  animate={{
+                    x: assembled ? -50 : -120,
+                    y: assembled ? 0 : 0,
+                    rotate: assembled ? 0 : 180,
+                  }}
+                  transition={{ type: "spring", stiffness: 60 }}
+                />
+                {/* Right Triangle */}
+                <motion.div
+                  className="absolute w-0 h-0 border-t-[100px] border-b-[100px] border-l-[100px] border-t-transparent border-b-transparent border-l-purple-500 origin-left"
+                  animate={{
+                    x: assembled ? 50 : 120,
+                    y: assembled ? 0 : 0,
+                    rotate: assembled ? 0 : 180,
+                  }}
+                  transition={{ type: "spring", stiffness: 60 }}
+                />
+              </div>
+
+              <div className="mt-8 text-center text-slate-500 font-bold w-full max-w-md">
+                四個等腰直角三角形，可以拼成一個大正方形！這就是圖形拼砌的神奇之處。
+              </div>
+            </div>
+          </div>
+        );
+      }
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

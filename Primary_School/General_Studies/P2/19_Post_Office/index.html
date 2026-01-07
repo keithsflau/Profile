@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小二常識：郵局服務 | Post Office</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Post Office",
+          zh: "郵局服務",
+          ja: "郵便局",
+        },
+        instruction: {
+          en: "Weigh the mail & stick stamps!",
+          zh: "為郵件稱重並貼上郵票！",
+          ja: "郵便物の重さを量り、切手を貼ってください！",
+        },
+        weight: { en: "Weight", zh: "重量" },
+        cost: { en: "Cost", zh: "郵費" },
+        stamps: { en: "Stamps", zh: "郵票" },
+
+        letter: { en: "Letter", zh: "信件" },
+        packet: { en: "Packet", zh: "小包裹" },
+        parcel: { en: "Parcel", zh: "大包裹" },
+
+        check: { en: "Send", zh: "寄出" },
+        reset: { en: "Reset", zh: "重置" },
+
+        correct: { en: "Mailed Successfully!", zh: "成功寄出！" },
+        wrong: { en: "Incorrect Postage.", zh: "郵資不足或過多。" },
+        next: { en: "Next Mail", zh: "下一件" },
+      };
+
+      // Postage Rates (Simplified)
+      // < 30g : $2.2
+      // < 50g : $3.4
+      // < 100g: $5.0
+      // > 100g: $10.0
+
+      const rates = [
+        { max: 30, cost: 2.2 },
+        { max: 50, cost: 3.4 },
+        { max: 100, cost: 5.0 },
+        { max: 500, cost: 10.0 }, // Catch all heavy
+      ];
+
+      const stamps = [
+        { val: 0.1, label: "$0.1", color: "bg-slate-200" }, // For exact adjustments if needed, though P2 might struggle with exact. Let's make logical steps.
+        // Better use standard HK stamps: $2.2, $3.4, $5.0 directly?
+        // Or make it a math game?
+        // Let's provide denominations: $1, $2, $0.1, $0.2, $0.5, $5
+        { val: 5.0, label: "$5", color: "bg-purple-200 border-purple-400" },
+        { val: 2.2, label: "$2.2", color: "bg-green-200 border-green-400" },
+        { val: 2.0, label: "$2", color: "bg-blue-200 border-blue-400" },
+        { val: 1.0, label: "$1", color: "bg-red-200 border-red-400" },
+        { val: 0.5, label: "$0.5", color: "bg-yellow-200 border-yellow-400" },
+        { val: 0.1, label: "$0.1", color: "bg-slate-200 border-slate-400" },
+      ];
+
+      const mailTypes = [
+        { id: "letter", weight: 20, icon: "✉️", label: "letter" },
+        { id: "packet", weight: 45, icon: "📨", label: "packet" },
+        { id: "parcel", weight: 150, icon: "📦", label: "parcel" },
+        { id: "big_letter", weight: 80, icon: "📑", label: "letter" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [currentMail, setCurrentMail] = useState(mailTypes[0]);
+        const [placedStamps, setPlacedStamps] = useState([]);
+        const [status, setStatus] = useState(null);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        useEffect(() => {
+          newGame();
+        }, []);
+
+        const newGame = () => {
+          const m = mailTypes[Math.floor(Math.random() * mailTypes.length)];
+          setCurrentMail(m);
+          setPlacedStamps([]);
+          setStatus(null);
+        };
+
+        const getRequiredPostage = (w) => {
+          for (let r of rates) {
+            if (w <= r.max) return r.cost;
+          }
+          return 10.0;
+        };
+
+        const currentCost = getRequiredPostage(currentMail.weight);
+        const currentPaid = placedStamps.reduce((a, b) => a + b.val, 0);
+
+        const addStamp = (s) => {
+          setPlacedStamps((prev) => [...prev, s]);
+          setStatus(null);
+        };
+
+        const check = () => {
+          // Allow slight buffer for float math?
+          // precise:
+          if (Math.abs(currentPaid - currentCost) < 0.01) {
+            setStatus("correct");
+          } else {
+            setStatus("wrong");
+          }
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-green-800 mb-4 mt-8 drop-shadow-sm bg-white/50 px-6 py-2 rounded-full">
+              📮 {getText("title")}
+            </h1>
+
+            <div className="bg-white rounded-3xl p-8 shadow-2xl w-full max-w-4xl flex flex-col items-center">
+              {/* Scale Visual */}
+              <div className="relative w-64 h-64 mb-8 flex flex-col items-center justify-end">
+                {/* Scale Base */}
+                <div className="w-40 h-20 bg-slate-300 rounded-t-full border-4 border-slate-400 relative z-10">
+                  {/* Display */}
+                  <div className="absolute top-8 left-0 right-0 text-center font-mono text-xl font-bold text-slate-700 bg-slate-200 mx-8 rounded">
+                    {currentMail.weight}g
+                  </div>
+                </div>
+                {/* Scale Plate */}
+                <motion.div
+                  initial={{ y: -20 }}
+                  animate={{ y: 0 }}
+                  transition={{ type: "spring", stiffness: 100 }}
+                  className="w-56 h-4 bg-slate-400 absolute top-[40%] rounded-full shadow-lg z-20"
+                />
+                {/* Mail Item */}
+                <motion.div
+                  key={currentMail.id + currentMail.weight} // Force re-anim
+                  initial={{ y: -200, opacity: 0 }}
+                  animate={{ y: -100, opacity: 1 }}
+                  className="absolute z-30"
+                >
+                  <div className="w-48 h-32 bg-yellow-100 border-4 border-yellow-200 shadow-xl flex items-center justify-center text-6xl relative rounded-lg">
+                    {currentMail.icon}
+
+                    {/* Stamps on Envelope */}
+                    <div className="absolute top-2 right-2 flex flex-wrap-reverse justify-end content-start w-24 gap-1">
+                      {placedStamps.map((s, i) => (
+                        <motion.div
+                          key={i}
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          className={`${s.color} w-8 h-10 border-2 border-dashed text-[10px] flex items-center justify-center font-bold shadow-sm`}
+                        >
+                          {s.label}
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Info Panel */}
+              <div className="w-full bg-green-50 p-6 rounded-2xl mb-8 border-2 border-green-100 flex justify-between items-center text-xl font-bold">
+                <div className="text-green-800">
+                  {getText("weight")}: {currentMail.weight}g
+                </div>
+                <div className="text-green-800">
+                  {getText("cost")}:{" "}
+                  <span className="text-2xl text-green-600">
+                    ${currentCost.toFixed(1)}
+                  </span>
+                </div>
+                <div
+                  className={`${
+                    Math.abs(currentPaid - currentCost) < 0.01
+                      ? "text-green-600"
+                      : "text-red-500"
+                  }`}
+                >
+                  {getText("stamps")}: ${currentPaid.toFixed(1)}
+                </div>
+              </div>
+
+              {/* Stamps Bank */}
+              <div className="grid grid-cols-3 md:grid-cols-6 gap-4 mb-8">
+                {stamps.map((s) => (
+                  <button
+                    key={s.label}
+                    onClick={() => addStamp(s)}
+                    disabled={status === "correct"}
+                    className={`${s.color} w-20 h-24 border-4 border-dashed rounded flex flex-col items-center justify-center shadow-md hover:scale-105 transition-transform active:scale-95`}
+                  >
+                    <div className="w-full h-2/3 border-b-2 border-black/10 bg-white/30 mb-1"></div>
+                    <span className="font-bold">{s.label}</span>
+                  </button>
+                ))}
+              </div>
+
+              {status && (
+                <div
+                  className={`mb-6 p-4 rounded-xl font-black text-2xl w-full text-center ${
+                    status === "correct"
+                      ? "bg-green-100 text-green-700"
+                      : "bg-red-100 text-red-600"
+                  }`}
+                >
+                  {getText(status)}
+                </div>
+              )}
+
+              <div className="flex gap-4 w-full">
+                <button
+                  onClick={check}
+                  className="flex-1 bg-green-600 text-white py-4 rounded-xl font-bold shadow-xl border-b-4 border-green-800 active:border-b-0 active:translate-y-1 text-xl"
+                >
+                  {getText("check")}
+                </button>
+                <button
+                  onClick={() => {
+                    setPlacedStamps([]);
+                    setStatus(null);
+                  }}
+                  className="w-32 bg-slate-200 text-slate-600 py-4 rounded-xl font-bold shadow-xl border-b-4 border-slate-400 active:border-b-0 active:translate-y-1 text-xl"
+                >
+                  {getText("reset")}
+                </button>
+                {status === "correct" && (
+                  <button
+                    onClick={newGame}
+                    className="w-32 bg-yellow-500 text-white py-4 rounded-xl font-bold shadow-xl border-b-4 border-yellow-700 active:border-b-0 active:translate-y-1 text-xl"
+                  >
+                    →
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-8 bg-white/70 p-4 rounded-xl text-xs text-slate-500 text-center font-mono">
+              Rates: &lt;30g:$2.2 | &lt;50g:$3.4 | &lt;100g:$5.0 |
+              &gt;100g:$10.0
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

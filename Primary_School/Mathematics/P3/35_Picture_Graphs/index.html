@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小三數學：趣味象形圖</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fde68a 0%, #f59e0b 100%);
+      }
+      .grid-bg {
+        background-image: radial-gradient(#d1d5db 1px, transparent 1px);
+        background-size: 20px 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { motion } = window.Motion;
+
+      function App() {
+        const [scale, setScale] = useState(1); // 1 item = 1 unit or 1 item = 10 units? Simple P3 mostly 1-1 or 1-10
+        const [data, setData] = useState([
+          {
+            name: "喜愛圖書",
+            icon: "📚",
+            count: 4,
+            color: "bg-blue-100 border-blue-300",
+          },
+          {
+            name: "喜愛運動",
+            icon: "⚽",
+            count: 6,
+            color: "bg-green-100 border-green-300",
+          },
+          {
+            name: "喜愛音樂",
+            icon: "🎵",
+            count: 3,
+            color: "bg-pink-100 border-pink-300",
+          },
+        ]);
+
+        const updateCount = (idx, delta) => {
+          const newData = [...data];
+          newData[idx].count = Math.max(0, newData[idx].count + delta);
+          setData(newData);
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-6xl font-black text-amber-900 mb-8 drop-shadow-sm">
+              📊 趣味象形圖
+            </h1>
+
+            <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-5xl w-full flex flex-col lg:flex-row gap-8">
+              {/* Editor */}
+              <div className="lg:w-1/3 space-y-4">
+                <h2 className="text-2xl font-bold text-amber-800 mb-4">
+                  調查數據
+                </h2>
+                {data.map((item, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-white rounded-xl p-4 shadow-sm border-2 border-slate-100 flex items-center justify-between"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="text-3xl">{item.icon}</div>
+                      <div className="font-bold text-slate-700">
+                        {item.name}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => updateCount(idx, -1)}
+                        className="w-8 h-8 rounded-full bg-slate-100 hover:bg-red-100 text-slate-600 font-bold"
+                      >
+                        -
+                      </button>
+                      <span className="text-xl font-black w-6 text-center">
+                        {item.count}
+                      </span>
+                      <button
+                        onClick={() => updateCount(idx, 1)}
+                        className="w-8 h-8 rounded-full bg-slate-100 hover:bg-green-100 text-slate-600 font-bold"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                ))}
+
+                <div className="mt-8 p-4 bg-amber-50 rounded-xl border-2 border-amber-200">
+                  <label className="block text-lg font-bold text-amber-800 mb-2">
+                    圖例設定
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <div className="text-4xl">⭐</div>
+                    <div>
+                      <div className="font-bold text-slate-700">
+                        每個圖案代表
+                      </div>
+                      <div className="flex gap-2 mt-1">
+                        {[1, 2, 5, 10].map((v) => (
+                          <button
+                            key={v}
+                            onClick={() => setScale(v)}
+                            className={`px-3 py-1 rounded-lg font-bold ${
+                              scale === v
+                                ? "bg-amber-500 text-white"
+                                : "bg-white text-amber-700"
+                            }`}
+                          >
+                            {v}
+                          </button>
+                        ))}
+                        <span className="self-center font-bold text-slate-600">
+                          人
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Graph Display */}
+              <div className="lg:w-2/3 bg-white rounded-3xl border-4 border-slate-200 p-8 relative grid-bg">
+                <h2 className="text-3xl font-black text-center text-slate-700 mb-8 border-b-2 border-slate-100 pb-4">
+                  全班喜愛活動調查
+                </h2>
+
+                <div className="space-y-8">
+                  {data.map((item, idx) => {
+                    // Calculate how many icons needed
+                    // P3 Logic: If scale is 2, and count is 5, usually represented as 2.5 icons or simply require round numbers.
+                    // Let's visualize partials if needed, or simple rounded division.
+                    const numIcons = item.count / scale;
+
+                    return (
+                      <div key={idx} className="flex items-center">
+                        <div className="w-32 font-bold text-right pr-4 text-xl text-slate-600">
+                          {item.name}
+                        </div>
+                        <div className="flex-1 min-h-[60px] flex items-center flex-wrap gap-2 p-2 rounded-xl bg-slate-50">
+                          <div className="flex flex-wrap gap-1">
+                            {[...Array(Math.floor(numIcons))].map((_, i) => (
+                              <motion.div
+                                key={`full-${i}`}
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                className="text-4xl drop-shadow-md"
+                              >
+                                {item.icon}
+                              </motion.div>
+                            ))}
+                            {/* Partial Icon Visualization (Clip) */}
+                            {numIcons % 1 !== 0 && (
+                              <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                className="text-4xl drop-shadow-md relative overflow-hidden"
+                                style={{ width: `${(numIcons % 1) * 36}px` }} // Approx width crop
+                              >
+                                <div className="w-[36px]">{item.icon}</div>
+                              </motion.div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="w-16 font-black text-slate-400 pl-4">
+                          {item.count}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="absolute bottom-4 right-4 text-slate-400 font-bold bg-white/80 px-4 py-2 rounded-lg backdrop-blur-sm border border-slate-200">
+                  代表：1 個圖案 = {scale} 人
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HKDSE 2025 Paper 1A Q23 - Broken Image Detective</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.development.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #0f172a;
+        color: #e2e8f0;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+    <div id="root" class="w-full max-w-5xl"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      // Lucide Icon Shim
+      const LucideIcon = ({ name, size = 20, className = "" }) => {
+        const formatName = (n) =>
+          n
+            .split("-")
+            .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
+            .join("");
+        const iconName = formatName(name);
+        const [svgHtml, setSvgHtml] = useState("");
+        useEffect(() => {
+          if (window.lucide?.icons[iconName]?.toSvg) {
+            setSvgHtml(
+              window.lucide.icons[iconName].toSvg({
+                width: size,
+                height: size,
+                class: className,
+              })
+            );
+          }
+        }, [name]);
+        return (
+          <span
+            dangerouslySetInnerHTML={{ __html: svgHtml }}
+            style={{ display: "inline-flex" }}
+          />
+        );
+      };
+
+      const DetectiveTool = ({ icon, title, desc, onTest, result }) => (
+        <button
+          onClick={onTest}
+          className={`p-6 rounded-2xl border text-left transition-all w-full flex items-start gap-4 ${
+            result
+              ? result.foundIssue
+                ? "bg-red-900/20 border-red-500 ring-1 ring-red-500"
+                : "bg-green-900/20 border-green-500 ring-1 ring-green-500"
+              : "bg-slate-900 border-slate-700 hover:border-blue-500 hover:scale-[1.02]"
+          }`}
+        >
+          <div
+            className={`p-3 rounded-xl ${
+              result
+                ? result.foundIssue
+                  ? "bg-red-500/20 text-red-400"
+                  : "bg-green-500/20 text-green-400"
+                : "bg-slate-800 text-slate-400"
+            }`}
+          >
+            <LucideIcon name={icon} size={24} />
+          </div>
+          <div className="flex-1">
+            <h3
+              className={`font-bold text-lg mb-1 ${
+                result ? "text-white" : "text-slate-200"
+              }`}
+            >
+              {title}
+            </h3>
+            <p className="text-sm text-slate-400 mb-2">{desc}</p>
+            {result && (
+              <div
+                className={`text-sm font-bold ${
+                  result.foundIssue ? "text-red-400" : "text-green-400"
+                }`}
+              >
+                Result: {result.msg}
+              </div>
+            )}
+          </div>
+        </button>
+      );
+
+      const App = () => {
+        const [results, setResults] = useState({
+          res: null,
+          path: null,
+          os: null,
+        });
+
+        const runTest = (type) => {
+          if (type === "res") {
+            setResults((p) => ({
+              ...p,
+              res: {
+                foundIssue: false,
+                msg: "Image still displays (just blurry).",
+              },
+            }));
+          } else if (type === "path") {
+            setResults((p) => ({
+              ...p,
+              path: {
+                foundIssue: true,
+                msg: "CRITICAL FAIL! File not found in folder.",
+              },
+            }));
+          } else if (type === "os") {
+            setResults((p) => ({
+              ...p,
+              os: {
+                foundIssue: false,
+                msg: "No impact. Web standards are universal.",
+              },
+            }));
+          }
+        };
+
+        return (
+          <div className="space-y-8 animate-fade-in w-full max-w-4xl mx-auto">
+            <header className="text-center space-y-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-900/30 border border-cyan-500/30 text-cyan-400 text-sm font-bold mb-4">
+                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                HKDSE 2025 Paper 1A Q23
+              </div>
+              <h1 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-400 to-rose-500">
+                Broken Image Detective
+              </h1>
+              <p className="text-slate-400 max-w-xl mx-auto">
+                Why is the image not showing? Use the tools to investigate.
+              </p>
+            </header>
+
+            {/* Simulation Area */}
+            <div className="bg-slate-950 p-8 rounded-3xl border border-slate-800 flex flex-col items-center">
+              <div className="w-32 h-32 border-2 border-dashed border-slate-600 rounded-xl flex items-center justify-center bg-slate-900 mb-4">
+                <LucideIcon
+                  name="image-off"
+                  size={48}
+                  className="text-slate-600"
+                />
+              </div>
+              <div className="text-slate-500 font-mono text-sm">
+                img not loaded
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <DetectiveTool
+                icon="minimize"
+                title="Check Resolution"
+                desc="Is the image resolution too low for the screen?"
+                onTest={() => runTest("res")}
+                result={results.res}
+              />
+
+              <DetectiveTool
+                icon="folder-search"
+                title="Check File Path"
+                desc="Is the file actually in the specified folder?"
+                onTest={() => runTest("path")}
+                result={results.path}
+              />
+
+              <DetectiveTool
+                icon="monitor"
+                title="Check OS Compatibility"
+                desc="Is the server's OS different from client's?"
+                onTest={() => runTest("os")}
+                result={results.os}
+              />
+            </div>
+
+            {results.res && results.path && results.os && (
+              <div className="bg-gradient-to-r from-red-900/40 to-pink-900/40 p-6 rounded-2xl border border-red-500/30 text-center animate-fade-in">
+                <h2 className="text-xl font-bold text-white mb-2">
+                  Case Solved
+                </h2>
+                <p className="text-slate-300 mb-4">
+                  The only valid reason for a broken image icon is a{" "}
+                  <strong>File Path Error</strong> (Statement 2). Resolution
+                  only affects quality. OS differences don't matter for images.
+                </p>
+                <div className="inline-block px-6 py-2 bg-red-600 text-white font-bold rounded-full shadow-lg shadow-red-500/30">
+                  Correct Answer: B (Only 2)
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

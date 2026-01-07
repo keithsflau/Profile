@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Circuit Constructor | S2 Science</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        font-family: "Outfit", sans-serif;
+        background: #fff7ed;
+      }
+      .component-slot {
+        transition: all 0.2s;
+      }
+      .component-slot:hover {
+        border-color: #f97316;
+        background-color: #fffaf0;
+      }
+      .wire {
+        background: #334155;
+      }
+      .bulb-on {
+        box-shadow: 0 0 20px #facc15;
+        background: #fef08a;
+        border-color: #eab308;
+      }
+    </style>
+  </head>
+  <body class="bg-orange-50 text-slate-800 min-h-screen">
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      const components = [
+        {
+          id: "battery",
+          name: "Battery",
+          icon: "fa-car-battery",
+          type: "source",
+        },
+        { id: "bulb", name: "Light Bulb", icon: "fa-lightbulb", type: "load" },
+        {
+          id: "switch",
+          name: "Switch",
+          icon: "fa-toggle-off",
+          type: "control",
+        },
+        { id: "wire", name: "Wire", icon: "fa-minus", type: "connector" },
+      ];
+
+      // 3x3 Grid
+      const initialGrid = Array(9).fill(null);
+
+      const App = () => {
+        const [grid, setGrid] = useState(initialGrid);
+        const [selectedComp, setSelectedComp] = useState(null);
+        const [isClosed, setIsClosed] = useState(false);
+        const [switchState, setSwitchState] = useState(false); // false = open (off), true = closed (on)
+
+        const handleDrop = (index) => {
+          if (selectedComp) {
+            const newGrid = [...grid];
+            newGrid[index] = {
+              ...selectedComp,
+              state: selectedComp.id === "switch" ? false : null,
+            };
+            setGrid(newGrid);
+            setSelectedComp(null);
+          }
+        };
+
+        const toggleSwitch = (index) => {
+          const newGrid = [...grid];
+          if (newGrid[index] && newGrid[index].id === "switch") {
+            newGrid[index].state = !newGrid[index].state;
+            setGrid(newGrid);
+          }
+        };
+
+        const clearIndex = (index) => {
+          const newGrid = [...grid];
+          newGrid[index] = null;
+          setGrid(newGrid);
+        };
+
+        // Circuit Logic (Very simplified for 3x3)
+        // Check if we have a loop involving Battery -> Wire/Switch/Load -> Battery
+        // For 3x3, just check if we have enough components and if all switches are closed?
+        // Let's implement a rigid "Series Circuit Checker":
+        // Needs at least 1 Battery, 1 Bulb. If switch exists, must be closed.
+        // If path connects? (Too hard for simple grid logic without graph traversal).
+        // Approximation: If grid contains Battery AND Bulb, AND (no Switch OR Switch is closed), light up.
+        useEffect(() => {
+          const hasBattery = grid.some((c) => c && c.id === "battery");
+          const hasBulb = grid.some((c) => c && c.id === "bulb");
+          const switches = grid.filter((c) => c && c.id === "switch");
+          const allSwitchesClosed = switches.every((s) => s.state === true);
+
+          // Also check connectivity crudely: do we have > 3 components placed?
+          const componentCount = grid.filter((c) => c).length;
+
+          if (
+            hasBattery &&
+            hasBulb &&
+            allSwitchesClosed &&
+            componentCount >= 4
+          ) {
+            setIsClosed(true);
+          } else {
+            setIsClosed(false);
+          }
+        }, [grid]);
+
+        return (
+          <div className="p-8 max-w-5xl mx-auto min-h-screen flex flex-col items-center">
+            <header className="text-center mb-10 w-full">
+              <span className="text-orange-600 font-bold uppercase text-xs tracking-widest">
+                Form 2 Science • Unit 8
+              </span>
+              <h1 className="text-4xl font-extrabold text-slate-800 mb-2">
+                Circuit Constructor
+              </h1>
+              <p className="text-slate-500">
+                Build a simple circuit. Place components to light the bulb.
+              </p>
+            </header>
+
+            <div className="flex flex-col md:flex-row gap-12 w-full">
+              {/* Toolbox */}
+              <div className="bg-white p-6 rounded-3xl shadow-xl border border-orange-100 w-full md:w-1/4 h-fit">
+                <h3 className="font-bold text-slate-400 uppercase text-xs tracking-widest mb-4">
+                  Components
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
+                  {components.map((comp) => (
+                    <button
+                      key={comp.id}
+                      onClick={() => setSelectedComp(comp)}
+                      className={`p-4 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ${
+                        selectedComp?.id === comp.id
+                          ? "bg-orange-100 border-orange-500 text-orange-700"
+                          : "bg-slate-50 border-slate-100 text-slate-500 hover:bg-slate-100"
+                      }`}
+                    >
+                      <i className={`fa-solid ${comp.icon} text-2xl`}></i>
+                      <span className="text-xs font-bold">{comp.name}</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="mt-8 bg-blue-50 p-4 rounded-xl text-blue-800 text-xs border border-blue-200">
+                  <strong>Tip:</strong> Fill the grid corners or edges to
+                  simulate a closed loop. Place at least 1 Battery and 1 Bulb.
+                </div>
+              </div>
+
+              {/* Breadboard Grid */}
+              <div className="bg-slate-800 p-8 rounded-3xl shadow-2xl w-full md:w-3/4 flex items-center justify-center relative">
+                <div className="grid grid-cols-3 gap-2 bg-slate-700 p-4 rounded-xl border-2 border-slate-600">
+                  {grid.map((cell, i) => (
+                    <div
+                      key={i}
+                      onClick={() =>
+                        cell && cell.id === "switch"
+                          ? toggleSwitch(i)
+                          : cell
+                          ? clearIndex(i)
+                          : handleDrop(i)
+                      }
+                      className={`w-32 h-32 bg-slate-900 rounded-lg border-2 border-slate-600 flex items-center justify-center relative component-slot cursor-pointer ${
+                        selectedComp ? "hover:border-orange-400" : ""
+                      }`}
+                    >
+                      {!cell && (
+                        <div className="w-1 h-1 bg-slate-600 rounded-full"></div>
+                      )}
+
+                      {cell && (
+                        <div
+                          className={`flex flex-col items-center transition-all ${
+                            isClosed && cell.id === "bulb"
+                              ? "text-yellow-400 scale-110 drop-shadow-[0_0_10px_rgba(250,204,21,0.8)]"
+                              : "text-slate-300"
+                          }`}
+                        >
+                          {/* Icon */}
+                          <i
+                            className={`fa-solid ${
+                              cell.id === "wire"
+                                ? "fa-minus rotate-90 scale-150"
+                                : cell.icon
+                            } text-4xl mb-2`}
+                          ></i>
+
+                          {/* Switch State */}
+                          {cell.id === "switch" && (
+                            <span
+                              className={`text-xs font-bold uppercase px-2 py-0.5 rounded ${
+                                cell.state
+                                  ? "bg-green-500 text-white"
+                                  : "bg-red-500 text-white"
+                              }`}
+                            >
+                              {cell.state ? "CLOSED" : "OPEN"}
+                            </span>
+                          )}
+
+                          {/* Bulb State */}
+                          {cell.id === "bulb" && isClosed && (
+                            <span className="text-xs font-bold text-yellow-500 uppercase">
+                              ON
+                            </span>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Wire Logic Visuals connector lines to neighbors could go here but hard in grid */}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Status Indicator */}
+                <div
+                  className={`absolute top-4 right-4 px-4 py-2 rounded-full font-bold uppercase text-sm border-2 ${
+                    isClosed
+                      ? "bg-green-500 text-white border-green-600"
+                      : "bg-slate-700 text-slate-500 border-slate-600"
+                  }`}
+                >
+                  Circuit: {isClosed ? "Complete" : "Broken"}
+                </div>
+              </div>
+            </div>
+
+            <footer className="mt-12 text-center">
+              <a
+                href="../index.html"
+                className="text-orange-600/50 hover:text-orange-600 transition font-bold"
+              >
+                <i className="fa-solid fa-arrow-left mr-2"></i> Back to
+                Dashboard
+              </a>
+            </footer>
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

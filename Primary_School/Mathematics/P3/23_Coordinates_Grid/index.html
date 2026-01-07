@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>小三數學：座標方格</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #f3e8ff 0%, #c084fc 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      function App() {
+        const [x, setX] = useState(3);
+        const [y, setY] = useState(2);
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-6xl font-black text-white mb-8">📍 座標方格</h1>
+            <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full">
+              <svg width="500" height="500" className="mx-auto mb-8">
+                <defs>
+                  <pattern
+                    id="grid"
+                    width="50"
+                    height="50"
+                    patternUnits="userSpaceOnUse"
+                  >
+                    <path
+                      d="M 50 0 L 0 0 0 50"
+                      fill="none"
+                      stroke="#e5e7eb"
+                      strokeWidth="1"
+                    />
+                  </pattern>
+                </defs>
+                <rect width="500" height="500" fill="url(#grid)" />
+                <line
+                  x1="0"
+                  y1="450"
+                  x2="500"
+                  y2="450"
+                  stroke="#1f2937"
+                  strokeWidth="3"
+                />
+                <line
+                  x1="50"
+                  y1="0"
+                  x2="50"
+                  y2="500"
+                  stroke="#1f2937"
+                  strokeWidth="3"
+                />
+                {[...Array(9)].map((_, i) => (
+                  <text
+                    key={i}
+                    x={50 + i * 50 + 25}
+                    y="480"
+                    textAnchor="middle"
+                    className="text-xl font-bold"
+                  >
+                    {i + 1}
+                  </text>
+                ))}
+                {[...Array(9)].map((_, i) => (
+                  <text
+                    key={i}
+                    x="25"
+                    y={450 - i * 50 - 25}
+                    textAnchor="middle"
+                    className="text-xl font-bold"
+                  >
+                    {i + 1}
+                  </text>
+                ))}
+                <circle
+                  cx={50 + x * 50}
+                  cy={450 - y * 50}
+                  r="20"
+                  fill="#a855f7"
+                  stroke="#ffffff"
+                  strokeWidth="4"
+                />
+              </svg>
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-lg font-bold mb-2">
+                    X 座標：{x}
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="8"
+                    value={x}
+                    onChange={(e) => setX(parseInt(e.target.value))}
+                    className="w-full"
+                  />
+                </div>
+                <div>
+                  <label className="block text-lg font-bold mb-2">
+                    Y 座標：{y}
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="8"
+                    value={y}
+                    onChange={(e) => setY(parseInt(e.target.value))}
+                    className="w-full"
+                  />
+                </div>
+              </div>
+              <div className="mt-6 bg-purple-50 p-6 rounded-xl text-center">
+                <div className="text-5xl font-black text-purple-600">
+                  ({x}, {y})
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

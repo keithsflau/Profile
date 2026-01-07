@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小五數學：體積概念 | Volume Concept</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #e0e7ff 0%, #6366f1 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Volume Concept",
+          zh: "體積概念",
+          ja: "体積の概念",
+          ko: "부피 개념",
+          es: "Concepto de Volumen",
+          de: "Volumenkonzept",
+          fi: "Tilavuuden käsite",
+          fr: "Concept de volume",
+          ar: "مفهوم الحجم",
+          it: "Concetto di volume",
+        },
+        subtitle: {
+          en: "Volume Concept - Counting Unit Cubes",
+          zh: "體積概念 - 數立方塊",
+          ja: "体積の概念 - 単位立方体を数える",
+          ko: "부피 개념 - 단위 정육면체 세기",
+          es: "Concepto de Volumen - Contando Cubos Unitarios",
+          de: "Volumenkonzept - Einheitswürfel zählen",
+          fi: "Tilavuuden käsite - Yksikkökuutioiden laskeminen",
+          fr: "Concept de volume - Compter les cubes unitaires",
+          ar: "مفهوم الحجم - عد المكعبات الوحدوية",
+          it: "Concetto di volume - Contare cubi unitari",
+        },
+        length: {
+          en: "Length (cubes):",
+          zh: "長 (塊):",
+          ja: "長さ (個):",
+          ko: "길이 (개):",
+          es: "Longitud (cubos):",
+          de: "Länge (Würfel):",
+          fi: "Pituus (kuutiot):",
+          fr: "Longueur (cubes) :",
+          ar: "الطول (مكعبات):",
+          it: "Lunghezza (cubi):",
+        },
+        width: {
+          en: "Width (cubes):",
+          zh: "闊 (塊):",
+          ja: "幅 (個):",
+          ko: "너비 (개):",
+          es: "Ancho (cubos):",
+          de: "Breite (Würfel):",
+          fi: "Leveys (kuutiot):",
+          fr: "Largeur (cubes) :",
+          ar: "العرض (مكعبات):",
+          it: "Larghezza (cubi):",
+        },
+        height: {
+          en: "Height (layers):",
+          zh: "高 (層):",
+          ja: "高さ (層):",
+          ko: "높이 (층):",
+          es: "Altura (capas):",
+          de: "Höhe (Schichten):",
+          fi: "Korkeus (kerrokset):",
+          fr: "Hauteur (couches) :",
+          ar: "الارتفاع (طبقات):",
+          it: "Altezza (strati):",
+        },
+        calculation: {
+          en: "Calculation:",
+          zh: "計算:",
+          ja: "計算:",
+          ko: "계산:",
+          es: "Cálculo:",
+          de: "Berechnung:",
+          fi: "Laskenta:",
+          fr: "Calcul :",
+          ar: "الحساب:",
+          it: "Calcolo:",
+        },
+        volume: {
+          en: "Volume",
+          zh: "體積",
+          ja: "体積",
+          ko: "부피",
+          es: "Volumen",
+          de: "Volumen",
+          fi: "Tilavuus",
+          fr: "Volume",
+          ar: "الحجم",
+          it: "Volume",
+        },
+        cubicUnits: {
+          en: "cubic units",
+          zh: "立方單位",
+          ja: "立方単位",
+          ko: "세제곱 단위",
+          es: "unidades cúbicas",
+          de: "Kubikeinheiten",
+          fi: "kuutioyksikköä",
+          fr: "unités cubiques",
+          ar: "وحدات مكعبة",
+          it: "unità cubiche",
+        },
+        tip: {
+          en: "Volume = Length × Width × Height (number of unit cubes)",
+          zh: "體積 = 長 × 闊 × 高 (單位立方體的數量)",
+          ja: "体積 = 長さ × 幅 × 高さ (単位立方体の数)",
+          ko: "부피 = 길이 × 너비 × 높이 (단위 정육면체의 수)",
+          es: "Volumen = Longitud × Ancho × Altura (número de cubos unitarios)",
+          de: "Volumen = Länge × Breite × Höhe (Anzahl der Einheitswürfel)",
+          fi: "Tilavuus = Pituus × Leveys × Korkeus (yksikkökuutioiden määrä)",
+          fr: "Volume = Longueur × Largeur × Hauteur (nombre de cubes unitaires)",
+          ar: "الحجم = الطول × العرض × الارتفاع (عدد المكعبات الوحدوية)",
+          it: "Volume = Lunghezza × Larghezza × Altezza (numero di cubi unitari)",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const [layers, setLayers] = useState(3);
+        const [rows, setRows] = useState(3);
+        const [cols, setCols] = useState(4);
+        const volume = layers * rows * cols;
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-5xl font-black text-indigo-100 mb-2 mt-8">
+              📦 {getText("title")}
+            </h1>
+            <p className="text-xl text-indigo-200 font-bold mb-8">
+              {getText("subtitle")}
+            </p>
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-4xl w-full">
+              <div className="flex flex-col md:flex-row gap-8">
+                <div className="flex-1 bg-slate-100 rounded-2xl p-6 flex items-center justify-center min-h-[300px]">
+                  <div
+                    className="perspective-1000"
+                    style={{ perspective: "600px" }}
+                  >
+                    <div
+                      style={{
+                        transform: "rotateX(-20deg) rotateY(30deg)",
+                        transformStyle: "preserve-3d",
+                      }}
+                    >
+                      {[...Array(layers)].map((_, l) => (
+                        <div
+                          key={l}
+                          className="flex flex-col"
+                          style={{ transform: `translateZ(${l * 28}px)` }}
+                        >
+                          {[...Array(rows)].map((_, r) => (
+                            <div key={r} className="flex">
+                              {[...Array(cols)].map((_, c) => (
+                                <div
+                                  key={c}
+                                  className="w-7 h-7 border border-indigo-300 bg-indigo-400 m-px"
+                                  style={{
+                                    boxShadow:
+                                      "inset -2px -2px 0 rgba(0,0,0,0.1), inset 2px 2px 0 rgba(255,255,255,0.3)",
+                                  }}
+                                ></div>
+                              ))}
+                            </div>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex-1 space-y-4">
+                  <div>
+                    <label className="block font-bold text-indigo-800 mb-1">
+                      {getText("length")} {cols}
+                    </label>
+                    <input
+                      type="range"
+                      min="1"
+                      max="6"
+                      value={cols}
+                      onChange={(e) => setCols(parseInt(e.target.value))}
+                      className="w-full accent-indigo-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-indigo-800 mb-1">
+                      {getText("width")} {rows}
+                    </label>
+                    <input
+                      type="range"
+                      min="1"
+                      max="5"
+                      value={rows}
+                      onChange={(e) => setRows(parseInt(e.target.value))}
+                      className="w-full accent-indigo-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-indigo-800 mb-1">
+                      {getText("height")} {layers}
+                    </label>
+                    <input
+                      type="range"
+                      min="1"
+                      max="5"
+                      value={layers}
+                      onChange={(e) => setLayers(parseInt(e.target.value))}
+                      className="w-full accent-indigo-500"
+                    />
+                  </div>
+
+                  <div className="bg-indigo-50 rounded-xl p-4 border-2 border-indigo-200">
+                    <p className="text-center font-bold">
+                      {getText("calculation")}
+                    </p>
+                    <p className="text-center text-xl font-mono">
+                      {cols} × {rows} × {layers} = {volume}
+                    </p>
+                  </div>
+
+                  <div className="bg-emerald-100 rounded-2xl p-6 text-center border-4 border-emerald-300">
+                    <div className="text-emerald-600 font-bold">
+                      {getText("volume")}
+                    </div>
+                    <div className="text-5xl font-black text-emerald-800">
+                      {volume}
+                    </div>
+                    <div className="text-emerald-600">
+                      {getText("cubicUnits")}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-6 bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
+                <p className="font-bold">💡 {getText("tip")}</p>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

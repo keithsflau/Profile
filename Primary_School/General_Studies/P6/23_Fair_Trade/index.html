@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Fair Trade</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #fff8f1;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Fair Trade Chocolate",
+          zh: "公平貿易巧克力",
+          ja: "フェアトレードチョコレート",
+          ko: "공정 무역 초콜릿",
+          es: "Chocolate de comercio justo",
+          de: "Fairtrade-Schokolade",
+          fi: "Reilun kaupan suklaa",
+          fr: "Chocolat équitable",
+          ar: "شكولاتة التجارة العادلة",
+          it: "Cioccolato Equo Solidale",
+        },
+        instruction: {
+          en: "Compare Regular Trade vs Fair Trade.",
+          zh: "比較普通貿易與公平貿易。",
+          ja: "通常の貿易とフェアトレードを比較してください。",
+          ko: "일반 무역과 공정 무역을 비교하세요.",
+          es: "Compara el comercio regular con el comercio justo.",
+          de: "Vergleiche regulären Handel mit fairem Handel.",
+          fi: "Vertaa tavallista kauppaa ja reilua kauppaa.",
+          fr: "Comparez le commerce régulier et le commerce équitable.",
+          ar: "قارن التجارة العادية بالتجارة العادلة.",
+          it: "Confronta Commercio Regolare vs Commercio Equo.",
+        },
+        farmer: { en: "Farmer", zh: "農民", ja: "農家", ko: "농부" },
+        company: {
+          en: "Big Company",
+          zh: "大公司",
+          ja: "大企業",
+          ko: "대기업",
+        },
+        price: {
+          en: "Chocolate Price: $5.00",
+          zh: "巧克力價格: $5.00",
+          ja: "チョコ価格: $5.00",
+          ko: "초콜릿 가격: $5.00",
+        },
+
+        regular: {
+          en: "Regular Trade",
+          zh: "普通貿易",
+          ja: "通常の貿易",
+          ko: "일반 무역",
+        },
+        fair: {
+          en: "Fair Trade",
+          zh: "公平貿易",
+          ja: "公平貿易",
+          ko: "공정 무역",
+        },
+
+        farmer_earns: {
+          en: "Farmer Earns:",
+          zh: "農民收入：",
+          ja: "農家の収入：",
+          ko: "농부 수입:",
+        },
+        life: {
+          en: "Quality of Life:",
+          zh: "生活素質：",
+          ja: "生活の質：",
+          ko: "삶의 질:",
+        },
+        poor: {
+          en: "Poor 😞",
+          zh: "貧窮 😞",
+          ja: "貧しい 😞",
+          ko: "가난함 😞",
+        },
+        good: { en: "Good 😊", zh: "良好 😊", ja: "良い 😊", ko: "좋음 😊" },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [mode, setMode] = useState("regular"); // regular, fair
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        // Regular: Farmer gets 5%, Company gets 95%.
+        // Fair: Farmer gets 25%, Company gets 75% (Simplified)
+
+        const farmerShare = mode === "regular" ? 5 : 25;
+        const companyShare = mode === "regular" ? 95 : 75;
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-amber-800">
+              {getText("title")}
+            </h1>
+
+            <div className="flex gap-4 mb-8 bg-amber-100 p-2 rounded-full">
+              <button
+                onClick={() => setMode("regular")}
+                className={`px-6 py-2 rounded-full font-bold transition-colors ${
+                  mode === "regular"
+                    ? "bg-amber-600 text-white"
+                    : "text-amber-800"
+                }`}
+              >
+                {getText("regular")}
+              </button>
+              <button
+                onClick={() => setMode("fair")}
+                className={`px-6 py-2 rounded-full font-bold transition-colors ${
+                  mode === "fair" ? "bg-green-600 text-white" : "text-amber-800"
+                }`}
+              >
+                {getText("fair")}
+              </button>
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-8 w-full max-w-4xl justify-center items-end">
+              {/* Farmer */}
+              <div className="flex-1 flex flex-col items-center text-center">
+                <div className="text-6xl mb-4">👨‍🌾</div>
+                <div className="font-bold text-amber-900 text-xl">
+                  {getText("farmer")}
+                </div>
+
+                {/* Money Stack */}
+                <div className="w-24 bg-gray-200 rounded-b-lg relative mt-4 overflow-hidden border-2 border-gray-300 flex items-end justify-center h-64">
+                  <motion.div
+                    className="w-full bg-green-500"
+                    initial={{ height: 0 }}
+                    animate={{ height: `${farmerShare}%` }}
+                  ></motion.div>
+                  <div className="absolute top-2 font-bold z-10">
+                    {farmerShare}%
+                  </div>
+                </div>
+
+                <div className="mt-4 font-bold text-sm">
+                  {getText("farmer_earns")} $
+                  {((5.0 * farmerShare) / 100).toFixed(2)}
+                </div>
+                <div
+                  className={`mt-2 font-black text-xl ${
+                    mode === "fair" ? "text-green-600" : "text-red-500"
+                  }`}
+                >
+                  {getText(mode === "fair" ? "good" : "poor")}
+                </div>
+              </div>
+
+              {/* Company/Midlemen */}
+              <div className="flex-1 flex flex-col items-center text-center">
+                <div className="text-6xl mb-4">🏭</div>
+                <div className="font-bold text-amber-900 text-xl">
+                  {getText("company")}
+                </div>
+
+                {/* Money Stack */}
+                <div className="w-24 bg-gray-200 rounded-b-lg relative mt-4 overflow-hidden border-2 border-gray-300 flex items-end justify-center h-64">
+                  <motion.div
+                    className="w-full bg-blue-500"
+                    initial={{ height: 0 }}
+                    animate={{ height: `${companyShare}%` }}
+                  ></motion.div>
+                  <div className="absolute top-2 font-bold z-10 text-white drop-shadow-md">
+                    {companyShare}%
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小一常識：中國地圖拼圖 | China Map Puzzle</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fefce8 0%, #fde047 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "China Map Fun",
+          zh: "中國地圖小百科",
+          ja: "中国地図",
+        },
+        instruction: {
+          en: "Drag the icons to the correct place on the map!",
+          zh: "把圖示拖到地圖上正確的位置！",
+          ja: "地図上の正しい場所にアイコンをドラッグしてください！",
+        },
+        bj: { en: "Beijing (Capital)", zh: "北京 (首都)" },
+        hk: { en: "Hong Kong", zh: "香港" },
+        sichuan: { en: "Sichuan (Panda Home)", zh: "四川 (熊貓故鄉)" },
+
+        flag: { en: "National Flag", zh: "國旗" },
+        panda: { en: "Panda", zh: "熊貓" },
+        bauhinia: { en: "Bauhinia", zh: "洋紫荊" },
+
+        check: { en: "Check", zh: "檢查" },
+        reset: { en: "Reset", zh: "重置" },
+        correct: { en: "Great Geography Skill!", zh: "地理小博士！" },
+        wrong: { en: "Try again!", zh: "再試一次！" },
+      };
+
+      const locations = [
+        { id: "bj", name: "bj", x: 65, y: 30, targetItem: "flag" },
+        { id: "sichuan", name: "sichuan", x: 45, y: 55, targetItem: "panda" },
+        { id: "hk", name: "hk", x: 68, y: 75, targetItem: "bauhinia" },
+      ];
+
+      const items = [
+        { id: "flag", icon: "🇨🇳", label: "flag" },
+        { id: "panda", icon: "🐼", label: "panda" },
+        { id: "bauhinia", icon: "🌸", label: "bauhinia" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [placements, setPlacements] = useState({}); // locId -> itemId
+        const [status, setStatus] = useState(null);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const handleDrop = (itemId, locId) => {
+          setPlacements((prev) => ({
+            ...prev,
+            [locId]: itemId,
+          }));
+          setStatus(null);
+        };
+
+        const check = () => {
+          const allCorrect = locations.every(
+            (loc) => placements[loc.id] === loc.targetItem
+          );
+          if (allCorrect) setStatus("correct");
+          else setStatus("wrong");
+        };
+
+        const reset = () => {
+          setPlacements({});
+          setStatus(null);
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-rose-700 mb-4 mt-8 drop-shadow-sm">
+              🗺️ {getText("title")}
+            </h1>
+            <p className="font-bold text-rose-800 mb-8">
+              {getText("instruction")}
+            </p>
+
+            {/* Map Container */}
+            <div className="relative w-full max-w-md aspect-[4/3] bg-yellow-100 rounded-3xl border-4 border-yellow-300 shadow-xl overflow-hidden mb-8">
+              {/* Abstract China Map Shape (Made with lots of blobs/circles for P1 simplified view) */}
+              {/* Chicken Shape: Head top right, Belly center, Tail left */}
+
+              {/* Base */}
+              <div className="absolute top-[10%] left-[10%] w-[80%] h-[80%] bg-white rounded-[40%_60%_70%_30%_/_40%_50%_60%_50%] opacity-50 border-2 border-slate-200"></div>
+
+              {/* Locations */}
+              {locations.map((loc) => {
+                const placedItemId = placements[loc.id];
+                const placedItem = items.find((i) => i.id === placedItemId);
+
+                return (
+                  <div
+                    key={loc.id}
+                    className={`absolute w-24 h-24 -ml-12 -mt-12 rounded-full border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all ${
+                      status === "correct"
+                        ? "border-green-500 bg-green-100/80"
+                        : placedItem
+                        ? "border-rose-400 bg-white/80"
+                        : "border-slate-400 bg-white/40 hover:bg-white/60"
+                    }`}
+                    style={{ left: `${loc.x}%`, top: `${loc.y}%` }}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const iId = e.dataTransfer.getData("itemId");
+                      if (iId) handleDrop(iId, loc.id);
+                    }}
+                    onClick={() => {
+                      // Remove
+                      const next = { ...placements };
+                      delete next[loc.id];
+                      setPlacements(next);
+                      setStatus(null);
+                    }}
+                  >
+                    {placedItem ? (
+                      <motion.button
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="text-center"
+                      >
+                        <div className="text-4xl">{placedItem.icon}</div>
+                      </motion.button>
+                    ) : (
+                      <div className="text-center">
+                        <div className="text-2xl opacity-30">📍</div>
+                      </div>
+                    )}
+                    <div
+                      className={`absolute -bottom-8 bg-white/80 px-2 py-1 rounded text-xs font-bold whitespace-nowrap shadow-sm ${
+                        placedItem ? "text-black" : "text-slate-500"
+                      }`}
+                    >
+                      {getText(loc.name)}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {status && (
+              <div
+                className={`text-2xl font-black mb-6 ${
+                  status === "correct" ? "text-green-600" : "text-red-500"
+                }`}
+              >
+                {getText(status)}
+              </div>
+            )}
+
+            <div className="flex gap-4">
+              {/* Items Bank */}
+              <div className="flex gap-4 bg-white/60 p-4 rounded-2xl">
+                {items.map((item) => {
+                  // Hide if placed
+                  const isPlaced = Object.values(placements).includes(item.id);
+                  if (isPlaced)
+                    return <div key={item.id} className="w-20 h-20"></div>;
+
+                  return (
+                    <div
+                      key={item.id}
+                      draggable
+                      onDragStart={(e) =>
+                        e.dataTransfer.setData("itemId", item.id)
+                      }
+                      className="w-20 h-20 bg-white rounded-xl shadow-md flex flex-col items-center justify-center cursor-grab active:cursor-grabbing hover:scale-110 transition-transform"
+                    >
+                      <div className="text-4xl mb-1">{item.icon}</div>
+                      <div className="text-[10px] font-bold text-slate-600">
+                        {getText(item.label)}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <button
+                  onClick={check}
+                  className="bg-rose-500 text-white px-4 py-2 rounded-xl font-bold hover:bg-rose-600 shadow h-full"
+                >
+                  {getText("check")}
+                </button>
+                <button
+                  onClick={reset}
+                  className="bg-slate-200 text-slate-600 px-4 py-2 rounded-xl font-bold hover:bg-slate-300 shadow h-full"
+                >
+                  {getText("reset")}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小五數學：小數單位換算 | Decimal Unit Conversion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #f0fdf4 0%, #22c55e 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Decimal Unit Conversion",
+          zh: "小數單位換算",
+          ja: "小数の単位変換",
+          ko: "소수 단위 변환",
+          es: "Conversión de Unidades Decimales",
+          de: "Dezimalumrechnung",
+          fi: "Desimaaliyksiköiden muunnos",
+          fr: "Conversion d'unités décimales",
+          ar: "تحويل الوحدات العشرية",
+          it: "Conversione unità decimali",
+        },
+        length: {
+          en: "Length",
+          zh: "長度",
+          ja: "長さ",
+          ko: "길이",
+          es: "Longitud",
+          de: "Länge",
+          fi: "Pituus",
+          fr: "Longueur",
+          ar: "طول",
+          it: "Lunghezza",
+        },
+        weight: {
+          en: "Weight",
+          zh: "重量",
+          ja: "重さ",
+          ko: "무게",
+          es: "Peso",
+          de: "Gewicht",
+          fi: "Paino",
+          fr: "Poids",
+          ar: "وزن",
+          it: "Peso",
+        },
+        capacity: {
+          en: "Capacity",
+          zh: "容量",
+          ja: "容量",
+          ko: "용량",
+          es: "Capacidad",
+          de: "Kapazität",
+          fi: "Tilavuus",
+          fr: "Capacité",
+          ar: "سعة",
+          it: "Capacità",
+        },
+        equals: {
+          en: "Equals",
+          zh: "等於",
+          ja: "等しい",
+          ko: "같음",
+          es: "Igual a",
+          de: "Gleicht",
+          fi: "Yhtä kuin",
+          fr: "Égale",
+          ar: "يساوي",
+          it: "Uguale a",
+        },
+        m: {
+          en: "m",
+          zh: "米",
+          ja: "m",
+          ko: "m",
+          es: "m",
+          de: "m",
+          fi: "m",
+          fr: "m",
+          ar: "م",
+          it: "m",
+        },
+        cm: {
+          en: "cm",
+          zh: "厘米",
+          ja: "cm",
+          ko: "cm",
+          es: "cm",
+          de: "cm",
+          fi: "cm",
+          fr: "cm",
+          ar: "سم",
+          it: "cm",
+        },
+        kg: {
+          en: "kg",
+          zh: "千克",
+          ja: "kg",
+          ko: "kg",
+          es: "kg",
+          de: "kg",
+          fi: "kg",
+          fr: "kg",
+          ar: "كجم",
+          it: "kg",
+        },
+        g: {
+          en: "g",
+          zh: "克",
+          ja: "g",
+          ko: "g",
+          es: "g",
+          de: "g",
+          fi: "g",
+          fr: "g",
+          ar: "جم",
+          it: "g",
+        },
+        L: {
+          en: "L",
+          zh: "公升",
+          ja: "L",
+          ko: "L",
+          es: "L",
+          de: "L",
+          fi: "L",
+          fr: "L",
+          ar: "ل",
+          it: "L",
+        },
+        mL: {
+          en: "mL",
+          zh: "毫升",
+          ja: "mL",
+          ko: "mL",
+          es: "mL",
+          de: "mL",
+          fi: "mL",
+          fr: "mL",
+          ar: "مل",
+          it: "mL",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const [val, setVal] = useState(2.5);
+        const [type, setType] = useState("length");
+
+        const conversions = {
+          length: { from: "m", to: "cm", factor: 100 },
+          weight: { from: "kg", to: "g", factor: 1000 },
+          capacity: { from: "L", to: "mL", factor: 1000 },
+        };
+        const c = conversions[type];
+        const result = val * c.factor;
+
+        const fromUnit = `${c.from} ${getText(c.from)}`;
+        const toUnit = `${c.to} ${getText(c.to)}`;
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-5xl font-black text-green-900 mb-2 mt-8">
+              📐 {getText("title")}
+            </h1>
+
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-2xl w-full mt-8">
+              <div className="flex justify-center gap-4 mb-6">
+                <button
+                  onClick={() => setType("length")}
+                  className={`px-4 py-2 rounded-xl font-bold ${
+                    type === "length"
+                      ? "bg-green-500 text-white"
+                      : "bg-slate-100"
+                  }`}
+                >
+                  {getText("length")}
+                </button>
+                <button
+                  onClick={() => setType("weight")}
+                  className={`px-4 py-2 rounded-xl font-bold ${
+                    type === "weight"
+                      ? "bg-green-500 text-white"
+                      : "bg-slate-100"
+                  }`}
+                >
+                  {getText("weight")}
+                </button>
+                <button
+                  onClick={() => setType("capacity")}
+                  className={`px-4 py-2 rounded-xl font-bold ${
+                    type === "capacity"
+                      ? "bg-green-500 text-white"
+                      : "bg-slate-100"
+                  }`}
+                >
+                  {getText("capacity")}
+                </button>
+              </div>
+
+              <div className="flex items-center justify-center gap-4 mb-8 flex-wrap">
+                <input
+                  type="number"
+                  step="0.01"
+                  value={val}
+                  onChange={(e) => setVal(parseFloat(e.target.value) || 0)}
+                  className="w-28 text-3xl font-mono font-black text-center border-4 border-green-300 rounded-xl p-2"
+                />
+                <span className="text-xl font-bold text-green-700">
+                  {fromUnit}
+                </span>
+              </div>
+
+              <div className="bg-slate-50 rounded-2xl p-6 text-center mb-6">
+                <p className="text-xl">
+                  {val} × {c.factor} = {result}
+                </p>
+                <p className="text-sm text-slate-500 mt-2">
+                  1 {c.from} = {c.factor} {c.to}
+                </p>
+              </div>
+
+              <div className="bg-emerald-100 rounded-2xl p-6 text-center border-4 border-emerald-300">
+                <div className="text-emerald-600 font-bold">
+                  {getText("equals")}
+                </div>
+                <div className="text-5xl font-black text-emerald-800">
+                  {result} {toUnit}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

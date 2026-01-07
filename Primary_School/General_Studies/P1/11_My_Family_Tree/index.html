@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小一常識：家庭樹拼圖 | My Family Tree</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #ecfccb 0%, #a3e635 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "My Family Tree",
+          zh: "家庭樹拼圖",
+          ja: "家系図",
+        },
+        instruction: {
+          en: "Drag the family members to the correct place!",
+          zh: "把家庭成員拖到正確的位置！",
+          ja: "家族を正しい場所にドラッグしてください！",
+        },
+        grandpa: { en: "Grandfather", zh: "祖父/爺爺" },
+        grandma: { en: "Grandmother", zh: "祖母/嫲嫲" },
+        father: { en: "Father", zh: "爸爸" },
+        mother: { en: "Mother", zh: "媽媽" },
+        me: { en: "Me", zh: "我" },
+        sister: { en: "Sister", zh: "姐姐/妹妹" },
+
+        check: { en: "Check", zh: "檢查" },
+        reset: { en: "Reset", zh: "重置" },
+        correct: {
+          en: "Correct! What a lovely family!",
+          zh: "答對了！真可愛的家庭！",
+        },
+        wrong: { en: "Some are wrong. Try again!", zh: "有些錯了，再試一次！" },
+      };
+
+      const members = [
+        { id: "grandpa", icon: "👴" },
+        { id: "grandma", icon: "👵" },
+        { id: "father", icon: "👨" },
+        { id: "mother", icon: "👩" },
+        { id: "me", icon: "👶" },
+        { id: "sister", icon: "👧" },
+      ];
+
+      // Define slots layout
+      // Level 1: Grandpa, Grandma
+      // Level 2: Father, Mother
+      // Level 3: Me, Sister
+      const initialSlots = [
+        { id: "slot_gp", target: "grandpa", x: -100, y: 50 },
+        { id: "slot_gm", target: "grandma", x: 100, y: 50 },
+        { id: "slot_fa", target: "father", x: -100, y: 200 },
+        { id: "slot_mo", target: "mother", x: 100, y: 200 },
+        { id: "slot_me", target: "me", x: -100, y: 350 },
+        { id: "slot_sis", target: "sister", x: 100, y: 350 },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [placements, setPlacements] = useState({}); // slotId -> memberId
+        const [status, setStatus] = useState(null); // 'correct', 'wrong'
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        // Simple Drag Logic: Click Slot -> Select Member? Or Drag?
+        // Let's use Drag and Drop with basic "nearest slot" logic if possible,
+        // OR simpler: Click Member, Click Slot.
+        // Let's go with: List of members at bottom. Drag to slot.
+
+        const [availableMembers, setAvailableMembers] = useState(
+          members.map((m) => m.id)
+        );
+
+        const handleDrop = (memberId, slotId) => {
+          const slot = initialSlots.find((s) => s.id === slotId);
+          // Verify correct? Or allow placement anywhere and check later?
+          // "Check later" is better pedagogy.
+
+          // Remove from available
+          setAvailableMembers((prev) => prev.filter((id) => id !== memberId));
+
+          // If slot occupied, return occupant to available?
+          if (placements[slotId]) {
+            setAvailableMembers((prev) => [...prev, placements[slotId]]);
+          }
+
+          setPlacements((prev) => ({
+            ...prev,
+            [slotId]: memberId,
+          }));
+          setStatus(null);
+        };
+
+        const handleRemove = (slotId) => {
+          const memberId = placements[slotId];
+          if (!memberId) return;
+          setPlacements((prev) => {
+            const next = { ...prev };
+            delete next[slotId];
+            return next;
+          });
+          setAvailableMembers((prev) => [...prev, memberId]);
+          setStatus(null);
+        };
+
+        const checkAnswers = () => {
+          const allCorrect = initialSlots.every(
+            (slot) => placements[slot.id] === slot.target
+          );
+          if (allCorrect) setStatus("correct");
+          else setStatus("wrong");
+        };
+
+        const reset = () => {
+          setPlacements({});
+          setAvailableMembers(members.map((m) => m.id));
+          setStatus(null);
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-lime-800 mb-4 mt-8 drop-shadow-sm">
+              🌳 {getText("title")}
+            </h1>
+            <p className="font-bold text-lime-700 mb-4">
+              {getText("instruction")}
+            </p>
+
+            {/* Tree Area */}
+            <div className="relative w-full max-w-2xl h-[500px] bg-sky-100 rounded-3xl border-4 border-lime-500 overflow-hidden mb-8 shadow-inner">
+              {/* Visual Tree */}
+              <div className="absolute inset-x-0 bottom-0 h-1/2 bg-lime-200 rounded-t-full"></div>
+              <div className="absolute w-8 h-full bg-amber-600 left-1/2 -ml-4 bottom-0"></div>
+              <div className="absolute w-32 h-4 bg-amber-600 top-[100px] left-1/2 -ml-16"></div>{" "}
+              {/* Branch 1 */}
+              <div className="absolute w-32 h-4 bg-amber-600 top-[250px] left-1/2 -ml-16"></div>{" "}
+              {/* Branch 2 */}
+              {/* Connecting lines */}
+              {/* Simplify: Just CSS drawing or SVG is better, but Divs work for abstract tree */}
+              {/* Slots */}
+              {initialSlots.map((slot) => {
+                const memberId = placements[slot.id];
+                const member = members.find((m) => m.id === memberId);
+                return (
+                  <div
+                    key={slot.id}
+                    className={`absolute w-32 h-24 rounded-xl border-4 flex flex-col items-center justify-center cursor-pointer transition-colors bg-white/80 ${
+                      status === "correct"
+                        ? "border-green-500 bg-green-100"
+                        : "border-dashed border-slate-400 hover:bg-white"
+                    }`}
+                    style={{
+                      left: `50%`,
+                      top: slot.y,
+                      marginLeft: slot.x - 64, // center (width/2)
+                    }}
+                    onClick={() => handleRemove(slot.id)}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const mid = e.dataTransfer.getData("memberId");
+                      if (mid) handleDrop(mid, slot.id);
+                    }}
+                  >
+                    {member ? (
+                      <>
+                        <span className="text-4xl shadow-sm">
+                          {member.icon}
+                        </span>
+                        <span className="font-bold text-xs text-center">
+                          {getText(member.id)}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-slate-300 font-bold text-sm">
+                        {getText(slot.target)}?
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Controls */}
+            <div className="flex gap-4 mb-8">
+              <button
+                onClick={checkAnswers}
+                className="bg-lime-500 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-lime-600"
+              >
+                {getText("check")} ✅
+              </button>
+              <button
+                onClick={reset}
+                className="bg-white text-slate-500 px-8 py-3 rounded-full font-bold shadow-lg hover:bg-gray-100"
+              >
+                {getText("reset")} 🔄
+              </button>
+            </div>
+
+            {status && (
+              <div
+                className={`text-2xl font-black mb-8 ${
+                  status === "correct" ? "text-green-600" : "text-red-500"
+                }`}
+              >
+                {getText(status)}
+              </div>
+            )}
+
+            {/* Members Bank */}
+            <div className="bg-white p-6 rounded-3xl shadow-xl w-full max-w-3xl flex flex-wrap gap-4 justify-center min-h-[120px]">
+              {availableMembers.map((mid) => {
+                const m = members.find((mem) => mem.id === mid);
+                return (
+                  <div
+                    key={m.id}
+                    draggable
+                    onDragStart={(e) => {
+                      e.dataTransfer.setData("memberId", m.id);
+                    }}
+                    className="w-24 h-24 bg-lime-50 rounded-xl border-2 border-lime-200 flex flex-col items-center justify-center cursor-grab active:cursor-grabbing hover:scale-105 transition-transform"
+                  >
+                    <span className="text-4xl">{m.icon}</span>
+                    <span className="font-bold text-xs text-lime-800">
+                      {getText(m.id)}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

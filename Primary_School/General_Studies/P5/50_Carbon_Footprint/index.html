@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Carbon Footprint</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #f1f8e9;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Eco Choices",
+          zh: "環保選擇",
+          ja: "エコチョイス",
+          ko: "에코 선택",
+          es: "Opciones ecológicas",
+          de: "Öko-Entscheidungen",
+          fi: "Ekovalinnat",
+          fr: "Choix écologiques",
+          ar: "الخيارات البيئية",
+          it: "Scelte Ecologiche",
+        },
+        instruction: {
+          en: "Choose the option with LESS carbon footprint.",
+          zh: "選擇碳足跡較少的選項。",
+          ja: "二酸化炭素排出量が少ない方を選んでください。",
+          ko: "탄소 발자국이 적은 옵션을 선택하세요.",
+          es: "Elige la opción con MENOS huella de carbono.",
+          de: "Wähle die Option mit WENIGER CO2-Fußabdruck.",
+          fi: "Valitse vaihtoehto, jolla on PIENEMPI hiilijalanjälki.",
+          fr: "Choisissez l'option avec MOINS d'empreinte carbone.",
+          ar: "اختر الخيار ذو البصمة الكربونية الأقل.",
+          it: "Scegli l'opzione con MENO impronta di carbonio.",
+        },
+        correct: { en: "Correct!", zh: "正確！", ja: "正解！", ko: "정답!" },
+
+        car: { en: "Private Car", zh: "私家車", ja: "自家用車", ko: "자가용" },
+        bus: {
+          en: "Public Bus",
+          zh: "公共巴士",
+          ja: "公共バス",
+          ko: "공공 버스",
+        },
+        beef: {
+          en: "Beef Burger",
+          zh: "牛肉漢堡",
+          ja: "ビーフバーガー",
+          ko: "소고기 버거",
+        },
+        veg: {
+          en: "Veggie Burger",
+          zh: "素食漢堡",
+          ja: "ベジバーガー",
+          ko: "채식 버거",
+        },
+        bottle: {
+          en: "Plastic Bottle",
+          zh: "塑料瓶",
+          ja: "ペットボトル",
+          ko: "플라스틱 병",
+        },
+        reusable: {
+          en: "Reusable Cup",
+          zh: "可重用杯",
+          ja: "再利用可能なカップ",
+          ko: "재사용 컵",
+        },
+      };
+
+      const pairs = [
+        {
+          id: 1,
+          options: [
+            { id: "car", icon: "🚗", carbon: "high" },
+            { id: "bus", icon: "🚌", carbon: "low" },
+          ],
+        },
+        {
+          id: 2,
+          options: [
+            { id: "beef", icon: "🍔", carbon: "high" },
+            { id: "veg", icon: "🥗", carbon: "low" },
+          ],
+        },
+        {
+          id: 3,
+          options: [
+            { id: "bottle", icon: "🥤", carbon: "high" },
+            { id: "reusable", icon: "🥛", carbon: "low" },
+          ],
+        },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [idx, setIdx] = useState(0);
+        const [score, setScore] = useState(0);
+        const [feedback, setFeedback] = useState(null);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+        const current = pairs[idx];
+
+        const choose = (opt) => {
+          if (feedback) return;
+          if (opt.carbon === "low") {
+            setFeedback("correct");
+            setScore(score + 1);
+            setTimeout(() => {
+              setFeedback(null);
+              setIdx((idx + 1) % pairs.length);
+            }, 1000);
+          } else {
+            setFeedback("wrong"); // shake
+            setTimeout(() => setFeedback(null), 500);
+          }
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-green-800">
+              {getText("title")}
+            </h1>
+            <p className="mb-8 font-bold text-slate-500">
+              {getText("instruction")}
+            </p>
+
+            <div className="grid grid-cols-2 gap-8 w-full max-w-2xl">
+              {current.options.map((opt) => (
+                <button
+                  key={opt.id}
+                  onClick={() => choose(opt)}
+                  className="bg-white p-8 rounded-3xl shadow-xl hover:bg-green-50 transition-colors border-4 border-transparent hover:border-green-300 flex flex-col items-center gap-4"
+                >
+                  <div className="text-8xl">{opt.icon}</div>
+                  <div className="text-xl font-bold text-slate-700">
+                    {getText(opt.id)}
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {feedback === "correct" && (
+              <div className="mt-8 text-4xl font-black text-green-600 animate-bounce">
+                {getText("correct")}
+              </div>
+            )}
+
+            <div className="mt-12 font-bold text-slate-400">Score: {score}</div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

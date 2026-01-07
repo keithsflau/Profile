@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Circuit Builder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #1e293b;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Circuit Builder",
+          zh: "電路工程師",
+          ja: "回路ビルダー",
+          ko: "회로 빌더",
+          es: "Constructor de circuitos",
+          de: "Schaltkreis-Bauer",
+          fi: "Virtapiirin rakentaja",
+          fr: "Constructeur de circuits",
+          ar: "باني الدوائر",
+          it: "Costruttore di Circuiti",
+        },
+        instruction: {
+          en: "Connect the circuit perfectly to light the bulb.",
+          zh: "連接電路，讓燈泡發光。",
+          ja: "回路を完全に接続して電球を点灯させてください。",
+          ko: "회로를 완벽하게 연결하여 전구를 켜세요.",
+          es: "Conecta el circuito perfectamente para encender la bombilla.",
+          de: "Verbinde den Stromkreis perfekt, um die Glühbirne zum Leuchten zu bringen.",
+          fi: "Yhdistä virtapiiri täydellisesti sytyttääksesi lampun.",
+          fr: "Connectez parfaitement le circuit pour allumer l'ampoule.",
+          ar: "قم بتوصيل الدائرة بشكل مثالي لإضاءة المصباح.",
+          it: "Collega perfettamente il circuito per accendere la lampadina.",
+        },
+        battery: {
+          en: "Battery",
+          zh: "電池",
+          ja: "電池",
+          ko: "배터리",
+          es: "Batería",
+          de: "Batterie",
+          fi: "Paristo",
+          fr: "Batterie",
+          ar: "بطارية",
+          it: "Batteria",
+        },
+        wire: {
+          en: "Wire",
+          zh: "電線",
+          ja: "ワイヤー",
+          ko: "전선",
+          es: "Cable",
+          de: "Draht",
+          fi: "Johto",
+          fr: "Fil",
+          ar: "سلك",
+          it: "Filo",
+        },
+        bulb: {
+          en: "Bulb",
+          zh: "燈泡",
+          ja: "電球",
+          ko: "전구",
+          es: "Bombilla",
+          de: "Glühbirne",
+          fi: "Lamppu",
+          fr: "Ampoule",
+          ar: "مصباح",
+          it: "Lampadina",
+        },
+        switch: {
+          en: "Switch",
+          zh: "開關",
+          ja: "スイッチ",
+          ko: "스위치",
+          es: "Interruptor",
+          de: "Schalter",
+          fi: "Katkaisin",
+          fr: "Interrupteur",
+          ar: "مفتاح كهربائي",
+          it: "Interruttore",
+        },
+        on: {
+          en: "ON",
+          zh: "開",
+          ja: "オン",
+          ko: "켜짐",
+          es: "ENCENDIDO",
+          de: "AN",
+          fi: "PÄÄLLÄ",
+          fr: "MARCHE",
+          ar: "تشغيل",
+          it: "ACCESO",
+        },
+        off: {
+          en: "OFF",
+          zh: "關",
+          ja: "オフ",
+          ko: "꺼짐",
+          es: "APAGADO",
+          de: "AUS",
+          fi: "POIS",
+          fr: "ARRÊT",
+          ar: "إيقاف",
+          it: "SPENTO",
+        },
+        success: {
+          en: "Light On!",
+          zh: "燈亮了！",
+          ja: "点灯！",
+          ko: "불이 켜졌습니다!",
+          es: "¡Luz encendida!",
+          de: "Licht an!",
+          fi: "Valo päällä!",
+          fr: "Lumière allumée !",
+          ar: "الضوء يعمل!",
+          it: "Luce Accesa!",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [switchState, setSwitchState] = useState(false); // false = open (off), true = closed (on)
+        const [wiresConnected, setWiresConnected] = useState(false); // simplified: user clicks 'connect'? Or drag?
+
+        // Let's make it drag-to-connect simple puzzle
+        // 3 Components: Battery, Bulb, Switch
+        // 3 Wires needed: Bat->Switch, Switch->Bulb, Bulb->Bat
+        const [connections, setConnections] = useState({
+          w1: false,
+          w2: false,
+          w3: false,
+        });
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const isLightOn =
+          switchState && connections.w1 && connections.w2 && connections.w3;
+
+        const connectWire = (id) => {
+          setConnections((prev) => ({ ...prev, [id]: true }));
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4 select-none">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-yellow-400 drop-shadow-lg shadow-yellow-500/50">
+              {getText("title")}
+            </h1>
+
+            <div className="relative w-full max-w-2xl h-[400px] bg-slate-800 rounded-3xl border-4 border-slate-600 shadow-2xl flex items-center justify-center">
+              {/* Circuit SVG Layer */}
+              <svg
+                className="absolute inset-0 pointer-events-none"
+                viewBox="0 0 600 400"
+              >
+                {/* Wire 1: Battery Top to Switch Left */}
+                <path
+                  d="M150,150 V100 H300"
+                  stroke={connections.w1 ? "#fbbf24" : "#475569"}
+                  strokeWidth="8"
+                  fill="none"
+                />
+                {/* Wire 2: Switch Right to Bulb Top */}
+                <path
+                  d="M400,100 H500 V200"
+                  stroke={connections.w2 ? "#fbbf24" : "#475569"}
+                  strokeWidth="8"
+                  fill="none"
+                />
+                {/* Wire 3: Bulb Bottom to Battery Bottom */}
+                <path
+                  d="M500,280 V350 H150 V250"
+                  stroke={connections.w3 ? "#fbbf24" : "#475569"}
+                  strokeWidth="8"
+                  fill="none"
+                />
+              </svg>
+
+              {/* Components */}
+
+              {/* Battery */}
+              <div className="absolute left-[100px] top-[150px] w-[100px] h-[150px] bg-gradient-to-b from-gray-400 to-gray-600 rounded-lg flex flex-col items-center justify-center border-4 border-gray-300 z-10">
+                <div className="absolute -top-4 w-8 h-4 bg-gray-300 rounded-t-sm"></div>
+                <div className="text-4xl">🔋</div>
+                <div className="text-white font-bold mt-2">
+                  {getText("battery")}
+                </div>
+              </div>
+
+              {/* Switch */}
+              <div
+                className="absolute left-[300px] top-[70px] w-[100px] h-[60px] bg-gray-700 rounded border-2 border-gray-500 z-10 flex items-center justify-center cursor-pointer hover:bg-gray-600 transition-colors"
+                onClick={() => setSwitchState(!switchState)}
+              >
+                <div
+                  className={`w-12 h-6 rounded-full p-1 transition-colors ${
+                    switchState ? "bg-green-500" : "bg-red-500"
+                  }`}
+                >
+                  <div
+                    className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-transform ${
+                      switchState ? "translate-x-6" : "translate-x-0"
+                    }`}
+                  ></div>
+                </div>
+                <div className="absolute -bottom-6 text-white text-xs">
+                  {getText("switch")}
+                </div>
+              </div>
+
+              {/* Bulb */}
+              <div className="absolute right-[80px] top-[200px] w-[80px] h-[100px] flex flex-col items-center z-10">
+                <div
+                  className={`text-8xl transition-all duration-300 ${
+                    isLightOn
+                      ? "drop-shadow-[0_0_30px_rgba(250,204,21,0.8)] scale-110"
+                      : "opacity-50 grayscale"
+                  }`}
+                >
+                  💡
+                </div>
+                <div className="text-white font-bold">{getText("bulb")}</div>
+              </div>
+
+              {/* Wire Click Zones (Interactive Hints) */}
+              {!connections.w1 && (
+                <button
+                  onClick={() => connectWire("w1")}
+                  className="absolute top-[80px] left-[200px] bg-blue-500 text-white px-3 py-1 rounded-full text-xs animate-bounce z-20"
+                >
+                  Connect Wire
+                </button>
+              )}
+              {!connections.w2 && (
+                <button
+                  onClick={() => connectWire("w2")}
+                  className="absolute top-[80px] right-[150px] bg-blue-500 text-white px-3 py-1 rounded-full text-xs animate-bounce z-20"
+                >
+                  Connect Wire
+                </button>
+              )}
+              {!connections.w3 && (
+                <button
+                  onClick={() => connectWire("w3")}
+                  className="absolute bottom-[20px] left-[300px] bg-blue-500 text-white px-3 py-1 rounded-full text-xs animate-bounce z-20"
+                >
+                  Connect Wire
+                </button>
+              )}
+            </div>
+
+            <div className="mt-8 text-center text-white h-20">
+              {isLightOn ? (
+                <div className="animate-fade-in">
+                  <div className="text-5xl mb-2">✨</div>
+                  <div className="text-3xl font-bold text-yellow-300">
+                    {getText("success")}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-slate-400">{getText("instruction")}</div>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

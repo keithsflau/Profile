@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小六數學：眾數與中位數 | Mode and Median</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fef9c3 0%, #a16207 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      function App() {
+        const [nums, setNums] = useState([5, 2, 8, 2, 9, 5, 2]);
+        const [sorted, setSorted] = useState([]);
+        const [mode, setMode] = useState([]);
+        const [median, setMedian] = useState(null);
+
+        useEffect(() => {
+          // Sort
+          const s = [...nums].sort((a, b) => a - b);
+          setSorted(s);
+
+          // Mode
+          const counts = {};
+          nums.forEach((n) => (counts[n] = (counts[n] || 0) + 1));
+          let maxCount = 0;
+          for (let n in counts) if (counts[n] > maxCount) maxCount = counts[n];
+          const m = [];
+          if (maxCount > 1) {
+            for (let n in counts)
+              if (counts[n] === maxCount) m.push(parseInt(n));
+          }
+          setMode(
+            m.length > 0 ? m : ["沒有 None (所有數只出現一次 all unique)"]
+          );
+
+          // Median
+          const mid = Math.floor(s.length / 2);
+          if (s.length % 2 !== 0) {
+            setMedian(s[mid]);
+          } else {
+            setMedian((s[mid - 1] + s[mid]) / 2);
+          }
+        }, [nums]);
+
+        const randomize = () => {
+          const newNums = Array.from(
+            { length: 7 },
+            () => Math.floor(Math.random() * 9) + 1
+          );
+          setNums(newNums);
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-5xl font-black text-yellow-900 mb-2">
+              📊 眾數與中位數
+            </h1>
+            <p className="text-xl text-yellow-700 font-bold mb-8">
+              Mode and Median
+            </p>
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-3xl w-full">
+              <div className="text-center mb-8">
+                <button
+                  onClick={randomize}
+                  className="px-6 py-2 bg-yellow-500 text-white font-bold rounded-lg hover:bg-yellow-600 transition-colors"
+                >
+                  隨機生成 Random Generate
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Raw Data */}
+                <div className="bg-slate-50 p-6 rounded-2xl border-2 border-slate-200">
+                  <h3 className="text-lg font-bold text-slate-500 mb-4 uppercase">
+                    原始數據 Raw Data
+                  </h3>
+                  <div className="flex flex-wrap gap-2 justify-center">
+                    {nums.map((n, i) => (
+                      <div
+                        key={i}
+                        className="w-12 h-12 bg-white rounded-lg border-2 border-slate-300 flex items-center justify-center text-xl font-black text-slate-700 shadow-sm"
+                      >
+                        {n}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Sorted Data */}
+                <div className="bg-blue-50 p-6 rounded-2xl border-2 border-blue-200 relative">
+                  <h3 className="text-lg font-bold text-blue-500 mb-4 uppercase">
+                    排序後 Sorted (小 → 大)
+                  </h3>
+                  <div className="flex flex-wrap gap-2 justify-center">
+                    {sorted.map((n, i) => (
+                      <div
+                        key={i}
+                        className={`w-12 h-12 rounded-lg border-2 flex items-center justify-center text-xl font-black shadow-sm
+                          ${
+                            (sorted.length % 2 !== 0 &&
+                              i === Math.floor(sorted.length / 2)) ||
+                            (sorted.length % 2 === 0 &&
+                              (i === sorted.length / 2 - 1 ||
+                                i === sorted.length / 2))
+                              ? "bg-indigo-100 border-indigo-400 text-indigo-800 scale-110 z-10"
+                              : "bg-white border-slate-300 text-slate-700"
+                          }`}
+                      >
+                        {n}
+                      </div>
+                    ))}
+                  </div>
+                  {/* Median Arrow/Label logic could be complex, keeping it simple visual highlight above */}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                <div className="bg-green-100 p-6 rounded-2xl border-4 border-green-300 text-center">
+                  <div className="text-green-700 font-bold mb-1">眾數 Mode</div>
+                  <div className="text-sm text-green-600 mb-2">
+                    出現最多次的數 Most frequent
+                  </div>
+                  <div className="text-4xl font-black text-green-800">
+                    {mode.join(", ")}
+                  </div>
+                </div>
+
+                <div className="bg-indigo-100 p-6 rounded-2xl border-4 border-indigo-300 text-center">
+                  <div className="text-indigo-700 font-bold mb-1">
+                    中位數 Median
+                  </div>
+                  <div className="text-sm text-indigo-600 mb-2">
+                    中間的數 The middle number
+                  </div>
+                  <div className="text-4xl font-black text-indigo-800">
+                    {median}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 bg-amber-50 p-4 rounded-xl border border-amber-200 text-amber-800 text-sm text-center">
+                <p>注意：如果中間有兩個數，中位數是這兩個數的平均值。</p>
+                <p>
+                  Note: If there are two middle numbers, the median is their
+                  average.
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

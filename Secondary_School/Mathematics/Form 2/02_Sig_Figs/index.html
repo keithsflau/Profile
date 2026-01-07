@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Significant Figures | S2 Math</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-indigo-50 text-slate-800 min-h-screen">
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+
+      const App = () => {
+        const [numStr, setNumStr] = useState("1234.5678");
+        const [sigFigs, setSigFigs] = useState(3);
+
+        const num = parseFloat(numStr);
+
+        const toSigFigs = (n, sf) => {
+          if (isNaN(n)) return "Invalid Number";
+          if (n === 0) return "0";
+          return n.toPrecision(sf);
+        };
+
+        const result = toSigFigs(num, sigFigs);
+
+        return (
+          <div className="p-8 max-w-4xl mx-auto min-h-screen flex flex-col items-center">
+            <header className="mb-8 text-center">
+              <div className="text-indigo-600 font-bold uppercase text-xs tracking-widest mb-2">
+                Unit 4: Algebra & Estimation
+              </div>
+              <h1 className="text-4xl font-extrabold text-slate-900">
+                Significant Figures
+              </h1>
+              <p className="text-slate-500">
+                Rounding numbers to specified precision.
+              </p>
+            </header>
+
+            <div className="w-full max-w-2xl bg-white p-8 rounded-3xl shadow-xl border border-indigo-100 mb-8 text-center">
+              <div className="mb-6">
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">
+                  Original Number
+                </label>
+                <input
+                  type="text"
+                  value={numStr}
+                  onChange={(e) => setNumStr(e.target.value)}
+                  className="text-center w-full text-4xl font-extrabold text-slate-800 bg-slate-50 rounded-xl p-4 outline-none focus:ring-2 focus:ring-indigo-400"
+                />
+              </div>
+
+              <div className="mb-8">
+                <label className="block text-xs font-bold text-indigo-400 uppercase mb-2">
+                  Significant Figures: {sigFigs}
+                </label>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  value={sigFigs}
+                  onChange={(e) => setSigFigs(Number(e.target.value))}
+                  className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                />
+              </div>
+
+              <div className="bg-indigo-600 text-white p-6 rounded-2xl shadow-lg relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-20">
+                  <i className="fa-solid fa-calculator text-6xl"></i>
+                </div>
+                <div className="text-sm font-bold opacity-80 uppercase mb-1">
+                  Result
+                </div>
+                <div className="text-5xl font-mono font-bold">{result}</div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl w-full text-sm text-slate-500">
+              <div className="bg-white p-4 rounded-xl shadow border border-slate-100">
+                <h3 className="font-bold text-slate-800 mb-2">
+                  Rule 1: Non-Zero Digits
+                </h3>
+                <p>
+                  All non-zero digits are significant. (e.g. 123 has 3 s.f.)
+                </p>
+              </div>
+              <div className="bg-white p-4 rounded-xl shadow border border-slate-100">
+                <h3 className="font-bold text-slate-800 mb-2">
+                  Rule 2: Trapped Zeros
+                </h3>
+                <p>
+                  Zeros between non-zero digits are significant. (e.g. 102 has 3
+                  s.f.)
+                </p>
+              </div>
+              <div className="bg-white p-4 rounded-xl shadow border border-slate-100">
+                <h3 className="font-bold text-slate-800 mb-2">
+                  Rule 3: Leading Zeros
+                </h3>
+                <p>
+                  Zeros at the beginning are NOT significant. (e.g. 0.005 has 1
+                  s.f.)
+                </p>
+              </div>
+              <div className="bg-white p-4 rounded-xl shadow border border-slate-100">
+                <h3 className="font-bold text-slate-800 mb-2">
+                  Rule 4: Trailing Zeros
+                </h3>
+                <p>
+                  Zeros at the end are significant IF there is a decimal point.
+                  (e.g. 5.00 has 3 s.f.)
+                </p>
+              </div>
+            </div>
+
+            <footer className="mt-8">
+              <a
+                href="../index.html"
+                className="text-indigo-600 hover:text-indigo-700 font-bold"
+              >
+                <i className="fa-solid fa-arrow-left mr-2"></i> Back to
+                Dashboard
+              </a>
+            </footer>
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

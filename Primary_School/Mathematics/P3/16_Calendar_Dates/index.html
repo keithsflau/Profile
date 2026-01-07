@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>小三數學：月曆日期</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fee2e2 0%, #fca5a5 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      function App() {
+        const [month, setMonth] = useState(1);
+        const [year, setYear] = useState(2025);
+        const daysInMonth = new Date(year, month, 0).getDate();
+        const firstDay = new Date(year, month - 1, 1).getDay();
+        const days = [
+          ...Array(firstDay).fill(null),
+          ...Array(daysInMonth)
+            .fill(0)
+            .map((_, i) => i + 1),
+        ];
+        const months = [
+          "一月",
+          "二月",
+          "三月",
+          "四月",
+          "五月",
+          "六月",
+          "七月",
+          "八月",
+          "九月",
+          "十月",
+          "十一月",
+          "十二月",
+        ];
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-6xl font-black text-red-900 mb-8">
+              📅 月曆日期
+            </h1>
+            <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full">
+              <div className="flex justify-center gap-4 mb-8">
+                <button
+                  onClick={() => setMonth((m) => (m > 1 ? m - 1 : 12))}
+                  className="px-6 py-3 bg-red-500 text-white rounded-xl font-bold"
+                >
+                  ←
+                </button>
+                <div className="px-8 py-3 bg-gradient-to-r from-red-100 to-pink-100 rounded-xl text-2xl font-black">
+                  {year}年 {months[month - 1]}
+                </div>
+                <button
+                  onClick={() => setMonth((m) => (m < 12 ? m + 1 : 1))}
+                  className="px-6 py-3 bg-red-500 text-white rounded-xl font-bold"
+                >
+                  →
+                </button>
+              </div>
+              <div className="grid grid-cols-7 gap-2 mb-4 text-center font-bold text-red-800">
+                {["日", "一", "二", "三", "四", "五", "六"].map((d, i) => (
+                  <div key={i} className="py-2">
+                    {d}
+                  </div>
+                ))}
+              </div>
+              <div className="grid grid-cols-7 gap-2">
+                {days.map((day, i) =>
+                  day ? (
+                    <div
+                      key={i}
+                      className="aspect-square bg-gradient-to-br from-red-100 to-pink-100 rounded-xl flex items-center justify-center text-2xl font-black hover:scale-110 transition-all cursor-pointer"
+                    >
+                      {day}
+                    </div>
+                  ) : (
+                    <div key={i} />
+                  )
+                )}
+              </div>
+              <div className="mt-8 bg-red-50 p-4 rounded-xl text-center">
+                <div className="text-lg font-bold text-red-800">
+                  本月有 {daysInMonth} 天
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

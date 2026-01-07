@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小五數學：簡易方程 (乘除) | Simple Equations (×÷)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fef3c7 0%, #f59e0b 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Simple Equations (Multiply/Divide)",
+          zh: "簡易方程 (乘除)",
+          ja: "簡単な方程式 (掛け算/割り算)",
+          ko: "간단한 방정식 (곱셈/나눗셈)",
+          es: "Ecuaciones Simples (Multiplicación/División)",
+          de: "Einfache Gleichungen (Multiplikation/Division)",
+          fi: "Yksinkertaiset yhtälöt (kerto-/jakolasku)",
+          fr: "Équations simples (Multiplication/Division)",
+          ar: "معادلات بسيطة (ضرب/قسمة)",
+          it: "Equazioni semplici (Moltiplicazione/Divisione)",
+        },
+        findX: {
+          en: "Find x:",
+          zh: "求 x 的值:",
+          ja: "x の値を求めよ:",
+          ko: "x의 값 구하기:",
+          es: "Encuentra x:",
+          de: "Finde x:",
+          fi: "Ratkaise x:",
+          fr: "Trouvez x :",
+          ar: "جد قيمة x:",
+          it: "Trova x:",
+        },
+        steps: {
+          en: "Solution Steps:",
+          zh: "解題步驟:",
+          ja: "解法の手順:",
+          ko: "풀이 단계:",
+          es: "Pasos de Solución:",
+          de: "Lösungsschritte:",
+          fi: "Ratkaisun vaiheet:",
+          fr: "Étapes de la solution :",
+          ar: "خطوات الحل:",
+          it: "Passaggi della soluzione:",
+        },
+        check: {
+          en: "Check",
+          zh: "檢查",
+          ja: "確認",
+          ko: "확인",
+          es: "Comprobar",
+          de: "Prüfen",
+          fi: "Tarkista",
+          fr: "Vérifier",
+          ar: "تحقق",
+          it: "Controlla",
+        },
+        correct: {
+          en: "Correct!",
+          zh: "答對了！",
+          ja: "正解！",
+          ko: "정답입니다!",
+          es: "¡Correcto!",
+          de: "Richtig!",
+          fi: "Oikein!",
+          fr: "Correct !",
+          ar: "صحيح!",
+          it: "Corretto!",
+        },
+        wrong: {
+          en: "Try again! The answer is",
+          zh: "再試一次！答案是",
+          ja: "もう一度！答えは",
+          ko: "다시 시도하세요! 정답은",
+          es: "¡Inténtalo de nuevo! La respuesta es",
+          de: "Versuch es noch einmal! Die Antwort ist",
+          fi: "Yritä uudelleen! Vastaus on",
+          fr: "Réessayez ! La réponse est",
+          ar: "حاول مرة أخرى! الإجابة هي",
+          it: "Riprova! La risposta è",
+        },
+        newProblem: {
+          en: "New Problem",
+          zh: "新題目",
+          ja: "新しい問題",
+          ko: "새로운 문제",
+          es: "Nuevo Problema",
+          de: "Neues Problem",
+          fi: "Uusi tehtävä",
+          fr: "Nouveau problème",
+          ar: "مسألة جديدة",
+          it: "Nuovo problema",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const [problem, setProblem] = useState({ a: 3, b: 15, type: "mult" });
+        const [userAnswer, setUserAnswer] = useState("");
+        const [feedback, setFeedback] = useState(null);
+
+        const correctAnswer =
+          problem.type === "mult"
+            ? problem.b / problem.a
+            : problem.b * problem.a;
+
+        const generate = () => {
+          const type = Math.random() > 0.5 ? "mult" : "div";
+          const a = Math.floor(Math.random() * 8) + 2;
+          const ans = Math.floor(Math.random() * 10) + 2;
+          const b = type === "mult" ? a * ans : ans;
+          setProblem({ a, b, type });
+          setUserAnswer("");
+          setFeedback(null);
+        };
+
+        const check = () => {
+          if (parseInt(userAnswer) === correctAnswer) {
+            setFeedback("correct");
+          } else {
+            setFeedback("wrong");
+          }
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-5xl font-black text-amber-900 mb-2 mt-8">
+              🔢 {getText("title")}
+            </h1>
+
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-2xl w-full mt-8">
+              <div className="bg-amber-50 rounded-2xl p-8 mb-6 text-center border-2 border-amber-200">
+                <p className="text-sm text-amber-600 mb-2">
+                  {getText("findX")}
+                </p>
+                <div className="text-5xl font-black text-slate-800 font-mono">
+                  {problem.type === "mult"
+                    ? `${problem.a}x = ${problem.b}`
+                    : `x ÷ ${problem.a} = ${problem.b}`}
+                </div>
+              </div>
+
+              <div className="bg-slate-50 rounded-2xl p-6 mb-6">
+                <p className="font-bold text-slate-700 mb-4">
+                  {getText("steps")}
+                </p>
+                <div className="space-y-2 font-mono text-lg">
+                  {problem.type === "mult" ? (
+                    <>
+                      <p>
+                        {problem.a}x = {problem.b}
+                      </p>
+                      <p>
+                        x = {problem.b} ÷ {problem.a}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p>
+                        x ÷ {problem.a} = {problem.b}
+                      </p>
+                      <p>
+                        x = {problem.b} × {problem.a}
+                      </p>
+                    </>
+                  )}
+                  <p className="text-amber-600 font-bold">x = ?</p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-center gap-4 mb-6">
+                <span className="text-2xl font-bold">x =</span>
+                <input
+                  type="number"
+                  value={userAnswer}
+                  onChange={(e) => setUserAnswer(e.target.value)}
+                  className="w-24 text-3xl font-black text-center border-4 border-amber-300 rounded-xl p-2"
+                />
+                <button
+                  onClick={check}
+                  className="px-6 py-3 bg-amber-500 text-white rounded-xl font-bold hover:bg-amber-600"
+                >
+                  {getText("check")}
+                </button>
+              </div>
+
+              {feedback === "correct" && (
+                <div className="bg-emerald-100 border-4 border-emerald-300 rounded-2xl p-4 text-center text-emerald-800 font-bold text-xl">
+                  ✓ {getText("correct")}
+                </div>
+              )}
+              {feedback === "wrong" && (
+                <div className="bg-red-100 border-4 border-red-300 rounded-2xl p-4 text-center text-red-800 font-bold text-xl">
+                  ✗ {getText("wrong")} {correctAnswer}
+                </div>
+              )}
+
+              <button
+                onClick={generate}
+                className="mt-6 w-full py-3 bg-slate-200 text-slate-700 rounded-xl font-bold hover:bg-slate-300"
+              >
+                {getText("newProblem")}
+              </button>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

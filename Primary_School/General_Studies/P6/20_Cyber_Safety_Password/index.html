@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Password Strength</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #0f172a;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Password Shield",
+          zh: "密碼盾牌",
+          ja: "パスワードシールド",
+          ko: "비밀번호 방패",
+          es: "Escudo de contraseña",
+          de: "Passwort-Schild",
+          fi: "Salasanakilpi",
+          fr: "Bouclier de mot de passe",
+          ar: "درع كلمة المرور",
+          it: "Scudo Password",
+        },
+        instruction: {
+          en: "Test these passwords. Are they safe?",
+          zh: "測試這些密碼。它們安全嗎？",
+          ja: "これらのパスワードをテストしてください。安全ですか？",
+          ko: "이 비밀번호들을 테스트해 보세요. 안전한가요?",
+          es: "Prueba estas contraseñas. ¿Son seguras?",
+          de: "Teste diese Passwörter. Sind sie sicher?",
+          fi: "Testaa nämä salasanat. Ovatko ne turvallisia?",
+          fr: "Testez ces mots de passe. Sont-ils sûrs ?",
+          ar: "اختبر كلمات المرور هذه. هل هي آمنة؟",
+          it: "Testa queste password. Sono sicure?",
+        },
+        very_weak: {
+          en: "Very Weak ⚠️",
+          zh: "非常弱 ⚠️",
+          ja: "非常に弱い ⚠️",
+          ko: "매우 약함 ⚠️",
+        },
+        weak: { en: "Weak 😟", zh: "弱 😟", ja: "弱い 😟", ko: "약함 😟" },
+        strong: {
+          en: "Strong! 🛡️",
+          zh: "強！ 🛡️",
+          ja: "強い！ 🛡️",
+          ko: "강함! 🛡️",
+        },
+
+        reason1: {
+          en: "Too short / Common pattern",
+          zh: "太短 / 常見模式",
+          ja: "短すぎる / 一般的なパターン",
+          ko: "너무 짧음 / 흔한 패턴",
+        },
+        reason2: {
+          en: "No numbers or symbols",
+          zh: "沒有數字或符號",
+          ja: "数字や記号がない",
+          ko: "숫자나 기호 없음",
+        },
+        reason3: {
+          en: "Great mix of characters!",
+          zh: "很好的字符組合！",
+          ja: "素晴らしい文字の組み合わせ！",
+          ko: "훌륭한 문자 조합!",
+        },
+
+        test: {
+          en: "Test Password",
+          zh: "測試密碼",
+          ja: "パスワードをテスト",
+          ko: "비밀번호 테스트",
+        },
+      };
+
+      // Game Modes
+      const levels = [
+        { pwd: "123456", score: 0, reason: "reason1", label: "very_weak" },
+        { pwd: "password", score: 0, reason: "reason1", label: "very_weak" },
+        { pwd: "ilovecat", score: 1, reason: "reason2", label: "weak" },
+        { pwd: "P@ssword1", score: 2, reason: "reason3", label: "strong" },
+        { pwd: "Super$ecret99", score: 2, reason: "reason3", label: "strong" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [index, setIndex] = useState(0);
+        const [result, setResult] = useState(null);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+        const current = levels[index];
+
+        const handleTest = () => {
+          setResult(current);
+        };
+
+        const next = () => {
+          setIndex((index + 1) % levels.length);
+          setResult(null);
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-cyan-400">
+              {getText("title")}
+            </h1>
+
+            <div className="w-full max-w-lg bg-slate-800 p-8 rounded-3xl shadow-2xl border-4 border-slate-600 text-center">
+              <p className="mb-8 text-slate-400 font-bold">
+                {getText("instruction")}
+              </p>
+
+              <div className="bg-white text-black text-3xl font-mono font-bold py-6 px-4 rounded-xl mb-8 tracking-widest shadow-inner">
+                {current.pwd}
+              </div>
+
+              {!result ? (
+                <button
+                  onClick={handleTest}
+                  className="w-full py-4 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl text-xl shadow-lg"
+                >
+                  {getText("test")}
+                </button>
+              ) : (
+                <div className="flex flex-col items-center animate-pulse">
+                  <div
+                    className={`text-4xl font-black mb-2 ${
+                      result.score === 0
+                        ? "text-red-500"
+                        : result.score === 1
+                        ? "text-yellow-400"
+                        : "text-green-500"
+                    }`}
+                  >
+                    {getText(result.label)}
+                  </div>
+                  <div className="text-sm text-slate-300 mb-6">
+                    {getText(result.reason)}
+                  </div>
+                  <button
+                    onClick={next}
+                    className="px-8 py-2 bg-slate-600 hover:bg-slate-500 rounded-lg font-bold"
+                  >
+                    Next ➔
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Decorative Shield */}
+            <div className="mt-12 opacity-20 text-9xl">🛡️</div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

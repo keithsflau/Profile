@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小三數學：這是一個好玩的混合運算</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #f472b6 0%, #db2777 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { motion, AnimatePresence } = window.Motion;
+
+      function App() {
+        // Generates question of type: A [op1] B [op2] C
+        // Logic: P3 mixed operations usually involve +/- mixed, or x/÷ with +/- (BODMAS simple)
+        // Let's stick to simple: (A + B) x C or A + B x C
+
+        const [step, setStep] = useState(0); // 0: input, 1: showing step 1, 2: showing final
+        const [q, setQ] = useState({
+          n1: 5,
+          n2: 3,
+          n3: 2,
+          op1: "+",
+          op2: "×",
+          hasBracket: false,
+        });
+
+        const generate = () => {
+          const ops = ["+", "-", "×"];
+          const o1 = ops[Math.floor(Math.random() * 3)];
+          const o2 = ops[Math.floor(Math.random() * 3)];
+          const n1 = Math.floor(Math.random() * 10) + 2;
+          const n2 = Math.floor(Math.random() * 10) + 2;
+          const n3 = Math.floor(Math.random() * 5) + 2;
+          // Add brackets randomly 30%
+          const bracket = Math.random() > 0.7;
+          setQ({ n1, n2, n3, op1: o1, op2: o2, hasBracket: bracket });
+          setStep(0);
+        };
+
+        // Simple parser logic for display
+        // Case 1: Bracket first. (n1 op1 n2) op2 n3
+        // Case 2: BODMAS. Multiply/Divide first.
+        let step1Val, finalVal, explanation;
+
+        if (q.hasBracket) {
+          // Assuming format (n1 op1 n2) op2 n3
+          // First calc inside bracket
+          const inside = eval(`${q.n1} ${q.op1.replace("×", "*")} ${q.n2}`);
+          step1Val = inside;
+          finalVal = eval(`${inside} ${q.op2.replace("×", "*")} ${q.n3}`);
+          explanation = `先計算括號內的：${q.n1} ${q.op1} ${q.n2} = ${inside}`;
+        } else {
+          // n1 op1 n2 op2 n3
+          // Check priorities
+          const p1 = q.op1 === "×";
+          const p2 = q.op2 === "×";
+
+          if (p1 && !p2) {
+            // x then +/-
+            step1Val = q.n1 * q.n2;
+            finalVal = eval(`${step1Val} ${q.op2.replace("×", "*")} ${q.n3}`);
+            explanation = `先乘除後加減：${q.n1} × ${q.n2} = ${step1Val}`;
+          } else if (!p1 && p2) {
+            // +/- then x
+            step1Val = q.n2 * q.n3;
+            finalVal = eval(`${q.n1} ${q.op1.replace("×", "*")} ${step1Val}`);
+            explanation = `先乘除後加減：${q.n2} × ${q.n3} = ${step1Val}`;
+          } else {
+            // Same priority, left to right
+            step1Val = eval(`${q.n1} ${q.op1.replace("×", "*")} ${q.n2}`);
+            finalVal = eval(`${step1Val} ${q.op2.replace("×", "*")} ${q.n3}`);
+            explanation = `由左至右計算：${q.n1} ${q.op1} ${q.n2} = ${step1Val}`;
+          }
+        }
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-6xl font-black text-white mb-8 drop-shadow-lg">
+              🔢 四則混合運算
+            </h1>
+
+            <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full text-center">
+              <div className="flex justify-center items-center gap-4 text-5xl font-black text-slate-800 mb-12 h-32">
+                {q.hasBracket && <span className="text-pink-500">(</span>}
+                <span>{q.n1}</span>
+                <span className="text-pink-600">{q.op1}</span>
+                <span>{q.n2}</span>
+                {q.hasBracket && <span className="text-pink-500">)</span>}
+                <span className="text-pink-600">{q.op2}</span>
+                <span>{q.n3}</span>
+                <span>=</span>
+                <span>?</span>
+              </div>
+
+              <div className="space-y-4 min-h-[200px]">
+                <AnimatePresence mode="wait">
+                  {step >= 1 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="bg-yellow-100 p-6 rounded-2xl border-l-8 border-yellow-400 text-left"
+                    >
+                      <div className="text-lg font-bold text-yellow-800 mb-2">
+                        步驟一
+                      </div>
+                      <div className="text-2xl font-bold text-slate-800">
+                        {explanation}
+                      </div>
+                      <div className="mt-2 text-slate-500">
+                        剩餘算式：
+                        {q.hasBracket ||
+                        (q.op1 === "×" && q.op2 !== "×") ||
+                        (q.op1 !== "×" && q.op2 !== "×")
+                          ? `${step1Val} ${q.op2} ${q.n3}`
+                          : `${q.n1} ${q.op1} ${step1Val}`}
+                      </div>
+                    </motion.div>
+                  )}
+                  {step >= 2 && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.3 }}
+                      className="bg-green-100 p-6 rounded-2xl border-l-8 border-green-500 text-left"
+                    >
+                      <div className="text-lg font-bold text-green-800 mb-2">
+                        最終答案
+                      </div>
+                      <div className="text-4xl font-black text-green-600">
+                        {finalVal}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              <div className="mt-12 flex gap-4 justify-center">
+                <button
+                  onClick={() => setStep((s) => Math.min(2, s + 1))}
+                  disabled={step >= 2}
+                  className={`px-8 py-4 rounded-xl font-black text-xl transition-all ${
+                    step >= 2
+                      ? "bg-slate-200 text-slate-400"
+                      : "bg-pink-500 text-white hover:bg-pink-600 shadow-lg hover:scale-105"
+                  }`}
+                >
+                  下一步 expl step
+                </button>
+                <button
+                  onClick={generate}
+                  className="px-8 py-4 bg-slate-800 text-white rounded-xl font-black text-xl hover:bg-slate-700 shadow-lg transition-all"
+                >
+                  新題目
+                </button>
+              </div>
+
+              <div className="mt-6 text-slate-500 font-bold text-sm">
+                💡 記得口訣：先乘除，後加減，有括號先算括號！
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

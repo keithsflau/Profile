@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小二常識：情緒紅綠燈 | Emotion Traffic Light</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Emotion Traffic Light",
+          zh: "情緒紅綠燈",
+          ja: "感情の信号機",
+        },
+        instruction: {
+          en: "How to handle this feeling?",
+          zh: "如何處理這種情緒？",
+          ja: "この感情をどう処理しますか？",
+        },
+        red: { en: "Stop (Calm Down)", zh: "停 (冷靜)" },
+        yellow: { en: "Think (What to do?)", zh: "想 (怎麼辦？)" },
+        green: { en: "Go (Act)", zh: "行 (行動)" },
+
+        angry: { en: "Very Angry! Want to hit!", zh: "很生氣！想打人！" },
+        nervous: { en: "Nervous about exam...", zh: "考試前很緊張..." },
+        sad: { en: "Sad because friend left.", zh: "朋友走了很傷心。" },
+        excited: { en: "Too excited running around!", zh: "太興奮亂跑！" },
+
+        redAction: {
+          en: "Take deep breaths. 1...2...3...",
+          zh: "深呼吸... 1... 2... 3...",
+        },
+        yellowAction: {
+          en: "Think: Hitting hurts others.",
+          zh: "想：打人會令別人受傷。",
+        },
+        greenAction: {
+          en: "Tell teacher or draw a picture.",
+          zh: "告訴老師或畫畫發洩。",
+        },
+
+        next: { en: "Next Step", zh: "下一步" },
+        restart: { en: "Try Another", zh: "試試其他" },
+        great: { en: "Great job managing emotions!", zh: "處理情緒做得好！" },
+      };
+
+      const scenarios = [
+        {
+          id: "angry",
+          icon: "😡",
+          color: "bg-red-100",
+          redText: "Deep Breaths... Count to 10.",
+          yellowText: "Think: Breaking things is bad.",
+          greenText: "Talk to an adult calmly.",
+        },
+        {
+          id: "nervous",
+          icon: "😰",
+          color: "bg-blue-100",
+          redText: "Stop and drink water.",
+          yellowText: "Think: I studied hard, I can do it.",
+          greenText: "Do my best!",
+        },
+        {
+          id: "excited",
+          icon: "😆",
+          color: "bg-yellow-100",
+          redText: "Stop running!",
+          yellowText: "Think: I might bump into others.",
+          greenText: "Play safely.",
+        },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [scenario, setScenario] = useState(null);
+        const [step, setStep] = useState(0); // 0: Select Scenario, 1: Red, 2: Yellow, 3: Green, 4: Done
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const selectScenario = (s) => {
+          setScenario(s);
+          setStep(1);
+        };
+
+        const nextStep = () => {
+          setStep((s) => s + 1);
+        };
+
+        const reset = () => {
+          setScenario(null);
+          setStep(0);
+        };
+
+        // Custom localized texts for steps if needed, for now simplifying to generic structure or mapping
+        // In real app, would map specific texts. Let's try simple mapping:
+        const getSteppedText = (s, step) => {
+          // Simplified for prototype: usually would pull from language file
+          // Here just return English or mock translated
+          const prefix =
+            step === 1 ? s.redText : step === 2 ? s.yellowText : s.greenText;
+          return prefix; // In real app, put these in 't' object
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-slate-800 mb-8 mt-8 drop-shadow-sm bg-white/50 px-6 py-2 rounded-full">
+              🚥 {getText("title")}
+            </h1>
+
+            {step === 0 && (
+              <div className="w-full max-w-2xl grid grid-cols-1 md:grid-cols-3 gap-6">
+                {scenarios.map((s) => (
+                  <button
+                    key={s.id}
+                    onClick={() => selectScenario(s)}
+                    className={`${s.color} p-6 rounded-3xl shadow-lg flex flex-col items-center justify-center gap-4 hover:scale-105 transition-transform border-4 border-white`}
+                  >
+                    <span className="text-6xl">{s.icon}</span>
+                    <span className="font-bold text-slate-700 text-lg">
+                      {getText(s.id)}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {step > 0 && scenario && (
+              <div className="w-full max-w-md flex flex-col items-center">
+                {/* Traffic Light Visual */}
+                <div className="bg-slate-800 p-4 rounded-3xl flex flex-col gap-4 shadow-2xl mb-8 border-4 border-slate-600">
+                  <motion.div
+                    animate={{
+                      opacity: step === 1 ? 1 : 0.3,
+                      scale: step === 1 ? 1.1 : 1,
+                    }}
+                    className="w-20 h-20 bg-red-500 rounded-full shadow-lg border-4 border-red-600"
+                  />
+                  <motion.div
+                    animate={{
+                      opacity: step === 2 ? 1 : 0.3,
+                      scale: step === 2 ? 1.1 : 1,
+                    }}
+                    className="w-20 h-20 bg-yellow-400 rounded-full shadow-lg border-4 border-yellow-500"
+                  />
+                  <motion.div
+                    animate={{
+                      opacity: step === 3 ? 1 : 0.3,
+                      scale: step === 3 ? 1.1 : 1,
+                    }}
+                    className="w-20 h-20 bg-green-500 rounded-full shadow-lg border-4 border-green-600"
+                  />
+                </div>
+
+                <AnimatePresence mode="wait">
+                  {step <= 3 ? (
+                    <motion.div
+                      key={step}
+                      initial={{ opacity: 0, x: 50 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -50 }}
+                      className="bg-white p-8 rounded-3xl shadow-xl text-center w-full min-h-[200px] flex flex-col items-center justify-center border-b-8 border-slate-200"
+                    >
+                      <h2
+                        className={`text-4xl font-black mb-4 ${
+                          step === 1
+                            ? "text-red-500"
+                            : step === 2
+                            ? "text-yellow-500"
+                            : "text-green-500"
+                        }`}
+                      >
+                        {step === 1
+                          ? getText("red")
+                          : step === 2
+                          ? getText("yellow")
+                          : getText("green")}
+                      </h2>
+                      <p className="text-xl font-bold text-slate-600 mb-6">
+                        {getSteppedText(scenario, step)}
+                      </p>
+                      <button
+                        onClick={nextStep}
+                        className="bg-slate-700 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-slate-800 text-lg"
+                      >
+                        {getText("next")} ➡️
+                      </button>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="bg-white p-12 rounded-3xl shadow-xl text-center"
+                    >
+                      <div className="text-8xl mb-4">😌</div>
+                      <h2 className="text-3xl font-black text-green-600 mb-6">
+                        {getText("great")}
+                      </h2>
+                      <button
+                        onClick={reset}
+                        className="bg-blue-500 text-white px-10 py-4 rounded-full font-black text-xl hover:bg-blue-600 shadow-xl"
+                      >
+                        {getText("restart")} 🔄
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

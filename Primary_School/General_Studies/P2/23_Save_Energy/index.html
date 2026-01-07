@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小二常識：節約能源 | Save Energy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Save Energy",
+          zh: "節約能源",
+          ja: "省エネルギー",
+        },
+        instruction: {
+          en: "Turn off unused lights & appliances!",
+          zh: "關掉不用的電燈和電器！",
+          ja: "使っていない電気や家電を消そう！",
+        },
+        saved: { en: "Energy Saved!", zh: "節省了能源！" },
+        wasted: { en: "Still Wasting Energy...", zh: "還在浪費能源..." },
+        all_off: { en: "Great! House is green!", zh: "太好了！家裡很環保！" },
+        reset: { en: "Play Again", zh: "再玩一次" },
+      };
+
+      const initialItems = [
+        { id: 1, type: "light", x: 20, y: 20, on: true, icon: "💡" },
+        { id: 2, type: "light", x: 80, y: 20, on: true, icon: "💡" },
+        { id: 3, type: "tv", x: 50, y: 50, on: true, icon: "📺" },
+        { id: 4, type: "computer", x: 80, y: 60, on: true, icon: "🖥️" },
+        { id: 5, type: "fan", x: 20, y: 70, on: true, icon: "🌀" }, // Fan
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [items, setItems] = useState(initialItems);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const toggle = (id) => {
+          setItems((prev) =>
+            prev.map((i) => (i.id === id ? { ...i, on: !i.on } : i))
+          );
+        };
+
+        const reset = () => {
+          setItems(initialItems.map((i) => ({ ...i, on: true })));
+        };
+
+        const allOff = items.every((i) => !i.on);
+        const onCount = items.filter((i) => i.on).length;
+
+        // Visualizing energy meter
+        const energyLevel = (onCount / items.length) * 100;
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center select-none">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-green-400 mb-4 mt-8 drop-shadow-[0_0_10px_rgba(74,222,128,0.5)]">
+              🌍 {getText("title")}
+            </h1>
+            <p className="font-bold text-slate-300 mb-8 text-center">
+              {getText("instruction")}
+            </p>
+
+            {/* House View */}
+            <div
+              className="relative w-full max-w-2xl aspect-[4/3] bg-slate-800 rounded-3xl border-8 border-slate-700 shadow-2xl overflow-hidden mb-8 transition-colors duration-1000"
+              style={{ backgroundColor: allOff ? "#0f172a" : "#334155" }}
+            >
+              {/* Windows / Rooms (Simplified) */}
+              <div className="absolute inset-4 border-4 border-slate-600 rounded-2xl grid grid-cols-2 grid-rows-2">
+                <div className="border-r-4 border-b-4 border-slate-600 relative">
+                  {/* Room 1 */}
+                </div>
+                <div className="border-b-4 border-slate-600 relative">
+                  {/* Room 2 */}
+                </div>
+                <div className="border-r-4 border-slate-600 relative">
+                  {/* Room 3 */}
+                </div>
+                <div className="relative">{/* Room 4 */}</div>
+              </div>
+
+              {/* Items */}
+              {items.map((item) => (
+                <motion.button
+                  key={item.id}
+                  className="absolute text-5xl md:text-6xl p-4 focus:outline-none"
+                  style={{
+                    top: `${item.y}%`,
+                    left: `${item.x}%`,
+                    transform: "translate(-50%, -50%)",
+                  }}
+                  onClick={() => toggle(item.id)}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <div
+                    className={`relative ${
+                      item.on ? "" : "opacity-30 grayscale"
+                    }`}
+                  >
+                    {item.icon}
+                    {item.on && (
+                      <motion.div
+                        className="absolute inset-0 bg-yellow-400 rounded-full blur-xl -z-10"
+                        animate={{ opacity: [0.5, 0.8, 0.5] }}
+                        transition={{ repeat: Infinity, duration: 1.5 }}
+                      />
+                    )}
+                  </div>
+                  {/* Switch visual */}
+                  <div
+                    className={`absolute bottom-0 right-0 w-8 h-4 rounded-full border-2 border-white/50 ${
+                      item.on ? "bg-green-500" : "bg-red-500"
+                    }`}
+                  >
+                    <div
+                      className={`w-4 h-full bg-white rounded-full shadow transition-all ${
+                        item.on ? "translate-x-[100%]" : "translate-x-0"
+                      }`}
+                    ></div>
+                  </div>
+                </motion.button>
+              ))}
+
+              {/* Empty House Overlay if all Off */}
+              {allOff && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm z-20"
+                >
+                  <div className="text-8xl mb-4">🌙</div>
+                  <h2 className="text-3xl font-black text-green-400 mb-6">
+                    {getText("all_off")}
+                  </h2>
+                  <button
+                    onClick={reset}
+                    className="bg-green-600 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-green-700"
+                  >
+                    {getText("reset")} 🔄
+                  </button>
+                </motion.div>
+              )}
+            </div>
+
+            {/* Energy Meter */}
+            <div className="w-full max-w-md bg-slate-700 rounded-full h-8 overflow-hidden border-2 border-slate-500 relative mb-2">
+              <motion.div
+                className="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-red-500"
+                animate={{ width: `${energyLevel}%` }}
+              />
+              <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white shadow-black drop-shadow-md">
+                USAGE
+              </div>
+            </div>
+            <div className="text-slate-400 text-sm font-mono">
+              {onCount > 0 ? getText("wasted") : getText("saved")}
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

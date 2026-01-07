@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Disease Vectors</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #fdf4f4;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Disease Transmission",
+          zh: "疾病傳播",
+          ja: "病気の伝染",
+          ko: "질병 전파",
+          es: "Transmisión de enfermedades",
+          de: "Krankheitsübertragung",
+          fi: "Taudin leviäminen",
+          fr: "Transmission des maladies",
+          ar: "انتقال الأمراض",
+          it: "Trasmissione Malattie",
+        },
+        instruction: {
+          en: "How is this disease spread?",
+          zh: "這種疾病是如何傳播的？",
+          ja: "この病気はどのように広まりますか？",
+          ko: "이 질병은 어떻게 전파되나요?",
+          es: "¿Cómo se propaga esta enfermedad?",
+          de: "Wie wird diese Krankheit verbreitet?",
+          fi: "Miten tämä tauti leviää?",
+          fr: "Comment cette maladie se propage-t-elle ?",
+          ar: "كيف ينتشر هذا المرض؟",
+          it: "Come si diffonde questa malattia?",
+        },
+        mosquito: { en: "Mosquito", zh: "蚊子", ja: "蚊", ko: "모기" },
+        rat: {
+          en: "Rat / Flea",
+          zh: "老鼠 / 跳蚤",
+          ja: "ネズミ / ノミ",
+          ko: "쥐 / 벼룩",
+        },
+        droplet: {
+          en: "Air / Droplets",
+          zh: "空氣 / 飛沫",
+          ja: "空気 / 飛沫",
+          ko: "공기 / 비말",
+        },
+        food: {
+          en: "Contaminated Food",
+          zh: "受污染食物",
+          ja: "汚染された食品",
+          ko: "오염된 음식",
+        },
+        contact: {
+          en: "Direct Contact",
+          zh: "直接接觸",
+          ja: "直接接触",
+          ko: "직접 접촉",
+        },
+
+        dengue: {
+          en: "Dengue Fever",
+          zh: "登革熱",
+          ja: "デング熱",
+          ko: "뎅기열",
+        },
+        malaria: { en: "Malaria", zh: "瘧疾", ja: "マラリア", ko: "말라리아" },
+        plague: {
+          en: "Plague",
+          zh: "鼠疫 (黑死病)",
+          ja: "ペスト",
+          ko: "흑사병",
+        },
+        flu: {
+          en: "Influenza / Flu",
+          zh: "流行性感冒",
+          ja: "インフルエンザ",
+          ko: "독감",
+        },
+        cholera: { en: "Cholera", zh: "霍亂", ja: "コレラ", ko: "콜레라" },
+        chickenpox: { en: "Chickenpox", zh: "水痘", ja: "水疱瘡", ko: "수두" },
+
+        correct: { en: "Correct!", zh: "正確！", ja: "正解！", ko: "정답!" },
+        wrong: {
+          en: "Wrong vector.",
+          zh: "傳播媒介錯誤。",
+          ja: "間違った媒介。",
+          ko: "잘못된 매개체입니다.",
+        },
+      };
+
+      const pairs = [
+        { id: "dengue", vector: "mosquito", icon: "🦟" },
+        { id: "malaria", vector: "mosquito", icon: "🦟" },
+        { id: "plague", vector: "rat", icon: "🐀" },
+        { id: "flu", vector: "droplet", icon: "🗣️" },
+        { id: "cholera", vector: "food", icon: "🥘" }, // Food/Water
+        { id: "chickenpox", vector: "contact", icon: "🤝" }, // Contact/Air
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [index, setIndex] = useState(0);
+        const [feedback, setFeedback] = useState(null);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+        const current = pairs[index];
+        const vectors = ["mosquito", "rat", "droplet", "food", "contact"];
+
+        const handleAnswer = (v) => {
+          if (feedback) return;
+          if (current.vector === v) {
+            setFeedback("correct");
+            setTimeout(() => {
+              setFeedback(null);
+              setIndex((index + 1) % pairs.length);
+            }, 1000);
+          } else {
+            setFeedback("wrong");
+            setTimeout(() => setFeedback(null), 1000);
+          }
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col items-center justify-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-rose-800">
+              {getText("title")}
+            </h1>
+
+            <div className="w-full max-w-2xl bg-white p-8 rounded-3xl shadow-xl flex flex-col items-center">
+              <div className="text-center font-bold text-slate-500 mb-6">
+                {getText("instruction")}
+              </div>
+
+              <div className="bg-rose-50 p-12 rounded-full mb-8 text-2xl font-bold text-rose-800 border-4 border-rose-200">
+                {getText(current.id)}
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full">
+                {vectors.map((v) => (
+                  <button
+                    key={v}
+                    onClick={() => handleAnswer(v)}
+                    className="p-6 bg-slate-100 hover:bg-slate-200 rounded-xl font-bold flex flex-col items-center transition-all active:scale-95"
+                  >
+                    <span className="text-3xl mb-2">
+                      {v === "mosquito"
+                        ? "🦟"
+                        : v === "rat"
+                        ? "🐀"
+                        : v === "droplet"
+                        ? "🗣️"
+                        : v === "food"
+                        ? "🥘"
+                        : "🤝"}
+                    </span>
+                    {getText(v)}
+                  </button>
+                ))}
+              </div>
+
+              {feedback && (
+                <div
+                  className={`mt-8 text-3xl font-black ${
+                    feedback === "correct" ? "text-green-600" : "text-red-500"
+                  } animate-pulse`}
+                >
+                  {getText(feedback)}
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小三數學：數學遊樂場</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+        cursor: crosshair;
+        user-select: none;
+      }
+      .mole-hole {
+        box-shadow: inset 0 10px 20px rgba(0, 0, 0, 0.5);
+      }
+      .mole {
+        transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        transform-origin: bottom center;
+      }
+      .mole-enter {
+        transform: translateY(100%);
+      }
+      .mole-active {
+        transform: translateY(0%);
+      }
+      .mole-exit {
+        transform: translateY(100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect, useCallback } = React;
+
+      function App() {
+        const [gameState, setGameState] = useState("menu");
+        const [target, setTarget] = useState(2);
+        const [score, setScore] = useState(0);
+        const [timeLeft, setTimeLeft] = useState(30);
+
+        // Moles state: Array of objects or null.
+        // Object: { val: number, isCorrect: boolean, id: number, status: 'active' | 'hit' | 'missed' }
+        const [moles, setMoles] = useState(Array(9).fill(null));
+
+        useEffect(() => {
+          let interval;
+          if (gameState === "playing") {
+            interval = setInterval(() => {
+              // 1. Pick a random hole
+              const holeIdx = Math.floor(Math.random() * 9);
+
+              // Only spawn if empty
+              setMoles((prev) => {
+                if (prev[holeIdx]) return prev; // Hole occupied
+
+                const isTarget = Math.random() > 0.4;
+                // Generate logic
+                let num;
+                if (isTarget) {
+                  num = target * (Math.floor(Math.random() * 10) + 1);
+                } else {
+                  // Force wrong number
+                  num =
+                    target * (Math.floor(Math.random() * 10) + 1) +
+                    (Math.random() > 0.5 ? 1 : -1);
+                }
+
+                const newMole = {
+                  val: num,
+                  id: Date.now() + Math.random(),
+                  isCorrect: num % target === 0,
+                  status: "active",
+                };
+
+                const newMoles = [...prev];
+                newMoles[holeIdx] = newMole;
+                return newMoles;
+              });
+
+              // Auto-remove logic handled by separate timeout per mole?
+              // Simpler: Just clear specific hole after N seconds if it's consistent.
+              setTimeout(() => {
+                setMoles((prev) => {
+                  if (prev[holeIdx] && prev[holeIdx].status === "active") {
+                    const n = [...prev];
+                    n[holeIdx] = null;
+                    return n;
+                  }
+                  return prev;
+                });
+              }, 1500);
+            }, 800);
+          }
+          return () => clearInterval(interval);
+        }, [gameState, target]);
+
+        useEffect(() => {
+          if (gameState === "playing") {
+            if (timeLeft > 0) {
+              const timer = setInterval(() => setTimeLeft((t) => t - 1), 1000);
+              return () => clearInterval(timer);
+            } else {
+              setGameState("gameover");
+            }
+          }
+        }, [gameState, timeLeft]);
+
+        // Explicit Whack Function
+        const whack = (idx, mole) => {
+          if (!mole || mole.status !== "active") return;
+
+          // Optimistic update of UI?
+          // We can remove it instantly or show a "hit" animation.
+          // Let's remove instantly for responsiveness.
+
+          if (mole.isCorrect) {
+            setScore((s) => s + 10);
+            // Play sound?
+          } else {
+            setScore((s) => Math.max(0, s - 5));
+          }
+
+          setMoles((prev) => {
+            const n = [...prev];
+            n[idx] = null;
+            return n;
+          });
+        };
+
+        const startGame = (t) => {
+          setTarget(t);
+          setScore(0);
+          setTimeLeft(30);
+          setGameState("playing");
+          setMoles(Array(9).fill(null));
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center justify-center">
+            {gameState === "menu" && (
+              <div className="bg-white/95 rounded-3xl p-12 text-center max-w-2xl w-full shadow-2xl animate-fade-in">
+                <h1 className="text-6xl font-black text-green-800 mb-4">
+                  🐹 數數地鼠王
+                </h1>
+                <p className="text-xl text-green-600 mb-8 font-bold">
+                  打擊所有{" "}
+                  <span className="text-2xl text-green-700">
+                    {target === 2 ? "?" : ""}
+                  </span>{" "}
+                  的倍數！
+                </p>
+                <div className="grid grid-cols-3 gap-4">
+                  {[2, 3, 4, 5, 6, 9].map((n) => (
+                    <button
+                      key={n}
+                      onClick={() => startGame(n)}
+                      className="py-6 bg-green-100 hover:bg-green-500 hover:text-white text-green-800 rounded-2xl text-2xl font-black transition-all shadow-md transform hover:scale-105 active:scale-95"
+                    >
+                      {n} 的倍數
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {gameState === "playing" && (
+              <div className="w-full max-w-2xl">
+                <div className="flex justify-between items-center mb-8 bg-black/40 backdrop-blur-md p-4 rounded-2xl text-white shadow-xl">
+                  <div className="text-2xl font-black">
+                    目標:{" "}
+                    <span className="text-yellow-300 text-3xl">{target}</span>{" "}
+                    的倍數
+                  </div>
+                  <div className="text-4xl font-black text-yellow-300 drop-shadow-md">
+                    {score} 分
+                  </div>
+                  <div className="text-2xl font-bold font-mono">
+                    ⏱️ {timeLeft}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-6">
+                  {moles.map((mole, i) => (
+                    <div
+                      key={i}
+                      className="aspect-square bg-[#5d4037] rounded-full mole-hole relative overflow-hidden"
+                      // Click handler on the HOLE to catch any clicks
+                      onClick={() => whack(i, mole)}
+                    >
+                      {/* Mole */}
+                      <div
+                        className={`absolute bottom-0 left-0 right-0 h-[80%] flex items-center justify-center transition-transform duration-200 ${
+                          mole ? "translate-y-0" : "translate-y-full"
+                        }`}
+                      >
+                        {mole && (
+                          <div
+                            className={`w-[80%] h-full rounded-t-full flex flex-col items-center justify-center text-4xl font-black border-4 border-black/20 shadow-inner cursor-pointer active:scale-90 transition-transform ${
+                              mole.isCorrect
+                                ? "bg-yellow-400 text-yellow-900"
+                                : "bg-red-400 text-red-900"
+                            }`}
+                          >
+                            <span className="z-10 mt-6">{mole.val}</span>
+                            {/* Face */}
+                            <div className="absolute top-4 flex gap-8">
+                              <div className="w-3 h-3 bg-black rounded-full"></div>
+                              <div className="w-3 h-3 bg-black rounded-full"></div>
+                            </div>
+                            <div className="absolute top-8 w-4 h-2 bg-black/50 rounded-full"></div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Grass overlay */}
+                      <div className="absolute bottom-0 w-full h-4 bg-green-600 rounded-b-full pointer-events-none z-20"></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {gameState === "gameover" && (
+              <div className="bg-white rounded-3xl p-12 text-center max-w-lg w-full shadow-2xl">
+                <h2 className="text-5xl font-black text-slate-800 mb-4">
+                  遊戲結束!
+                </h2>
+                <div className="text-2xl text-slate-500 font-bold mb-2">
+                  你的得分
+                </div>
+                <div className="text-8xl font-black text-green-600 mb-8">
+                  {score}
+                </div>
+                <button
+                  onClick={() => setGameState("menu")}
+                  className="w-full py-4 bg-green-500 text-white rounded-xl font-black text-xl hover:bg-green-600 shadow-xl transition-transform active:scale-95"
+                >
+                  回主選單
+                </button>
+              </div>
+            )}
+            <div className="fixed bottom-4 left-4">
+              <a
+                href="../index.html"
+                className="bg-white/80 backdrop-blur hover:bg-white text-slate-600 px-6 py-3 rounded-full font-bold shadow-lg flex items-center gap-2 transition-all"
+              >
+                ← 返回目錄
+              </a>
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

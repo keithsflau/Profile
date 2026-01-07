@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HKDSE ICT - Color Depth Visualizer</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.development.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #0f172a;
+        color: #e2e8f0;
+      }
+      .color-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(20px, 1fr));
+        gap: 2px;
+      }
+      .pixel {
+        aspect-ratio: 1;
+        transition: background-color 0.2s;
+      }
+      .zoom-panel {
+        image-rendering: pixelated;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen p-8 bg-slate-900 flex justify-center items-center">
+    <div id="root" class="w-full max-w-5xl"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect, useMemo } = React;
+
+      // --- LUCIDE ICON SHIM ---
+      const LucideIcon = ({ name, size = 24, className = "" }) => {
+        const formatName = (n) =>
+          n
+            .split("-")
+            .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
+            .join("");
+        const iconName = formatName(name);
+
+        const [svgHtml, setSvgHtml] = useState("");
+
+        useEffect(() => {
+          if (
+            window.lucide &&
+            window.lucide.icons &&
+            window.lucide.icons[iconName] &&
+            typeof window.lucide.icons[iconName].toSvg === "function"
+          ) {
+            setSvgHtml(
+              window.lucide.icons[iconName].toSvg({
+                width: size,
+                height: size,
+                class: className,
+              })
+            );
+          }
+        }, [name, size, className, iconName]);
+
+        return (
+          <span
+            dangerouslySetInnerHTML={{ __html: svgHtml }}
+            style={{ display: "inline-flex" }}
+          />
+        );
+      };
+      const Palette = (p) => <LucideIcon name="palette" {...p} />;
+      const Image = (p) => <LucideIcon name="image" {...p} />; // unused but safe
+      const Database = (p) => <LucideIcon name="database" {...p} />; // unused but safe
+      const Info = (p) => <LucideIcon name="info" {...p} />; // unused but safe
+      // --- END SHIM ---
+
+      const App = () => {
+        const [depth, setDepth] = useState(24);
+        const [res, setRes] = useState({ w: 100, h: 100 });
+
+        const colors = useMemo(() => {
+          if (depth === 1) return ["#000000", "#ffffff"];
+          if (depth === 2) return ["#000000", "#ffffff", "#ff0000", "#0000ff"];
+          if (depth === 8) {
+            const pal = [];
+            for (let i = 0; i < 256; i++)
+              pal.push(`hsl(${Math.floor((i / 256) * 360)}, 70%, 50%)`);
+            return pal;
+          }
+          return null;
+        }, [depth]);
+
+        const fileSizeBits = res.w * res.h * depth;
+        const fileSizeKB = fileSizeBits / 8 / 1024;
+
+        const renderPreview = () => {
+          if (depth === 24)
+            return "linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)";
+          if (depth === 1)
+            return "repeating-linear-gradient(to right, black 0%, black 50%, white 50%, white 100%)";
+          if (depth === 8)
+            return "linear-gradient(to right, #ff0000, #00ff00, #0000ff)";
+          return "gray";
+        };
+
+        return (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div className="space-y-8">
+              <header>
+                <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-2">
+                  <Palette className="text-pink-500" /> Color Depth (Bit Depth)
+                </h1>
+                <p className="text-slate-400">Paper 1A Q7 Concept</p>
+              </header>
+              <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700">
+                <h3 className="text-lg font-bold text-white mb-4">Settings</h3>
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-slate-400 text-sm font-bold mb-2">
+                      Bit Depth
+                    </label>
+                    <div className="flex gap-2">
+                      {[1, 8, 24].map((d) => (
+                        <button
+                          key={d}
+                          onClick={() => setDepth(d)}
+                          className={`flex-1 py-3 rounded-xl font-bold border-2 transition-all ${
+                            depth === d
+                              ? "border-pink-500 bg-pink-900/20 text-white"
+                              : "border-slate-700 bg-slate-900 text-slate-500 hover:border-slate-600"
+                          }`}
+                        >
+                          {d}-bit
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="p-4 bg-slate-900 rounded-lg text-sm text-slate-300 space-y-2">
+                    <div className="flex justify-between">
+                      <span>
+                        Total Colors (2<sup>{depth}</sup>):
+                      </span>
+                      <span className="font-mono text-pink-400 font-bold">
+                        {depth === 24 ? "16,777,216" : Math.pow(2, depth)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between border-t border-slate-800 pt-2">
+                      <span>
+                        File Size ({res.w}x{res.h}):
+                      </span>
+                      <span className="font-mono text-cyan-400 font-bold">
+                        {fileSizeKB.toFixed(2)} KB
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="p-4 border border-yellow-500/30 bg-yellow-900/10 rounded-lg text-sm text-yellow-200">
+                <strong>Exam Tip (Paper 1A Q7):</strong>
+                <ul className="list-disc pl-4 mt-2 space-y-1">
+                  <li>
+                    <strong>Higher Bit Depth</strong> = More Colors = Larger
+                    File Size.
+                  </li>
+                  <li>
+                    <strong>True Color</strong> is 24-bit (8R, 8G, 8B).
+                  </li>
+                  <li>
+                    Increasing from 16-bit to 24-bit increases size by 1.5x
+                    (24/16), not by number of colors.
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div className="bg-slate-950 p-8 rounded-2xl border border-slate-800 flex flex-col items-center justify-center">
+              <div className="w-64 h-64 rounded-full shadow-2xl border-4 border-slate-700 mb-6 relative overflow-hidden">
+                <div
+                  className="w-full h-full"
+                  style={{ background: renderPreview() }}
+                ></div>
+                <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-[1px]">
+                  <span className="text-white font-bold text-xl drop-shadow-md">
+                    {depth}-bit Color
+                  </span>
+                </div>
+              </div>
+              <div className="w-full">
+                <h4 className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-2 text-center">
+                  Pixel Data Simulation
+                </h4>
+                <div className="flex justify-center gap-1 font-mono text-[10px] text-slate-600 overflow-hidden">
+                  {Array.from({ length: 8 }).map((_, i) => (
+                    <div key={i} className="flex flex-col items-center">
+                      <div
+                        className="w-8 h-8 rounded border border-slate-700 mb-1"
+                        style={{
+                          backgroundColor:
+                            depth === 1
+                              ? i % 2
+                                ? "white"
+                                : "black"
+                              : depth === 8
+                              ? colors[i * 10]
+                              : `hsl(${i * 40}, 70%, 50%)`,
+                        }}
+                      ></div>
+                      <span>
+                        {depth === 1
+                          ? i % 2
+                          : depth === 8
+                          ? (i * 10).toString(16).padStart(2, "0")
+                          : "FF.."}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

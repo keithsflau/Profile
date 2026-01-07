@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inverse Matrix Operations | M2 Matrix</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", sans-serif;
+        background: #0f172a;
+        color: #e2e8f0;
+      }
+      .glass {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .bracket {
+        border-left: 2px solid #94a3b8;
+        border-right: 2px solid #94a3b8;
+        border-radius: 4px;
+        padding: 0 4px;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <div id="root" class="flex-grow flex flex-col"></div>
+    <script type="text/babel">
+      const { useState } = React;
+
+      const translations = {
+        en: {
+          unit: "Unit 5: Matrices",
+          title: "Inverse Matrix (2×2)",
+          subtitle: "A⁻¹ = (1/|A|) · adj(A)",
+          step1: "Step 1: Determinant |A| = ad - bc",
+          singular: "Singular Matrix! No Inverse.",
+          step2: "Step 2: Adjugate (Swap Main, Negate Off)",
+          step3: "Step 3: Multiply by 1/|A|",
+          langBtn: "中文",
+        },
+        zh: {
+          unit: "第五單元：矩陣",
+          title: "逆矩陣 (2×2)",
+          subtitle: "A⁻¹ = (1/|A|) · adj(A)",
+          step1: "第 1 步：行列式 |A| = ad - bc",
+          singular: "奇異矩陣！無逆矩陣。",
+          step2: "第 2 步：伴隨矩陣 (主對角交換，副對角變號)",
+          step3: "第 3 步：乘以 1/|A|",
+          langBtn: "English",
+        },
+      };
+
+      const App = () => {
+        // 2x2 Matrix Inverse
+        // A = [[a, b], [c, d]]
+        // A^-1 = 1/det(A) * [[d, -b], [-c, a]]
+
+        const [lang, setLang] = useState("en");
+        const t = translations[lang];
+
+        const [mat, setMat] = useState({ a: 4, b: 7, c: 2, d: 6 });
+
+        const det = mat.a * mat.d - mat.b * mat.c;
+
+        // Check if inverse exists
+        const exists = det !== 0;
+
+        return (
+          <div className="flex-grow flex flex-col items-center justify-center p-8">
+            <div className="absolute top-4 right-4">
+              <button
+                onClick={() => setLang((l) => (l === "en" ? "zh" : "en"))}
+                className="px-3 py-1 bg-slate-800 border border-slate-600 rounded-full text-xs font-bold text-emerald-400 hover:bg-slate-700 hover:text-white transition flex items-center gap-2"
+              >
+                <i className="fa-solid fa-language"></i>
+                {t.langBtn}
+              </button>
+            </div>
+
+            <header className="mb-12 text-center">
+              <div className="text-amber-500 font-bold uppercase tracking-widest text-xs mb-2">
+                {t.unit}
+              </div>
+              <h1 className="text-4xl font-extrabold text-white mb-2">
+                {t.title}
+              </h1>
+              <p className="text-slate-400 font-mono text-lg">{t.subtitle}</p>
+            </header>
+
+            <div className="flex flex-col items-center gap-12 w-full max-w-3xl">
+              {/* Input Matrix A */}
+              <div className="flex gap-4 items-center">
+                <span className="text-3xl font-bold text-white">A = </span>
+                <div className="bracket p-4 grid grid-cols-2 gap-4">
+                  <input
+                    type="number"
+                    value={mat.a}
+                    onChange={(e) =>
+                      setMat({ ...mat, a: Number(e.target.value) })
+                    }
+                    className="w-16 h-16 text-center text-2xl font-bold bg-slate-800 rounded p-2 text-sky-400 focus:bg-slate-700 outline-none"
+                  />
+                  <input
+                    type="number"
+                    value={mat.b}
+                    onChange={(e) =>
+                      setMat({ ...mat, b: Number(e.target.value) })
+                    }
+                    className="w-16 h-16 text-center text-2xl font-bold bg-slate-800 rounded p-2 text-pink-400 focus:bg-slate-700 outline-none"
+                  />
+                  <input
+                    type="number"
+                    value={mat.c}
+                    onChange={(e) =>
+                      setMat({ ...mat, c: Number(e.target.value) })
+                    }
+                    className="w-16 h-16 text-center text-2xl font-bold bg-slate-800 rounded p-2 text-emerald-400 focus:bg-slate-700 outline-none"
+                  />
+                  <input
+                    type="number"
+                    value={mat.d}
+                    onChange={(e) =>
+                      setMat({ ...mat, d: Number(e.target.value) })
+                    }
+                    className="w-16 h-16 text-center text-2xl font-bold bg-slate-800 rounded p-2 text-amber-400 focus:bg-slate-700 outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Step 1: Determinant */}
+              <div className="glass p-6 rounded-2xl w-full text-center relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
+                <h3 className="text-amber-500 font-bold uppercase text-xs mb-2">
+                  {t.step1}
+                </h3>
+                <div className="font-mono text-xl">
+                  (<span className="text-sky-400">{mat.a}</span>)(
+                  <span className="text-amber-400">{mat.d}</span>) - (
+                  <span className="text-pink-400">{mat.b}</span>)(
+                  <span className="text-emerald-400">{mat.c}</span>) ={" "}
+                  {mat.a * mat.d} - {mat.b * mat.c}
+                </div>
+                <div
+                  className={`mt-2 text-3xl font-extrabold ${
+                    exists ? "text-white" : "text-rose-500"
+                  }`}
+                >
+                  {det}
+                </div>
+                {!exists && (
+                  <div className="text-rose-400 font-bold mt-2">
+                    {t.singular}
+                  </div>
+                )}
+              </div>
+
+              {/* Step 2: Adjugate */}
+              {exists && (
+                <div className="glass p-6 rounded-2xl w-full text-center relative overflow-hidden flex flex-col items-center">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+                  <h3 className="text-blue-500 font-bold uppercase text-xs mb-4">
+                    {t.step2}
+                  </h3>
+
+                  <div className="flex gap-8 items-center">
+                    <div className="opacity-50 blur-[1px] scale-75">
+                      <div className="bracket p-2 grid grid-cols-2 gap-2">
+                        <div className="w-10 h-10 flex items-center justify-center bg-slate-800 text-sky-400 font-bold">
+                          {mat.a}
+                        </div>
+                        <div className="w-10 h-10 flex items-center justify-center bg-slate-800 text-pink-400 font-bold">
+                          {mat.b}
+                        </div>
+                        <div className="w-10 h-10 flex items-center justify-center bg-slate-800 text-emerald-400 font-bold">
+                          {mat.c}
+                        </div>
+                        <div className="w-10 h-10 flex items-center justify-center bg-slate-800 text-amber-400 font-bold">
+                          {mat.d}
+                        </div>
+                      </div>
+                    </div>
+                    <i className="fa-solid fa-arrow-right text-slate-500"></i>
+                    <div className="bracket p-4 grid grid-cols-2 gap-4">
+                      {/* Swapped a and d */}
+                      <div className="w-16 h-16 flex items-center justify-center bg-slate-700 rounded text-amber-400 font-bold text-2xl border-2 border-amber-500/50">
+                        {mat.d}
+                      </div>
+                      <div className="w-16 h-16 flex items-center justify-center bg-slate-700 rounded text-pink-200 font-bold text-2xl border-2 border-slate-500/50">
+                        {-mat.b}
+                      </div>
+                      <div className="w-16 h-16 flex items-center justify-center bg-slate-700 rounded text-emerald-200 font-bold text-2xl border-2 border-slate-500/50">
+                        {-mat.c}
+                      </div>
+                      <div className="w-16 h-16 flex items-center justify-center bg-slate-700 rounded text-sky-400 font-bold text-2xl border-2 border-sky-500/50">
+                        {mat.a}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 3: Result */}
+              {exists && (
+                <div className="glass p-6 rounded-2xl w-full text-center relative overflow-hidden flex flex-col items-center">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
+                  <h3 className="text-emerald-500 font-bold uppercase text-xs mb-4">
+                    {t.step3}
+                  </h3>
+                  <div className="flex items-center gap-4">
+                    <div className="text-2xl font-mono text-white">A⁻¹ = </div>
+                    <div className="bracket p-4 grid grid-cols-2 gap-2 font-mono">
+                      <div className="p-2 bg-slate-800 text-white rounded">
+                        {(mat.d / det).toFixed(3)}
+                      </div>
+                      <div className="p-2 bg-slate-800 text-white rounded">
+                        {(-mat.b / det).toFixed(3)}
+                      </div>
+                      <div className="p-2 bg-slate-800 text-white rounded">
+                        {(-mat.c / det).toFixed(3)}
+                      </div>
+                      <div className="p-2 bg-slate-800 text-white rounded">
+                        {(mat.a / det).toFixed(3)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      };
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

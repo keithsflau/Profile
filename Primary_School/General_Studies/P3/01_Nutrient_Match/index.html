@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小三常識：營養配對 | Nutrient Match</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Nutrient Match",
+          zh: "營養配對",
+          ja: "栄養素マッチ",
+        },
+        instruction: {
+          en: "Drag foods to their main nutrient!",
+          zh: "將食物拖放到對應的主要營養素！",
+          ja: "食べ物を主な栄養素にドラッグしてください！",
+        },
+
+        carbs: { en: "Carbohydrates", zh: "碳水化合物" },
+        protein: { en: "Protein", zh: "蛋白質" },
+        vitamins: { en: "Vitamins & Minerals", zh: "維生素和礦物質" },
+        fats: { en: "Fats", zh: "脂肪" },
+
+        rice: { en: "Rice", zh: "米飯" },
+        bread: { en: "Bread", zh: "麵包" },
+        noodle: { en: "Noodles", zh: "麵條" },
+
+        meat: { en: "Meat", zh: "肉類" },
+        egg: { en: "Egg", zh: "雞蛋" },
+        fish: { en: "Fish", zh: "魚" },
+
+        apple: { en: "Apple", zh: "蘋果" },
+        veg: { en: "Vegetables", zh: "蔬菜" },
+        orange: { en: "Orange", zh: "橙" },
+
+        oil: { en: "Oil", zh: "食用油" },
+        butter: { en: "Butter", zh: "牛油" },
+
+        correct: { en: "Correct!", zh: "答對了！" },
+        wrong: { en: "Try Again!", zh: "再試一次！" },
+
+        completed: { en: "Nutrition Expert!", zh: "營養小專家！" },
+        reset: { en: "Play Again", zh: "再玩一次" },
+
+        desc_carbs: { en: "Energy Source", zh: "能量來源" },
+        desc_protein: { en: "Builds Body", zh: "幫助生長" },
+        desc_vitamins: { en: "Health Guard", zh: "維持健康" },
+        desc_fats: { en: "Energy Storage", zh: "儲存能量" },
+      };
+
+      const categories = [
+        {
+          id: "carbs",
+          color: "bg-yellow-100",
+          border: "border-yellow-400",
+          text: "text-yellow-700",
+          icon: "⚡",
+        },
+        {
+          id: "protein",
+          color: "bg-red-100",
+          border: "border-red-400",
+          text: "text-red-700",
+          icon: "💪",
+        },
+        {
+          id: "vitamins",
+          color: "bg-green-100",
+          border: "border-green-400",
+          text: "text-green-700",
+          icon: "🛡️",
+        },
+        {
+          id: "fats",
+          color: "bg-orange-100",
+          border: "border-orange-400",
+          text: "text-orange-700",
+          icon: "🔋",
+        },
+      ];
+
+      const foods = [
+        { id: "rice", icon: "🍚", type: "carbs" },
+        { id: "bread", icon: "🍞", type: "carbs" },
+        { id: "meat", icon: "🥩", type: "protein" },
+        { id: "egg", icon: "🥚", type: "protein" },
+        { id: "apple", icon: "🍎", type: "vitamins" },
+        { id: "veg", icon: "🥬", type: "vitamins" },
+        { id: "oil", icon: "🫗", type: "fats" },
+        { id: "butter", icon: "🧈", type: "fats" },
+        { id: "fish", icon: "🐟", type: "protein" },
+        { id: "noodle", icon: "🍜", type: "carbs" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [queue, setQueue] = useState([]);
+        const [current, setCurrent] = useState(null);
+        const [feedback, setFeedback] = useState(null);
+        const [completedCategories, setCompletedCategories] = useState({}); // Counts
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        useEffect(() => {
+          initGame();
+        }, []);
+
+        const initGame = () => {
+          const q = [...foods].sort(() => Math.random() - 0.5);
+          setQueue(q);
+          setCurrent(q[0]);
+          setFeedback(null);
+          setCompletedCategories({});
+        };
+
+        const handleSort = (catId) => {
+          if (feedback) return;
+          if (current.type === catId) {
+            setFeedback({ status: "correct", catId });
+            setTimeout(() => {
+              setFeedback(null);
+              const nextIdx = queue.indexOf(current) + 1;
+              if (nextIdx < queue.length) setCurrent(queue[nextIdx]);
+              else setCurrent(null);
+            }, 800);
+          } else {
+            setFeedback({ status: "wrong" });
+            setTimeout(() => setFeedback(null), 800);
+          }
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center select-none overflow-hidden font-sans">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-rose-800 mb-4 mt-8 drop-shadow-sm bg-white/50 px-6 py-2 rounded-full">
+              🥗 {getText("title")}
+            </h1>
+
+            {/* Draggable Item */}
+            <div className="flex-1 flex flex-col items-center justify-center w-full relative">
+              <AnimatePresence mode="wait">
+                {current ? (
+                  <motion.div
+                    key={current.id}
+                    initial={{ scale: 0, y: 50, rotate: -10 }}
+                    animate={{ scale: 1, y: 0, rotate: 0 }}
+                    exit={{ scale: 0, opacity: 0 }}
+                    className="bg-white p-8 rounded-full shadow-2xl border-8 border-rose-200 w-48 h-48 flex flex-col items-center justify-center z-20 cursor-grab active:cursor-grabbing hover:scale-105 transition-transform"
+                    drag
+                    dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+                    dragElastic={0.2}
+                    onDragEnd={(e, info) => {
+                      // Simple proximity Logic could go here, but button tapping is smoother for P3 on tablets
+                      // We keep instructions simple: Drag visually, but Tap to select is easier to impl reliably
+                    }}
+                  >
+                    <div className="text-7xl mb-2">{current.icon}</div>
+                    <div className="font-bold text-slate-600">
+                      {getText(current.id)}
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="bg-white/90 p-12 rounded-3xl shadow-xl text-center z-20"
+                  >
+                    <div className="text-8xl mb-4">🏆</div>
+                    <h2 className="text-3xl font-black text-rose-800 mb-6">
+                      {getText("completed")}
+                    </h2>
+                    <button
+                      onClick={initGame}
+                      className="bg-rose-500 text-white px-10 py-4 rounded-full font-black text-xl hover:bg-rose-600 shadow-xl"
+                    >
+                      {getText("reset")} 🔄
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {feedback && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-6 rounded-3xl font-black text-4xl shadow-2xl z-30 whitespace-nowrap ${
+                    feedback.status === "correct"
+                      ? "bg-green-500 text-white"
+                      : "bg-red-500 text-white"
+                  }`}
+                >
+                  {getText(feedback.status)}
+                </motion.div>
+              )}
+            </div>
+
+            <p className="font-bold text-rose-800 text-lg mb-6 bg-white/60 px-4 py-1 rounded-full">
+              {getText("instruction")}
+            </p>
+
+            {/* Buckets */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full max-w-6xl mb-8">
+              {categories.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => handleSort(cat.id)}
+                  className={`${cat.color} ${cat.border} border-y-4 rounded-3xl p-4 flex flex-col items-center shadow-lg active:scale-95 transition-all relative overflow-hidden group h-40 justify-between`}
+                >
+                  <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity text-6xl">
+                    {cat.icon}
+                  </div>
+                  <div className="text-4xl">{cat.icon}</div>
+                  <div
+                    className={`font-black text-xl md:text-2xl ${cat.text} text-center leading-none`}
+                  >
+                    {getText(cat.id)}
+                  </div>
+                  <div className="text-xs font-bold text-slate-500 bg-white/50 px-2 py-1 rounded-full">
+                    {getText(`desc_${cat.id}`)}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

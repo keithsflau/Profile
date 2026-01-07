@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小五數學：容量與體積 | Capacity and Volume</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #dbeafe 0%, #3b82f6 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Capacity and Volume",
+          zh: "容量與體積",
+          ja: "容積と体積",
+          ko: "용량과 부피",
+          es: "Capacidad y Volumen",
+          de: "Kapazität und Volumen",
+          fi: "Kapasiteetti ja tilavuus",
+          fr: "Capacité et volume",
+          ar: "السعة والحجم",
+          it: "Capacità e Volume",
+        },
+        length: {
+          en: "Length L",
+          zh: "長 L",
+          ja: "長さ L",
+          ko: "길이 L",
+          es: "Longitud L",
+          de: "Länge L",
+          fi: "Pituus L",
+          fr: "Longueur L",
+          ar: "الطول L",
+          it: "Lunghezza L",
+        },
+        width: {
+          en: "Width W",
+          zh: "闊 W",
+          ja: "幅 W",
+          ko: "너비 W",
+          es: "Ancho W",
+          de: "Breite B",
+          fi: "Leveys L",
+          fr: "Largeur l",
+          ar: "العرض W",
+          it: "Larghezza W",
+        },
+        height: {
+          en: "Height H",
+          zh: "高 H",
+          ja: "高さ H",
+          ko: "높이 H",
+          es: "Altura H",
+          de: "Höhe H",
+          fi: "Korkeus K",
+          fr: "Hauteur H",
+          ar: "الارتفاع H",
+          it: "Altezza H",
+        },
+        fillLevel: {
+          en: "Fill Level",
+          zh: "裝水量",
+          ja: "水位",
+          ko: "채운 양",
+          es: "Nivel de llenado",
+          de: "Füllstand",
+          fi: "Täyttöaste",
+          fr: "Niveau de remplissage",
+          ar: "مستوى الامتلاء",
+          it: "Livello di riempimento",
+        },
+        containerVolume: {
+          en: "Container Volume:",
+          zh: "容器體積:",
+          ja: "容器の体積:",
+          ko: "용기 부피:",
+          es: "Volumen del Contenedor:",
+          de: "Behältervolumen:",
+          fi: "Säiliön tilavuus:",
+          fr: "Volume du conteneur :",
+          ar: "حجم الحاوية:",
+          it: "Volume del contenitore:",
+        },
+        capacity: {
+          en: "Capacity:",
+          zh: "容量:",
+          ja: "容積:",
+          ko: "용량:",
+          es: "Capacidad:",
+          de: "Kapazität:",
+          fi: "Kapasiteetti:",
+          fr: "Capacité :",
+          ar: "السعة:",
+          it: "Capacità:",
+        },
+        currentWater: {
+          en: "Current Water:",
+          zh: "現裝水量:",
+          ja: "現在の水量:",
+          ko: "현재 물의 양:",
+          es: "Agua Actual:",
+          de: "Aktuelle Wassermenge:",
+          fi: "Nykyinen vesimäärä:",
+          fr: "Eau actuelle :",
+          ar: "الماء الحالي:",
+          it: "Acqua attuale:",
+        },
+        tipTitle: {
+          en: "Remember: 1 cm³ = 1 mL",
+          zh: "記住: 1 cm³ = 1 mL",
+          ja: "覚えておこう: 1 cm³ = 1 mL",
+          ko: "기억하세요: 1 cm³ = 1 mL",
+          es: "Recuerda: 1 cm³ = 1 mL",
+          de: "Merke: 1 cm³ = 1 mL",
+          fi: "Muista: 1 cm³ = 1 mL",
+          fr: "Rappelez-vous : 1 cm³ = 1 mL",
+          ar: "تذكر: 1 cm³ = 1 mL",
+          it: "Ricorda: 1 cm³ = 1 mL",
+        },
+        tipText: {
+          en: "Volume describes the space occupied by an object, Capacity describes how much liquid a container can hold.",
+          zh: "體積 (Volume) 描述物體佔用的空間，容量 (Capacity) 描述容器能裝多少液體。",
+          ja: "体積は物体が占める空間を表し、容積は容器にどれくらいの液体が入るかを表します。",
+          ko: "부피는 물체가 차지하는 공간을 의미하고, 용량은 용기가 담을 수 있는 액체의 양을 의미합니다.",
+          es: "El volumen describe el espacio ocupado por un objeto, la capacidad describe cuánto líquido puede contener un recipiente.",
+          de: "Volumen beschreibt den von einem Objekt eingenommenen Raum, Kapazität beschreibt, wie viel Flüssigkeit ein Behälter fassen kann.",
+          fi: "Tilavuus kuvaa esineen viemää tilaa, kapasiteetti kuvaa kuinka paljon nestettä säiliöön mahtuu.",
+          fr: "Le volume décrit l'espace occupé par un objet, la capacité décrit la quantité de liquide qu'un conteneur peut contenir.",
+          ar: "الحجم يصف الحيز الذي يشغله الجسم، بينما السعة تصف كمية السائل التي يمكن أن تحتويها الحاوية.",
+          it: "Il volume descrive lo spazio occupato da un oggetto, la capacità descrive quanto liquido può contenere un contenitore.",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const [l, setL] = useState(10);
+        const [w, setW] = useState(8);
+        const [h, setH] = useState(6);
+        const [fillPercent, setFillPercent] = useState(75);
+
+        const totalVolume = l * w * h;
+        const capacity = totalVolume; // 1 cm³ = 1 mL
+        const filledVolume = Math.round((totalVolume * fillPercent) / 100);
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-5xl font-black text-blue-100 mb-2 mt-8">
+              💧 {getText("title")}
+            </h1>
+
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-4xl w-full mt-8">
+              <div className="flex flex-col md:flex-row gap-8 items-center">
+                <div className="flex-1">
+                  <svg
+                    viewBox="0 0 200 180"
+                    className="w-full max-w-xs mx-auto"
+                  >
+                    {/* Container */}
+                    <rect
+                      x="40"
+                      y="30"
+                      width="120"
+                      height="120"
+                      fill="none"
+                      stroke="#3b82f6"
+                      strokeWidth="3"
+                    />
+                    {/* Water */}
+                    <rect
+                      x="40"
+                      y={30 + 120 * (1 - fillPercent / 100)}
+                      width="120"
+                      height={(120 * fillPercent) / 100}
+                      fill="#60a5fa"
+                      opacity="0.7"
+                    />
+                    {/* Dimensions */}
+                    <text
+                      x="100"
+                      y="165"
+                      textAnchor="middle"
+                      className="text-xs font-bold fill-blue-800"
+                    >
+                      {l} cm
+                    </text>
+                    <text
+                      x="170"
+                      y="90"
+                      className="text-xs font-bold fill-blue-800"
+                    >
+                      {h} cm
+                    </text>
+                  </svg>
+                </div>
+                <div className="flex-1 space-y-4">
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="text-sm font-bold text-blue-800">
+                        {getText("length")}
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="20"
+                        value={l}
+                        onChange={(e) => setL(parseInt(e.target.value) || 1)}
+                        className="w-full text-xl text-center border-2 rounded p-1"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-bold text-blue-800">
+                        {getText("width")}
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="20"
+                        value={w}
+                        onChange={(e) => setW(parseInt(e.target.value) || 1)}
+                        className="w-full text-xl text-center border-2 rounded p-1"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-bold text-blue-800">
+                        {getText("height")}
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="20"
+                        value={h}
+                        onChange={(e) => setH(parseInt(e.target.value) || 1)}
+                        className="w-full text-xl text-center border-2 rounded p-1"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block font-bold text-blue-800 mb-1">
+                      {getText("fillLevel")}: {fillPercent}%
+                    </label>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={fillPercent}
+                      onChange={(e) => setFillPercent(parseInt(e.target.value))}
+                      className="w-full accent-blue-500"
+                    />
+                  </div>
+                  <div className="bg-blue-50 rounded-xl p-4 border-2 border-blue-200">
+                    <p>
+                      <b>{getText("containerVolume")}</b> {l} × {w} × {h} ={" "}
+                      {totalVolume} cm³
+                    </p>
+                    <p>
+                      <b>{getText("capacity")}</b> {capacity} mL ={" "}
+                      {(capacity / 1000).toFixed(2)} L
+                    </p>
+                    <p>
+                      <b>{getText("currentWater")}</b> {filledVolume} mL
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-6 bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
+                <p className="font-bold">💡 {getText("tipTitle")}</p>
+                <p className="text-sm">{getText("tipText")}</p>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

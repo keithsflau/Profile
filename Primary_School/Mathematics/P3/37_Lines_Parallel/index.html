@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小三數學：平行與垂直</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+
+      function App() {
+        const [mode, setMode] = useState("parallel"); // parallel, perpendicular
+        const [angle, setAngle] = useState(0);
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-5xl font-black text-teal-900 mb-8">
+              平行與垂直
+            </h1>
+
+            <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full">
+              <div className="flex gap-4 justify-center mb-8">
+                <button
+                  onClick={() => {
+                    setMode("parallel");
+                    setAngle(0);
+                  }}
+                  className={`px-8 py-3 rounded-xl font-bold text-xl transition-all ${
+                    mode === "parallel"
+                      ? "bg-teal-500 text-white shadow-lg scale-105"
+                      : "bg-teal-100 text-teal-800"
+                  }`}
+                >
+                  平行線 (Parallel)
+                </button>
+                <button
+                  onClick={() => {
+                    setMode("perpendicular");
+                    setAngle(0);
+                  }}
+                  className={`px-8 py-3 rounded-xl font-bold text-xl transition-all ${
+                    mode === "perpendicular"
+                      ? "bg-teal-500 text-white shadow-lg scale-105"
+                      : "bg-teal-100 text-teal-800"
+                  }`}
+                >
+                  垂直線 (Perpendicular)
+                </button>
+              </div>
+
+              <div className="relative h-96 bg-slate-50 rounded-2xl border-4 border-slate-200 overflow-hidden flex items-center justify-center">
+                {/* Grid Background */}
+                <div
+                  className="absolute inset-0 opacity-20"
+                  style={{
+                    backgroundImage:
+                      "linear-gradient(#cbd5e1 1px, transparent 1px), linear-gradient(90deg, #cbd5e1 1px, transparent 1px)",
+                    backgroundSize: "40px 40px",
+                  }}
+                ></div>
+
+                {/* Lines */}
+                <div
+                  className="relative w-full h-full flex items-center justify-center transition-transform duration-500"
+                  style={{ transform: `rotate(${angle}deg)` }}
+                >
+                  {mode === "parallel" && (
+                    <>
+                      <div
+                        className="absolute h-2 w-64 bg-teal-600 rounded-full shadow-md"
+                        style={{ transform: "translateY(-40px)" }}
+                      >
+                        <div className="absolute -left-8 top-1/2 -translate-y-1/2 text-2xl">
+                          🛤️
+                        </div>
+                      </div>
+                      <div
+                        className="absolute h-2 w-64 bg-teal-600 rounded-full shadow-md"
+                        style={{ transform: "translateY(40px)" }}
+                      >
+                        <div className="absolute -left-8 top-1/2 -translate-y-1/2 text-2xl">
+                          🛤️
+                        </div>
+                      </div>
+                      {/* Reference arrows showing constant distance */}
+                      <div
+                        className="absolute h-20 w-px border-l-2 border-dashed border-slate-400 flex items-center justify-center"
+                        style={{ left: "50%" }}
+                      >
+                        <span className="bg-slate-50 px-1 text-xs text-slate-500 font-bold">
+                          永不相交
+                        </span>
+                      </div>
+                    </>
+                  )}
+
+                  {mode === "perpendicular" && (
+                    <>
+                      <div className="absolute h-2 w-80 bg-red-500 rounded-full shadow-md"></div>
+                      <div className="absolute w-2 h-80 bg-red-500 rounded-full shadow-md"></div>
+                      {/* Right angle marker */}
+                      <div
+                        className="absolute w-8 h-8 border-t-4 border-r-4 border-slate-400"
+                        style={{
+                          top: "50%",
+                          left: "50%",
+                          transform: "translate(0, -100%)",
+                        }}
+                      ></div>
+                      <div className="absolute top-1/2 left-1/2 -translate-y-full translate-x-1 pl-2 pb-2 font-black text-slate-400">
+                        90°
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-8">
+                <label className="block text-center font-bold text-teal-800 mb-2">
+                  旋轉看看
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="360"
+                  value={angle}
+                  onChange={(e) => setAngle(parseInt(e.target.value))}
+                  className="w-full h-3 bg-teal-200 rounded-lg appearance-none cursor-pointer"
+                />
+              </div>
+
+              <div className="mt-8 bg-teal-50 p-6 rounded-2xl flex items-start gap-4">
+                <div className="text-4xl">💡</div>
+                <div>
+                  <h3 className="font-bold text-teal-900 text-lg mb-2">
+                    {mode === "parallel" ? "平行線特點" : "垂直線特點"}
+                  </h3>
+                  <p className="text-teal-700">
+                    {mode === "parallel"
+                      ? "兩條直線之間的距離永遠相等，而且永不相交，像火車軌一樣。"
+                      : "兩條直線相交成直角 (90度)，像十字路口或書本的角一樣。"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

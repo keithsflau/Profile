@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小三常識：好公民 | Smart Citizen</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Smart Citizen",
+          zh: "好公民",
+          ja: "スマート市民",
+          ko: "스마트 시민",
+          es: "Ciudadano Inteligente",
+          de: "Smarter Bürger",
+          fi: "Fiksu kansalainen",
+          fr: "Citoyen intelligent",
+          ar: "مواطن ذكي",
+          it: "Cittadino Intelligente",
+        },
+        instruction: {
+          en: "Is this behavior good?",
+          zh: "這種行為正確嗎？",
+          ja: "この行動は正しいですか？",
+          ko: "이 행동은 올바른가요?",
+          es: "¿Es este comportamiento bueno?",
+          de: "Ist dieses Verhalten gut?",
+          fi: "Onko tämä käytös hyvää?",
+          fr: "Ce comportement est-il bon ?",
+          ar: "هل هذا السلوك جيد؟",
+          it: "Questo comportamento è buono?",
+        },
+
+        good: {
+          en: "Good",
+          zh: "正確",
+          ja: "良い",
+          ko: "좋음",
+          es: "Bueno",
+          de: "Gut",
+          fi: "Hyvä",
+          fr: "Bien",
+          ar: "جيد",
+          it: "Buono",
+        },
+        bad: {
+          en: "Bad",
+          zh: "錯誤",
+          ja: "悪い",
+          ko: "나쁨",
+          es: "Malo",
+          de: "Schlecht",
+          fi: "Huono",
+          fr: "Mauvais",
+          ar: "سيء",
+          it: "Cattivo",
+        },
+
+        q1: {
+          en: "Queuing up politely",
+          zh: "守秩序排隊",
+          ja: "礼儀正しく並ぶ",
+          ko: "질서 있게 줄 서기",
+          es: "Hacer cola educadamente",
+          de: "Höflich anstehen",
+          fi: "Jonottaa kohteliaasti",
+          fr: "Faire la queue poliment",
+          ar: "الاصطفاف بأدب",
+          it: "Fare la fila educatamente",
+        },
+        q2: {
+          en: "Talking loudly on bus",
+          zh: "在巴士上大聲說話",
+          ja: "バスで大声で話す",
+          ko: "버스에서 크게 말하기",
+          es: "Hablar alto en el autobús",
+          de: "Laut im Bus sprechen",
+          fi: "Puhua kovaa bussissa",
+          fr: "Parler fort dans le bus",
+          ar: "التحدث بصوت عال في الحافلة",
+          it: "Parlare ad alta voce sull'autobus",
+        },
+        q3: {
+          en: "Helping elderly crossing",
+          zh: "扶長者過馬路",
+          ja: "高齢者の横断を手伝う",
+          ko: "노인 길 건너기 돕기",
+          es: "Ayudar a ancianos a cruzar",
+          de: "Älteren beim Überqueren helfen",
+          fi: "Auttaa vanhuksia ylittämään",
+          fr: "Aider les personnes âgées à traverser",
+          ar: "مساعدة كبار السن في العبور",
+          it: "Aiutare gli anziani ad attraversare",
+        },
+        q4: {
+          en: "Littering on street",
+          zh: "亂拋垃圾",
+          ja: "道にゴミを捨てる",
+          ko: "길에 쓰레기 버리기",
+          es: "Tirar basura en la calle",
+          de: "Müll auf die Straße werfen",
+          fi: "Roskaaminen kadulla",
+          fr: "Jeter des déchets dans la rue",
+          ar: "رمي القمامة في الشارع",
+          it: "Gettare rifiuti per strada",
+        },
+        q5: {
+          en: "Wasting water",
+          zh: "浪費食水",
+          ja: "水を無駄にする",
+          ko: "물 낭비하기",
+          es: "Desperdiciar agua",
+          de: "Wasser verschwenden",
+          fi: "Veden tuhlaaminen",
+          fr: "Gaspiller l'eau",
+          ar: "هدر المياه",
+          it: "Sprecare acqua",
+        },
+        q6: {
+          en: "Returning lost items",
+          zh: "路不拾遺",
+          ja: "落とし物を届ける",
+          ko: "분실물 돌려주기",
+          es: "Devolver objetos perdidos",
+          de: "Verlorene Gegenstände zurückgeben",
+          fi: "Kadonneiden tavaroiden palauttaminen",
+          fr: "Rendre les objets perdus",
+          ar: "إعادة العناصر المفقودة",
+          it: "Restituire oggetti smarriti",
+        },
+
+        correct: {
+          en: "Correct!",
+          zh: "答對了！",
+          ja: "正解！",
+          ko: "정답입니다!",
+          es: "¡Correcto!",
+          de: "Richtig!",
+          fi: "Oikein!",
+          fr: "Correct !",
+          ar: "صحيح!",
+          it: "Corretto!",
+        },
+        wrong: {
+          en: "Think again!",
+          zh: "想一想！",
+          ja: "もう一度考えて！",
+          ko: "다시 생각해보세요!",
+          es: "¡Piénsalo de nuevo!",
+          de: "Denk nochmal nach!",
+          fi: "Mieti uudelleen!",
+          fr: "Réfléchissez encore !",
+          ar: "فكر مرة أخرى!",
+          it: "Pensaci ancora!",
+        },
+        completed: {
+          en: "Model Citizen!",
+          zh: "模範好公民！",
+          ja: "模範市民！",
+          ko: "모범 시민!",
+          es: "¡Ciudadano Modelo!",
+          de: "Vorbildlicher Bürger!",
+          fi: "Mallikansalainen!",
+          fr: "Citoyen modèle !",
+          ar: "مواطن نموذجي!",
+          it: "Cittadino Modello!",
+        },
+        reset: {
+          en: "Play Again",
+          zh: "再玩一次",
+          ja: "もう一度プレイ",
+          ko: "다시 하기",
+          es: "Jugar de Nuevo",
+          de: "Nochmal spielen",
+          fi: "Pelaa uudelleen",
+          fr: "Rejouer",
+          ar: "العب مرة أخرى",
+          it: "Gioca di Nuovo",
+        },
+        score: {
+          en: "Civic Score",
+          zh: "公民分",
+          ja: "市民スコア",
+          ko: "시민 점수",
+          es: "Puntuación Cívica",
+          de: "Bürger-Punktestand",
+          fi: "Kansalaispisteet",
+          fr: "Score civique",
+          ar: "النتيجة المدنية",
+          it: "Punteggio Civico",
+        },
+      };
+
+      const scenarios = [
+        { id: "q1", type: "good", icon: "🧍🧍‍♀️🧍‍♂️" },
+        { id: "q2", type: "bad", icon: "🗣️🚌" },
+        { id: "q3", type: "good", icon: "👵🤝" },
+        { id: "q4", type: "bad", icon: "🚯" },
+        { id: "q5", type: "bad", icon: "🚰💧" },
+        { id: "q6", type: "good", icon: "👛👮" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [queue, setQueue] = useState([]);
+        const [current, setCurrent] = useState(null);
+        const [score, setScore] = useState(0);
+        const [feedback, setFeedback] = useState(null);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        useEffect(() => {
+          initGame();
+        }, []);
+
+        const initGame = () => {
+          const q = [...scenarios].sort(() => Math.random() - 0.5);
+          setQueue(q);
+          setCurrent(q[0]);
+          setScore(0);
+          setFeedback(null);
+        };
+
+        const handleAnswer = (ans) => {
+          // good or bad
+          if (feedback) return;
+
+          const isCorrect = ans === current.type;
+          if (isCorrect) {
+            setScore((s) => s + 10);
+            setFeedback("correct");
+          } else {
+            setScore((s) => Math.max(0, s - 5));
+            setFeedback("wrong");
+          }
+
+          setTimeout(() => {
+            setFeedback(null);
+            const nextIdx = queue.indexOf(current) + 1;
+            if (nextIdx < queue.length) setCurrent(queue[nextIdx]);
+            else setCurrent(null);
+          }, 800);
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center select-none font-sans overflow-hidden">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-violet-800 mb-4 mt-8 drop-shadow-sm bg-white/50 px-6 py-2 rounded-full">
+              🤝 {getText("title")}
+            </h1>
+
+            {current ? (
+              <div className="w-full max-w-md flex flex-col items-center flex-1 justify-center relative">
+                <div className="absolute top-0 right-0 lg:-right-32 font-bold bg-white text-violet-600 px-4 py-2 rounded-xl shadow">
+                  {getText("score")}: {score}
+                </div>
+
+                {/* Card */}
+                <motion.div
+                  key={current.id}
+                  initial={{ scale: 0.8, opacity: 0, rotate: -5 }}
+                  animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                  exit={{ scale: 1.2, opacity: 0 }}
+                  className="bg-white p-12 rounded-[2.5rem] shadow-2xl border-b-8 border-violet-200 mb-8 flex flex-col items-center text-center w-full aspect-square justify-center relative z-20"
+                >
+                  <div className="text-9xl mb-6">{current.icon}</div>
+                  <h2 className="text-3xl font-black text-slate-800 leading-tight">
+                    {getText(current.id)}
+                  </h2>
+
+                  {feedback && (
+                    <div
+                      className={`absolute inset-0 bg-white/90 rounded-[2rem] flex items-center justify-center font-black text-4xl whitespace-nowrap ${
+                        feedback === "correct"
+                          ? "text-green-600"
+                          : "text-red-500"
+                      }`}
+                    >
+                      {getText(feedback)}
+                    </div>
+                  )}
+                </motion.div>
+
+                <p className="font-bold text-violet-900 mb-8 text-xl opacity-80">
+                  {getText("instruction")}
+                </p>
+
+                <div className="flex gap-6 w-full">
+                  <button
+                    onClick={() => handleAnswer("good")}
+                    disabled={feedback}
+                    className="flex-1 bg-green-500 text-white rounded-2xl py-6 font-black text-3xl shadow-xl border-b-8 border-green-700 active:border-b-0 active:translate-y-2 hover:bg-green-400 transition-colors"
+                  >
+                    👍{" "}
+                    <span className="text-lg block mt-2 opacity-80">
+                      {getText("good")}
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => handleAnswer("bad")}
+                    disabled={feedback}
+                    className="flex-1 bg-red-500 text-white rounded-2xl py-6 font-black text-3xl shadow-xl border-b-8 border-red-700 active:border-b-0 active:translate-y-2 hover:bg-red-400 transition-colors"
+                  >
+                    👎{" "}
+                    <span className="text-lg block mt-2 opacity-80">
+                      {getText("bad")}
+                    </span>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white/90 p-12 rounded-3xl shadow-xl text-center mt-20">
+                <div className="text-8xl mb-4">🏅</div>
+                <h2 className="text-3xl font-black text-violet-800 mb-6">
+                  {getText("completed")}
+                </h2>
+                <p className="text-xl text-slate-500 font-bold mb-8">
+                  {getText("score")}: {score}
+                </p>
+                <button
+                  onClick={initGame}
+                  className="bg-violet-600 text-white px-10 py-4 rounded-full font-black text-xl hover:bg-violet-700 shadow-xl"
+                >
+                  {getText("reset")} 🔄
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小六數學：代數式 | Algebraic Expressions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #dbeafe 0%, #3b82f6 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      function App() {
+        // Simple quiz for translating phrases to expressions
+        const problems = [
+          { q: "x 加上 5 (x plus 5)", ans: "x + 5" },
+          { q: "y 減去 3 (y minus 3)", ans: "y - 3" },
+          { q: "k 的 4 倍 (4 times k)", ans: "4k" },
+          { q: "m 除以 2 (m divided by 2)", ans: "m / 2" },
+          { q: "10 減去 z (10 minus z)", ans: "10 - z" },
+          { q: "n 的一半 (half of n)", ans: "n / 2" },
+        ];
+
+        const [flipped, setFlipped] = useState(
+          Array(problems.length).fill(false)
+        );
+
+        const toggle = (i) => {
+          const newFlipped = [...flipped];
+          newFlipped[i] = !newFlipped[i];
+          setFlipped(newFlipped);
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-5xl font-black text-blue-900 mb-2">
+              🔤 代數式
+            </h1>
+            <p className="text-xl text-blue-700 font-bold mb-8">
+              Algebraic Expressions
+            </p>
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-4xl w-full">
+              <p className="text-center text-lg mb-6 text-slate-600">
+                點擊卡片查看代數式 Click cards to reveal expressions
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {problems.map((p, i) => (
+                  <div
+                    key={i}
+                    onClick={() => toggle(i)}
+                    className="aspect-video cursor-pointer perspective-1000 group"
+                  >
+                    <div
+                      className={`relative w-full h-full duration-500 preserve-3d transition-transform ${
+                        flipped[i] ? "rotate-y-180" : ""
+                      }`}
+                      style={{
+                        transformStyle: "preserve-3d",
+                        transform: flipped[i]
+                          ? "rotateY(180deg)"
+                          : "rotateY(0deg)",
+                      }}
+                    >
+                      {/* Front */}
+                      <div
+                        className="absolute w-full h-full bg-blue-100 rounded-2xl border-4 border-blue-300 flex items-center justify-center p-4 backface-hidden shadow-lg hover:bg-blue-200"
+                        style={{ backfaceVisibility: "hidden" }}
+                      >
+                        <p className="font-bold text-center text-blue-900 text-lg">
+                          {p.q}
+                        </p>
+                      </div>
+                      {/* Back */}
+                      <div
+                        className="absolute w-full h-full bg-indigo-500 rounded-2xl border-4 border-indigo-600 flex items-center justify-center p-4 backface-hidden shadow-lg rotate-y-180"
+                        style={{
+                          backfaceVisibility: "hidden",
+                          transform: "rotateY(180deg)",
+                        }}
+                      >
+                        <p className="font-black text-center text-white text-3xl font-mono">
+                          {p.ans}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-8 bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
+                <p className="font-bold">📝 書寫規則:</p>
+                <ul className="list-disc list-inside text-sm mt-1 space-y-1">
+                  <li>
+                    乘號通常省略: 4 × k 寫成 <b>4k</b>
+                  </li>
+                  <li>
+                    除號寫成分數形式: m ÷ 2 寫成 <b>m/2</b>
+                  </li>
+                  <li>
+                    數字通常寫在字母前面: k × 4 寫成 <b>4k</b>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

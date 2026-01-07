@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Binary Basics | S1 Math</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", sans-serif;
+      }
+      .card-inner {
+        transition: transform 0.6s;
+        transform-style: preserve-3d;
+      }
+      .flipped .card-inner {
+        transform: rotateY(180deg);
+      }
+      .front,
+      .back {
+        backface-visibility: hidden;
+      }
+      .back {
+        transform: rotateY(180deg);
+      }
+    </style>
+  </head>
+  <body class="bg-slate-900 text-white min-h-screen">
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+
+      const App = () => {
+        // 5 bits: 16, 8, 4, 2, 1
+        const [bits, setBits] = useState([0, 1, 0, 1, 1]); // 0 or 1
+
+        const toggle = (i) => {
+          const newBits = [...bits];
+          newBits[i] = newBits[i] === 0 ? 1 : 0;
+          setBits(newBits);
+        };
+
+        const decimal = bits.reduce((acc, bit, i) => {
+          const power = bits.length - 1 - i;
+          return acc + bit * Math.pow(2, power);
+        }, 0);
+
+        return (
+          <div className="p-8 max-w-5xl mx-auto min-h-screen flex flex-col items-center">
+            <header className="mb-12 text-center">
+              <div className="text-blue-400 font-bold uppercase text-xs tracking-widest mb-2">
+                Unit 3: Data
+              </div>
+              <h1 className="text-4xl font-extrabold text-white">
+                Binary Basics
+              </h1>
+              <p className="text-slate-400">
+                Computers count with only 0s and 1s.
+              </p>
+            </header>
+
+            {/* Cards Container */}
+            <div className="flex gap-4 mb-4 justify-center flex-wrap">
+              {bits.map((bit, i) => {
+                const power = bits.length - 1 - i;
+                const value = Math.pow(2, power);
+
+                return (
+                  <div key={i} className="flex flex-col items-center gap-4">
+                    <div className="text-slate-400 font-mono text-sm uppercase">
+                      2<sup>{power}</sup>
+                    </div>
+
+                    <div
+                      onClick={() => toggle(i)}
+                      className={`w-24 h-36 cursor-pointer relative perspective-1000 ${
+                        bit ? "" : "flipped"
+                      }`}
+                    >
+                      <div className="card-inner w-full h-full relative transition-all duration-500 transform-style-3d">
+                        {/* Front (Value Shown - 1) */}
+                        <div
+                          className={`front absolute inset-0 bg-white rounded-xl shadow-xl flex flex-col items-center justify-center backface-hidden ${
+                            !bit ? "hidden" : ""
+                          }`}
+                        >
+                          {/* Using standard flip logic: bit 1 = Show Dots. bit 0 = Show Blank/Back.
+                                                     Wait, standard binary cards logic: Side A has dots. Side B is blank.
+                                                     If bit 1, we show Side A.
+                                                     If bit 0, we show Side B.
+                                                 */}
+                          <div className="text-4xl font-extrabold text-slate-900 mb-2">
+                            {value}
+                          </div>
+                          <div className="grid grid-cols-4 gap-1 p-2">
+                            {Array.from({ length: value }).map((_, k) => (
+                              <div
+                                key={k}
+                                className="w-1.5 h-1.5 bg-black rounded-full"
+                              ></div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Back (Hidden - 0) */}
+                        <div
+                          className={`back absolute inset-0 bg-slate-800 rounded-xl shadow-inner border-2 border-slate-700 flex items-center justify-center backface-hidden ${
+                            bit ? "hidden" : ""
+                          }`}
+                          style={{ transform: "none" }}
+                        >
+                          {/* Wait conceptual flip. If bit=0, show Back. If bit=1 show front.
+                                                     My CSS logic above: flipped class applies rotateY.
+                                                     If bit 0, flipped -> rotate 180.
+                                                     Back face usually has rotate 180.
+                                                     Let's simplify without 3D flip first for robustness, just conditionally render.
+                                                 */}
+                          <div className="text-4xl font-extrabold text-slate-600">
+                            0
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Simple Overlay switch visual if 3D fails or for clarity */}
+                      <div
+                        className={`absolute inset-0 rounded-xl transition-all duration-300 ${
+                          bit
+                            ? "bg-white text-slate-900"
+                            : "bg-slate-800 text-slate-500 border-2 border-slate-700"
+                        } flex flex-col items-center justify-center`}
+                      >
+                        <div className="text-5xl font-extrabold">
+                          {bit ? value : 0}
+                        </div>
+                        {bit && (
+                          <div className="absolute bottom-2 flex flex-wrap gap-1 justify-center px-2 max-w-full">
+                            {Array.from({ length: Math.min(value, 16) }).map(
+                              (_, k) => (
+                                <div
+                                  key={k}
+                                  className="w-1.5 h-1.5 bg-slate-900 rounded-full"
+                                ></div>
+                              )
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="text-2xl font-mono font-bold text-blue-400">
+                      {bit}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Result */}
+            <div className="mt-12 bg-slate-800 p-8 rounded-3xl border border-slate-700 text-center max-w-2xl w-full">
+              <div className="flex items-center justify-center gap-2 text-3xl font-mono text-slate-400 mb-4">
+                {bits.map((b, i) => {
+                  const val = b * Math.pow(2, bits.length - 1 - i);
+                  return (
+                    <React.Fragment key={i}>
+                      <span
+                        className={b ? "text-white font-bold" : "opacity-30"}
+                      >
+                        {val}
+                      </span>
+                      {i < bits.length - 1 && <span>+</span>}
+                    </React.Fragment>
+                  );
+                })}
+              </div>
+              <div className="text-6xl font-extrabold text-white mb-2">
+                = {decimal}
+              </div>
+              <div className="text-blue-400 font-bold uppercase tracking-widest text-sm">
+                Decimal Value
+              </div>
+            </div>
+
+            <footer className="mt-12">
+              <a
+                href="../index.html"
+                className="text-slate-400 hover:text-white font-bold"
+              >
+                <i className="fa-solid fa-arrow-left mr-2"></i> Back to
+                Dashboard
+              </a>
+            </footer>
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

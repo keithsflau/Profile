@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小六數學：百分數變化 | Percentage Change</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fce7f3 0%, #ec4899 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      function App() {
+        const [oldVal, setOldVal] = useState(50);
+        const [newVal, setNewVal] = useState(60);
+
+        const change = newVal - oldVal;
+        const percentChange = (change / oldVal) * 100;
+        const isIncrease = change >= 0;
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-5xl font-black text-pink-900 mb-2">
+              📊 百分數變化
+            </h1>
+            <p className="text-xl text-pink-700 font-bold mb-8">
+              Percentage Change
+            </p>
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-2xl w-full">
+              <div className="grid grid-cols-2 gap-6 mb-8">
+                <div className="text-center">
+                  <label className="block font-bold text-pink-700 mb-2">
+                    舊數值 Old Value
+                  </label>
+                  <input
+                    type="number"
+                    value={oldVal}
+                    onChange={(e) => setOldVal(parseFloat(e.target.value) || 1)}
+                    className="w-full text-3xl font-black text-center border-4 border-pink-300 rounded-xl p-2"
+                  />
+                </div>
+                <div className="text-center">
+                  <label className="block font-bold text-pink-700 mb-2">
+                    新數值 New Value
+                  </label>
+                  <input
+                    type="number"
+                    value={newVal}
+                    onChange={(e) => setNewVal(parseFloat(e.target.value) || 0)}
+                    className="w-full text-3xl font-black text-center border-4 border-pink-300 rounded-xl p-2"
+                  />
+                </div>
+              </div>
+
+              <div className="bg-slate-50 rounded-2xl p-6 mb-6 text-center">
+                <p className="text-lg mb-2">
+                  變化量 = {newVal} - {oldVal} = {change > 0 ? "+" : ""}
+                  {change}
+                </p>
+                <p className="text-lg">百分數變化 = (變化量 ÷ 舊數值) × 100%</p>
+                <p className="font-mono text-xl mt-2">
+                  ({change} ÷ {oldVal}) × 100%
+                </p>
+              </div>
+
+              <div
+                className={`rounded-2xl p-6 text-center border-4 ${
+                  isIncrease
+                    ? "bg-green-100 border-green-300"
+                    : "bg-red-100 border-red-300"
+                }`}
+              >
+                <div
+                  className={`${
+                    isIncrease ? "text-green-600" : "text-red-600"
+                  } font-bold`}
+                >
+                  {isIncrease ? "增加 Increase" : "減少 Decrease"}
+                </div>
+                <div
+                  className={`text-5xl font-black ${
+                    isIncrease ? "text-green-800" : "text-red-800"
+                  }`}
+                >
+                  {Math.abs(percentChange).toFixed(1)}%
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

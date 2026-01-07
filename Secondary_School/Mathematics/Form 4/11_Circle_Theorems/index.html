@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Circle Theorems 圓幾何 | S3 Math</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-indigo-50 text-slate-800 min-h-screen">
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      const App = () => {
+        const [lang, setLang] = useState("en");
+        // Angles in degrees for point positions on circle
+        const [angleA, setAngleA] = useState(270); // Top
+        const [angleB, setAngleB] = useState(200); // Bottom Left
+        const [angleC, setAngleC] = useState(340); // Bottom Right
+        const [angleP, setAngleP] = useState(90); // Circumference Point
+
+        const t = {
+          title: { en: "Circle Theorems", zh: "圓幾何定理" },
+          theorem: {
+            en: "Angle at Center = 2 × Angle at Circumference",
+            zh: "圓心角兩倍於圓周角",
+          },
+          drag: { en: "Adjust the positions", zh: "調整點的位置" },
+          center: { en: "Center Angle", zh: "圓心角" },
+          circum: { en: "Circumference Angle", zh: "圓周角" },
+          back: { en: "Back to Dashboard", zh: "返回主頁" },
+        };
+
+        const cx = 200,
+          cy = 200,
+          r = 120;
+
+        const getPos = (deg) => {
+          const rad = (deg * Math.PI) / 180;
+          return {
+            x: cx + r * Math.cos(rad),
+            y: cy + r * Math.sin(rad),
+          };
+        };
+
+        const posB = getPos(angleB);
+        const posC = getPos(angleC);
+        const posP = getPos(angleP); // Point on circumference
+
+        // Calculate Angle BOC (Center)
+        // Normalize angles to be positive difference
+        let diffCenter = Math.abs(angleC - angleB);
+        if (diffCenter > 180) diffCenter = 360 - diffCenter; // Take the minor arc angle for this visual
+
+        // Real geometry calculation for angles at P
+        // Ideally should use vectors, but for this constraint setup:
+        // Angle BPC is always half of Angle BOC if on major arc
+        const angleCenter = diffCenter;
+        const angleCircum = angleCenter / 2;
+
+        return (
+          <div className="p-6 max-w-4xl mx-auto min-h-screen flex flex-col">
+            <header className="mb-6 flex justify-between items-center">
+              <div>
+                <div className="text-indigo-600 font-bold uppercase text-xs tracking-widest mb-1">
+                  S3 Math
+                </div>
+                <h1 className="text-3xl font-extrabold text-slate-900">
+                  {t.title[lang]}
+                </h1>
+              </div>
+              <button
+                onClick={() => setLang(lang === "en" ? "zh" : "en")}
+                className="px-3 py-1 bg-white border border-indigo-200 rounded-lg text-sm font-bold hover:bg-indigo-100"
+              >
+                {lang === "en" ? "中文" : "ENG"}
+              </button>
+            </header>
+
+            {/* Theorem Statement */}
+            <div className="bg-white p-4 rounded-xl border border-indigo-100 mb-6 text-center shadow-sm">
+              <div className="text-xl font-bold text-indigo-700">
+                {t.theorem[lang]}
+              </div>
+              <div className="text-sm text-slate-400 mt-1">∠BOC = 2 × ∠BPC</div>
+            </div>
+
+            {/* Interactive Area */}
+            <div className="grid md:grid-cols-2 gap-8 items-center mb-6">
+              <div className="bg-white p-4 rounded-2xl border border-indigo-100 flex justify-center relative">
+                <svg
+                  viewBox="0 0 400 400"
+                  className="w-full max-w-md h-auto select-none"
+                >
+                  {/* Circle */}
+                  <circle
+                    cx={cx}
+                    cy={cy}
+                    r={r}
+                    fill="none"
+                    stroke="#e0e7ff"
+                    strokeWidth="4"
+                  />
+
+                  {/* Radii to B and C */}
+                  <line
+                    x1={cx}
+                    y1={cy}
+                    x2={posB.x}
+                    y2={posB.y}
+                    stroke="#6366f1"
+                    strokeWidth="2"
+                    strokeDasharray="5,5"
+                  />
+                  <line
+                    x1={cx}
+                    y1={cy}
+                    x2={posC.x}
+                    y2={posC.y}
+                    stroke="#6366f1"
+                    strokeWidth="2"
+                    strokeDasharray="5,5"
+                  />
+
+                  {/* Lines to P */}
+                  <line
+                    x1={posP.x}
+                    y1={posP.y}
+                    x2={posB.x}
+                    y2={posB.y}
+                    stroke="#ec4899"
+                    strokeWidth="3"
+                  />
+                  <line
+                    x1={posP.x}
+                    y1={posP.y}
+                    x2={posC.x}
+                    y2={posC.y}
+                    stroke="#ec4899"
+                    strokeWidth="3"
+                  />
+
+                  {/* Chord BC */}
+                  <line
+                    x1={posB.x}
+                    y1={posB.y}
+                    x2={posC.x}
+                    y2={posC.y}
+                    stroke="#cbd5e1"
+                    strokeWidth="1"
+                  />
+
+                  {/* Center O */}
+                  <circle cx={cx} cy={cy} r="5" fill="#6366f1" />
+                  <text
+                    x={cx}
+                    y={cy + 25}
+                    textAnchor="middle"
+                    className="fill-indigo-600 font-bold text-lg"
+                  >
+                    O
+                  </text>
+
+                  {/* Points with Touch/Drag simulation (sliders below for stability) */}
+                  <circle
+                    cx={posB.x}
+                    cy={posB.y}
+                    r="8"
+                    fill="#6366f1"
+                    className="cursor-pointer hover:r-10 transition-all"
+                  />
+                  <text
+                    x={posB.x - 15}
+                    y={posB.y - 15}
+                    className="fill-indigo-600 font-bold"
+                  >
+                    B
+                  </text>
+
+                  <circle
+                    cx={posC.x}
+                    cy={posC.y}
+                    r="8"
+                    fill="#6366f1"
+                    className="cursor-pointer hover:r-10 transition-all"
+                  />
+                  <text
+                    x={posC.x + 15}
+                    y={posC.y - 15}
+                    className="fill-indigo-600 font-bold"
+                  >
+                    C
+                  </text>
+
+                  <circle
+                    cx={posP.x}
+                    cy={posP.y}
+                    r="8"
+                    fill="#ec4899"
+                    className="cursor-pointer hover:r-10 transition-all"
+                  />
+                  <text
+                    x={posP.x}
+                    y={posP.y - 20}
+                    textAnchor="middle"
+                    className="fill-pink-600 font-bold text-lg"
+                  >
+                    P
+                  </text>
+
+                  {/* Angle visualization arcs - Simplified for React Rendering */}
+                  <path
+                    d={`M ${cx + 30 * Math.cos((angleB * Math.PI) / 180)} ${
+                      cy + 30 * Math.sin((angleB * Math.PI) / 180)
+                    } A 30 30 0 0 1 ${
+                      cx + 30 * Math.cos((angleC * Math.PI) / 180)
+                    } ${cy + 30 * Math.sin((angleC * Math.PI) / 180)}`}
+                    fill="none"
+                    stroke="#6366f1"
+                    strokeWidth="2"
+                    opacity="0.5"
+                  />
+                </svg>
+              </div>
+
+              {/* Controls */}
+              <div className="space-y-6">
+                <div className="bg-white p-6 rounded-2xl border border-indigo-100 shadow-sm">
+                  <h3 className="text-sm font-bold text-slate-400 uppercase mb-4">
+                    {t.drag[lang]}
+                  </h3>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="flex justify-between text-xs font-bold text-indigo-600 mb-1">
+                        <span>Point B</span>
+                        <span>{angleB}°</span>
+                      </label>
+                      <input
+                        type="range"
+                        min="180"
+                        max="260"
+                        value={angleB}
+                        onChange={(e) => setAngleB(Number(e.target.value))}
+                        className="w-full accent-indigo-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="flex justify-between text-xs font-bold text-indigo-600 mb-1">
+                        <span>Point C</span>
+                        <span>{angleC}°</span>
+                      </label>
+                      <input
+                        type="range"
+                        min="280"
+                        max="360"
+                        value={angleC}
+                        onChange={(e) => setAngleC(Number(e.target.value))}
+                        className="w-full accent-indigo-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="flex justify-between text-xs font-bold text-pink-600 mb-1">
+                        <span>Point P (Top Arc)</span>
+                        <span>{angleP}°</span>
+                      </label>
+                      <input
+                        type="range"
+                        min="45"
+                        max="135"
+                        value={angleP}
+                        onChange={(e) => setAngleP(Number(e.target.value))}
+                        className="w-full accent-pink-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-indigo-500 text-white p-4 rounded-xl text-center shadow-lg transform transition hover:scale-105">
+                    <div className="text-xs uppercase opacity-80 mb-1">
+                      {t.center[lang]}
+                    </div>
+                    <div className="text-3xl font-extrabold">
+                      {angleCenter.toFixed(1)}°
+                    </div>
+                    <div className="text-xs opacity-75 mt-1">∠BOC</div>
+                  </div>
+                  <div className="bg-pink-500 text-white p-4 rounded-xl text-center shadow-lg transform transition hover:scale-105">
+                    <div className="text-xs uppercase opacity-80 mb-1">
+                      {t.circum[lang]}
+                    </div>
+                    <div className="text-3xl font-extrabold">
+                      {angleCircum.toFixed(1)}°
+                    </div>
+                    <div className="text-xs opacity-75 mt-1">∠BPC</div>
+                  </div>
+                </div>
+
+                <div className="text-center font-mono text-slate-500 text-sm bg-indigo-50 p-2 rounded-lg">
+                  {angleCircum.toFixed(1)}° × 2 = {angleCenter.toFixed(1)}°
+                </div>
+              </div>
+            </div>
+
+            <footer className="mt-auto pt-8">
+              <a
+                href="../index.html"
+                className="text-indigo-600 hover:text-indigo-700 font-bold"
+              >
+                <i className="fa-solid fa-arrow-left mr-2"></i>
+                {t.back[lang]}
+              </a>
+            </footer>
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

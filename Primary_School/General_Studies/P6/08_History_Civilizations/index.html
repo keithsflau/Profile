@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - History Civilizations</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #fffbeb;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Ancient Civilizations",
+          zh: "古代文明",
+          ja: "古代文明",
+          ko: "고대 문명",
+          es: "Civilizaciones antiguas",
+          de: "Antike Zivilisationen",
+          fi: "Muinaiset sivilisaatiot",
+          fr: "Civilisations anciennes",
+          ar: "الحضارات القديمة",
+          it: "Antiche Civiltà",
+        },
+        instruction: {
+          en: "Match the Wonder to the Civilization",
+          zh: "將奇蹟與文明配對",
+          ja: "不思議と文明を一致させる",
+          ko: "불가사의와 문명을 일치시키세요",
+          es: "Empareja la Maravilla con la Civilización",
+          de: "Ordne das Wunder der Zivilisation zu",
+          fi: "Yhdistä ihme sivilisaatioon",
+          fr: "Associez la Merveille à la Civilisation",
+          ar: "طابق العجيبة بالحضارة",
+          it: "Abbina la Meraviglia alla Civiltà",
+        },
+        egypt: {
+          en: "Ancient Egypt",
+          zh: "古埃及",
+          ja: "古代エジプト",
+          ko: "고대 이집트",
+        },
+        china: {
+          en: "Ancient China",
+          zh: "古代中國",
+          ja: "古代中国",
+          ko: "고대 중국",
+        },
+        rome: {
+          en: "Ancient Rome",
+          zh: "古羅馬",
+          ja: "古代ローマ",
+          ko: "고대 로마",
+        },
+        greece: {
+          en: "Ancient Greece",
+          zh: "古希臘",
+          ja: "古代ギリシャ",
+          ko: "고대 그리스",
+        },
+
+        pyramids: {
+          en: "Pyramids",
+          zh: "金字塔",
+          ja: "ピラミッド",
+          ko: "피라미드",
+        },
+        wall: {
+          en: "Great Wall",
+          zh: "萬里長城",
+          ja: "万里の長城",
+          ko: "만리장성",
+        },
+        colosseum: {
+          en: "Colosseum",
+          zh: "羅馬鬥獸場",
+          ja: "コロッセオ",
+          ko: "콜로세움",
+        },
+        parthenon: {
+          en: "Parthenon",
+          zh: "帕特農神廟",
+          ja: "パルテノン神殿",
+          ko: "파르테논 신전",
+        },
+
+        correct: {
+          en: "Correct Match!",
+          zh: "配對正確！",
+          ja: "正しいマッチ！",
+          ko: "올바른 매치!",
+        },
+      };
+
+      const pairs = [
+        { civ: "egypt", wonder: "pyramids", icon: "🔺" },
+        { civ: "china", wonder: "wall", icon: "🧱" },
+        { civ: "rome", wonder: "colosseum", icon: "🏟️" },
+        { civ: "greece", wonder: "parthenon", icon: "🏛️" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [selectedCiv, setSelectedCiv] = useState(null);
+        const [matched, setMatched] = useState([]);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        // Randomize visual order
+        const [civs, setCivs] = useState([]);
+        const [wonders, setWonders] = useState([]);
+
+        useEffect(() => {
+          setCivs([...pairs].sort(() => Math.random() - 0.5));
+          setWonders([...pairs].sort(() => Math.random() - 0.5));
+        }, []);
+
+        const handleCivClick = (c) => {
+          if (matched.includes(c.civ)) return;
+          setSelectedCiv(c);
+        };
+
+        const handleWonderClick = (w) => {
+          if (matched.includes(w.civ)) return;
+          if (!selectedCiv) return;
+
+          if (selectedCiv.civ === w.civ) {
+            setMatched([...matched, w.civ]);
+            setSelectedCiv(null);
+          } else {
+            setSelectedCiv(null);
+            // Error feedback
+            alert("Try again!");
+          }
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-amber-700">
+              {getText("title")}
+            </h1>
+            <p className="mb-8 font-bold text-slate-500">
+              {getText("instruction")}
+            </p>
+
+            <div className="flex gap-12 w-full max-w-4xl justify-center">
+              {/* Civilizations */}
+              <div className="flex flex-col gap-4">
+                <h2 className="text-center font-bold text-slate-400 mb-2">
+                  Civilization
+                </h2>
+                {civs.map((c) => (
+                  <button
+                    key={c.civ}
+                    onClick={() => handleCivClick(c)}
+                    disabled={matched.includes(c.civ)}
+                    className={`p-6 w-48 rounded-xl font-bold shadow-md transition-all
+                            ${
+                              matched.includes(c.civ)
+                                ? "bg-green-100 text-green-800 opacity-50"
+                                : selectedCiv && selectedCiv.civ === c.civ
+                                ? "bg-amber-500 text-white scale-105"
+                                : "bg-white hover:bg-amber-50 text-amber-900"
+                            }
+                         `}
+                  >
+                    {getText(c.civ)}
+                  </button>
+                ))}
+              </div>
+
+              {/* Wonders */}
+              <div className="flex flex-col gap-4">
+                <h2 className="text-center font-bold text-slate-400 mb-2">
+                  Wonder
+                </h2>
+                {wonders.map((w) => (
+                  <button
+                    key={w.wonder}
+                    onClick={() => handleWonderClick(w)}
+                    disabled={matched.includes(w.civ)}
+                    className={`p-6 w-48 rounded-xl font-bold shadow-md flex items-center gap-4 transition-all
+                            ${
+                              matched.includes(w.civ)
+                                ? "bg-green-100 text-green-800 opacity-50"
+                                : "bg-white hover:bg-slate-50 text-slate-800 border-2 border-transparent hover:border-amber-300"
+                            }
+                         `}
+                  >
+                    <span className="text-2xl">{w.icon}</span>
+                    {getText(w.wonder)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {matched.length === pairs.length && matched.length > 0 && (
+              <div className="mt-8 text-4xl font-black text-amber-600 animate-bounce">
+                {getText("correct")}
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

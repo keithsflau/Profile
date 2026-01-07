@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Ecosystem Balance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #f0fdf4;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Ecosystem Stability",
+          zh: "生態平衡",
+          ja: "生態系の安定",
+          ko: "생태계 안정성",
+          es: "Estabilidad del ecosistema",
+          de: "Ökosystemstabilität",
+          fi: "Ekosysteemin vakaus",
+          fr: "Stabilité de l'écosystème",
+          ar: "استقرار النظام البيئي",
+          it: "Stabilità dell'Ecosistema",
+        },
+        instruction: {
+          en: "Balance the population of Grass, Rabbits, and Foxes!",
+          zh: "平衡草、兔子和狐狸的數量！",
+          ja: "草、ウサギ、キツネの個体数のバランスをとってください！",
+          ko: "풀, 토끼, 여우의 개체수 균형을 맞추세요!",
+          es: "¡Equilibra la población de hierba, conejos y zorros!",
+          de: "Gleiche die Population von Gras, Kaninchen und Füchsen aus!",
+          fi: "Tasapainota ruohon, kanien ja kettujen populaatio!",
+          fr: "Équilibrez la population d'herbe, de lapins et de renards !",
+          ar: "وازِن أعداد العشب والأرانب والثعالب!",
+          it: "Bilancia la popolazione di erba, conigli e volpi!",
+        },
+        grass: {
+          en: "Grass (Producer)",
+          zh: "草 (生產者)",
+          ja: "草 (生産者)",
+          ko: "풀 (생산자)",
+          es: "Hierba (Productor)",
+          de: "Gras (Produzent)",
+          fi: "Ruoho (Tuottaja)",
+          fr: "Herbe (Producteur)",
+          ar: "عشب (منتج)",
+          it: "Erba (Produttore)",
+        },
+        rabbit: {
+          en: "Rabbit (Consumer)",
+          zh: "兔子 (消費者)",
+          ja: "ウサギ (消費者)",
+          ko: "토끼 (소비자)",
+          es: "Conejo (Consumidor)",
+          de: "Kaninchen (Verbraucher)",
+          fi: "Kani (Kuluttaja)",
+          fr: "Lapin (Consommateur)",
+          ar: "أرنب (مستهلك)",
+          it: "Coniglio (Consumatore)",
+        },
+        fox: {
+          en: "Fox (Predator)",
+          zh: "狐狸 (捕食者)",
+          ja: "キツネ (捕食者)",
+          ko: "여우 (포식자)",
+          es: "Zorro (Depredador)",
+          de: "Fuchs (Raubtier)",
+          fi: "Kettu (Petoeläin)",
+          fr: "Renard (Prédateur)",
+          ar: "ثعلب (مفترس)",
+          it: "Volpe (Predatore)",
+        },
+
+        status: {
+          en: "Ecosystem Status:",
+          zh: "生態系統狀態：",
+          ja: "生態系の状態：",
+          ko: "생태계 상태:",
+          es: "Estado del ecosistema:",
+          de: "Ökosystemstatus:",
+          fi: "Ekosysteemin tila:",
+          fr: "État de l'écosystème :",
+          ar: "حالة النظام البيئي:",
+          it: "Stato dell'Ecosistema:",
+        },
+        balanced: {
+          en: "Balanced",
+          zh: "平衡",
+          ja: "バランスが取れている",
+          ko: "균형 잡힘",
+          es: "Equilibrado",
+          de: "Ausgeglichen",
+          fi: "Tasapainoinen",
+          fr: "Équilibré",
+          ar: "متوازن",
+          it: "Bilanciato",
+        },
+        collapse: {
+          en: "Collapsing!",
+          zh: "崩潰中！",
+          ja: "崩壊中！",
+          ko: "붕괴 중!",
+          es: "¡Colapsando!",
+          de: "Zusammenbruch!",
+          fi: "Romahtamassa!",
+          fr: "Effondrement !",
+          ar: "ينهار!",
+          it: "Collasso!",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [grass, setGrass] = useState(50);
+        const [rabbits, setRabbits] = useState(10);
+        const [foxes, setFoxes] = useState(2);
+        const [running, setRunning] = useState(true);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        // Simple Simulation Interval
+        useEffect(() => {
+          if (!running) return;
+          const timer = setInterval(() => {
+            setGrass((g) => {
+              let nextG = g + 5; // Regrow
+              // Eaten by rabbits
+              nextG -= rabbits * 0.5;
+              return Math.max(0, Math.min(100, nextG));
+            });
+
+            setRabbits((r) => {
+              let nextR = r;
+              // Eat grass to survive/reproduce
+              if (grass > r * 2) nextR += r * 0.1; // Grow
+              else nextR -= r * 0.1; // Starve
+
+              // Eaten by foxes
+              nextR -= foxes * 1;
+
+              return Math.max(0, Math.min(100, nextR));
+            });
+
+            setFoxes((f) => {
+              let nextF = f;
+              // Eat rabbits
+              if (rabbits > f * 3) nextF += f * 0.05;
+              else nextF -= f * 0.1;
+
+              return Math.max(0, Math.min(50, nextF));
+            });
+          }, 500);
+          return () => clearInterval(timer);
+        }, [running, grass, rabbits, foxes]);
+
+        // Determine State
+        const isStable = grass > 10 && rabbits > 2 && foxes > 0 && rabbits < 80;
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-4 text-green-800">
+              {getText("title")}
+            </h1>
+
+            <div className="w-full max-w-4xl bg-white p-6 rounded-3xl shadow-xl border-4 border-green-100">
+              <div
+                className={`text-center font-bold text-xl mb-4 p-2 rounded ${
+                  isStable
+                    ? "bg-green-100 text-green-800"
+                    : "bg-red-100 text-red-800 animate-pulse"
+                }`}
+              >
+                {getText("status")}{" "}
+                {isStable ? getText("balanced") : getText("collapse")}
+              </div>
+
+              <div className="grid grid-cols-3 gap-4 h-[400px]">
+                {/* Grass Section */}
+                <div className="bg-green-100 rounded-xl relative overflow-hidden flex flex-col justify-end p-2 border-2 border-green-300">
+                  <div className="absolute top-2 left-2 font-bold text-green-900 bg-white/80 px-2 rounded z-10">
+                    {getText("grass")}: {Math.round(grass)}
+                  </div>
+                  <div className="flex flex-wrap content-end gap-1">
+                    {[...Array(Math.min(50, Math.round(grass)))].map((_, i) => (
+                      <div key={i} className="text-xl">
+                        🌿
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    onClick={() => setGrass((g) => Math.min(100, g + 10))}
+                    className="absolute top-2 right-2 bg-green-500 text-white w-8 h-8 rounded-full z-20 hover:scale-110 shadow"
+                  >
+                    ＋
+                  </button>
+                </div>
+
+                {/* Rabbit Section */}
+                <div className="bg-orange-50 rounded-xl relative overflow-hidden flex flex-col justify-end p-2 border-2 border-orange-200">
+                  <div className="absolute top-2 left-2 font-bold text-orange-900 bg-white/80 px-2 rounded z-10">
+                    {getText("rabbit")}: {Math.round(rabbits)}
+                  </div>
+                  <div className="flex flex-wrap content-end gap-1">
+                    {[...Array(Math.min(30, Math.round(rabbits)))].map(
+                      (_, i) => (
+                        <div key={i} className="text-xl">
+                          🐰
+                        </div>
+                      )
+                    )}
+                  </div>
+                  <button
+                    onClick={() => setRabbits((r) => Math.min(100, r + 5))}
+                    className="absolute top-2 right-2 bg-orange-500 text-white w-8 h-8 rounded-full z-20 hover:scale-110 shadow"
+                  >
+                    ＋
+                  </button>
+                </div>
+
+                {/* Fox Section */}
+                <div className="bg-red-50 rounded-xl relative overflow-hidden flex flex-col justify-end p-2 border-2 border-red-200">
+                  <div className="absolute top-2 left-2 font-bold text-red-900 bg-white/80 px-2 rounded z-10">
+                    {getText("fox")}: {Math.round(foxes)}
+                  </div>
+                  <div className="flex flex-wrap content-end gap-1">
+                    {[...Array(Math.min(20, Math.round(foxes)))].map((_, i) => (
+                      <div key={i} className="text-xl">
+                        🦊
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    onClick={() => setFoxes((f) => Math.min(50, f + 2))}
+                    className="absolute top-2 right-2 bg-red-500 text-white w-8 h-8 rounded-full z-20 hover:scale-110 shadow"
+                  >
+                    ＋
+                  </button>
+                </div>
+              </div>
+
+              <div className="mt-6 text-center text-slate-500 text-sm">
+                {getText("instruction")}
+              </div>
+
+              <div className="mt-4 flex justify-center">
+                <button
+                  onClick={() => setRunning(!running)}
+                  className="bg-slate-700 text-white px-6 py-2 rounded-lg font-bold"
+                >
+                  {running ? "Pause" : "Resume"}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

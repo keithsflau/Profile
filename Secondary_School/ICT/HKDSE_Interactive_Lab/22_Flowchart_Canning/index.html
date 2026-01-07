@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HKDSE ICT - Flowchart Logic</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.development.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #0f172a;
+        color: #e2e8f0;
+      }
+      .flow-node {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .node-active {
+        border-color: #facc15 !important;
+        background-color: rgba(234, 179, 8, 0.2) !important;
+        transform: scale(1.05);
+        box-shadow: 0 0 20px rgba(253, 224, 71, 0.3);
+      }
+      .diamond {
+        transform: rotate(45deg);
+      }
+      .diamond-inner {
+        transform: rotate(-45deg);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen p-8 flex justify-center items-center bg-slate-900">
+    <div id="root" class="w-full max-w-6xl"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      // --- LUCIDE ICON SHIM ---
+      const LucideIcon = ({ name, size = 24, className = "" }) => {
+        const formatName = (n) =>
+          n
+            .split("-")
+            .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
+            .join("");
+        const iconName = formatName(name);
+
+        const [svgHtml, setSvgHtml] = useState("");
+
+        useEffect(() => {
+          if (
+            window.lucide &&
+            window.lucide.icons &&
+            window.lucide.icons[iconName] &&
+            typeof window.lucide.icons[iconName].toSvg === "function"
+          ) {
+            setSvgHtml(
+              window.lucide.icons[iconName].toSvg({
+                width: size,
+                height: size,
+                class: className,
+              })
+            );
+          }
+        }, [name, size, className, iconName]);
+
+        return (
+          <span
+            dangerouslySetInnerHTML={{ __html: svgHtml }}
+            style={{ display: "inline-flex" }}
+          />
+        );
+      };
+      const Settings = (p) => <LucideIcon name="settings" {...p} />;
+      const Play = (p) => <LucideIcon name="play" {...p} />;
+      const RotateCcw = (p) => <LucideIcon name="rotate-ccw" {...p} />;
+      const Box = (p) => <LucideIcon name="box" {...p} />;
+      const ArrowDown = (p) => <LucideIcon name="arrow-down" {...p} />;
+      const CheckCircle2 = (p) => <LucideIcon name="check-circle-2" {...p} />;
+      const History = (p) => <LucideIcon name="history" {...p} />;
+      // --- END SHIM ---
+
+      const App = () => {
+        const [weight, setWeight] = useState(480);
+        const [activeStep, setActiveStep] = useState(0);
+        const [log, setLog] = useState([]);
+
+        const runSimulation = () => {
+          setLog([]);
+          setActiveStep(1);
+          setTimeout(() => {
+            setActiveStep(2);
+            addToLog("Machine loads can...");
+            setTimeout(() => {
+              setActiveStep(3);
+              addToLog(`Weighing... Measured: ${weight}g`);
+              setTimeout(() => {
+                if (weight >= 500) {
+                  setActiveStep(4);
+                  addToLog("Decision: YES (>= 500g) -> Accept");
+                } else {
+                  setActiveStep(5);
+                  addToLog("Decision: NO (< 500g) -> Reject");
+                }
+                setTimeout(() => {
+                  setActiveStep(6);
+                  addToLog("Process Complete.");
+                }, 1000);
+              }, 1000);
+            }, 1000);
+          }, 800);
+        };
+
+        const addToLog = (msg) => {
+          setLog((prev) => [
+            ...prev,
+            { time: new Date().toLocaleTimeString(), msg },
+          ]);
+        };
+
+        const FlowBox = ({ stepId, label, type, children }) => {
+          const isActive = activeStep === stepId;
+          if (type === "decision")
+            return (
+              <div className="flex flex-col items-center relative py-4">
+                <div
+                  className={`w-32 h-32 border-4 bg-slate-800 flex items-center justify-center diamond flow-node ${
+                    isActive
+                      ? "node-active border-yellow-400"
+                      : "border-slate-600"
+                  }`}
+                >
+                  <div className="diamond-inner text-center font-bold text-xs p-2">
+                    {label}
+                  </div>
+                </div>
+                {children}
+              </div>
+            );
+          if (type === "start" || type === "end")
+            return (
+              <div
+                className={`px-6 py-3 rounded-full border-4 font-bold text-sm flow-node ${
+                  isActive
+                    ? "node-active border-yellow-400 text-yellow-200"
+                    : "bg-slate-800 border-slate-600 text-slate-300"
+                }`}
+              >
+                {label}
+              </div>
+            );
+          return (
+            <div
+              className={`w-40 py-4 px-2 border-4 rounded bg-slate-800 text-center font-bold text-sm flow-node ${
+                isActive
+                  ? "node-active border-yellow-400 text-yellow-200"
+                  : "border-slate-600 text-slate-300"
+              }`}
+            >
+              {label}
+            </div>
+          );
+        };
+
+        const Arrow = () => <ArrowDown className="text-slate-600 my-2" />;
+
+        return (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 w-full">
+            <div className="flex flex-col items-center">
+              <FlowBox stepId={1} type="start" label="START" />
+              <Arrow />
+              <FlowBox stepId={2} type="process" label="Load Can (M1)" />
+              <Arrow />
+              <div className="relative">
+                <FlowBox stepId={3} type="decision" label="Weight >= 500g?" />
+                <div className="absolute top-1/2 -right-16 translate-y-8 flex flex-col items-center">
+                  <span className="text-green-500 font-bold text-xs mb-1">
+                    Yes
+                  </span>
+                  <div className="w-12 h-0.5 bg-slate-600"></div>
+                </div>
+                <div className="absolute top-1/2 -left-16 translate-y-8 flex flex-col items-center">
+                  <span className="text-red-500 font-bold text-xs mb-1">
+                    No
+                  </span>
+                  <div className="w-12 h-0.5 bg-slate-600"></div>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-32 w-full max-w-md mt-4">
+                <div className="flex flex-col items-center">
+                  <ArrowDown className="text-slate-600 mb-2" />
+                  <FlowBox stepId={5} type="process" label="Reject (M3)" />
+                </div>
+                <div className="flex flex-col items-center">
+                  <ArrowDown className="text-slate-600 mb-2" />
+                  <FlowBox stepId={4} type="process" label="Accept (M2)" />
+                </div>
+              </div>
+              <div className="w-full flex justify-center mt-4 relative h-8">
+                <div
+                  className="absolute top-0 w-1/2 border-b-2 border-l-2 border-r-2 border-slate-600 h-4 rounded-b-xl"
+                  style={{ left: "25%" }}
+                ></div>
+              </div>
+              <ArrowDown className="text-slate-600 -mt-2" />
+              <FlowBox stepId={6} type="end" label="END" />
+            </div>
+
+            <div className="space-y-8">
+              <header>
+                <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-2">
+                  <Settings className="text-cyan-400" /> Industry Process Flow
+                </h1>
+                <p className="text-slate-400">Paper 1A Q28 (Logic Control)</p>
+              </header>
+              <div className="bg-slate-800 p-8 rounded-2xl border border-slate-700 shadow-xl">
+                <label className="text-slate-400 font-bold uppercase text-xs mb-2 block">
+                  Canning Machine Input
+                </label>
+                <div className="flex items-center gap-4 mb-8">
+                  <Settings className="text-slate-500" />
+                  <input
+                    type="range"
+                    min="400"
+                    max="600"
+                    step="5"
+                    value={weight}
+                    onChange={(e) => setWeight(parseInt(e.target.value))}
+                    className="w-full accent-cyan-500"
+                    disabled={activeStep > 0 && activeStep < 6}
+                  />
+                  <div className="bg-slate-900 px-4 py-2 rounded-lg font-mono font-bold text-cyan-400 border border-slate-700 w-24 text-center">
+                    {weight}g
+                  </div>
+                </div>
+                <button
+                  onClick={runSimulation}
+                  disabled={activeStep > 0 && activeStep < 6}
+                  className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all ${
+                    activeStep > 0 && activeStep < 6
+                      ? "bg-slate-700 text-slate-500 cursor-wait"
+                      : "bg-cyan-600 hover:bg-cyan-500 text-white shadow-lg hover:shadow-cyan-500/30"
+                  }`}
+                >
+                  {activeStep > 0 && activeStep < 6 ? (
+                    "Processing..."
+                  ) : (
+                    <>
+                      <Play fill="currentColor" size={20} /> Run Simulation
+                    </>
+                  )}
+                </button>
+              </div>
+              <div className="bg-slate-950 rounded-xl border border-slate-800 p-4 h-64 overflow-y-auto font-mono text-sm">
+                <div className="flex items-center gap-2 text-slate-500 text-xs font-bold uppercase mb-4 sticky top-0 bg-slate-950 pb-2 border-b border-slate-900">
+                  <History size={14} /> System Log
+                </div>
+                {log.length === 0 && (
+                  <span className="text-slate-600 italic">
+                    Ready to start...
+                  </span>
+                )}
+                {log.map((l, i) => (
+                  <div
+                    key={i}
+                    className="mb-2 text-slate-300 flex gap-2 animate-fade-in"
+                  >
+                    <span className="text-slate-600">[{l.time}]</span>
+                    <span
+                      className={
+                        l.msg.includes("Decision")
+                          ? l.msg.includes("YES")
+                            ? "text-green-400"
+                            : "text-red-400"
+                          : ""
+                      }
+                    >
+                      {l.msg}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Rock Cycle</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #44403c;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "The Rock Cycle",
+          zh: "岩石循環",
+          ja: "岩石リサイクル",
+          ko: "암석의 순환",
+          es: "El ciclo de las rocas",
+          de: "Der Gesteinskreislauf",
+          fi: "Kivien kiertokulku",
+          fr: "Le cycle des roches",
+          ar: "دورة الصخور",
+          it: "Il Ciclo delle Rocce",
+        },
+        instruction: {
+          en: "Explore how rocks change over time.",
+          zh: "探索岩石隨時間變化的過程。",
+          ja: "岩石が時間とともにどのように変化するか調べてみましょう。",
+          ko: "시간이 지남에 따라 암석이 어떻게 변하는지 알아보세요.",
+          es: "Explora cómo cambian las rocas con el tiempo.",
+          de: "Erforsche, wie sich Gesteine im Laufe der Zeit verändern.",
+          fi: "Tutki, miten kivet muuttuvat ajan myötä.",
+          fr: "Découvrez comment les roches changent avec le temps.",
+          ar: "استكشف كيف تتغير الصخور بمرور الوقت.",
+          it: "Esplora come le rocce cambiano nel tempo.",
+        },
+        magma: {
+          en: "Magma",
+          zh: "岩漿",
+          ja: "マグマ",
+          ko: "마그마",
+          es: "Magma",
+          de: "Magma",
+          fi: "Magma",
+          fr: "Magma",
+          ar: "الصهارة",
+          it: "Magma",
+        },
+        igneous: {
+          en: "Igneous Rock",
+          zh: "火成岩",
+          ja: "火成岩",
+          ko: "화성암",
+          es: "Roca ígnea",
+          de: "Magmatisches Gestein",
+          fi: "Magmakivi",
+          fr: "Roche magmatique",
+          ar: "صخور نارية",
+          it: "Roccia Ignea",
+        },
+        sediment: {
+          en: "Sediment",
+          zh: "沉積物",
+          ja: "堆積物",
+          ko: "퇴적물",
+          es: "Sedimento",
+          de: "Sediment",
+          fi: "Sedimentti",
+          fr: "Sédiment",
+          ar: "رواسب",
+          it: "Sedimento",
+        },
+        sedimentary: {
+          en: "Sedimentary Rock",
+          zh: "沉積岩",
+          ja: "堆積岩",
+          ko: "퇴적암",
+          es: "Roca sedimentaria",
+          de: "Sedimentgestein",
+          fi: "Sedimenttikivi",
+          fr: "Roche sédimentaire",
+          ar: "صخور رسوبية",
+          it: "Roccia Sedimentaria",
+        },
+        metamorphic: {
+          en: "Metamorphic Rock",
+          zh: "變質岩",
+          ja: "変成岩",
+          ko: "변성암",
+          es: "Roca metamórfica",
+          de: "Metamorphes Gestein",
+          fi: "Metamorfinen kivi",
+          fr: "Roche métamorphique",
+          ar: "صخور متحولة",
+          it: "Roccia Metamorfica",
+        },
+
+        process_cool: { en: "Cooling", zh: "冷卻", ja: "冷却", ko: "냉각" },
+        process_weather: {
+          en: "Weathering",
+          zh: "風化侵蝕",
+          ja: "風化",
+          ko: "풍화",
+        },
+        process_compact: {
+          en: "Compaction",
+          zh: "壓實",
+          ja: "圧縮",
+          ko: "압축",
+        },
+        process_heat: {
+          en: "Heat & Pressure",
+          zh: "高溫高壓",
+          ja: "熱と圧力",
+          ko: "열과 압력",
+        },
+        process_melt: { en: "Melting", zh: "熔化", ja: "溶融", ko: "용해" },
+      };
+
+      const stages = [
+        {
+          id: "magma",
+          icon: "🌋",
+          color: "bg-red-600",
+          next: "igneous",
+          process: "process_cool",
+        },
+        {
+          id: "igneous",
+          icon: "🪨",
+          color: "bg-gray-600",
+          next: "sediment",
+          process: "process_weather",
+        },
+        {
+          id: "sediment",
+          icon: "🏜️",
+          color: "bg-yellow-600",
+          next: "sedimentary",
+          process: "process_compact",
+        },
+        {
+          id: "sedimentary",
+          icon: "🧱",
+          color: "bg-orange-700",
+          next: "metamorphic",
+          process: "process_heat",
+        },
+        {
+          id: "metamorphic",
+          icon: "💎",
+          color: "bg-purple-700",
+          next: "magma",
+          process: "process_melt",
+        },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [currentStageId, setCurrentStageId] = useState("magma");
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+        const currentStage = stages.find((s) => s.id === currentStageId);
+
+        const handleNext = () => {
+          setCurrentStageId(currentStage.next);
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-stone-300">
+              {getText("title")}
+            </h1>
+
+            <div className="relative w-full max-w-2xl h-[500px]">
+              {/* Circular Cycle Visualization */}
+              <div className="absolute inset-0 border-[20px] border-stone-700 rounded-full opacity-50"></div>
+
+              {/* Stages positioned in circle */}
+              {stages.map((s, i) => {
+                const angle = (i * 360) / stages.length - 90; // Start top
+                const radius = 200;
+                const x = Math.cos((angle * Math.PI) / 180) * radius;
+                const y = Math.sin((angle * Math.PI) / 180) * radius;
+
+                const isActive = s.id === currentStageId;
+
+                return (
+                  <div
+                    key={s.id}
+                    onClick={() => setCurrentStageId(s.id)}
+                    className={`absolute w-24 h-24 rounded-full flex items-center justify-center text-4xl shadow-lg border-4 transition-all cursor-pointer z-10
+                            ${s.color} ${
+                      isActive
+                        ? "border-white scale-125 z-20"
+                        : "border-stone-500 opacity-60"
+                    }
+                         `}
+                    style={{
+                      left: `calc(50% + ${x}px)`,
+                      top: `calc(50% + ${y}px)`,
+                      transform: "translate(-50%, -50%)",
+                    }}
+                  >
+                    {s.icon}
+                  </div>
+                );
+              })}
+
+              {/* Center Info Card */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 text-center">
+                <div className="text-6xl mb-4 animate-bounce">
+                  {currentStage.icon}
+                </div>
+                <h2 className="text-2xl font-bold mb-2">
+                  {getText(currentStage.id)}
+                </h2>
+
+                <div className="text-stone-400 mb-4 text-xs font-mono">
+                  NEXT PROCESS:
+                </div>
+                <button
+                  onClick={handleNext}
+                  className="bg-stone-100 text-stone-900 px-6 py-3 rounded-full font-bold hover:bg-white transition-transform active:scale-95 shadow-lg"
+                >
+                  ➡️ {getText(currentStage.process)}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

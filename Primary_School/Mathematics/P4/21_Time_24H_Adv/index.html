@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小四數學：時間區間計算</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #cffafe 0%, #3b82f6 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      function App() {
+        // Time Duration Calculator
+        const [startH, setStartH] = useState(14);
+        const [startM, setStartM] = useState(30);
+        const [endH, setEndH] = useState(16);
+        const [endM, setEndM] = useState(45);
+
+        // Calculate duration
+        let startTotal = startH * 60 + startM;
+        let endTotal = endH * 60 + endM;
+
+        // Handle next day case if needed, but for P4 usually within same day
+        if (endTotal < startTotal) endTotal += 24 * 60;
+
+        const diff = endTotal - startTotal;
+        const diffH = Math.floor(diff / 60);
+        const diffM = diff % 60;
+
+        const format = (h, m) =>
+          `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-5xl font-black text-white mb-8">
+              ⏱️ 時間區間計算
+            </h1>
+
+            <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full">
+              <div className="flex flex-col md:flex-row justify-between items-center gap-8 mb-12">
+                {/* Start Time */}
+                <div className="bg-blue-50 p-6 rounded-2xl flex flex-col items-center border-2 border-blue-200">
+                  <h3 className="text-xl font-bold text-blue-800 mb-4">
+                    開始時間
+                  </h3>
+                  <input
+                    type="time"
+                    value={format(startH, startM)}
+                    onChange={(e) => {
+                      const [h, m] = e.target.value.split(":").map(Number);
+                      setStartH(h);
+                      setStartM(m);
+                    }}
+                    className="text-4xl font-black bg-white border-2 border-blue-300 rounded-xl p-2 text-center outline-none focus:border-blue-500"
+                  />
+                </div>
+
+                <div className="text-4xl font-black text-blue-200">➜</div>
+
+                {/* End Time */}
+                <div className="bg-blue-50 p-6 rounded-2xl flex flex-col items-center border-2 border-blue-200">
+                  <h3 className="text-xl font-bold text-blue-800 mb-4">
+                    結束時間
+                  </h3>
+                  <input
+                    type="time"
+                    value={format(endH, endM)}
+                    onChange={(e) => {
+                      const [h, m] = e.target.value.split(":").map(Number);
+                      setEndH(h);
+                      setEndM(m);
+                    }}
+                    className="text-4xl font-black bg-white border-2 border-blue-300 rounded-xl p-2 text-center outline-none focus:border-blue-500"
+                  />
+                </div>
+              </div>
+
+              {/* Result Visualization */}
+              <div className="bg-slate-800 rounded-2xl p-8 text-white relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-10 text-9xl">
+                  ⏳
+                </div>
+                <h3 className="text-2xl font-bold text-slate-300 mb-2">
+                  相隔時間
+                </h3>
+                <div className="text-6xl font-black text-yellow-400 mb-2">
+                  {diffH} 小時 {diffM} 分鐘
+                </div>
+                <div className="text-slate-400 font-mono">
+                  ({endTotal} - {startTotal} = {diff} 分鐘)
+                </div>
+              </div>
+
+              {/* Timeline Visual */}
+              <div className="mt-8 h-12 bg-slate-200 rounded-full relative overflow-hidden">
+                <div
+                  className="absolute top-0 bottom-0 bg-blue-500 left-0 transition-all duration-500"
+                  style={{
+                    left: `${(startTotal / (24 * 60)) * 100}%`,
+                    width: `${(diff / (24 * 60)) * 100}%`,
+                  }}
+                ></div>
+                {/* Markets */}
+                {[0, 6, 12, 18, 24].map((h) => (
+                  <div
+                    key={h}
+                    className="absolute top-0 bottom-0 w-px bg-slate-400 text-xs"
+                    style={{ left: `${(h / 24) * 100}%` }}
+                  >
+                    <span className="absolute top-1 ml-1 font-bold text-slate-500">
+                      {h}:00
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-2 text-center text-slate-400 font-bold text-sm">
+                24小時時間軸 (Time Line)
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

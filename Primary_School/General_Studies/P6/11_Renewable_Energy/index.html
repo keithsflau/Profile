@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Renewable Energy Sources</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #ecfdf5;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Energy Sources Match",
+          zh: "能源配對",
+          ja: "エネルギー源マッチ",
+          ko: "에너지원 매치",
+          es: "Emparejar fuentes de energía",
+          de: "Energiequellen zuordnen",
+          fi: "Energialähteiden yhdistäminen",
+          fr: "Associer les sources d'énergie",
+          ar: "مطابقة مصادر الطاقة",
+          it: "Abbina Fonti Energetiche",
+        },
+        instruction: {
+          en: "Match the renewable energy source to its description.",
+          zh: "將可再生能源與其描述配對。",
+          ja: "再生可能エネルギー源をその説明と一致させてください。",
+          ko: "재생 가능 에너지원을 설명과 일치시키세요.",
+          es: "Empareja la fuente de energía renovable con su descripción.",
+          de: "Ordne die erneuerbare Energiequelle ihrer Beschreibung zu.",
+          fi: "Yhdistä uusiutuva energialähde sen kuvaukseen.",
+          fr: "Associez la source d'énergie renouvelable à sa description.",
+          ar: "طابق مصدر الطاقة المتجددة بوصفه.",
+          it: "Abbina la fonte di energia rinnovabile alla sua descrizione.",
+        },
+        solar: {
+          en: "Solar Energy",
+          zh: "太陽能",
+          ja: "太陽エネルギー",
+          ko: "태양광 에너지",
+        },
+        wind: {
+          en: "Wind Energy",
+          zh: "風能",
+          ja: "風力エネルギー",
+          ko: "풍력 에너지",
+        },
+        hydro: {
+          en: "Hydropower",
+          zh: "水力能",
+          ja: "水力発電",
+          ko: "수력 에너지",
+        },
+        geo: {
+          en: "Geothermal",
+          zh: "地熱能",
+          ja: "地熱エネルギー",
+          ko: "지열 에너지",
+        },
+        bio: {
+          en: "Biomass",
+          zh: "生物質能",
+          ja: "バイオマス",
+          ko: "바이오매스",
+        },
+
+        desc_solar: {
+          en: "Energy from sunlight panels.",
+          zh: "來自陽光板的能量。",
+          ja: "日光パネルからのエネルギー。",
+          ko: "햇빛 패널에서 얻는 에너지.",
+        },
+        desc_wind: {
+          en: "Turbines spun by moving air.",
+          zh: "由流動空氣轉動的渦輪機。",
+          ja: "動く空気によって回転するタービン。",
+          ko: "바람에 의해 회전하는 터빈.",
+        },
+        desc_hydro: {
+          en: "Power from flowing water (dams).",
+          zh: "來自流動水（水壩）的動力。",
+          ja: "流れる水（ダム）からの動力。",
+          ko: "흐르는 물(댐)에서 얻는 동력.",
+        },
+        desc_geo: {
+          en: "Heat from deep inside Earth.",
+          zh: "來自地球深處的熱量。",
+          ja: "地球の深部からの熱。",
+          ko: "지구 깊은 곳의 열.",
+        },
+        desc_bio: {
+          en: "Burning plants or waste.",
+          zh: "燃燒植物或廢物。",
+          ja: "植物や廃棄物を燃やす。",
+          ko: "식물이나 폐기물을 태움.",
+        },
+
+        correct: {
+          en: "Correct Match!",
+          zh: "配對正確！",
+          ja: "正しいマッチ！",
+          ko: "올바른 매치!",
+        },
+      };
+
+      const pairs = [
+        { id: "solar", desc: "desc_solar", icon: "☀️" },
+        { id: "wind", desc: "desc_wind", icon: "🌬️" },
+        { id: "hydro", desc: "desc_hydro", icon: "💧" },
+        { id: "geo", desc: "desc_geo", icon: "🌋" },
+        { id: "bio", desc: "desc_bio", icon: "🌿" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [leftSelected, setLeftSelected] = useState(null);
+        const [rightSelected, setRightSelected] = useState(null);
+        const [matched, setMatched] = useState([]);
+
+        const [leftItems, setLeftItems] = useState([]);
+        const [rightItems, setRightItems] = useState([]);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        useEffect(() => {
+          setLeftItems([...pairs].sort(() => Math.random() - 0.5));
+          setRightItems([...pairs].sort(() => Math.random() - 0.5));
+        }, []);
+
+        const handleLeft = (item) => {
+          if (matched.includes(item.id)) return;
+          setLeftSelected(item);
+          checkMatch(item, rightSelected);
+        };
+
+        const handleRight = (item) => {
+          if (matched.includes(item.id)) return;
+          setRightSelected(item);
+          checkMatch(leftSelected, item);
+        };
+
+        const checkMatch = (l, r) => {
+          if (l && r) {
+            if (l.id === r.id) {
+              setMatched([...matched, l.id]);
+              setLeftSelected(null);
+              setRightSelected(null);
+            } else {
+              setTimeout(() => {
+                setLeftSelected(null);
+                setRightSelected(null);
+              }, 500);
+            }
+          }
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-emerald-700">
+              {getText("title")}
+            </h1>
+            <p className="mb-8 font-bold text-slate-500">
+              {getText("instruction")}
+            </p>
+
+            <div className="flex justify-between w-full max-w-5xl gap-8">
+              {/* Sources */}
+              <div className="flex-1 flex flex-col gap-4">
+                <h2 className="text-center font-bold text-emerald-800 border-b-2 border-emerald-100 pb-2">
+                  Source
+                </h2>
+                {leftItems.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => handleLeft(item)}
+                    disabled={matched.includes(item.id)}
+                    className={`p-6 rounded-xl font-bold text-lg shadow-md flex items-center gap-4 transition-all
+                            ${
+                              matched.includes(item.id)
+                                ? "bg-emerald-100 opacity-50 text-emerald-800"
+                                : leftSelected && leftSelected.id === item.id
+                                ? "bg-emerald-500 text-white scale-105"
+                                : "bg-white hover:bg-emerald-50 text-slate-700"
+                            }
+                         `}
+                  >
+                    <span className="text-3xl">{item.icon}</span>
+                    {getText(item.id)}
+                  </button>
+                ))}
+              </div>
+
+              {/* Descriptions */}
+              <div className="flex-1 flex flex-col gap-4">
+                <h2 className="text-center font-bold text-emerald-800 border-b-2 border-emerald-100 pb-2">
+                  Description
+                </h2>
+                {rightItems.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => handleRight(item)}
+                    disabled={matched.includes(item.id)}
+                    className={`p-6 rounded-xl font-bold text-sm shadow-md text-left transition-all
+                            ${
+                              matched.includes(item.id)
+                                ? "bg-emerald-100 opacity-50 text-emerald-800"
+                                : rightSelected && rightSelected.id === item.id
+                                ? "bg-emerald-500 text-white scale-105"
+                                : "bg-white hover:bg-emerald-50 text-slate-700"
+                            }
+                         `}
+                  >
+                    {getText(item.desc)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {matched.length === pairs.length && (
+              <div className="mt-8 text-4xl font-black text-emerald-600 animate-bounce">
+                {getText("correct")}
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

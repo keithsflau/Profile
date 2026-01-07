@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Stress Buster</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #eff6ff;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Stress Buster",
+          zh: "壓力消除器",
+          ja: "ストレスバスター",
+          ko: "스트레스 해소",
+          es: "Eliminador de estrés",
+          de: "Stress-Killer",
+          fi: "Stressinpoistaja",
+          fr: "Anti-stress",
+          ar: "مزيل التوتر",
+          it: "Anti-Stress",
+        },
+        instruction: {
+          en: "Pop the stress bubbles!",
+          zh: "戳破壓力泡泡！",
+          ja: "ストレスの泡を割ろう！",
+          ko: "스트레스 거품을 터뜨리세요!",
+          es: "¡Revienta las burbujas de estrés!",
+          de: "Lass die Stressblasen platzen!",
+          fi: "Poksa stressikuplat!",
+          fr: "Éclatez les bulles de stress !",
+          ar: "فقع فقاعات التوتر!",
+          it: "Scopper i bolle di stress!",
+        },
+        exam: { en: "Exams", zh: "考試", ja: "試験", ko: "시험" },
+        homework: { en: "Homework", zh: "功課", ja: "宿題", ko: "숙제" },
+        quarrel: { en: "Arguments", zh: "吵架", ja: "口論", ko: "다툼" },
+        time: {
+          en: "No Time",
+          zh: "沒時間",
+          ja: "時間がない",
+          ko: "시간 없음",
+        },
+
+        relieved: {
+          en: "So Relaxing~",
+          zh: "真輕鬆～",
+          ja: "リラックス〜",
+          ko: "편안해요~",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [bubbles, setBubbles] = useState([]);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        useEffect(() => {
+          const words = [
+            "exam",
+            "homework",
+            "quarrel",
+            "time",
+            "exam",
+            "homework",
+          ];
+          const newBubbles = words.map((w, i) => ({
+            id: i,
+            word: w,
+            x: Math.random() * 80 + 10,
+            y: Math.random() * 80 + 10,
+            popped: false,
+          }));
+          setBubbles(newBubbles);
+        }, []);
+
+        const pop = (id) => {
+          setBubbles((prev) =>
+            prev.map((b) => (b.id === id ? { ...b, popped: true } : b))
+          );
+          // Play sound?
+        };
+
+        const allPopped = bubbles.every((b) => b.popped);
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-blue-600">
+              {getText("title")}
+            </h1>
+            <p className="mb-4 font-bold text-slate-500">
+              {getText("instruction")}
+            </p>
+
+            <div className="relative w-full max-w-2xl h-[500px] border-4 border-blue-200 rounded-3xl bg-blue-50 overflow-hidden shadow-inner">
+              {bubbles.map(
+                (b) =>
+                  !b.popped && (
+                    <motion.button
+                      key={b.id}
+                      onClick={() => pop(b.id)}
+                      className="absolute w-24 h-24 rounded-full bg-gradient-to-br from-blue-300 to-blue-500 text-white font-bold flex items-center justify-center shadow-lg active:scale-90 opacity-80 backdrop-blur"
+                      style={{ left: `${b.x}%`, top: `${b.y}%` }}
+                      animate={{ y: [0, -20, 0] }}
+                      transition={{
+                        repeat: Infinity,
+                        duration: 3 + Math.random(),
+                        ease: "easeInOut",
+                      }}
+                    >
+                      {getText(b.word)}
+                    </motion.button>
+                  )
+              )}
+
+              {allPopped && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-5xl font-black text-blue-400 animate-pulse">
+                    {getText("relieved")} 😌
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小五數學：分數乘分數 | Fraction × Fraction</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="../../common/i18n.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fdf4ff 0%, #e879f9 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Fraction × Fraction",
+          zh: "分數乘分數",
+          ja: "分数 × 分数",
+          ko: "분수 × 분수",
+          es: "Fracción × Fracción",
+          de: "Bruch × Bruch",
+          fi: "Murtoluku × Murtoluku",
+          fr: "Fraction × Fraction",
+          ar: "كسر × كسر",
+          it: "Frazione × Frazione",
+        },
+        formulaTitle: {
+          en: "Formula:",
+          zh: "公式:",
+          ja: "公式:",
+          ko: "공식:",
+          es: "Fórmula:",
+          de: "Formel:",
+          fi: "Kaava:",
+          fr: "Formule :",
+          ar: "الصيغة:",
+          it: "Formula:",
+        },
+        formula: {
+          en: "Numerator × Numerator / Denominator × Denominator",
+          zh: "分子 × 分子 / 分母 × 分母",
+          ja: "分子 × 分子 / 分母 × 分母",
+          ko: "분자 × 분자 / 분모 × 분모",
+          es: "Numerador × Numerador / Denominador × Denominador",
+          de: "Zähler × Zähler / Nenner × Nenner",
+          fi: "Osoittaja × Osoittaja / Nimittäjä × Nimittäjä",
+          fr: "Numérateur × Numérateur / Dénominateur × Dénominateur",
+          ar: "البسط × البسط / المقام × المقام",
+          it: "Numeratore × Numeratore / Denominatore × Denominatore",
+        },
+        numerator: {
+          en: "(Numerator)",
+          zh: "(分子)",
+          ja: "(分子)",
+          ko: "(분자)",
+          es: "(Numerador)",
+          de: "(Zähler)",
+          fi: "(Osoittaja)",
+          fr: "(Numérateur)",
+          ar: "(البسط)",
+          it: "(Numeratore)",
+        },
+        denominator: {
+          en: "(Denominator)",
+          zh: "(分母)",
+          ja: "(分母)",
+          ko: "(분모)",
+          es: "(Denominador)",
+          de: "(Nenner)",
+          fi: "(Nimittäjä)",
+          fr: "(Dénominateur)",
+          ar: "(المقام)",
+          it: "(Denominatore)",
+        },
+        simplify: {
+          en: "Simplify ÷",
+          zh: "約簡 ÷",
+          ja: "約分 ÷",
+          ko: "약분 ÷",
+          es: "Simplificar ÷",
+          de: "Vereinfachen ÷",
+          fi: "Supista ÷",
+          fr: "Simplifier ÷",
+          ar: "تبسيط ÷",
+          it: "Semplifica ÷",
+        },
+        answer: {
+          en: "Answer",
+          zh: "答案",
+          ja: "答え",
+          ko: "답",
+          es: "Respuesta",
+          de: "Antwort",
+          fi: "Vastaus",
+          fr: "Réponse",
+          ar: "إجابة",
+          it: "Risposta",
+        },
+        visualization: {
+          en: "Visualization: {f1} of {f2}",
+          zh: "視覺化: {f1} 的 {f2}",
+          ja: "視覚化: {f2} の {f1}",
+          ko: "시각화: {f2} 의 {f1}",
+          es: "Visualización: {f1} de {f2}",
+          de: "Visualisierung: {f1} von {f2}",
+          fi: "Visualisointi: {f1} - {f2}",
+          fr: "Visualisation : {f1} de {f2}",
+          ar: "التصور: {f1} من {f2}",
+          it: "Visualizzazione: {f1} di {f2}",
+        },
+        purpleCells: {
+          en: "Purple Cells",
+          zh: "紫色格",
+          ja: "紫色のセル",
+          ko: "보라색 칸",
+          es: "Celdas Moradas",
+          de: "Lila Zellen",
+          fi: "Violetit solut",
+          fr: "Cellules violettes",
+          ar: "خلايا أرجوانية",
+          it: "Celle viola",
+        },
+        totalCells: {
+          en: "Total Cells",
+          zh: "總格數",
+          ja: "総セル数",
+          ko: "총 칸 수",
+          es: "Celdas Totales",
+          de: "Gesamtzellen",
+          fi: "Soluja yhteensä",
+          fr: "Total des cellules",
+          ar: "إجمالي الخلايا",
+          it: "Celle totali",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const [n1, setN1] = useState(2);
+        const [d1, setD1] = useState(3);
+        const [n2, setN2] = useState(3);
+        const [d2, setD2] = useState(4);
+
+        const gcd = (a, b) => (b === 0 ? a : gcd(b, a % b));
+        const prodN = n1 * n2;
+        const prodD = d1 * d2;
+        const g = gcd(prodN, prodD);
+        const simN = prodN / g;
+        const simD = prodD / g;
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-5xl font-black text-fuchsia-900 mb-2 mt-8">
+              ✖️ {getText("title")}
+            </h1>
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-3xl w-full mt-8">
+              <div className="flex items-center justify-center gap-6 mb-8 flex-wrap">
+                <div className="bg-pink-50 p-4 rounded-xl border-2 border-pink-200">
+                  <div className="flex flex-col items-center">
+                    <input
+                      type="number"
+                      min="1"
+                      value={n1}
+                      onChange={(e) =>
+                        setN1(Math.max(1, parseInt(e.target.value) || 1))
+                      }
+                      className="w-14 text-3xl font-black text-center border-b-4 border-pink-400 bg-transparent outline-none"
+                    />
+                    <div className="w-14 h-1 bg-pink-800 my-1"></div>
+                    <input
+                      type="number"
+                      min="1"
+                      value={d1}
+                      onChange={(e) =>
+                        setD1(Math.max(1, parseInt(e.target.value) || 1))
+                      }
+                      className="w-14 text-3xl font-black text-center bg-transparent outline-none"
+                    />
+                  </div>
+                </div>
+                <span className="text-4xl font-black text-fuchsia-400">×</span>
+                <div className="bg-purple-50 p-4 rounded-xl border-2 border-purple-200">
+                  <div className="flex flex-col items-center">
+                    <input
+                      type="number"
+                      min="1"
+                      value={n2}
+                      onChange={(e) =>
+                        setN2(Math.max(1, parseInt(e.target.value) || 1))
+                      }
+                      className="w-14 text-3xl font-black text-center border-b-4 border-purple-400 bg-transparent outline-none"
+                    />
+                    <div className="w-14 h-1 bg-purple-800 my-1"></div>
+                    <input
+                      type="number"
+                      min="1"
+                      value={d2}
+                      onChange={(e) =>
+                        setD2(Math.max(1, parseInt(e.target.value) || 1))
+                      }
+                      className="w-14 text-3xl font-black text-center bg-transparent outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-slate-50 rounded-2xl p-6 text-center mb-6">
+                <p className="text-xl mb-2">
+                  <b>{getText("formulaTitle")}</b> {getText("formula")}
+                </p>
+                <p className="text-2xl font-mono">
+                  {n1} × {n2} = {prodN} {getText("numerator")}
+                </p>
+                <p className="text-2xl font-mono">
+                  {d1} × {d2} = {prodD} {getText("denominator")}
+                </p>
+                <p className="text-2xl font-mono mt-2">
+                  = {prodN}/{prodD}
+                </p>
+                {g > 1 && (
+                  <p className="text-lg text-slate-500 mt-2">
+                    {getText("simplify")} {g} = {simN}/{simD}
+                  </p>
+                )}
+              </div>
+
+              <div className="bg-fuchsia-100 rounded-2xl p-6 text-center border-4 border-fuchsia-300">
+                <div className="text-fuchsia-600 font-bold mb-2">
+                  {getText("answer")}
+                </div>
+                <div className="text-5xl font-black text-fuchsia-800">
+                  {simN}/{simD}
+                </div>
+              </div>
+
+              {/* Visual grid */}
+              <div className="mt-6 bg-slate-100 rounded-2xl p-4">
+                <p className="text-center text-sm text-slate-600 mb-4">
+                  {getText("visualization")
+                    .replace("{f1}", `${n1}/${d1}`)
+                    .replace("{f2}", `${n2}/${d2}`)}
+                </p>
+                <div
+                  className="grid gap-1 mx-auto w-fit"
+                  style={{ gridTemplateColumns: `repeat(${d2}, 1fr)` }}
+                >
+                  {[...Array(d1 * d2)].map((_, i) => {
+                    const row = Math.floor(i / d2);
+                    const col = i % d2;
+                    const filled = row < n1 && col < n2;
+                    return (
+                      <div
+                        key={i}
+                        className={`w-8 h-8 border border-slate-300 ${
+                          filled
+                            ? "bg-fuchsia-400"
+                            : row < n1
+                            ? "bg-pink-200"
+                            : "bg-white"
+                        }`}
+                      ></div>
+                    );
+                  })}
+                </div>
+                <p className="text-center text-sm text-slate-500 mt-2">
+                  {getText("purpleCells")} = {n1 * n2} / {getText("totalCells")}{" "}
+                  = {d1 * d2}
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

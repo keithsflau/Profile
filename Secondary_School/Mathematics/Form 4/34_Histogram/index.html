@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Histogram Builder | S4 Math 直方圖</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Sans+TC:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-purple-50 text-slate-800 min-h-screen">
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useMemo } = React;
+
+      const translations = {
+        en: {
+          unit: "Unit 5: Statistics",
+          title: "Histogram Builder",
+          desc: "Visualize frequency distribution of data.",
+          data: "Data (comma-separated)",
+          bins: "Number of Bins",
+          frequency: "Frequency",
+          classWidth: "Class Width",
+        },
+        zh: {
+          unit: "單元五：統計學",
+          title: "直方圖生成器",
+          desc: "視像化數據的頻率分布。",
+          data: "數據（逗號分隔）",
+          bins: "組數",
+          frequency: "頻率",
+          classWidth: "組距",
+        },
+      };
+
+      const App = () => {
+        const [lang, setLang] = useState("en");
+        const t = translations[lang];
+
+        const [input, setInput] = useState(
+          "12, 15, 23, 25, 28, 32, 35, 38, 42, 45, 48, 52, 55, 58, 62, 65, 68, 72, 75, 78"
+        );
+        const [numBins, setNumBins] = useState(5);
+
+        const histogram = useMemo(() => {
+          const nums = input
+            .split(/[,\s]+/)
+            .map(Number)
+            .filter((n) => !isNaN(n));
+          if (nums.length < 2) return null;
+
+          const min = Math.min(...nums);
+          const max = Math.max(...nums);
+          const range = max - min;
+          const binWidth = range / numBins;
+
+          const bins = [];
+          for (let i = 0; i < numBins; i++) {
+            const lower = min + i * binWidth;
+            const upper = min + (i + 1) * binWidth;
+            const count = nums.filter(
+              (n) => n >= lower && (i === numBins - 1 ? n <= upper : n < upper)
+            ).length;
+            bins.push({ lower, upper, count });
+          }
+
+          return { bins, binWidth, max: Math.max(...bins.map((b) => b.count)) };
+        }, [input, numBins]);
+
+        // Chart
+        const w = 550,
+          h = 300;
+        const chartH = 220;
+
+        return (
+          <div className="p-8 max-w-4xl mx-auto min-h-screen flex flex-col items-center select-none">
+            <header className="mb-8 text-center w-full relative">
+              <button
+                onClick={() => setLang(lang === "en" ? "zh" : "en")}
+                className="absolute right-0 top-0 px-4 py-2 bg-white rounded-full shadow border border-purple-200 text-sm font-bold text-purple-600 hover:bg-purple-50 transition"
+              >
+                <i className="fa-solid fa-globe mr-2"></i>
+                {lang === "en" ? "中文" : "ENG"}
+              </button>
+              <div className="text-purple-600 font-bold uppercase text-xs tracking-widest mb-2">
+                {t.unit}
+              </div>
+              <h1 className="text-4xl font-extrabold text-slate-900 mb-2">
+                {t.title}
+              </h1>
+              <p className="text-slate-500">{t.desc}</p>
+            </header>
+
+            <div className="bg-white p-6 rounded-3xl shadow-xl border border-purple-100 w-full mb-8">
+              {/* Data Input */}
+              <div className="mb-6">
+                <label className="text-sm font-bold text-slate-500 block mb-2">
+                  {t.data}
+                </label>
+                <textarea
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  className="w-full p-4 bg-slate-50 rounded-xl border border-slate-200 font-mono focus:ring-2 focus:ring-purple-400 outline-none h-20"
+                ></textarea>
+              </div>
+
+              {/* Bins Control */}
+              <div className="mb-6">
+                <label className="text-sm font-bold text-slate-500 block mb-2">
+                  {t.bins}
+                </label>
+                <input
+                  type="range"
+                  min="3"
+                  max="10"
+                  value={numBins}
+                  onChange={(e) => setNumBins(Number(e.target.value))}
+                  className="w-full accent-purple-500"
+                />
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-400">
+                    {t.bins}: {numBins}
+                  </span>
+                  {histogram && (
+                    <span className="text-purple-600 font-mono">
+                      {t.classWidth}: {histogram.binWidth.toFixed(1)}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Histogram */}
+              {histogram ? (
+                <div className="bg-slate-50 p-4 rounded-xl overflow-x-auto">
+                  <svg width={w} height={h} className="mx-auto">
+                    {/* Y-axis */}
+                    <line
+                      x1="60"
+                      y1="20"
+                      x2="60"
+                      y2={chartH + 30}
+                      stroke="#94a3b8"
+                      strokeWidth="2"
+                    />
+                    <text
+                      x="30"
+                      y={chartH / 2}
+                      textAnchor="middle"
+                      transform={`rotate(-90, 30, ${chartH / 2})`}
+                      className="text-xs fill-slate-400"
+                    >
+                      {t.frequency}
+                    </text>
+
+                    {/* X-axis */}
+                    <line
+                      x1="60"
+                      y1={chartH + 30}
+                      x2={w - 20}
+                      y2={chartH + 30}
+                      stroke="#94a3b8"
+                      strokeWidth="2"
+                    />
+
+                    {/* Bars */}
+                    {histogram.bins.map((bin, i) => {
+                      const barWidth = (w - 100) / histogram.bins.length - 4;
+                      const barHeight =
+                        histogram.max > 0
+                          ? (bin.count / histogram.max) * chartH
+                          : 0;
+                      const x = 70 + i * (barWidth + 4);
+                      const y = chartH + 30 - barHeight;
+
+                      return (
+                        <g key={i}>
+                          <rect
+                            x={x}
+                            y={y}
+                            width={barWidth}
+                            height={barHeight}
+                            fill="#a855f7"
+                            stroke="#9333ea"
+                            strokeWidth="1"
+                            className="hover:opacity-80 transition"
+                          />
+                          {/* Frequency label */}
+                          <text
+                            x={x + barWidth / 2}
+                            y={y - 5}
+                            textAnchor="middle"
+                            className="text-xs fill-purple-600 font-bold"
+                          >
+                            {bin.count}
+                          </text>
+                          {/* Range label */}
+                          <text
+                            x={x + barWidth / 2}
+                            y={h - 10}
+                            textAnchor="middle"
+                            className="text-[9px] fill-slate-400"
+                          >
+                            {bin.lower.toFixed(0)}-{bin.upper.toFixed(0)}
+                          </text>
+                        </g>
+                      );
+                    })}
+                  </svg>
+                </div>
+              ) : (
+                <div className="text-center text-slate-400 py-12">
+                  <i className="fa-solid fa-chart-bar text-4xl mb-2"></i>
+                  <p>Enter at least 2 data points</p>
+                </div>
+              )}
+
+              {/* Frequency Table */}
+              {histogram && (
+                <div className="mt-6 bg-purple-50 p-4 rounded-xl border border-purple-100 overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-purple-200">
+                        <th className="py-2 text-purple-500">Class Interval</th>
+                        <th className="py-2 text-purple-500">{t.frequency}</th>
+                      </tr>
+                    </thead>
+                    <tbody className="font-mono">
+                      {histogram.bins.map((bin, i) => (
+                        <tr key={i} className="border-b border-purple-100">
+                          <td className="py-2 text-center">
+                            {bin.lower.toFixed(1)} - {bin.upper.toFixed(1)}
+                          </td>
+                          <td className="py-2 text-center font-bold text-purple-700">
+                            {bin.count}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            <footer className="mt-8">
+              <a
+                href="../index.html"
+                className="text-purple-500 hover:text-purple-700 font-bold"
+              >
+                <i className="fa-solid fa-arrow-left mr-2"></i> Back to
+                Dashboard
+              </a>
+            </footer>
+          </div>
+        );
+      };
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

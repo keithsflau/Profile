@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小六數學：比例尺繪圖 | Scale Drawing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fae8ff 0%, #c026d3 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      function App() {
+        const [realH, setRealH] = useState(200); // cm
+        const [realW, setRealW] = useState(100); // cm
+        const [scale, setScale] = useState(50); // 1:50
+
+        const drawH = realH / scale;
+        const drawW = realW / scale;
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-5xl font-black text-fuchsia-900 mb-2">
+              ✏️ 比例尺繪圖
+            </h1>
+            <p className="text-xl text-fuchsia-700 font-bold mb-8">
+              Scale Drawing
+            </p>
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-4xl w-full flex flex-col md:flex-row gap-8">
+              <div className="flex-1 space-y-6">
+                <div>
+                  <label className="block font-bold text-fuchsia-800">
+                    實際高度 Real Height (cm): {realH}
+                  </label>
+                  <input
+                    type="range"
+                    min="100"
+                    max="400"
+                    step="10"
+                    value={realH}
+                    onChange={(e) => setRealH(parseInt(e.target.value))}
+                    className="w-full accent-fuchsia-600"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-fuchsia-800">
+                    實際闊度 Real Width (cm): {realW}
+                  </label>
+                  <input
+                    type="range"
+                    min="50"
+                    max="300"
+                    step="10"
+                    value={realW}
+                    onChange={(e) => setRealW(parseInt(e.target.value))}
+                    className="w-full accent-fuchsia-600"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-fuchsia-800 mb-2">
+                    選擇比例尺 Scale:
+                  </label>
+                  <div className="flex gap-2">
+                    {[10, 20, 50, 100].map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => setScale(s)}
+                        className={`flex-1 py-2 rounded-lg font-bold border-2 ${
+                          scale === s
+                            ? "bg-fuchsia-600 text-white border-fuchsia-600"
+                            : "bg-white border-slate-300 text-slate-600"
+                        }`}
+                      >
+                        1:{s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-fuchsia-50 p-4 rounded-xl border border-fuchsia-200">
+                  <p className="font-bold text-fuchsia-900">
+                    計算 Drawing Size:
+                  </p>
+                  <p className="font-mono">
+                    高: {realH} ÷ {scale} = {drawH} cm
+                  </p>
+                  <p className="font-mono">
+                    闊: {realW} ÷ {scale} = {drawW} cm
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex-1 flex items-center justify-center bg-slate-50 border-4 border-slate-200 rounded-xl min-h-[300px] relative">
+                {/* Grid BG */}
+                <div
+                  className="absolute inset-0 opacity-10"
+                  style={{
+                    backgroundImage:
+                      "radial-gradient(#000 1px, transparent 1px)",
+                    backgroundSize: "20px 20px",
+                  }}
+                ></div>
+
+                <div
+                  className="relative bg-fuchsia-500 transition-all duration-300 shadow-xl border-2 border-fuchsia-700 mx-auto"
+                  style={{
+                    width: `${drawW * 20}px`, // Scale up for visibility: 1cm = 20px on screen
+                    height: `${drawH * 20}px`,
+                  }}
+                >
+                  <div className="absolute -left-8 top-1/2 -translate-y-1/2 -rotate-90 text-xs font-bold whitespace-nowrap text-slate-500">
+                    {drawH} cm
+                  </div>
+                  <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs font-bold whitespace-nowrap text-slate-500">
+                    {drawW} cm
+                  </div>
+                </div>
+
+                <div className="absolute bottom-2 right-2 text-xs text-slate-400 font-bold">
+                  1cm (Screen) ≈ 20px
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

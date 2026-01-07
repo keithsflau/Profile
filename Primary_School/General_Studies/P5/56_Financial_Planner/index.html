@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Financial Planner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #f0fdf4;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Pocket Money Planner",
+          zh: "零用錢規劃師",
+          ja: "お小遣いプランナー",
+          ko: "용돈 계획기",
+          es: "Planificador de dinero de bolsillo",
+          de: "Taschengeldplaner",
+          fi: "Taskurahasuunnittelija",
+          fr: "Planificateur d'argent de poche",
+          ar: "مخطط مصروف الجيب",
+          it: "Pianificatore Paghetta",
+        },
+        instruction: {
+          en: "Save money to buy the Bike ($100)!",
+          zh: "儲蓄購買單車 ($100)！",
+          ja: "自転車（$100）を買うためにお金を貯めよう！",
+          ko: "자전거($100)를 사기 위해 돈을 모으세요!",
+          es: "¡Ahorra dinero para comprar la bicicleta ($100)!",
+          de: "Spare Geld, um das Fahrrad zu kaufen ($100)!",
+          fi: "Säästä rahaa ostaaksesi pyörän ($100)!",
+          fr: "Économisez de l'argent pour acheter le vélo (100 $) !",
+          ar: "ادخر المال لشراء الدراجة (100 دولار)!",
+          it: "Risparmia per comprare la bici ($100)!",
+        },
+        income: {
+          en: "Income (Weekly)",
+          zh: "收入 (每週)",
+          ja: "収入 (毎週)",
+          ko: "수입 (주간)",
+          es: "Ingresos (Semanal)",
+          de: "Einkommen (Wöchentlich)",
+          fi: "Tulot (Viikoittain)",
+          fr: "Revenu (Hebdomadaire)",
+          ar: "دخل (أسبوعي)",
+          it: "Entrate (Settimanali)",
+        },
+        spend: {
+          en: "Spend",
+          zh: "花費",
+          ja: "使う",
+          ko: "지출",
+          es: "Gastar",
+          de: "Ausgeben",
+          fi: "Kuluta",
+          fr: "Dépenser",
+          ar: "إنفاق",
+          it: "Spendere",
+        },
+        save: {
+          en: "Save",
+          zh: "儲蓄",
+          ja: "貯金",
+          ko: "저축",
+          es: "Ahorrar",
+          de: "Sparen",
+          fi: "Säästä",
+          fr: "Économiser",
+          ar: "ادخار",
+          it: "Risparmiare",
+        },
+
+        snack: {
+          en: "Buy Snacks (-$10)",
+          zh: "買零食 (-$10)",
+          ja: "お菓子を買う (-$10)",
+          ko: "간식 구매 (-$10)",
+        },
+        toy: {
+          en: "Buy Toy (-$20)",
+          zh: "買玩具 (-$20)",
+          ja: "おもちゃを買う (-$20)",
+          ko: "장난감 구매 (-$20)",
+        },
+        allowance: {
+          en: "Allowance (+$30)",
+          zh: "零用錢 (+$30)",
+          ja: "お小遣い (+$30)",
+          ko: "용돈 (+$30)",
+        },
+
+        wallet: {
+          en: "Wallet:",
+          zh: "錢包：",
+          ja: "財布：",
+          ko: "지갑:",
+          es: "Cartera:",
+          de: "Brieftasche:",
+          fi: "Lompakko:",
+          fr: "Portefeuille :",
+          ar: "محفظة:",
+          it: "Portafoglio:",
+        },
+        goal: {
+          en: "Goal:",
+          zh: "目標：",
+          ja: "目標：",
+          ko: "목표:",
+          es: "Meta:",
+          de: "Ziel:",
+          fi: "Tavoite:",
+          fr: "Objectif :",
+          ar: "هدف:",
+          it: "Obiettivo:",
+        },
+        success: {
+          en: "Goal Reached! 🚲",
+          zh: "達成目標！🚲",
+          ja: "目標達成！🚲",
+          ko: "목표 달성! 🚲",
+          es: "¡Meta alcanzada! 🚲",
+          de: "Ziel erreicht! 🚲",
+          fi: "Tavoite saavutettu! 🚲",
+          fr: "Objectif atteint ! 🚲",
+          ar: "تم الوصول إلى الهدف! 🚲",
+          it: "Obiettivo Raggiunto! 🚲",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [money, setMoney] = useState(0);
+        const [history, setHistory] = useState([]);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+        const GOAL = 100;
+
+        const handleTransaction = (amount, type) => {
+          if (money + amount < 0) return; // No debt
+          setMoney(money + amount);
+          setHistory([...history, { amount, type }]);
+        };
+
+        const reset = () => {
+          setMoney(0);
+          setHistory([]);
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-green-700">
+              {getText("title")}
+            </h1>
+
+            <div className="mb-8 font-bold text-slate-500 text-xl text-center">
+              {getText("instruction")}
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-8 w-full max-w-4xl">
+              {/* Visual Tracker */}
+              <div className="flex-1 bg-white p-6 rounded-3xl shadow-xl border-4 border-green-100 flex flex-col items-center">
+                <div className="text-6xl mb-4">🐷</div>
+                <div className="text-3xl font-black mb-2 text-green-600">
+                  {getText("wallet")} ${money}
+                </div>
+
+                <div className="w-full bg-slate-200 h-8 rounded-full mt-4 overflow-hidden border border-slate-300">
+                  <motion.div
+                    className="h-full bg-green-500"
+                    animate={{
+                      width: `${Math.min(100, (money / GOAL) * 100)}%`,
+                    }}
+                  ></motion.div>
+                </div>
+                <div className="w-full flex justify-between text-xs font-bold text-slate-400 mt-1">
+                  <span>$0</span>
+                  <span>
+                    {getText("goal")} ${GOAL}
+                  </span>
+                </div>
+
+                {money >= GOAL && (
+                  <div className="mt-8 bg-yellow-100 text-yellow-800 p-4 rounded-xl font-bold text-2xl animate-bounce">
+                    {getText("success")}
+                  </div>
+                )}
+              </div>
+
+              {/* Actions */}
+              <div className="flex-1 flex flex-col gap-4">
+                <button
+                  onClick={() => handleTransaction(30, "allowance")}
+                  disabled={money >= GOAL}
+                  className="bg-green-100 hover:bg-green-200 text-green-800 p-6 rounded-2xl font-bold text-xl flex justify-between items-center transition-transform active:scale-95 disabled:opacity-50"
+                >
+                  <span>📅 {getText("allowance")}</span>
+                  <span className="text-3xl">💰</span>
+                </button>
+
+                <button
+                  onClick={() => handleTransaction(-10, "snack")}
+                  disabled={money < 10 || money >= GOAL}
+                  className="bg-red-50 hover:bg-red-100 text-red-800 p-6 rounded-2xl font-bold text-xl flex justify-between items-center transition-transform active:scale-95 disabled:opacity-50"
+                >
+                  <span>🍫 {getText("snack")}</span>
+                  <span className="text-3xl">💸</span>
+                </button>
+
+                <button
+                  onClick={() => handleTransaction(-20, "toy")}
+                  disabled={money < 20 || money >= GOAL}
+                  className="bg-red-50 hover:bg-red-100 text-red-800 p-6 rounded-2xl font-bold text-xl flex justify-between items-center transition-transform active:scale-95 disabled:opacity-50"
+                >
+                  <span>🤖 {getText("toy")}</span>
+                  <span className="text-3xl">💸</span>
+                </button>
+
+                <button
+                  onClick={reset}
+                  className="mt-4 text-slate-400 font-bold underline hover:text-slate-600"
+                >
+                  Reset
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

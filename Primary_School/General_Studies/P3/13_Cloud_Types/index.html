@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小三常識：雲的形狀 | Cloud Types</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: radial-gradient(circle at center, #7dd3fc 0%, #0284c7 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Cloud Watcher",
+          zh: "雲的觀察員",
+          ja: "雲の観察",
+          ko: "구름 관찰자",
+          es: "Observador de Nubes",
+          de: "Wolkenbeobachter",
+          fi: "Pilvibongari",
+          fr: "Observateur de nuages",
+          ar: "مراقب السحب",
+          it: "Osservatore di Nuvole",
+        },
+        instruction: {
+          en: "What weather comes next?",
+          zh: "這預示甚麼天氣？",
+          ja: "次はどんな天気？",
+          ko: "다음 날씨는 어떨까요?",
+          es: "¿Qué clima viene después?",
+          de: "Welches Wetter kommt als nächstes?",
+          fi: "Millainen sää tulee seuraavaksi?",
+          fr: "Quel temps fera-t-il ensuite ?",
+          ar: "ما هو الطقس القادم؟",
+          it: "Che tempo farà dopo?",
+        },
+
+        cumulus: {
+          en: "Cumulus (Fluffy)",
+          zh: "積雲 (棉花狀)",
+          ja: "積雲 (ふわふわ)",
+          ko: "적운 (솜털)",
+          es: "Cúmulo (Esponjoso)",
+          de: "Kumulus (Flauschig)",
+          fi: "Kumpupilvi (Pehmeä)",
+          fr: "Cumulus (Duveteux)",
+          ar: "رقني (رقيق)",
+          it: "Cumulo (Soffice)",
+        },
+        stratus: {
+          en: "Stratus (Flat)",
+          zh: "層雲 (層狀)",
+          ja: "層雲 (平ら)",
+          ko: "층운 (평평함)",
+          es: "Estrato (Plano)",
+          de: "Stratus (Flach)",
+          fi: "Kerrospilvi (Tasainen)",
+          fr: "Stratus (Plat)",
+          ar: "رهج (مسطح)",
+          it: "Strato (Piatto)",
+        },
+        nimbus: {
+          en: "Nimbus (Dark/Rain)",
+          zh: "雨雲 (深灰色)",
+          ja: "乱層雲 (暗い/雨)",
+          ko: "난층운 (어두움/비)",
+          es: "Nimbo (Oscuro/Lluvia)",
+          de: "Nimbus (Dunkel/Regen)",
+          fi: "Sadepilvi (Tumma/Sade)",
+          fr: "Nimbus (Sombre/Pluie)",
+          ar: "مزن (مظلم/مطر)",
+          it: "Nembo (Scuro/Pioggia)",
+        },
+        wispy: {
+          en: "Cirrus (Wispy)",
+          zh: "卷雲 (羽毛狀)",
+          ja: "巻雲 (薄い)",
+          ko: "권운 (새털)",
+          es: "Cirro (Tenue)",
+          de: "Cirrus (Federwolke)",
+          fi: "Yläpilvi (Hento)",
+          fr: "Cirrus (Vaporeux)",
+          ar: "سمحاق (رقيق)",
+          it: "Cirro (Tenue)",
+        },
+
+        sunny: {
+          en: "Sunny / Fair",
+          zh: "天晴 / 良好",
+          ja: "晴れ / 良好",
+          ko: "맑음 / 좋음",
+          es: "Soleado / Bueno",
+          de: "Sonnig / Heiter",
+          fi: "Aurinkoinen / Selkeä",
+          fr: "Ensoleillé / Beau",
+          ar: "مشمس / صحو",
+          it: "Soleggiato / Sereno",
+        },
+        overcast: {
+          en: "Cloudy / Gloomy",
+          zh: "陰天 / 灰暗",
+          ja: "曇り / どんより",
+          ko: "흐림 / 우울",
+          es: "Nublado / Sombrío",
+          de: "Bewölkt / Trüb",
+          fi: "Pilvinen / Synkkä",
+          fr: "Nuageux / Sombre",
+          ar: "غائم / كئيب",
+          it: "Nuvoloso / Cupo",
+        },
+        rain: {
+          en: "Rain / Storm",
+          zh: "下雨 / 因為",
+          ja: "雨 / 嵐",
+          ko: "비 / 폭풍",
+          es: "Lluvia / Tormenta",
+          de: "Regen / Sturm",
+          fi: "Sade / Myrsky",
+          fr: "Pluie / Tempête",
+          ar: "مطر / عاصفة",
+          it: "Pioggia / Tempesta",
+        },
+        windy: {
+          en: "Faire / Windy",
+          zh: "晴朗 / 有風",
+          ja: "晴れ / 風",
+          ko: "맑음 / 바람",
+          es: "Bueno / Ventoso",
+          de: "Heiter / Windig",
+          fi: "Selkeä / Tuulinen",
+          fr: "Beau / Venté",
+          ar: "صحو / عاصف",
+          it: "Sereno / Ventoso",
+        },
+
+        correct: {
+          en: "Correct!",
+          zh: "觀察正確！",
+          ja: "正解！",
+          ko: "정답입니다!",
+          es: "¡Correcto!",
+          de: "Richtig!",
+          fi: "Oikein!",
+          fr: "Correct !",
+          ar: "صحيح!",
+          it: "Corretto!",
+        },
+        wrong: {
+          en: "Try Again",
+          zh: "再看清楚！",
+          ja: "もう一度見て！",
+          ko: "다시 보세요!",
+          es: "¡Inténtalo de nuevo!",
+          de: "Versuch es nochmal!",
+          fi: "Yritä uudelleen!",
+          fr: "Réessayez !",
+          ar: "حاول مرة أخرى!",
+          it: "Riprova!",
+        },
+        completed: {
+          en: "Sky Expert!",
+          zh: "天空專家！",
+          ja: "空のエキスパート！",
+          ko: "하늘 전문가!",
+          es: "¡Experto del Cielo!",
+          de: "Himmelsexperte!",
+          fi: "Taivasasiantuntija!",
+          fr: "Expert du ciel !",
+          ar: "خبير السماء!",
+          it: "Esperto del Cielo!",
+        },
+        reset: {
+          en: "Watch Again",
+          zh: "再觀察",
+          ja: "もう一度観察",
+          ko: "다시 관찰하기",
+          es: "Observar de Nuevo",
+          de: "Nochmal beobachten",
+          fi: "Katso uudelleen",
+          fr: "Observer à nouveau",
+          ar: "شاهد مرة أخرى",
+          it: "Guarda di Nuovo",
+        },
+      };
+
+      const clouds = [
+        {
+          id: "cumulus",
+          shape: "☁️",
+          color: "text-white",
+          type: "sunny",
+          size: "text-9xl scale-125",
+        },
+        {
+          id: "nimbus",
+          shape: "☁️",
+          color: "text-slate-600",
+          type: "rain",
+          size: "text-[10rem]",
+        }, // Dark
+        {
+          id: "stratus",
+          shape: "🌫️",
+          color: "text-slate-300",
+          type: "overcast",
+          size: "text-9xl scale-x-150",
+        }, // Flat
+        {
+          id: "wispy",
+          shape: "〰️",
+          color: "text-white opacity-80",
+          type: "windy",
+          size: "text-8xl rotate-12",
+        }, // Wispy simulation
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [target, setTarget] = useState(null);
+        const [feedback, setFeedback] = useState(null);
+        const [score, setScore] = useState(0);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        useEffect(() => {
+          newCloud();
+        }, []);
+
+        const newCloud = () => {
+          const c = clouds[Math.floor(Math.random() * clouds.length)];
+          setTarget(c);
+          setFeedback(null);
+        };
+
+        const handleGuess = (weatherType) => {
+          if (feedback) return;
+
+          if (weatherType === target.type) {
+            setFeedback("correct");
+            setScore((s) => s + 1);
+            setTimeout(newCloud, 1000);
+          } else {
+            setFeedback("wrong");
+            setTimeout(() => setFeedback(null), 800);
+          }
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center select-none font-sans overflow-hidden cursor-default">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-white mb-2 mt-8 drop-shadow-md">
+              🌤️ {getText("title")}
+            </h1>
+
+            <div className="font-bold text-white mb-8 bg-sky-900/30 px-6 py-1 rounded-full">
+              {getText("instruction")}
+            </div>
+
+            {target && (
+              <div className="flex-1 w-full max-w-4xl flex flex-col items-center">
+                {/* Sky Viewport */}
+                <div className="relative w-full aspect-video bg-sky-300 rounded-[3rem] shadow-inner border-8 border-white overflow-hidden mb-8 flex items-center justify-center">
+                  {/* Sun (Conditional) */}
+                  {(target.type === "sunny" || target.type === "windy") && (
+                    <div className="absolute top-8 right-8 text-yellow-300 text-6xl animate-spin-slow">
+                      ☀️
+                    </div>
+                  )}
+
+                  {/* The Cloud */}
+                  <motion.div
+                    key={target.id + score} // Remount on new
+                    initial={{ x: -200, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    className={`${target.size} ${target.color} drop-shadow-xl select-none`}
+                  >
+                    {target.shape}
+                  </motion.div>
+
+                  {/* Rain FX */}
+                  {target.type === "rain" && (
+                    <div className="absolute inset-0 bg-slate-900/20 pointer-events-none flex flex-col items-center justify-center pt-32">
+                      <div className="text-4xl animate-bounce text-blue-300">
+                        💧 💧 💧
+                      </div>
+                    </div>
+                  )}
+
+                  {feedback && (
+                    <div
+                      className={`absolute inset-0 flex items-center justify-center z-20`}
+                    >
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className={`px-8 py-4 rounded-3xl font-black text-3xl shadow-2xl ${
+                          feedback === "correct"
+                            ? "bg-green-500 text-white"
+                            : "bg-red-500 text-white"
+                        }`}
+                      >
+                        {getText(feedback)}
+                      </motion.div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Controls */}
+                <div className="w-full bg-white/10 backdrop-blur-md rounded-3xl p-6 border-2 border-white/20">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-white font-bold opacity-80">
+                      {getText(target.id)}
+                    </span>
+                    <span className="bg-white/20 text-white px-3 py-1 rounded-full font-mono font-bold">
+                      Score: {score}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {[
+                      { id: "sunny", label: "sunny", icon: "☀️" },
+                      { id: "overcast", label: "overcast", icon: "☁️" },
+                      { id: "rain", label: "rain", icon: "🌧️" },
+                      { id: "windy", label: "windy", icon: "🍃" },
+                    ].map((opt) => (
+                      <button
+                        key={opt.id}
+                        onClick={() => handleGuess(opt.id)}
+                        disabled={feedback}
+                        className="bg-white hover:bg-sky-50 active:scale-95 transition-all text-sky-800 rounded-xl py-4 font-bold shadow-lg flex flex-col items-center"
+                      >
+                        <span className="text-3xl mb-2">{opt.icon}</span>
+                        <span className="text-sm leading-tight">
+                          {getText(opt.label)}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

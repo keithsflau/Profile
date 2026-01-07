@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>M2 Mathematics | Algebra & Calculus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Plus+Jakarta+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              outfit: ["Outfit", "sans-serif"],
+              jakarta: ["Plus Jakarta Sans", "sans-serif"],
+              mono: ["JetBrains Mono", "monospace"],
+            },
+            colors: {
+              m2: {
+                50: "#f0f9ff",
+                100: "#e0f2fe",
+                500: "#0ea5e9", // Sky 500
+                600: "#0284c7",
+                900: "#0c4a6e",
+                dark: "#0f172a", // Slate 900
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        background-color: #0f172a;
+        color: #e2e8f0;
+        background-image: radial-gradient(
+            at 0% 0%,
+            rgba(14, 165, 233, 0.15) 0px,
+            transparent 50%
+          ),
+          radial-gradient(
+            at 100% 100%,
+            rgba(99, 102, 241, 0.15) 0px,
+            transparent 50%
+          );
+        background-attachment: fixed;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+      }
+      .glass-panel:hover {
+        background: rgba(30, 41, 59, 0.9);
+        border-color: rgba(14, 165, 233, 0.4);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+      }
+      .neon-text {
+        text-shadow: 0 0 10px rgba(14, 165, 233, 0.5);
+      }
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0f172a;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #334155;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #475569;
+      }
+    </style>
+  </head>
+  <body
+    class="font-jakarta antialiased selection:bg-sky-500 selection:text-white"
+  >
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      const translations = {
+        en: {
+          title: "Algebra & Calculus",
+          subtitle: "Advanced Interactive Labs for Hong Kong DSE M2",
+          module: "Module 2",
+          units: {
+            unit1: "Unit 1: Algebra & Complex Numbers",
+            unit2: "Unit 2: Limits & Differentiation",
+            unit3: "Unit 3: Integration & Applications",
+            unit4: "Unit 4: Matrices & Systems",
+            unit5: "Unit 5: Vectors",
+            unit6: "Unit 6: Diff. Eqs & Series",
+          },
+          apps: {
+            "01": "Math Induction",
+            "02": "Binomial Expansion",
+            46: "Argand Diagram",
+            47: "De Moivre's Theorem",
+            48: "Complex Locus",
+            50: "Euler's Identity",
+            "03": "Limit to e",
+            "04": "First Principles",
+            10: "Asymptotes",
+            "06": "Product Rule",
+            "07": "Chain Rule",
+            "08": "Parametric Curves",
+            "09": "2nd Derivative Test",
+            31: "Rectilinear Motion",
+            32: "Related Rates",
+            33: "Optimization",
+            11: "Substitution",
+            12: "Int. by Parts",
+            13: "Area Between Curves",
+            14: "Vol: Washer",
+            15: "Vol: Shell",
+            44: "Vol: Slicing",
+            34: "Trapezoidal Rule",
+            35: "Standard Integrals",
+            42: "Reduction Formulae",
+            43: "Improper Integrals",
+            45: "Polar Curves",
+            16: "Matrix Ops",
+            17: "Determinant (3x3)",
+            18: "Inverse Matrix",
+            19: "Cramer's Rule",
+            20: "Gaussian Elim.",
+            21: "Linear Sys (2D)",
+            22: "Linear Sys (3D)",
+            23: "Transform (2D)",
+            24: "Eigenvalues",
+            25: "Transform (3D)",
+            "05": "3D Vector Visualizer",
+            26: "Scalar Product",
+            27: "Vector Product",
+            28: "Scalar Triple Prod",
+            29: "Line Equation",
+            30: "Plane Equation",
+            36: "Separation of Var",
+            37: "Slope Fields",
+            38: "Euler's Method",
+            39: "Logistic Growth",
+            40: "Gen vs Particular",
+            41: "Maclaurin Series",
+            49: "Hyperbolic Funcs",
+          },
+          ui: {
+            systemOp: "System Operational",
+            returnPortal: "Return to Main Portal",
+            id: "ID",
+            status_live: "INT",
+            status_wip: "WIP",
+            tag_3d: "3D",
+          },
+        },
+        zh: {
+          title: "代數與微積分",
+          subtitle: "DSE M2 進階互動實驗室",
+          module: "單元二",
+          units: {
+            unit1: "第一單元：代數與複數",
+            unit2: "第二單元：極限與微分",
+            unit3: "第三單元：積分及其應用",
+            unit4: "第四單元：矩陣與線性方程組",
+            unit5: "第五單元：向量",
+            unit6: "第六單元：微分方程與級數",
+          },
+          apps: {
+            "01": "數學歸納法",
+            "02": "二項式展開",
+            46: "阿根圖",
+            47: "棣莫弗定理",
+            48: "複數軌跡",
+            50: "歐拉恆等式",
+            "03": "e 的極限",
+            "04": "導修第一原理",
+            10: "漸近線",
+            "06": "積法則",
+            "07": "鏈式法則",
+            "08": "參數曲線",
+            "09": "二階導數判別法",
+            31: "直線運動",
+            32: "相關變率",
+            33: "優化問題",
+            11: "代換積分法",
+            12: "分部積分法",
+            13: "曲線間的面積",
+            14: "體積：圓盤法",
+            15: "體積：圓殼法",
+            44: "體積：切片法",
+            34: "梯形法則",
+            35: "標準積分",
+            42: "遞推公式",
+            43: "廣義積分",
+            45: "極坐標曲線",
+            16: "矩陣運算",
+            17: "行列式 (3x3)",
+            18: "逆矩陣",
+            19: "克萊瑪法則",
+            20: "高斯消去法",
+            21: "線性系統 (2D)",
+            22: "線性系統 (3D)",
+            23: "線性變換 (2D)",
+            24: "特徵值",
+            25: "線性變換 (3D)",
+            "05": "3D 向量視覺化",
+            26: "純量積 (點積)",
+            27: "向量積 (叉積)",
+            28: "純量三重積",
+            29: "直線方程",
+            30: "平面方程",
+            36: "變量分離法",
+            37: "斜率場",
+            38: "歐拉方法",
+            39: "邏輯斯諦增長",
+            40: "通解與特解",
+            41: "麥克勞林級數",
+            49: "雙曲函數",
+          },
+          ui: {
+            systemOp: "系統運作正常",
+            returnPortal: "返回主頁",
+            id: "編號",
+            status_live: "互動",
+            status_wip: "開發中",
+            tag_3d: "3D",
+          },
+        },
+      };
+
+      const curriculum = [
+        {
+          id: "unit1",
+          color: "text-sky-400",
+          border: "border-sky-500/30",
+          icon: "fa-layer-group",
+          apps: [
+            {
+              id: "01",
+              path: "01_Math_Induction/index.html",
+              status: "live",
+              icon: "fa-arrow-down-1-9",
+            },
+            {
+              id: "02",
+              path: "02_Binomial_Exp/index.html",
+              status: "live",
+              icon: "fa-superscript",
+            },
+            {
+              id: "46",
+              path: "46_Complex_Argand/index.html",
+              status: "live",
+              icon: "fa-compass",
+            },
+            {
+              id: "47",
+              path: "47_De_Moivre/index.html",
+              status: "live",
+              icon: "fa-circle-nodes",
+            },
+            {
+              id: "48",
+              path: "48_Complex_Locus/index.html",
+              status: "live",
+              icon: "fa-bullseye",
+            },
+            {
+              id: "50",
+              path: "50_Euler_Identity/index.html",
+              status: "live",
+              icon: "fa-infinity",
+            },
+          ],
+        },
+        {
+          id: "unit2",
+          color: "text-emerald-400",
+          border: "border-emerald-500/30",
+          icon: "fa-wave-square",
+          apps: [
+            {
+              id: "03",
+              path: "03_Limit_Euler/index.html",
+              status: "live",
+              icon: "fa-chart-line",
+            },
+            {
+              id: "04",
+              path: "04_First_Principles/index.html",
+              status: "live",
+              icon: "fa-file-signature",
+            },
+            {
+              id: "10",
+              path: "10_Asymptotes/index.html",
+              status: "live",
+              icon: "fa-arrows-to-dot",
+            },
+            {
+              id: "06",
+              path: "06_Prod_Quot_Rule/index.html",
+              status: "live",
+              icon: "fa-vector-square",
+            },
+            {
+              id: "07",
+              path: "07_Chain_Rule/index.html",
+              status: "live",
+              icon: "fa-gears",
+            },
+            {
+              id: "08",
+              path: "08_Parametric_Diff/index.html",
+              status: "live",
+              icon: "fa-stopwatch",
+            },
+            {
+              id: "09",
+              path: "09_Second_Deriv/index.html",
+              status: "live",
+              icon: "fa-wave-square",
+            },
+            {
+              id: "31",
+              path: "31_Rectilinear_Motion/index.html",
+              status: "live",
+              icon: "fa-person-running",
+            },
+            {
+              id: "32",
+              path: "32_Related_Rates/index.html",
+              status: "live",
+              icon: "fa-clock",
+            },
+            {
+              id: "33",
+              path: "33_Optimization/index.html",
+              status: "live",
+              icon: "fa-thumbs-up",
+            },
+          ],
+        },
+        {
+          id: "unit3",
+          color: "text-rose-400",
+          border: "border-rose-500/30",
+          icon: "fa-integral",
+          apps: [
+            {
+              id: "11",
+              path: "11_Integration_Sub/index.html",
+              status: "live",
+              icon: "fa-arrow-right-arrow-left",
+            },
+            {
+              id: "12",
+              path: "12_Integration_Parts/index.html",
+              status: "live",
+              icon: "fa-puzzle-piece",
+            },
+            {
+              id: "13",
+              path: "13_Area_Between/index.html",
+              status: "live",
+              icon: "fa-chart-area",
+            },
+            {
+              id: "14",
+              path: "14_Vol_Washer_3D/index.html",
+              status: "live",
+              icon: "fa-ring",
+              tags: ["Three.js"],
+            },
+            {
+              id: "15",
+              path: "15_Vol_Shell_3D/index.html",
+              status: "live",
+              icon: "fa-toilet-paper",
+              tags: ["Three.js"],
+            },
+            {
+              id: "44",
+              path: "44_General_Slicing/index.html",
+              status: "live",
+              icon: "fa-bread-slice",
+              tags: ["Three.js"],
+            },
+            {
+              id: "34",
+              path: "34_Trapezoidal_Rule/index.html",
+              status: "live",
+              icon: "fa-draw-polygon",
+            },
+            {
+              id: "35",
+              path: "35_Standard_Integrals/index.html",
+              status: "live",
+              icon: "fa-list-check",
+            },
+            {
+              id: "42",
+              path: "42_Reduction_Formula/index.html",
+              status: "live",
+              icon: "fa-stairs",
+            },
+            {
+              id: "43",
+              path: "43_Improper_Integrals/index.html",
+              status: "live",
+              icon: "fa-infinity",
+            },
+            {
+              id: "45",
+              path: "45_Polar_Curves/index.html",
+              status: "live",
+              icon: "fa-fan",
+            },
+          ],
+        },
+        {
+          id: "unit4",
+          color: "text-amber-400",
+          border: "border-amber-500/30",
+          icon: "fa-table-cells",
+          apps: [
+            {
+              id: "16",
+              path: "16_Matrix_Ops/index.html",
+              status: "live",
+              icon: "fa-calculator",
+            },
+            {
+              id: "17",
+              path: "17_Determinant_3x3/index.html",
+              status: "live",
+              icon: "fa-border-all",
+            },
+            {
+              id: "18",
+              path: "18_Inverse_Matrix/index.html",
+              status: "live",
+              icon: "fa-rotate-left",
+            },
+            {
+              id: "19",
+              path: "19_Cramers_Rule/index.html",
+              status: "live",
+              icon: "fa-divide",
+            },
+            {
+              id: "20",
+              path: "20_Gaussian_Elim/index.html",
+              status: "live",
+              icon: "fa-stairs",
+            },
+            {
+              id: "21",
+              path: "21_Linear_Sys_2D/index.html",
+              status: "live",
+              icon: "fa-lines-leaning",
+            },
+            {
+              id: "22",
+              path: "22_Linear_Sys_3D/index.html",
+              status: "live",
+              icon: "fa-cubes-stacked",
+              tags: ["Three.js"],
+            },
+            {
+              id: "23",
+              path: "23_Linear_Trans_2D/index.html",
+              status: "live",
+              icon: "fa-minimize",
+            },
+            {
+              id: "24",
+              path: "24_Eigenvalues/index.html",
+              status: "live",
+              icon: "fa-up-right-and-down-left-from-center",
+            },
+            {
+              id: "25",
+              path: "25_Matrix_3D_Trans/index.html",
+              status: "live",
+              icon: "fa-cube",
+              tags: ["Three.js"],
+            },
+          ],
+        },
+        {
+          id: "unit5",
+          color: "text-purple-400",
+          border: "border-purple-500/30",
+          icon: "fa-location-arrow",
+          apps: [
+            {
+              id: "05",
+              path: "05_Vector_3D/index.html",
+              status: "live",
+              icon: "fa-arrows-up-down-left-right",
+              tags: ["Three.js"],
+            },
+            {
+              id: "26",
+              path: "26_Dot_Product/index.html",
+              status: "live",
+              icon: "fa-xmarks-lines",
+              tags: ["Three.js"],
+            },
+            {
+              id: "27",
+              path: "27_Cross_Product/index.html",
+              status: "live",
+              icon: "fa-screwdriver-wrench",
+              tags: ["Three.js"],
+            },
+            {
+              id: "28",
+              path: "28_Scalar_Triple/index.html",
+              status: "live",
+              icon: "fa-cube",
+              tags: ["Three.js"],
+            },
+            {
+              id: "29",
+              path: "29_Line_Equation/index.html",
+              status: "live",
+              icon: "fa-grip-lines",
+              tags: ["Three.js"],
+            },
+            {
+              id: "30",
+              path: "30_Plane_Equation/index.html",
+              status: "live",
+              icon: "fa-sheet-plastic",
+              tags: ["Three.js"],
+            },
+          ],
+        },
+        {
+          id: "unit6",
+          color: "text-indigo-400",
+          border: "border-indigo-500/30",
+          icon: "fa-arrow-down-up-across-line",
+          apps: [
+            {
+              id: "36",
+              path: "36_Diff_Eq_Intro/index.html",
+              status: "live",
+              icon: "fa-shuffle",
+            },
+            {
+              id: "37",
+              path: "37_Slope_Fields/index.html",
+              status: "live",
+              icon: "fa-wind",
+            },
+            {
+              id: "38",
+              path: "38_Eulers_Method/index.html",
+              status: "live",
+              icon: "fa-turn-up",
+            },
+            {
+              id: "39",
+              path: "39_Logistic_Growth/index.html",
+              status: "live",
+              icon: "fa-bacteria",
+            },
+            {
+              id: "40",
+              path: "40_Gen_Part_Solutions/index.html",
+              status: "live",
+              icon: "fa-key",
+            },
+            {
+              id: "41",
+              path: "41_Maclaurin_Series/index.html",
+              status: "live",
+              icon: "fa-bezier-curve",
+            },
+            {
+              id: "49",
+              path: "49_Hyperbolic_Funcs/index.html",
+              status: "live",
+              icon: "fa-bridge-water",
+            },
+          ],
+        },
+      ];
+
+      const Header = ({ lang, setLang, t }) => (
+        <header className="py-12 px-6 mb-8 text-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-sky-900/20 to-transparent pointer-events-none"></div>
+
+          <div className="absolute top-4 right-4 z-20">
+            <button
+              onClick={() => setLang((l) => (l === "en" ? "zh" : "en"))}
+              className="px-4 py-2 bg-slate-800 border border-slate-600 rounded-full text-xs font-bold text-sky-400 hover:bg-slate-700 hover:text-white transition flex items-center gap-2"
+            >
+              <i className="fa-solid fa-language"></i>
+              {lang === "en" ? "中文" : "English"}
+            </button>
+          </div>
+
+          <div className="max-w-4xl mx-auto relative z-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-sky-900/50 text-sky-300 text-xs font-bold uppercase tracking-widest rounded-full mb-4 border border-sky-500/30">
+              <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
+              {t.module}
+            </div>
+            <h1 className="font-outfit text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-sky-200 to-sky-400 tracking-tight mb-4 neon-text">
+              {t.title}
+            </h1>
+            <p className="text-lg text-slate-400 max-w-2xl mx-auto font-mono">
+              {t.subtitle}
+            </p>
+          </div>
+        </header>
+      );
+
+      const AppCard = ({ app, colorBase, t }) => {
+        const isLive = app.status === "live";
+        return (
+          <a
+            href={isLive ? app.path : "#"}
+            className={`block group relative h-full p-6 rounded-2xl transition-all duration-300 ${
+              isLive
+                ? "glass-panel cursor-pointer"
+                : "bg-slate-800/50 border border-slate-700/50 opacity-50 cursor-not-allowed"
+            }`}
+          >
+            <div className="flex justify-between items-start mb-4">
+              <div
+                className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl bg-slate-800 border border-slate-700 ${colorBase} group-hover:scale-110 transition-transform`}
+              >
+                <i className={`fa-solid ${app.icon}`}></i>
+              </div>
+              <div className="flex gap-2">
+                {app.tags && app.tags.includes("Three.js") && (
+                  <span className="px-1.5 py-0.5 rounded bg-orange-900/50 text-orange-400 text-[10px] font-mono border border-orange-500/30">
+                    {t.ui.tag_3d}
+                  </span>
+                )}
+                <span
+                  className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${
+                    isLive
+                      ? "bg-emerald-900/50 text-emerald-400 border border-emerald-500/30"
+                      : "bg-slate-700 text-slate-400"
+                  }`}
+                >
+                  {isLive ? t.ui.status_live : t.ui.status_wip}
+                </span>
+              </div>
+            </div>
+            <h3
+              className={`font-outfit font-bold text-xl leading-tight mb-2 ${
+                isLive
+                  ? "text-slate-100 group-hover:text-sky-300 transition-colors"
+                  : "text-slate-500"
+              }`}
+            >
+              {t.apps[app.id]}
+            </h3>
+            <div className="flex justify-between items-end">
+              <p className="text-xs text-slate-500 font-mono">
+                {t.ui.id}: {app.id}
+              </p>
+              {isLive && (
+                <i className="fa-solid fa-arrow-right text-slate-600 group-hover:text-sky-400 -translate-x-2 group-hover:translate-x-0 transition-all"></i>
+              )}
+            </div>
+          </a>
+        );
+      };
+
+      const UnitSection = ({ unit, t }) => (
+        <div className="mb-16">
+          <div className="flex items-center gap-4 mb-8 pl-2 border-l-4 border-sky-500/50">
+            <div className={`text-2xl ${unit.color}`}>
+              <i className={`fa-solid ${unit.icon}`}></i>
+            </div>
+            <div>
+              <h2 className="font-outfit text-2xl font-bold text-slate-100">
+                {t.units[unit.id]}
+              </h2>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {unit.apps.map((app) => (
+              <AppCard key={app.id} app={app} colorBase={unit.color} t={t} />
+            ))}
+          </div>
+        </div>
+      );
+
+      const Dashboard = () => {
+        const [lang, setLang] = useState("en");
+        const t = translations[lang];
+
+        return (
+          <div className="min-h-screen pb-20">
+            <Header lang={lang} setLang={setLang} t={t} />
+            <main className="container mx-auto px-6 max-w-7xl">
+              {curriculum.map((unit) => (
+                <UnitSection key={unit.id} unit={unit} t={t} />
+              ))}
+            </main>
+            <footer className="text-center py-12 text-slate-600 text-sm font-mono">
+              <div className="mb-4">
+                <span className="inline-block w-2 h-2 bg-sky-500 rounded-full mr-2"></span>
+                {t.ui.systemOp}
+              </div>
+              <a
+                href="../index.html"
+                className="hover:text-sky-400 transition underline underline-offset-4"
+              >
+                {t.ui.returnPortal}
+              </a>
+            </footer>
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<Dashboard />);
+    </script>
+  </body>
+</html>

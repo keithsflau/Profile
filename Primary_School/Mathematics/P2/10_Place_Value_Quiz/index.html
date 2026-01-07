@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小二數學：位值問答 | Place Value Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #f0fdf4 0%, #16a34a 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "🏗️ Place Value Quiz",
+          zh: "🏗️ 位值問答",
+          ja: "🏗️ 位取りクイズ",
+          ko: "🏗️ 자릿수 퀴즈",
+          es: "🏗️ Cuestionario de valor posicional",
+          de: "🏗️ Stellenwert-Quiz",
+          fi: "🏗️ Paikka-arvo tietovisa",
+          fr: "🏗️ Quiz de valeur de position",
+          ar: "🏗️ اختبار القيمة المكانية",
+          it: "🏗️ Quiz sul valore posizionale",
+        },
+        whatIsValue: {
+          en: "What is the value of the underlined digit?",
+          zh: "紅線數字的數值是多少？",
+          ja: "下線部の数字の値は何ですか？",
+          ko: "밑줄 친 숫자의 값은 무엇입니까?",
+          es: "¿Cuál es el valor del dígito subrayado?",
+          de: "Was ist der Wert der unterstrichenen Ziffer?",
+          fi: "Mikä on alleviivatun numeron arvo?",
+          fr: "Quelle est la valeur du chiffre souligné ?",
+          ar: "ما هي قيمة الرقم الذي تحته خط؟",
+          it: "Qual è il valore della cifra sottolineata?",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        // e.g. "What is the value of 5 in 523?" Answer: 500
+        const [num, setNum] = useState(123);
+        const [targetDigit, setTargetDigit] = useState(1);
+        const [pos, setPos] = useState("Hundreds"); // Hundreds, Tens, Units
+        const [feedback, setFeedback] = useState("");
+        const [opts, setOpts] = useState([]);
+
+        const next = () => {
+          const h = Math.floor(Math.random() * 9) + 1;
+          const t = Math.floor(Math.random() * 10);
+          const u = Math.floor(Math.random() * 10);
+          // Ensure digits are distinct to avoid confusion? Yes, preferable.
+          // Or handle duplicate digits logic correctly.
+          // Let's enforce distinct for clarity.
+          // Actually, simpler: Determine which POSITION target is.
+
+          const newNum = h * 100 + t * 10 + u;
+          const positions = [
+            { name: "Hundreds", val: h * 100, digit: h, char: "H" },
+            { name: "Tens", val: t * 10, digit: t, char: "T" },
+            { name: "Units", val: u, digit: u, char: "U" },
+          ];
+          const p = positions[Math.floor(Math.random() * 3)];
+
+          setNum(newNum);
+          setTargetDigit(p.digit);
+          setPos(p.name);
+
+          // Options: Face value, Place value, Random
+          // e.g. if 5 in 500: opts: 5, 50, 500
+          const o = [p.digit, p.digit * 10, p.digit * 100].filter(
+            (x) => x <= 900 && x > 0
+          );
+          // Filter isn't quite right for 0? 0 value is always 0.
+          // P2 usually doesn't ask value of 0, but if it does answer is 0.
+          // If digit is 0, value is 0.
+
+          let finalOpts = [];
+          if (p.digit === 0) {
+            finalOpts = [0, 10, 1]; // trick
+          } else {
+            finalOpts = [p.digit, p.digit * 10, p.digit * 100];
+          }
+          // Special case: if digit is same, options might overlap visually (e.g. 5, 50, 500). Distinct.
+          setOpts(finalOpts.sort((a, b) => a - b));
+          setFeedback("");
+        };
+
+        useEffect(next, []);
+
+        const check = (ans) => {
+          let correctVal = 0;
+          const h = Math.floor(num / 100);
+          const t = Math.floor((num % 100) / 10);
+          const u = num % 10;
+
+          if (pos === "Hundreds") correctVal = h * 100;
+          else if (pos === "Tens") correctVal = t * 10;
+          else correctVal = u;
+
+          if (ans === correctVal) {
+            setFeedback("CORRECT");
+            setTimeout(next, 1500);
+          } else {
+            setFeedback("WRONG");
+          }
+        };
+
+        // Highlight logic
+        const hStr = Math.floor(num / 100).toString();
+        const tStr = Math.floor((num % 100) / 10).toString();
+        const uStr = (num % 10).toString();
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center justify-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+
+            <h1 className="text-5xl font-black text-green-900 mb-8 max-w-2xl text-center">
+              {t.title[lang] || t.title["en"]}
+            </h1>
+
+            <div className="bg-white/90 rounded-3xl p-8 shadow-2xl w-full max-w-2xl text-center border-4 border-green-300">
+              <div className="text-8xl font-black text-slate-800 mb-8 font-mono tracking-wider">
+                <span
+                  className={
+                    pos === "Hundreds"
+                      ? "text-red-500 underline decoration-4 underline-offset-8"
+                      : ""
+                  }
+                >
+                  {hStr}
+                </span>
+                <span
+                  className={
+                    pos === "Tens"
+                      ? "text-orange-500 underline decoration-4 underline-offset-8"
+                      : ""
+                  }
+                >
+                  {tStr}
+                </span>
+                <span
+                  className={
+                    pos === "Units"
+                      ? "text-green-500 underline decoration-4 underline-offset-8"
+                      : ""
+                  }
+                >
+                  {uStr}
+                </span>
+              </div>
+
+              <h2 className="text-3xl font-bold text-slate-600 mb-12">
+                {t.whatIsValue[lang] || t.whatIsValue["en"]}
+              </h2>
+
+              <div className="flex justify-center gap-6">
+                {opts.map((o) => (
+                  <button
+                    key={o}
+                    onClick={() => check(o)}
+                    className="px-8 py-4 bg-green-100 border-4 border-green-400 rounded-2xl text-4xl font-black text-green-900 shadow-lg hover:scale-110 active:scale-95 transition-all"
+                  >
+                    {o}
+                  </button>
+                ))}
+              </div>
+
+              <div className="h-16 mt-8">
+                {feedback === "CORRECT" && (
+                  <div className="text-4xl font-black text-green-500 animate-bounce">
+                    {get("correct", lang)}
+                  </div>
+                )}
+                {feedback === "WRONG" && (
+                  <div className="text-4xl font-black text-red-500 animate-shake">
+                    {get("wrong", lang)}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

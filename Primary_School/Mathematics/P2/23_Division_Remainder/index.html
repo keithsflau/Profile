@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小二數學：除法 (餘數) | Division with Remainder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #eff6ff 0%, #3b82f6 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "➗ Division with Remainder",
+          zh: "➗ 有餘數的除法",
+          ja: "➗ 余りのある割り算",
+          ko: "➗ 나머지 있는 나눗셈",
+          es: "➗ División con resto",
+          de: "➗ Division mit Rest",
+          fi: "➗ Jakolasku ja jäämä",
+          fr: "➗ Division avec reste",
+          ar: "➗ القسمة مع الباقي",
+          it: "➗ Divisione con resto",
+        },
+        desc: {
+          zh: "有 {total} 个 🍊，每 {perGroup} 个一袋。",
+          en: "Total {total} oranges. {perGroup} in each bag.",
+          ja: "{total} 個のオレンジがあります。各袋に {perGroup} 個入れます。",
+          ko: "오렌지 {total}개가 있습니다. 한 봉지에 {perGroup}개씩 넣으세요.",
+          es: "Total {total} naranjas. {perGroup} en cada bolsa.",
+          fr: "Total {total} oranges. {perGroup} par sac.",
+          de: "Insgesamt {total} Orangen. {perGroup} in jeder Tüte.",
+        },
+        left: {
+          en: "Left",
+          zh: "剩餘",
+          ja: "残り",
+          ko: "남은 것",
+          es: "Sobra",
+          de: "Rest",
+          fi: "Jäämä",
+          fr: "Reste",
+          ar: "الباقي",
+          it: "Resto",
+        },
+        check: {
+          en: "Check",
+          zh: "檢查",
+          ja: "確認",
+          ko: "확인",
+          es: "Comprobar",
+          de: "Prüfen",
+          fi: "Tarkista",
+          fr: "Vérifier",
+          ar: "تحقق",
+          it: "Controlla",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [total, setTotal] = useState(14);
+        const [perGroup, setPerGroup] = useState(4);
+        const [inputs, setInputs] = useState({ q: "", r: "" });
+        const [feedback, setFeedback] = useState("");
+
+        const newProb = () => {
+          setInputs({ q: "", r: "" });
+          setFeedback("");
+
+          const p = Math.floor(Math.random() * 3) + 3; // 3-5 per group
+          const q = Math.floor(Math.random() * 3) + 2; // 2-4 groups
+          const r = Math.floor(Math.random() * (p - 1)) + 1; // 1 to p-1 remainder (guarantee remainder)
+
+          setPerGroup(p);
+          setTotal(q * p + r);
+        };
+
+        useEffect(newProb, []);
+
+        const check = () => {
+          const quotient = Math.floor(total / perGroup);
+          const remainder = total % perGroup;
+
+          if (
+            parseInt(inputs.q) === quotient &&
+            parseInt(inputs.r) === remainder
+          ) {
+            setFeedback("CORRECT");
+            setTimeout(newProb, 3000);
+          } else {
+            setFeedback("WRONG");
+          }
+        };
+
+        const quotient = Math.floor(total / perGroup);
+        const remainder = total % perGroup;
+
+        const getDesc = () => {
+          const tmpl = t.desc[lang] || t.desc["en"];
+          return tmpl.replace("{total}", total).replace("{perGroup}", perGroup);
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center justify-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+
+            <h1 className="text-4xl md:text-5xl font-black text-blue-900 mb-8 max-w-2xl text-center">
+              {t.title[lang] || t.title["en"]}
+            </h1>
+
+            <div className="bg-white/90 rounded-3xl p-8 shadow-2xl w-full max-w-4xl text-center border-4 border-blue-300">
+              <div className="text-2xl font-bold text-slate-600 mb-8">
+                {getDesc()}
+              </div>
+
+              <div className="flex flex-wrap justify-center gap-6 mb-8 items-start min-h-[150px]">
+                {/* Full Groups Visual */}
+                {[...Array(quotient)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="bg-blue-100 border-4 border-blue-400 rounded-full p-4 w-32 h-32 flex flex-wrap justify-center items-center relative overflow-hidden"
+                  >
+                    {[...Array(perGroup)].map((_, j) => (
+                      <div key={j} className="text-2xl">
+                        🍊
+                      </div>
+                    ))}
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-10 text-6xl font-black text-blue-900">
+                      1
+                    </div>
+                  </div>
+                ))}
+
+                {/* Remainder Visual */}
+                <div className="bg-orange-100 border-4 border-dashed border-orange-400 rounded-2xl p-4 min-w-[100px] h-32 flex flex-col items-center justify-center">
+                  <span className="text-xs font-bold text-orange-600 mb-2">
+                    {t.left[lang] || t.left["en"]}
+                  </span>
+                  <div className="flex flex-wrap justify-center gap-1">
+                    {[...Array(remainder)].map((_, j) => (
+                      <div key={j} className="text-2xl">
+                        🍊
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-center gap-4 text-3xl font-bold text-blue-800 flex-wrap">
+                <div>
+                  {total} ÷ {perGroup} ={" "}
+                </div>
+                <input
+                  type="number"
+                  value={inputs.q}
+                  onChange={(e) => setInputs({ ...inputs, q: e.target.value })}
+                  className="w-20 text-center border-b-4 border-blue-500 bg-blue-50 text-4xl font-black focus:outline-none placeholder-blue-200"
+                  placeholder="?"
+                />
+                <div>...</div>
+                <input
+                  type="number"
+                  value={inputs.r}
+                  onChange={(e) => setInputs({ ...inputs, r: e.target.value })}
+                  className="w-20 text-center border-b-4 border-orange-500 bg-orange-50 text-4xl font-black focus:outline-none placeholder-orange-200 text-orange-600"
+                  placeholder="?"
+                />
+              </div>
+
+              <div className="mt-8">
+                <button
+                  onClick={check}
+                  className="px-10 py-3 bg-blue-500 text-white rounded-full font-black text-2xl shadow-xl hover:bg-blue-600 active:scale-95 transition-transform"
+                >
+                  {t.check[lang] || t.check["en"]}
+                </button>
+              </div>
+
+              <div className="h-16 mt-8">
+                {feedback === "CORRECT" && (
+                  <div className="text-4xl font-black text-green-500 animate-bounce">
+                    {get("correct", lang)}
+                  </div>
+                )}
+                {feedback === "WRONG" && (
+                  <div className="text-4xl font-black text-red-500 animate-shake">
+                    {get("wrong", lang)}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

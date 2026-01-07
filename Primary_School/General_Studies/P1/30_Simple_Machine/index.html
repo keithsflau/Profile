@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小一常識：蹺蹺板大比拼 | Simple Machine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #f0abfc 0%, #c084fc 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Seesaw Balance",
+          zh: "蹺蹺板大比拼",
+          ja: "シーソーバランス",
+        },
+        instruction: {
+          en: "Who is heavier? Put an animal to test!",
+          zh: "誰比較重？放一隻動物試試看！",
+          ja: "誰が重い？動物を置いてみよう！",
+        },
+        heavier: { en: "Heavier", zh: "較重" },
+        lighter: { en: "Lighter", zh: "較輕" },
+        equal: { en: "Same Weight", zh: "一樣重" },
+        reset: { en: "Reset", zh: "重置" },
+
+        mouse: { en: "Mouse", zh: "老鼠" },
+        cat: { en: "Cat", zh: "貓" },
+        dog: { en: "Dog", zh: "狗" },
+        elephant: { en: "Elephant", zh: "大象" },
+      };
+
+      // Weights: 1 to 10
+      const animals = [
+        { id: "mouse", icon: "🐭", weight: 1 },
+        { id: "cat", icon: "🐱", weight: 3 },
+        { id: "dog", icon: "🐶", weight: 5 },
+        { id: "elephant", icon: "🐘", weight: 10 },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [leftAnimal, setLeftAnimal] = useState(animals[2]); // Dog default
+        const [rightAnimal, setRightAnimal] = useState(null);
+
+        const [angle, setAngle] = useState(0);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        useEffect(() => {
+          // Calculate angle based on weights
+          if (!rightAnimal) {
+            // If only left, it tips left (positive angle? let's say -20 deg = Left Down)
+            setAngle(-20);
+          } else {
+            if (leftAnimal.weight > rightAnimal.weight) setAngle(-20);
+            else if (leftAnimal.weight < rightAnimal.weight) setAngle(20);
+            else setAngle(0);
+          }
+        }, [rightAnimal, leftAnimal]);
+
+        const handleSelect = (animal) => {
+          setRightAnimal(animal);
+        };
+
+        const reset = () => {
+          setRightAnimal(null);
+          // Maybe randomize left?
+          const others = animals;
+          setLeftAnimal(others[Math.floor(Math.random() * others.length)]);
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-white mb-4 mt-8 drop-shadow-md">
+              ⚖️ {getText("title")}
+            </h1>
+
+            <p className="font-bold text-white mb-8 bg-purple-500/50 px-4 py-1 rounded">
+              {getText("instruction")}
+            </p>
+
+            {/* Seesaw Scene */}
+            <div className="relative w-full max-w-2xl h-[400px] flex justify-center items-end pb-12 mb-8">
+              {/* Fulcrum */}
+              <div className="w-0 h-0 border-l-[30px] border-l-transparent border-r-[30px] border-r-transparent border-b-[60px] border-b-slate-700 absolute bottom-12 left-1/2 -ml-[30px] z-10"></div>
+
+              {/* Plank */}
+              <motion.div
+                className="w-[90%] h-4 bg-amber-700 rounded-full relative bottom-[70px] z-20 flex justify-between px-4 md:px-12 items-end origin-center"
+                animate={{ rotate: angle }}
+                transition={{ type: "spring", stiffness: 60, damping: 10 }}
+              >
+                {/* Left Seat */}
+                <div className="relative -top-4 flex flex-col items-center">
+                  <div className="text-8xl filter drop-shadow-xl transform -scale-x-100">
+                    {leftAnimal.icon}
+                  </div>
+                </div>
+
+                {/* Right Seat */}
+                <div className="relative -top-4 flex flex-col items-center">
+                  {rightAnimal ? (
+                    <motion.div
+                      initial={{ scale: 0, y: -50 }}
+                      animate={{ scale: 1, y: 0 }}
+                      className="text-8xl filter drop-shadow-xl"
+                    >
+                      {rightAnimal.icon}
+                    </motion.div>
+                  ) : (
+                    <div className="w-24 h-24 border-4 border-dashed border-white/50 rounded-full flex items-center justify-center text-white/50 font-bold">
+                      ?
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+
+              {/* Ground */}
+              <div className="absolute bottom-0 w-full h-12 bg-green-500 rounded-lg"></div>
+            </div>
+
+            {/* Result Text */}
+            <div className="h-16 mb-4">
+              {rightAnimal && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-white px-6 py-2 rounded-xl shadow-lg"
+                >
+                  <span className="font-black text-xl text-purple-900">
+                    {rightAnimal.icon} {getText(rightAnimal.id)}
+                  </span>
+                  <span className="mx-2 text-slate-400">is</span>
+                  <span className="font-black text-xl text-purple-600">
+                    {angle === 0
+                      ? getText("equal")
+                      : angle === 20
+                      ? getText("heavier")
+                      : getText("lighter")}
+                  </span>
+                  <span className="mx-2 text-slate-400">than</span>
+                  <span className="font-black text-xl text-purple-900">
+                    {leftAnimal.icon} {getText(leftAnimal.id)}
+                  </span>
+                </motion.div>
+              )}
+            </div>
+
+            {/* Selector */}
+            <div className="flex gap-4 items-center bg-white/40 p-6 rounded-3xl backdrop-blur">
+              {animals.map((a) => (
+                <button
+                  key={a.id}
+                  onClick={() => handleSelect(a)}
+                  className="bg-white w-20 h-20 rounded-2xl shadow-lg flex flex-col items-center justify-center hover:scale-110 active:scale-95 transition-transform"
+                >
+                  <span className="text-4xl mb-1">{a.icon}</span>
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={reset}
+              className="mt-8 bg-purple-700 text-white px-8 py-2 rounded-full font-bold shadow hover:bg-purple-800"
+            >
+              {getText("reset")} 🔄
+            </button>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

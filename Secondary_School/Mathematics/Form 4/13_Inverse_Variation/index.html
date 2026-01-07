@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inverse Variation 反比例 | S2 Math</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-purple-50 text-slate-800 min-h-screen">
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+
+      const App = () => {
+        const [lang, setLang] = useState("en");
+        const [k, setK] = useState(20);
+        const [x, setX] = useState(4);
+
+        const t = {
+          title: { en: "Inverse Variation", zh: "反比例" },
+          constant: { en: "Constant k", zh: "常數 k" },
+          variable: { en: "Variable x", zh: "變數 x" },
+          result: { en: "Result y", zh: "結果 y" },
+          formula: { en: "Formula", zh: "公式" },
+          back: { en: "Back to Dashboard", zh: "返回主頁" },
+        };
+
+        const y = x > 0 ? k / x : 0;
+
+        // Curve points
+        const curvePoints = Array.from({ length: 20 }, (_, i) => {
+          const xVal = (i + 1) * 0.5;
+          return { x: xVal, y: k / xVal };
+        });
+
+        return (
+          <div className="p-6 max-w-4xl mx-auto min-h-screen flex flex-col">
+            <header className="mb-6 flex justify-between items-center">
+              <div>
+                <div className="text-purple-600 font-bold uppercase text-xs tracking-widest mb-1">
+                  S2 Math
+                </div>
+                <h1 className="text-3xl font-extrabold text-slate-900">
+                  {t.title[lang]}
+                </h1>
+              </div>
+              <button
+                onClick={() => setLang(lang === "en" ? "zh" : "en")}
+                className="px-3 py-1 bg-white border border-purple-200 rounded-lg text-sm font-bold hover:bg-purple-100"
+              >
+                {lang === "en" ? "中文" : "ENG"}
+              </button>
+            </header>
+
+            {/* Formula */}
+            <div className="bg-white p-4 rounded-xl border border-purple-100 mb-6 text-center">
+              <div className="text-xs font-bold text-slate-400 uppercase mb-2">
+                {t.formula[lang]}
+              </div>
+              <div className="text-3xl font-mono font-bold text-purple-600">
+                y = k/x
+              </div>
+            </div>
+
+            {/* Sliders */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="bg-white p-4 rounded-xl shadow-sm border border-purple-100">
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">
+                  {t.constant[lang]}: {k}
+                </label>
+                <input
+                  type="range"
+                  min="5"
+                  max="50"
+                  step="5"
+                  value={k}
+                  onChange={(e) => setK(Number(e.target.value))}
+                  className="w-full accent-purple-500"
+                />
+              </div>
+              <div className="bg-white p-4 rounded-xl shadow-sm border border-purple-100">
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">
+                  {t.variable[lang]}: {x}
+                </label>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  value={x}
+                  onChange={(e) => setX(Number(e.target.value))}
+                  className="w-full accent-purple-500"
+                />
+              </div>
+            </div>
+
+            {/* Result */}
+            <div className="bg-purple-500 text-white p-6 rounded-2xl shadow-xl text-center mb-6">
+              <div className="text-xs uppercase font-bold opacity-80 mb-2">
+                {t.result[lang]}
+              </div>
+              <div className="text-4xl font-extrabold">
+                y = {k} ÷ {x} = {y.toFixed(2)}
+              </div>
+            </div>
+
+            {/* Graph */}
+            <div className="bg-white p-6 rounded-xl border border-purple-100">
+              <svg viewBox="0 0 300 200" className="w-full h-48">
+                {/* Axes */}
+                <line
+                  x1="30"
+                  y1="180"
+                  x2="290"
+                  y2="180"
+                  stroke="#94a3b8"
+                  strokeWidth="2"
+                />
+                <line
+                  x1="30"
+                  y1="10"
+                  x2="30"
+                  y2="180"
+                  stroke="#94a3b8"
+                  strokeWidth="2"
+                />
+
+                {/* Hyperbola curve */}
+                <path
+                  d={curvePoints
+                    .map(
+                      (p, i) =>
+                        `${i === 0 ? "M" : "L"} ${30 + p.x * 25} ${
+                          180 - Math.min(p.y, 40) * 4
+                        }`
+                    )
+                    .join(" ")}
+                  fill="none"
+                  stroke="#a855f7"
+                  strokeWidth="3"
+                />
+
+                {/* Current point */}
+                <circle
+                  cx={30 + x * 25}
+                  cy={180 - Math.min(y, 40) * 4}
+                  r="8"
+                  fill="#a855f7"
+                  stroke="white"
+                  strokeWidth="2"
+                />
+
+                {/* Labels */}
+                <text x="280" y="195" className="text-xs fill-slate-400">
+                  x
+                </text>
+                <text x="15" y="20" className="text-xs fill-slate-400">
+                  y
+                </text>
+              </svg>
+              <p className="text-center text-sm text-slate-500 mt-2">
+                {lang === "en"
+                  ? "Inverse variation produces a hyperbola curve."
+                  : "反比例的圖像是一條雙曲線。"}
+              </p>
+            </div>
+
+            <footer className="mt-auto pt-8">
+              <a
+                href="../index.html"
+                className="text-purple-600 hover:text-purple-700 font-bold"
+              >
+                <i className="fa-solid fa-arrow-left mr-2"></i>
+                {t.back[lang]}
+              </a>
+            </footer>
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

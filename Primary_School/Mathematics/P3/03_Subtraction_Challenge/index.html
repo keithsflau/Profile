@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小三數學：減法大挑戰</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      src="https://unpkg.com/react@18/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fef3c7 0%, #fbbf24 100%);
+        background-attachment: fixed;
+      }
+      .number-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .number-card:hover {
+        transform: translateY(-4px);
+      }
+      .borrow-indicator {
+        animation: bounce 0.5s infinite;
+      }
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      // Inline Icons to replace Lucide
+      const Minus = ({ size = 24, className = "" }) => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={className}
+        >
+          <path d="M5 12h14" />
+        </svg>
+      );
+      const Trophy = ({ size = 24, className = "" }) => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={className}
+        >
+          <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+          <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+          <path d="M4 22h16" />
+          <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+          <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+          <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+        </svg>
+      );
+      const Target = ({ size = 24, className = "" }) => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={className}
+        >
+          <circle cx="12" cy="12" r="10" />
+          <circle cx="12" cy="12" r="6" />
+          <circle cx="12" cy="12" r="2" />
+        </svg>
+      );
+      const CheckCircle = ({ size = 24, className = "" }) => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={className}
+        >
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+          <path d="m9 11 3 3L22 4" />
+        </svg>
+      );
+      const XCircle = ({ size = 24, className = "" }) => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={className}
+        >
+          <circle cx="12" cy="12" r="10" />
+          <path d="m15 9-6 6" />
+          <path d="m9 9 6 6" />
+        </svg>
+      );
+      const ArrowRight = ({ size = 24, className = "" }) => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={className}
+        >
+          <path d="M5 12h14" />
+          <path d="m12 5 7 7-7 7" />
+        </svg>
+      );
+      const RotateCcw = ({ size = 24, className = "" }) => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={className}
+        >
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+          <path d="M3 3v5h5" />
+        </svg>
+      );
+
+      function App() {
+        const [mode, setMode] = useState("practice"); // practice, timed, story
+        const [num1, setNum1] = useState(856);
+        const [num2, setNum2] = useState(347);
+        const [userInputs, setUserInputs] = useState(["", "", "", ""]);
+        const [borrows, setBorrows] = useState(["", "", "", ""]);
+        const [feedback, setFeedback] = useState(null);
+        const [score, setScore] = useState(0);
+        const [timeLeft, setTimeLeft] = useState(60);
+        const [isTimerActive, setIsTimerActive] = useState(false);
+        const [questionsAnswered, setQuestionsAnswered] = useState(0);
+
+        const correctAnswer = num1 - num2;
+
+        useEffect(() => {
+          if (mode === "timed" && isTimerActive && timeLeft > 0) {
+            const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+            return () => clearTimeout(timer);
+          } else if (timeLeft === 0) {
+            setIsTimerActive(false);
+          }
+        }, [timeLeft, isTimerActive, mode]);
+
+        const generateQuestion = () => {
+          let n1, n2;
+          if (mode === "story") {
+            // Story problems with context
+            n1 = Math.floor(Math.random() * 900) + 100;
+            n2 = Math.floor(Math.random() * (n1 - 50)) + 50;
+          } else {
+            n1 = Math.floor(Math.random() * 900) + 100;
+            n2 = Math.floor(Math.random() * n1);
+          }
+          setNum1(n1);
+          setNum2(n2);
+          setUserInputs(["", "", "", ""]);
+          setBorrows(["", "", "", ""]);
+          setFeedback(null);
+        };
+
+        const checkAnswer = () => {
+          const userAnswer = parseInt(userInputs.join(""));
+          if (userAnswer === correctAnswer) {
+            setFeedback("correct");
+            setScore((s) => s + 10);
+            setQuestionsAnswered((q) => q + 1);
+          } else {
+            setFeedback("incorrect");
+          }
+        };
+
+        const handleInput = (index, value) => {
+          if (value.length > 1) value = value.slice(-1);
+          const newInputs = [...userInputs];
+          newInputs[index] = value;
+          setUserInputs(newInputs);
+        };
+
+        const handleBorrow = (index, value) => {
+          if (value.length > 1) value = value.slice(-1);
+          const newBorrows = [...borrows];
+          newBorrows[index] = value;
+          setBorrows(newBorrows);
+        };
+
+        const getDigit = (num, position) => {
+          const str = num.toString().padStart(4, "0");
+          return str[position];
+        };
+
+        const startTimedMode = () => {
+          setIsTimerActive(true);
+          setTimeLeft(60);
+          setScore(0);
+          setQuestionsAnswered(0);
+          generateQuestion();
+        };
+
+        const storyScenarios = [
+          {
+            emoji: "📚",
+            context: "圖書館有 {num1} 本書，借出了 {num2} 本，還剩多少本？",
+          },
+          {
+            emoji: "🎈",
+            context: "生日會有 {num1} 個氣球，爆了 {num2} 個，還剩多少個？",
+          },
+          {
+            emoji: "🍎",
+            context: "果園收成 {num1} 個蘋果，賣了 {num2} 個，還剩多少個？",
+          },
+          {
+            emoji: "🎟️",
+            context: "電影院有 {num1} 張票，售出 {num2} 張，還剩多少張？",
+          },
+        ];
+
+        const currentStory =
+          storyScenarios[Math.floor(Math.random() * storyScenarios.length)];
+        const storyText = currentStory.context
+          .replace("{num1}", num1)
+          .replace("{num2}", num2);
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <header className="text-center mb-8">
+              <div className="inline-flex items-center gap-3 bg-white/30 backdrop-blur-md px-6 py-3 rounded-full mb-4 shadow-lg">
+                <Minus className="text-amber-800" size={24} />
+                <span className="text-amber-800 font-bold text-lg">
+                  小三數學
+                </span>
+              </div>
+              <h1 className="text-5xl md:text-6xl font-black text-amber-900 mb-4 tracking-tight drop-shadow-lg">
+                減法大挑戰
+              </h1>
+              <div className="flex gap-4 justify-center">
+                <button
+                  onClick={() => setMode("practice")}
+                  className={`px-6 py-3 rounded-2xl font-bold transition-all ${
+                    mode === "practice"
+                      ? "bg-white text-amber-600 shadow-lg scale-105"
+                      : "bg-white/50 text-amber-700 hover:bg-white/70"
+                  }`}
+                >
+                  練習模式
+                </button>
+                <button
+                  onClick={() => {
+                    setMode("timed");
+                    startTimedMode();
+                  }}
+                  className={`px-6 py-3 rounded-2xl font-bold transition-all ${
+                    mode === "timed"
+                      ? "bg-white text-red-600 shadow-lg scale-105"
+                      : "bg-white/50 text-amber-700 hover:bg-white/70"
+                  }`}
+                >
+                  計時挑戰
+                </button>
+                <button
+                  onClick={() => setMode("story")}
+                  className={`px-6 py-3 rounded-2xl font-bold transition-all ${
+                    mode === "story"
+                      ? "bg-white text-purple-600 shadow-lg scale-105"
+                      : "bg-white/50 text-amber-700 hover:bg-white/70"
+                  }`}
+                >
+                  應用題
+                </button>
+              </div>
+            </header>
+
+            <main className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8">
+              <div className="lg:col-span-8 bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl">
+                {mode === "story" && (
+                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 mb-6 border-2 border-purple-200">
+                    <div className="text-5xl mb-3 text-center">
+                      {currentStory.emoji}
+                    </div>
+                    <div className="text-xl font-bold text-purple-800 text-center leading-relaxed">
+                      {storyText}
+                    </div>
+                  </div>
+                )}
+
+                {mode === "timed" && (
+                  <div className="flex justify-between items-center mb-6 bg-gradient-to-r from-red-50 to-orange-50 p-4 rounded-2xl">
+                    <div className="flex items-center gap-2">
+                      <Trophy className="text-yellow-600" size={24} />
+                      <span className="font-black text-2xl text-slate-800">
+                        得分: {score}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Target className="text-blue-600" size={24} />
+                      <span className="font-black text-2xl text-slate-800">
+                        已答: {questionsAnswered}
+                      </span>
+                    </div>
+                    <div
+                      className={`text-3xl font-black px-6 py-2 rounded-xl ${
+                        timeLeft <= 10
+                          ? "bg-red-500 text-white animate-pulse"
+                          : "bg-blue-500 text-white"
+                      }`}
+                    >
+                      ⏱️ {timeLeft}s
+                    </div>
+                  </div>
+                )}
+
+                <div className="max-w-md mx-auto">
+                  <div className="grid grid-cols-5 gap-2 text-center mb-2 text-amber-700 font-bold text-sm">
+                    <div></div>
+                    <div>千</div>
+                    <div>百</div>
+                    <div>十</div>
+                    <div>個</div>
+                  </div>
+
+                  {/* Borrow Row */}
+                  <div className="grid grid-cols-5 gap-2 mb-2 h-10">
+                    <div></div>
+                    {[0, 1, 2, 3].map((i) => (
+                      <input
+                        key={i}
+                        type="text"
+                        inputMode="numeric"
+                        maxLength="1"
+                        value={borrows[i]}
+                        onChange={(e) => handleBorrow(i, e.target.value)}
+                        className="w-full h-10 rounded-lg text-center font-bold text-red-600 bg-red-50 border-2 border-dashed border-red-300 text-sm"
+                        placeholder="借位"
+                      />
+                    ))}
+                  </div>
+
+                  {/* First Number */}
+                  <div className="grid grid-cols-5 gap-2 mb-2 text-2xl font-black text-slate-700">
+                    <div></div>
+                    <div className="number-card flex items-center justify-center h-14 bg-blue-100 rounded-xl shadow-sm">
+                      {getDigit(num1, 0)}
+                    </div>
+                    <div className="number-card flex items-center justify-center h-14 bg-blue-100 rounded-xl shadow-sm">
+                      {getDigit(num1, 1)}
+                    </div>
+                    <div className="number-card flex items-center justify-center h-14 bg-blue-100 rounded-xl shadow-sm">
+                      {getDigit(num1, 2)}
+                    </div>
+                    <div className="number-card flex items-center justify-center h-14 bg-blue-100 rounded-xl shadow-sm">
+                      {getDigit(num1, 3)}
+                    </div>
+                  </div>
+
+                  {/* Second Number with Minus Sign */}
+                  <div className="grid grid-cols-5 gap-2 mb-4 text-2xl font-black text-slate-700 relative">
+                    <div className="flex items-center justify-center text-3xl text-red-600">
+                      −
+                    </div>
+                    <div className="number-card flex items-center justify-center h-14 bg-orange-100 rounded-xl shadow-sm">
+                      {getDigit(num2, 0)}
+                    </div>
+                    <div className="number-card flex items-center justify-center h-14 bg-orange-100 rounded-xl shadow-sm">
+                      {getDigit(num2, 1)}
+                    </div>
+                    <div className="number-card flex items-center justify-center h-14 bg-orange-100 rounded-xl shadow-sm">
+                      {getDigit(num2, 2)}
+                    </div>
+                    <div className="number-card flex items-center justify-center h-14 bg-orange-100 rounded-xl shadow-sm">
+                      {getDigit(num2, 3)}
+                    </div>
+                  </div>
+
+                  <div className="border-b-4 border-amber-600 mb-4"></div>
+
+                  {/* Answer Inputs */}
+                  <div className="grid grid-cols-5 gap-2 mb-6">
+                    <div></div>
+                    {[0, 1, 2, 3].map((idx) => (
+                      <input
+                        key={idx}
+                        type="text"
+                        inputMode="numeric"
+                        maxLength="1"
+                        className="aspect-square rounded-xl text-3xl font-black text-center border-4 border-amber-300 focus:border-amber-500 outline-none bg-white transition-all hover:scale-105"
+                        placeholder="?"
+                        value={userInputs[idx]}
+                        onChange={(e) => handleInput(idx, e.target.value)}
+                      />
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={checkAnswer}
+                    className="w-full py-4 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl font-bold text-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 mb-4"
+                  >
+                    <CheckCircle strokeWidth={3} /> 檢查答案
+                  </button>
+
+                  {feedback === "correct" && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="bg-green-100 text-green-700 p-4 rounded-xl font-bold flex flex-col items-center gap-2 mb-4"
+                    >
+                      <CheckCircle size={32} />
+                      <div className="text-lg">
+                        答對了！答案是 {correctAnswer}
+                      </div>
+                      <button
+                        onClick={generateQuestion}
+                        className="px-6 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 flex items-center gap-2"
+                      >
+                        <ArrowRight size={16} /> 下一題
+                      </button>
+                    </motion.div>
+                  )}
+
+                  {feedback === "incorrect" && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="bg-red-100 text-red-700 p-4 rounded-xl font-bold flex items-center justify-center gap-2 mb-4"
+                    >
+                      <XCircle /> 再試試看！
+                    </motion.div>
+                  )}
+                </div>
+              </div>
+
+              <div className="lg:col-span-4 flex flex-col gap-6">
+                <div className="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-lg">
+                  <h3 className="text-xl font-black text-amber-600 mb-4">
+                    💡 減法要訣
+                  </h3>
+                  <div className="space-y-3 text-sm text-slate-700">
+                    <div className="bg-yellow-50 p-3 rounded-lg border-l-4 border-yellow-400">
+                      <strong>步驟一：</strong>由個位開始計算
+                    </div>
+                    <div className="bg-orange-50 p-3 rounded-lg border-l-4 border-orange-400">
+                      <strong>步驟二：</strong>如果上面數字較小，要向左借位
+                    </div>
+                    <div className="bg-red-50 p-3 rounded-lg border-l-4 border-red-400">
+                      <strong>步驟三：</strong>借位後該位數字+10，左邊減1
+                    </div>
+                    <div className="bg-green-50 p-3 rounded-lg border-l-4 border-green-400">
+                      <strong>步驟四：</strong>逐位計算直至完成
+                    </div>
+                  </div>
+                </div>
+
+                {mode === "practice" && (
+                  <div className="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-lg">
+                    <h3 className="text-lg font-black text-slate-800 mb-3">
+                      練習設定
+                    </h3>
+                    <button
+                      onClick={generateQuestion}
+                      className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-bold transition-all flex items-center justify-center gap-2 mb-3"
+                    >
+                      <RotateCcw size={20} /> 新題目
+                    </button>
+                    <div className="text-center text-green-600 font-black text-2xl">
+                      <Trophy className="inline mr-2" />
+                      總分: {score}
+                    </div>
+                  </div>
+                )}
+
+                {mode === "timed" && !isTimerActive && timeLeft === 0 && (
+                  <div className="bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl p-6 shadow-lg border-2 border-purple-300">
+                    <h3 className="text-2xl font-black text-purple-700 mb-3 text-center">
+                      時間到！
+                    </h3>
+                    <div className="text-center mb-4">
+                      <div className="text-5xl font-black text-purple-600 mb-2">
+                        {score}
+                      </div>
+                      <div className="text-lg text-purple-700">最終得分</div>
+                      <div className="text-sm text-slate-600 mt-2">
+                        答對了 {questionsAnswered} 題
+                      </div>
+                    </div>
+                    <button
+                      onClick={startTimedMode}
+                      className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold transition-all"
+                    >
+                      再玩一次
+                    </button>
+                  </div>
+                )}
+
+                <div className="bg-gradient-to-br from-blue-100 to-cyan-100 rounded-3xl p-6 shadow-lg">
+                  <h3 className="text-lg font-black text-blue-700 mb-3">
+                    🎯 例子
+                  </h3>
+                  <div className="bg-white p-4 rounded-xl font-mono text-sm">
+                    <div className="text-right mb-1">456</div>
+                    <div className="text-right mb-1">- 178</div>
+                    <div className="border-b-2 border-blue-300 mb-1"></div>
+                    <div className="text-right text-blue-600 font-bold">
+                      278
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </main>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小二數學：除法 (均分) | Division (Sharing)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #f0fdf4 0%, #16a34a 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "➗ Division: Sharing",
+          zh: "➗ 除法概念：均分",
+          ja: "➗ 割り算：等分",
+          ko: "➗ 나눗셈: 나누기",
+          es: "➗ División: Reparto",
+          de: "➗ Division: Aufteilen",
+          fi: "➗ Jakolasku: Jakaminen",
+          fr: "➗ Division : Partage",
+          ar: "➗ القسمة: التوزيع",
+          it: "➗ Divisione: Condivisione",
+        },
+        desc: {
+          zh: "將 {total} 个 🍎 平均分給 {groups} 个小朋友",
+          en: "Share {total} apples equally among {groups} kids",
+          ja: "{total} 個のリンゴを {groups} 人の子供たちに等しく分けます",
+          ko: "사과 {total}개를 {groups}명의 아이들에게 똑같이 나누어 줍니다",
+          es: "Reparte {total} manzanas equitativamente entre {groups} niños",
+          fr: "Partagez {total} pommes également entre {groups} enfants",
+          de: "Teile {total} Äpfel gleichmäßig unter {groups} Kindern auf",
+        },
+        start: {
+          en: "Start Sharing",
+          zh: "開始分",
+          ja: "分ける",
+          ko: "나누기 시작",
+          es: "Empezar a repartir",
+          de: "Aufteilen starten",
+          fi: "Aloita jako",
+          fr: "Commencer le partage",
+          ar: "ابدأ التوزيع",
+          it: "Inizia a condividere",
+        },
+        check: {
+          en: "Check",
+          zh: "檢查",
+          ja: "確認",
+          ko: "확인",
+          es: "Comprobar",
+          de: "Prüfen",
+          fi: "Tarkista",
+          fr: "Vérifier",
+          ar: "تحقق",
+          it: "Controlla",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [total, setTotal] = useState(12);
+        const [groups, setGroups] = useState(3);
+        const [distributed, setDistributed] = useState([]);
+        const [isFinished, setIsFinished] = useState(false);
+        const [input, setInput] = useState("");
+        const [feedback, setFeedback] = useState("");
+
+        const newProb = () => {
+          setDistributed([]);
+          setIsFinished(false);
+          setInput("");
+          setFeedback("");
+
+          const g = Math.floor(Math.random() * 4) + 2; // 2-5 groups
+          const perG = Math.floor(Math.random() * 4) + 2; // 2-5 items
+          setGroups(g);
+          setTotal(g * perG);
+        };
+
+        useEffect(newProb, []);
+
+        const distribute = () => {
+          if (isFinished) return;
+
+          // Animate distribution logic simulation
+          // We just instantly set the state for "distributed" count to visualize
+          let current = 0;
+          const target = total;
+          const interval = setInterval(() => {
+            current++;
+            setDistributed((prev) => {
+              const next = [...prev, current];
+              if (next.length === target) {
+                clearInterval(interval);
+                setIsFinished(true);
+              }
+              return next;
+            });
+          }, 200);
+        };
+
+        const check = () => {
+          if (parseInt(input) === total / groups) {
+            setFeedback("CORRECT");
+            setTimeout(newProb, 3000);
+          } else {
+            setFeedback("WRONG");
+          }
+        };
+
+        const getDesc = () => {
+          const tmpl = t.desc[lang] || t.desc["en"];
+          return tmpl.replace("{total}", total).replace("{groups}", groups);
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center justify-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+
+            <h1 className="text-4xl md:text-5xl font-black text-green-900 mb-8 max-w-2xl text-center">
+              {t.title[lang] || t.title["en"]}
+            </h1>
+
+            <div className="bg-white/90 rounded-3xl p-8 shadow-2xl w-full max-w-4xl text-center border-4 border-green-300">
+              <div className="mb-8">
+                <div className="text-2xl font-bold text-slate-600 mb-4">
+                  {getDesc()}
+                </div>
+
+                {/* Source Pile */}
+                <div className="flex justify-center flex-wrap gap-2 h-20 mb-4 items-center">
+                  {[...Array(total - distributed.length)].map((_, i) => (
+                    <div key={i} className="text-3xl animate-bounce">
+                      🍎
+                    </div>
+                  ))}
+                </div>
+
+                {!isFinished && distributed.length === 0 && (
+                  <button
+                    onClick={distribute}
+                    className="px-8 py-2 bg-green-500 text-white rounded-full font-bold shadow-lg hover:bg-green-600 mb-4"
+                  >
+                    {t.start[lang] || t.start["en"]}
+                  </button>
+                )}
+              </div>
+
+              <div className="flex justify-center gap-4 flex-wrap mb-8">
+                {[...Array(groups)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="bg-green-50 border-4 border-green-400 rounded-3xl p-4 w-32 min-h-[160px] flex flex-col items-center relative"
+                  >
+                    <div className="text-4xl mb-2">👶</div>
+                    <div className="flex flex-wrap justify-center gap-1">
+                      {distributed
+                        .filter((_, idx) => idx % groups === i)
+                        .map((_, j) => (
+                          <div key={j} className="text-2xl animate-ping-once">
+                            🍎
+                          </div>
+                        ))}
+                    </div>
+                    <div className="absolute bottom-2 text-green-700 font-bold">
+                      {
+                        distributed.filter((_, idx) => idx % groups === i)
+                          .length
+                      }
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {isFinished && (
+                <div className="animate-fade-in">
+                  <div className="text-3xl font-bold text-slate-700 mb-4 flex items-center justify-center gap-4 flex-wrap">
+                    {total} ÷ {groups} =
+                    <input
+                      type="number"
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      className="w-24 text-center border-b-4 border-green-500 bg-green-50 text-4xl font-black focus:outline-none"
+                      autoFocus
+                    />
+                  </div>
+                  <button
+                    onClick={check}
+                    className="px-10 py-3 bg-green-500 text-white rounded-full font-black text-2xl shadow-xl hover:bg-green-600 active:scale-95 transition-transform"
+                  >
+                    {t.check[lang] || t.check["en"]}
+                  </button>
+                </div>
+              )}
+
+              <div className="h-16 mt-8">
+                {feedback === "CORRECT" && (
+                  <div className="text-4xl font-black text-green-500 animate-bounce">
+                    {get("correct", lang)}
+                  </div>
+                )}
+                {feedback === "WRONG" && (
+                  <div className="text-4xl font-black text-red-500 animate-shake">
+                    {get("wrong", lang)}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+    <style>
+      @keyframes ping-once {
+        0% {
+          transform: scale(0);
+          opacity: 0;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+      .animate-ping-once {
+        animation: ping-once 0.3s cubic-bezier(0, 0, 0.2, 1) forwards;
+      }
+    </style>
+  </body>
+</html>

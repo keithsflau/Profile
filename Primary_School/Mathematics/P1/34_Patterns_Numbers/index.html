@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小一數學：數字規律 | Number Patterns</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fff1f2 0%, #f43f5e 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      function App() {
+        const [seq, setSeq] = useState([]);
+        const [ans, setAns] = useState(0);
+        const [input, setInput] = useState("");
+        const [feedback, setFeedback] = useState("");
+
+        const newGame = () => {
+          // Patterns: +1, +2, -1
+          const type = Math.random();
+          let start = Math.floor(Math.random() * 5) + 1;
+          let s = [];
+          let nextVal = 0;
+
+          if (type < 0.4) {
+            // +1
+            for (let i = 0; i < 5; i++) s.push(start + i);
+            nextVal = start + 5;
+          } else if (type < 0.7) {
+            // +2
+            for (let i = 0; i < 5; i++) s.push(start + i * 2);
+            nextVal = start + 10;
+          } else {
+            // -1 (countdown)
+            start = Math.floor(Math.random() * 5) + 10;
+            for (let i = 0; i < 5; i++) s.push(start - i);
+            nextVal = start - 5;
+          }
+
+          setSeq(s);
+          setAns(nextVal);
+          setInput("");
+          setFeedback("");
+        };
+
+        useEffect(newGame, []);
+
+        const check = () => {
+          if (parseInt(input) === ans) {
+            setFeedback("CORRECT");
+            setTimeout(newGame, 1000);
+          } else {
+            setFeedback("WRONG");
+          }
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center justify-center">
+            <h1 className="text-5xl font-black text-rose-900 mb-8">
+              🔢 數字規律 Number Patterns
+            </h1>
+
+            <div className="bg-white/90 rounded-3xl p-8 shadow-2xl w-full max-w-4xl text-center border-4 border-rose-300">
+              <div className="flex justify-center gap-4 mb-12 flex-wrap">
+                {seq.map((n, i) => (
+                  <div
+                    key={i}
+                    className="w-24 h-24 rounded-full bg-rose-100 border-4 border-rose-300 flex items-center justify-center text-4xl font-black text-rose-800 shadow"
+                  >
+                    {n}
+                  </div>
+                ))}
+                <div className="w-24 h-24 rounded-full bg-white border-4 border-dashed border-rose-400 flex items-center justify-center text-4xl font-black text-rose-300 shadow">
+                  ?
+                </div>
+              </div>
+
+              <h2 className="text-2xl font-bold text-slate-600 mb-8">
+                下一個數字是？ What comes next?
+              </h2>
+
+              <div className="flex justify-center gap-4 mb-6">
+                <input
+                  type="number"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  className="w-32 text-center text-4xl font-black p-4 border-4 border-rose-400 rounded-2xl bg-white focus:outline-none focus:ring-4 ring-rose-200"
+                  placeholder="?"
+                />
+                <button
+                  onClick={check}
+                  className="px-8 bg-rose-500 text-white rounded-2xl font-black text-xl hover:bg-rose-600 shadow-lg"
+                >
+                  檢查 Check
+                </button>
+              </div>
+
+              {feedback === "CORRECT" && (
+                <div className="text-4xl font-black text-green-500 animate-bounce">
+                  正確！ Correct!
+                </div>
+              )}
+              {feedback === "WRONG" && (
+                <div className="text-4xl font-black text-red-500 animate-shake">
+                  再試一次 Try Again
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

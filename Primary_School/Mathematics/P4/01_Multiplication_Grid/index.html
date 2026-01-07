@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小四數學：乘數表互動探索</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      src="https://unpkg.com/react@18/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.min.js"></script>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+      .cell {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+      }
+      .cell:hover {
+        transform: scale(1.1);
+        z-index: 10;
+      }
+      .highlighted {
+        animation: pulse 1s infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { Grid3x3, Zap, Trophy, Target, RefreshCw } = window.LucideReact;
+
+      function App() {
+        const [mode, setMode] = useState("explore"); // explore, quiz, pattern
+        const [selectedRow, setSelectedRow] = useState(null);
+        const [selectedCol, setSelectedCol] = useState(null);
+        const [score, setScore] = useState(0);
+        const [quizQuestion, setQuizQuestion] = useState(null);
+        const [userAnswer, setUserAnswer] = useState("");
+        const [feedback, setFeedback] = useState(null);
+        const [patternActive, setPatternActive] = useState(null);
+
+        const MAX = 12;
+
+        const generateQuiz = () => {
+          const a = Math.floor(Math.random() * 12) + 1;
+          const b = Math.floor(Math.random() * 12) + 1;
+          setQuizQuestion({ a, b, answer: a * b });
+          setUserAnswer("");
+          setFeedback(null);
+        };
+
+        useEffect(() => {
+          if (mode === "quiz") generateQuiz();
+        }, [mode]);
+
+        const checkAnswer = () => {
+          if (parseInt(userAnswer) === quizQuestion.answer) {
+            setFeedback("correct");
+            setScore((s) => s + 10);
+          } else {
+            setFeedback("incorrect");
+          }
+        };
+
+        const showPattern = (type) => {
+          setPatternActive(type);
+          setTimeout(() => setPatternActive(null), 3000);
+        };
+
+        const isInPattern = (row, col) => {
+          if (!patternActive) return false;
+          if (patternActive === "diagonal") return row === col;
+          if (patternActive === "square")
+            return row === col || row + col === MAX + 1;
+          if (patternActive === "even") return (row * col) % 2 === 0;
+          return false;
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            {/* Header */}
+            <header className="text-center mb-8">
+              <div className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-md px-6 py-3 rounded-full mb-4">
+                <Grid3x3 className="text-white" size={24} />
+                <span className="text-white font-bold text-lg">小四數學</span>
+              </div>
+              <h1 className="text-5xl md:text-6xl font-black text-white mb-4 tracking-tight">
+                乘數表探索
+              </h1>
+              <div className="flex gap-4 justify-center">
+                <button
+                  onClick={() => setMode("explore")}
+                  className={`px-6 py-3 rounded-2xl font-bold transition-all ${
+                    mode === "explore"
+                      ? "bg-white text-purple-600 shadow-lg scale-105"
+                      : "bg-white/20 text-white hover:bg-white/30"
+                  }`}
+                >
+                  探索模式
+                </button>
+                <button
+                  onClick={() => setMode("quiz")}
+                  className={`px-6 py-3 rounded-2xl font-bold transition-all ${
+                    mode === "quiz"
+                      ? "bg-white text-purple-600 shadow-lg scale-105"
+                      : "bg-white/20 text-white hover:bg-white/30"
+                  }`}
+                >
+                  挑戰模式
+                </button>
+                <button
+                  onClick={() => setMode("pattern")}
+                  className={`px-6 py-3 rounded-2xl font-bold transition-all ${
+                    mode === "pattern"
+                      ? "bg-white text-purple-600 shadow-lg scale-105"
+                      : "bg-white/20 text-white hover:bg-white/30"
+                  }`}
+                >
+                  規律探索
+                </button>
+              </div>
+            </header>
+
+            <main className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8">
+              {/* Grid */}
+              <div className="lg:col-span-8 bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl">
+                <div className="grid grid-cols-13 gap-2">
+                  {/* Corner cell */}
+                  <div className="w-12 h-12 flex items-center justify-center bg-purple-600 text-white font-black rounded-xl">
+                    ×
+                  </div>
+
+                  {/* Column headers */}
+                  {[...Array(MAX)].map((_, i) => (
+                    <div
+                      key={`col-${i}`}
+                      className="w-12 h-12 flex items-center justify-center bg-purple-100 text-purple-700 font-black rounded-xl cursor-pointer hover:bg-purple-200"
+                      onClick={() => setSelectedCol(i + 1)}
+                    >
+                      {i + 1}
+                    </div>
+                  ))}
+
+                  {/* Grid rows */}
+                  {[...Array(MAX)].map((_, rowIdx) => (
+                    <React.Fragment key={`row-${rowIdx}`}>
+                      {/* Row header */}
+                      <div
+                        className="w-12 h-12 flex items-center justify-center bg-purple-100 text-purple-700 font-black rounded-xl cursor-pointer hover:bg-purple-200"
+                        onClick={() => setSelectedRow(rowIdx + 1)}
+                      >
+                        {rowIdx + 1}
+                      </div>
+
+                      {/* Row cells */}
+                      {[...Array(MAX)].map((_, colIdx) => {
+                        const row = rowIdx + 1;
+                        const col = colIdx + 1;
+                        const value = row * col;
+                        const isSelected =
+                          selectedRow === row || selectedCol === col;
+                        const isTarget =
+                          selectedRow === row && selectedCol === col;
+                        const inPattern = isInPattern(row, col);
+
+                        return (
+                          <motion.div
+                            key={`cell-${row}-${col}`}
+                            className={`cell w-12 h-12 flex items-center justify-center font-bold rounded-xl ${
+                              isTarget
+                                ? "bg-yellow-400 text-yellow-900 shadow-lg scale-110"
+                                : isSelected
+                                ? "bg-purple-200 text-purple-900"
+                                : inPattern
+                                ? "bg-green-400 text-green-900"
+                                : "bg-slate-50 text-slate-700 hover:bg-slate-100"
+                            }`}
+                            onClick={() => {
+                              setSelectedRow(row);
+                              setSelectedCol(col);
+                            }}
+                            whileHover={{ scale: 1.1 }}
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: (rowIdx + colIdx) * 0.01 }}
+                          >
+                            {value}
+                          </motion.div>
+                        );
+                      })}
+                    </React.Fragment>
+                  ))}
+                </div>
+              </div>
+
+              {/* Sidebar */}
+              <div className="lg:col-span-4 flex flex-col gap-6">
+                {/* Explore Mode Info */}
+                {mode === "explore" && (
+                  <div className="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-lg">
+                    <h3 className="text-xl font-black text-purple-600 mb-4">
+                      選擇的乘數
+                    </h3>
+                    {selectedRow && selectedCol ? (
+                      <div className="text-center">
+                        <div className="text-5xl font-black text-slate-800 mb-4">
+                          {selectedRow} × {selectedCol}
+                        </div>
+                        <div className="text-6xl font-black text-purple-600 bg-purple-50 py-6 rounded-2xl">
+                          = {selectedRow * selectedCol}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center text-slate-400 py-8">
+                        點擊格子來探索乘數！
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Quiz Mode */}
+                {mode === "quiz" && quizQuestion && (
+                  <div className="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-lg">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-xl font-black text-purple-600">
+                        快速挑戰
+                      </h3>
+                      <div className="flex items-center gap-2 bg-yellow-100 px-4 py-2 rounded-full">
+                        <Trophy className="text-yellow-600" size={20} />
+                        <span className="font-black text-yellow-600">
+                          {score}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="text-center mb-6">
+                      <div className="text-4xl font-black text-slate-800 mb-4">
+                        {quizQuestion.a} × {quizQuestion.b} = ?
+                      </div>
+                      <input
+                        type="number"
+                        value={userAnswer}
+                        onChange={(e) => setUserAnswer(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && checkAnswer()}
+                        className="w-full px-6 py-4 rounded-2xl border-2 border-purple-200 focus:border-purple-500 outline-none text-3xl font-black text-center"
+                        placeholder="?"
+                      />
+                    </div>
+
+                    <button
+                      onClick={checkAnswer}
+                      className="w-full py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-2xl font-bold text-lg shadow-lg transition-all"
+                    >
+                      確認答案
+                    </button>
+
+                    {feedback === "correct" && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mt-4 bg-green-100 text-green-700 p-4 rounded-xl font-bold text-center"
+                      >
+                        ✓ 答對了！繼續加油！
+                      </motion.div>
+                    )}
+
+                    {feedback === "incorrect" && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mt-4 bg-red-100 text-red-700 p-4 rounded-xl font-bold text-center"
+                      >
+                        ✗ 再想想看！
+                      </motion.div>
+                    )}
+
+                    {feedback && (
+                      <button
+                        onClick={generateQuiz}
+                        className="w-full mt-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition-all flex items-center justify-center gap-2"
+                      >
+                        <RefreshCw size={18} /> 下一題
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {/* Pattern Mode */}
+                {mode === "pattern" && (
+                  <div className="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-lg">
+                    <h3 className="text-xl font-black text-purple-600 mb-4">
+                      發現規律
+                    </h3>
+                    <div className="flex flex-col gap-3">
+                      <button
+                        onClick={() => showPattern("diagonal")}
+                        className="w-full py-4 bg-green-500 hover:bg-green-600 text-white rounded-xl font-bold transition-all"
+                      >
+                        對角線規律
+                      </button>
+                      <button
+                        onClick={() => showPattern("square")}
+                        className="w-full py-4 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-bold transition-all"
+                      >
+                        完全平方數
+                      </button>
+                      <button
+                        onClick={() => showPattern("even")}
+                        className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold transition-all"
+                      >
+                        雙數規律
+                      </button>
+                    </div>
+                    <div className="mt-4 p-4 bg-purple-50 rounded-xl text-sm text-slate-600">
+                      點擊按鈕來看看乘數表中的數學規律！
+                    </div>
+                  </div>
+                )}
+              </div>
+            </main>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

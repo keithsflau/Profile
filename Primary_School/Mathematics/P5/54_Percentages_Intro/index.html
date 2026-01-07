@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小五數學：百分數入門</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fce38a 0%, #f38181 100%);
+      }
+      .grid-box {
+        transition: background-color 0.1s;
+      }
+      .grid-box:hover {
+        filter: brightness(0.95);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      const Percent = () => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="32"
+          height="32"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <circle cx="17.5" cy="17.5" r="2.5" />
+          <circle cx="6.5" cy="6.5" r="2.5" />
+          <path d="m19 5-14 14" />
+        </svg>
+      );
+
+      function App() {
+        // Grid 10x10 state
+        // We can just store a Set of selected indices for efficiency?
+        // Or simple boolean array.
+        const [selected, setSelected] = useState(new Set());
+        const [isDrawMode, setIsDrawMode] = useState(true); // Draw vs Erase
+
+        const toggleCell = (idx) => {
+          const next = new Set(selected);
+          if (next.has(idx)) {
+            next.delete(idx);
+          } else {
+            next.add(idx);
+          }
+          setSelected(next);
+        };
+
+        // Mouse drag handling
+        const [isDragging, setIsDragging] = useState(false);
+
+        const handleMouseDown = (idx) => {
+          setIsDragging(true);
+          const has = selected.has(idx);
+          setIsDrawMode(!has);
+
+          const next = new Set(selected);
+          if (has) next.delete(idx);
+          else next.add(idx);
+          setSelected(next);
+        };
+
+        const handleMouseEnter = (idx) => {
+          if (!isDragging) return;
+          const next = new Set(selected);
+          if (isDrawMode) next.add(idx);
+          else next.delete(idx);
+          setSelected(next);
+        };
+
+        const handleMouseUp = () => setIsDragging(false);
+        useEffect(() => {
+          window.addEventListener("mouseup", handleMouseUp);
+          return () => window.removeEventListener("mouseup", handleMouseUp);
+        }, []);
+
+        const count = selected.size;
+        const total = 100;
+        const percentage = Math.round((count / total) * 100);
+
+        return (
+          <div className="min-h-screen p-6 flex flex-col items-center justify-center select-none">
+            <div className="bg-white/90 backdrop-blur-xl rounded-[2rem] p-8 shadow-2xl border-4 border-white w-full max-w-4xl flex flex-col md:flex-row gap-8 items-center">
+              {/* Visual Area */}
+              <div className="flex-1 flex flex-col items-center">
+                <div
+                  className="bg-white p-2 shadow-inner rounded-xl border-4 border-slate-200"
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(10, 1fr)",
+                    gap: "2px",
+                    width: "340px",
+                  }}
+                >
+                  {Array.from({ length: 100 }).map((_, i) => (
+                    <div
+                      key={i}
+                      onMouseDown={() => handleMouseDown(i)}
+                      onMouseEnter={() => handleMouseEnter(i)}
+                      className={`w-8 h-8 rounded-sm cursor-pointer grid-box ${
+                        selected.has(i)
+                          ? "bg-red-500 shadow-sm scale-95"
+                          : "bg-slate-100"
+                      }`}
+                    />
+                  ))}
+                </div>
+                <div className="mt-4 text-slate-400 font-bold text-sm flex gap-4">
+                  <span>點擊或拖曳選擇 Click or Drag</span>
+                  <button
+                    onClick={() => setSelected(new Set())}
+                    className="text-red-400 hover:text-red-500 underline"
+                  >
+                    重置 Clear
+                  </button>
+                </div>
+              </div>
+
+              {/* Information Panel */}
+              <div className="flex-1 w-full space-y-8">
+                <div className="flex items-center gap-4">
+                  <div className="p-4 bg-red-100 rounded-2xl text-red-500">
+                    <Percent />
+                  </div>
+                  <div>
+                    <h1 className="text-3xl font-black text-slate-800">
+                      百分數 %
+                    </h1>
+                    <p className="text-slate-500 font-bold">
+                      Introduction to Percentage
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {/* Fraction Representation */}
+                  <div className="bg-slate-50 p-6 rounded-2xl border-2 border-slate-100 flex items-center justify-between">
+                    <span className="text-slate-500 font-bold">
+                      分數 Fraction
+                    </span>
+                    <div className="flex flex-col items-center text-3xl font-black text-slate-700">
+                      <span className="text-red-500">{count}</span>
+                      <div className="w-12 h-1 bg-slate-800 my-1"></div>
+                      <span>100</span>
+                    </div>
+                  </div>
+
+                  {/* Percentage Representation */}
+                  <div className="bg-red-50 p-6 rounded-2xl border-2 border-red-100 flex items-center justify-between">
+                    <span className="text-red-800/60 font-bold">
+                      百分數 Percentage
+                    </span>
+                    <div className="text-6xl font-black text-red-500 flex items-baseline">
+                      {percentage}
+                      <span className="text-4xl ml-1">%</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-yellow-50 p-4 rounded-xl border border-yellow-200 text-yellow-800 font-bold text-center">
+                  % 意思是 "每 100 個中佔多少"
+                  <br />% means "per 100"
+                </div>
+              </div>
+            </div>
+
+            <div className="fixed bottom-4 left-4">
+              <a
+                href="../index.html"
+                className="bg-white/80 backdrop-blur hover:bg-white text-slate-600 px-6 py-3 rounded-full font-bold shadow-lg flex items-center gap-2 transition-all"
+              >
+                ← 返回目錄
+              </a>
+            </div>
+          </div>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

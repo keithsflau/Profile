@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小三常識：禮貌好孩子 | Cultural Manners</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: radial-gradient(circle at center, #fce7f3 0%, #db2777 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Cultural Manners",
+          zh: "禮貌好孩子",
+          ja: "マナー教室",
+          ko: "예절 교실",
+          es: "Modales Culturales",
+          de: "Kulturelle Manieren",
+          fi: "Kulttuuriset tavat",
+          fr: "Manières culturelles",
+          ar: "الآداب الثقافية",
+          it: "Buone Maniere",
+        },
+        instruction: {
+          en: "What should you do?",
+          zh: "你應該怎樣做？",
+          ja: "どうすればいいですか？",
+          ko: "어떻게 해야 할까요?",
+          es: "¿Qué deberías hacer?",
+          de: "Was solltest du tun?",
+          fi: "Mitä sinun pitäisi tehdä?",
+          fr: "Que devriez-vous faire ?",
+          ar: "ماذا يجب أن تفعل؟",
+          it: "Cosa dovresti fare?",
+        },
+
+        tea_scene: {
+          en: "Giving tea to elders",
+          zh: "向長輩敬茶",
+          ja: "年長者にお茶を出す",
+          ko: "어른께 차 드리기",
+          es: "Dar té a los mayores",
+          de: "Tee an Ältere servieren",
+          fi: "Teen tarjoilu vanhuksille",
+          fr: "Donner du thé aux aînés",
+          ar: "تقديم الشاي للكبار",
+          it: "Dare il tè agli anziani",
+        },
+        tea_good: {
+          en: "Use both hands",
+          zh: "雙手奉茶",
+          ja: "両手を使う",
+          ko: "두 손으로 드리기",
+          es: "Usar ambas manos",
+          de: "Benutze beide Hände",
+          fi: "Käytä molempia käsiä",
+          fr: "Utiliser les deux mains",
+          ar: "استخدم كلتا اليدين",
+          it: "Usa entrambe le mani",
+        },
+        tea_bad: {
+          en: "Use one hand",
+          zh: "單手遞茶",
+          ja: "片手を使う",
+          ko: "한 손으로 드리기",
+          es: "Usar una mano",
+          de: "Benutze eine Hand",
+          fi: "Käytä yhtä kättä",
+          fr: "Utiliser une main",
+          ar: "استخدم يد واحدة",
+          it: "Usa una mano",
+        },
+
+        gift_scene: {
+          en: "Receiving a gift",
+          zh: "收到禮物",
+          ja: "プレゼントを受け取る",
+          ko: "선물 받기",
+          es: "Recibir un regalo",
+          de: "Ein Geschenk erhalten",
+          fi: "Lahjan vastaanottaminen",
+          fr: "Recevoir un cadeau",
+          ar: "تلقي هدية",
+          it: "Ricevere un regalo",
+        },
+        gift_good: {
+          en: "Say 'Thank you' with both hands",
+          zh: "雙手接過並說謝謝",
+          ja: "両手で「ありがとう」と言う",
+          ko: "두 손으로 받고 감사 인사하기",
+          es: "Decir 'Gracias' con ambas manos",
+          de: "Mit beiden Händen 'Danke' sagen",
+          fi: "Sano 'Kiitos' molemmin käsin",
+          fr: "Dire 'Merci' avec les deux mains",
+          ar: "قل 'شكرًا' بكلتا اليدين",
+          it: "Dì 'Grazie' con entrambe le mani",
+        },
+        gift_bad: {
+          en: "Snatch it quickly",
+          zh: "一手搶過",
+          ja: "素早くひったくる",
+          ko: "낚아채기",
+          es: "Arrebatarlo rápidamente",
+          de: "Schnell wegschnappen",
+          fi: "Nappaa se nopeasti",
+          fr: "L'arracher rapidement",
+          ar: "اخطفها بسرعة",
+          it: "Strappalo velocemente",
+        },
+
+        table_scene: {
+          en: "Dining with family",
+          zh: "與家人吃飯",
+          ja: "家族と食事",
+          ko: "가족과 식사",
+          es: "Cenando con la familia",
+          de: "Essen mit der Familie",
+          fi: "Ruokailu perheen kanssa",
+          fr: "Dîner en famille",
+          ar: "تناول الطعام مع العائلة",
+          it: "Cenare con la famiglia",
+        },
+        table_good: {
+          en: "Wait for elders to start",
+          zh: "等長輩起筷",
+          ja: "年長者が食べるのを待つ",
+          ko: "어른이 드실 때까지 기다리기",
+          es: "Esperar a que los mayores empiecen",
+          de: "Warte auf die Älteren",
+          fi: "Odota vanhempien aloittavan",
+          fr: "Attendre que les aînés commencent",
+          ar: "انتظر حتى يبدأ الكبار",
+          it: "Aspetta che gli anziani inizino",
+        },
+        table_bad: {
+          en: "Eat immediately",
+          zh: "自己先吃",
+          ja: "すぐに食べる",
+          ko: "먼저 먹기",
+          es: "Comer inmediatamente",
+          de: "Sofort essen",
+          fi: "Syö heti",
+          fr: "Manger immédiatement",
+          ar: "كل فورا",
+          it: "Mangia subito",
+        },
+
+        bus_scene: {
+          en: "On the bus",
+          zh: "在巴士上",
+          ja: "バスの中で",
+          ko: "버스에서",
+          es: "En el autobús",
+          de: "Im Bus",
+          fi: "Bussissa",
+          fr: "Dans le bus",
+          ar: "في الحافلة",
+          it: "Sull'autobus",
+        },
+        bus_good: {
+          en: "Give seat to elderly",
+          zh: "讓座給長者",
+          ja: "年長者に席を譲る",
+          ko: "어르신께 자리 양보하기",
+          es: "Ceder el asiento a los mayores",
+          de: "Platz für Ältere freimachen",
+          fi: "Anna istuin vanhukselle",
+          fr: "Céder sa place aux personnes âgées",
+          ar: "تخلي عن المقعد للمسنين",
+          it: "Cedi il posto agli anziani",
+        },
+        bus_bad: {
+          en: "Pretend to sleep",
+          zh: "假裝睡覺",
+          ja: "寝たふりをする",
+          ko: "자는 척하기",
+          es: "Fingir dormir",
+          de: "Schlafen vortäuschen",
+          fi: "Teeskentele nukkuvasi",
+          fr: "Faire semblant de dormir",
+          ar: "تظاهر بالنوم",
+          it: "Fingi di dormire",
+        },
+
+        correct: {
+          en: "Very Polite!",
+          zh: "乖巧有禮！",
+          ja: "とても礼儀正しい！",
+          ko: "예의 바르네요!",
+          es: "¡Muy Educado!",
+          de: "Sehr höflich!",
+          fi: "Erittäin kohtelias!",
+          fr: "Très poli !",
+          ar: "مهذب جدا!",
+          it: "Molto Educato!",
+        },
+        wrong: {
+          en: "Not polite!",
+          zh: "這樣不太好！",
+          ja: "失礼です！",
+          ko: "예의가 아니에요!",
+          es: "¡No es educado!",
+          de: "Nicht höflich!",
+          fi: "Ei kohteliasta!",
+          fr: "Pas poli !",
+          ar: "غير مهذب!",
+          it: "Non educato!",
+        },
+        completed: {
+          en: "Manners Expert!",
+          zh: "禮貌大使！",
+          ja: "マナーのエキスパート！",
+          ko: "예절 전문가!",
+          es: "¡Experto en Modales!",
+          de: "Manieren-Experte!",
+          fi: "Käytösasiantuntija!",
+          fr: "Expert en bonnes manières !",
+          ar: "خبير الآداب!",
+          it: "Esperto di Buone Maniere!",
+        },
+        reset: {
+          en: "Play Again",
+          zh: "再玩一次",
+          ja: "もう一度プレイ",
+          ko: "다시 하기",
+          es: "Jugar de Nuevo",
+          de: "Nochmal spielen",
+          fi: "Pelaa uudelleen",
+          fr: "Rejouer",
+          ar: "العب مرة أخرى",
+          it: "Gioca di Nuovo",
+        },
+      };
+
+      const scenarios = [
+        {
+          id: "tea",
+          scene: "tea_scene",
+          icon: "🍵",
+          good: { id: "tea_good", icon: "👐" },
+          bad: { id: "tea_bad", icon: "✋" },
+        },
+        {
+          id: "gift",
+          scene: "gift_scene",
+          icon: "🎁",
+          good: { id: "gift_good", icon: "🙇" },
+          bad: { id: "gift_bad", icon: "🏃" },
+        },
+        {
+          id: "table",
+          scene: "table_scene",
+          icon: "🍚",
+          good: { id: "table_good", icon: "🥢" },
+          bad: { id: "table_bad", icon: "😋" },
+        },
+        {
+          id: "bus",
+          scene: "bus_scene",
+          icon: "🚌",
+          good: { id: "bus_good", icon: "👵" },
+          bad: { id: "bus_bad", icon: "😴" },
+        },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [queue, setQueue] = useState([]);
+        const [current, setCurrent] = useState(null);
+        const [feedback, setFeedback] = useState(null);
+        const [score, setScore] = useState(0);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        useEffect(() => {
+          initGame();
+        }, []);
+
+        const initGame = () => {
+          const q = [...scenarios].sort(() => Math.random() - 0.5);
+          setQueue(q);
+          setCurrent(q[0]);
+          setScore(0);
+          setFeedback(null);
+        };
+
+        const handleChoice = (isGood) => {
+          if (feedback) return;
+
+          if (isGood) {
+            setFeedback("correct");
+            setScore((s) => s + 10);
+            setTimeout(() => {
+              setFeedback(null);
+              const nextIdx = queue.indexOf(current) + 1;
+              if (nextIdx < queue.length) setCurrent(queue[nextIdx]);
+              else setCurrent(null);
+            }, 1200);
+          } else {
+            setFeedback("wrong");
+            const nextIdx = queue.indexOf(current) + 1; // Actually, maybe force retry? Or just next.
+            // Let's force retry or delay longer
+            setTimeout(() => setFeedback(null), 1000);
+          }
+        };
+
+        // Randomize button positions
+        const getOptions = () => {
+          if (!current) return [];
+          const opts = [
+            { ...current.good, isGood: true },
+            { ...current.bad, isGood: false },
+          ];
+          // Simple shuffle based on current ID char code sum to be deterministic per render but random-ish
+          return current.id.charCodeAt(0) % 2 === 0 ? opts : opts.reverse();
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center select-none font-sans overflow-hidden">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-rose-900 mb-2 mt-8 drop-shadow-sm bg-white/50 px-6 py-2 rounded-full">
+              🙇 {getText("title")}
+            </h1>
+
+            <div className="font-bold text-rose-800 mb-6 bg-white/40 px-4 py-1 rounded-full text-xl">
+              {score} Points
+            </div>
+
+            {current ? (
+              <div className="w-full max-w-4xl flex flex-col items-center flex-1 justify-center relative">
+                {/* Scene Card */}
+                <div className="bg-white p-8 rounded-[3rem] shadow-2xl border-8 border-rose-300 w-full max-w-2xl mb-8 flex flex-col items-center">
+                  <div className="text-8xl mb-6">{current.icon}</div>
+                  <div className="text-2xl md:text-3xl font-black text-rose-800 text-center mb-2">
+                    {getText(current.scene)}
+                  </div>
+                  <div className="text-lg font-bold text-slate-500">
+                    {getText("instruction")}
+                  </div>
+                </div>
+
+                {/* Choices */}
+                <div className="flex flex-col md:flex-row gap-6 w-full max-w-4xl">
+                  {getOptions().map((opt, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handleChoice(opt.isGood)}
+                      disabled={!!feedback}
+                      className="flex-1 bg-rose-100 hover:bg-rose-200 border-b-8 border-rose-300 rounded-3xl p-8 flex flex-col items-center shadow-lg active:scale-95 transition-all group"
+                    >
+                      <div className="text-6xl mb-4 group-hover:scale-110 transition-transform">
+                        {opt.icon}
+                      </div>
+                      <div className="font-black text-xl md:text-2xl text-rose-900">
+                        {getText(opt.id)}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                {feedback && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 p-12 rounded-[3rem] font-black text-4xl shadow-2xl whitespace-nowrap flex flex-col items-center ${
+                      feedback === "correct"
+                        ? "bg-green-500 text-white"
+                        : "bg-red-500 text-white"
+                    }`}
+                  >
+                    <div className="text-8xl mb-4">
+                      {feedback === "correct" ? "🌟" : "😅"}
+                    </div>
+                    {getText(feedback)}
+                  </motion.div>
+                )}
+              </div>
+            ) : (
+              <div className="bg-white/90 p-12 rounded-3xl shadow-xl text-center mt-20">
+                <div className="text-8xl mb-4">💮</div>
+                <h2 className="text-4xl font-black text-rose-800 mb-6">
+                  {getText("completed")}
+                </h2>
+                <button
+                  onClick={initGame}
+                  className="bg-rose-600 text-white px-10 py-4 rounded-full font-black text-2xl hover:bg-rose-700 shadow-xl"
+                >
+                  {getText("reset")} 🔄
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

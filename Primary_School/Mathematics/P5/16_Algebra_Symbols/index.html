@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小五數學：代數符號入門 | Algebra Introduction</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #f0fdf4 0%, #4ade80 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Introduction to Algebra",
+          zh: "代數符號入門",
+          ja: "代数入門",
+          ko: "대수학 입문",
+          es: "Introducción al Álgebra",
+          de: "Einführung in die Algebra",
+          fi: "Algebran alkeet",
+          fr: "Introduction à l'algèbre",
+          ar: "مقدمة في الجبر",
+          it: "Introduzione all'algebra",
+        },
+        let: {
+          en: "Let",
+          zh: "設",
+          ja: "〜とする",
+          ko: "가정",
+          es: "Sea",
+          de: "Sei",
+          fi: "Olkoon",
+          fr: "Soit",
+          ar: "لنفترض",
+          it: "Sia",
+        },
+        basics: {
+          en: "Algebra Basics:",
+          zh: "代數基礎",
+          ja: "代数の基本:",
+          ko: "대수학 기초:",
+          es: "Conceptos Básicos de Álgebra:",
+          de: "Algebra-Grundlagen:",
+          fi: "Algebran perusteet:",
+          fr: "Bases de l'algèbre :",
+          ar: "أساسيات الجبر:",
+          it: "Nozioni di base sull'algebra:",
+        },
+        tip1: {
+          en: "x represents an unknown number",
+          zh: "x 代表一個未知數",
+          ja: "x は未知数を表します",
+          ko: "x는 미지수를 나타냅니다",
+          es: "x representa un número desconocido",
+          de: "x steht für eine unbekannte Zahl",
+          fi: "x edustaa tuntematonta lukua",
+          fr: "x représente un nombre inconnu",
+          ar: "x تمثل عدداً مجهولاً",
+          it: "x rappresenta un numero sconosciuto",
+        },
+        tip2: {
+          en: "2x means 2 × x",
+          zh: "2x 表示 2 × x",
+          ja: "2x は 2 × x を意味します",
+          ko: "2x는 2 × x를 의미합니다",
+          es: "2x significa 2 × x",
+          de: "2x bedeutet 2 × x",
+          fi: "2x tarkoittaa 2 × x",
+          fr: "2x signifie 2 × x",
+          ar: "2x تعني 2 × x",
+          it: "2x significa 2 × x",
+        },
+        tip3: {
+          en: "x + 3 means x plus 3",
+          zh: "x + 3 表示 x 加 3",
+          ja: "x + 3 は x に 3 を足すことを意味します",
+          ko: "x + 3은 x 더하기 3을 의미합니다",
+          es: "x + 3 significa x más 3",
+          de: "x + 3 bedeutet x plus 3",
+          fi: "x + 3 tarkoittaa x plus 3",
+          fr: "x + 3 signifie x plus 3",
+          ar: "x + 3 تعني x زائد 3",
+          it: "x + 3 significa x più 3",
+        },
+        tip4: {
+          en: "Change the value of x and see how the expression changes!",
+          zh: "改變 x 的值，觀察表達式結果的變化！",
+          ja: "x の値を変えて、式の値がどう変わるか見てみましょう！",
+          ko: "x의 값을 변경하고 식의 결과가 어떻게 변하는지 관찰해보세요!",
+          es: "¡Cambia el valor de x y observa cómo cambia la expresión!",
+          de: "Ändern Sie den Wert von x und sehen Sie, wie sich der Ausdruck ändert!",
+          fi: "Muuta x:n arvoa ja katso, miten lauseke muuttuu!",
+          fr: "Changez la valeur de x et voyez comment l'expression change !",
+          ar: "غير قيمة x وانظر كيف يتغير التعبير!",
+          it: "Cambia il valore di x e vedi come cambia l'espressione!",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const [x, setX] = useState(5);
+
+        const expressions = [
+          { expr: "x + 3", calc: x + 3 },
+          { expr: "2x", calc: 2 * x },
+          { expr: "x - 2", calc: x - 2 },
+          { expr: "3x + 1", calc: 3 * x + 1 },
+          { expr: "10 - x", calc: 10 - x },
+        ];
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-5xl font-black text-green-900 mb-2 mt-8">
+              🔤 {getText("title")}
+            </h1>
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-3xl w-full mt-8">
+              <div className="bg-green-50 rounded-2xl p-6 mb-6 text-center border-2 border-green-200">
+                <p className="text-lg text-green-700 mb-2">{getText("let")}</p>
+                <div className="flex items-center justify-center gap-4">
+                  <span className="text-6xl font-black text-green-600">x</span>
+                  <span className="text-4xl">=</span>
+                  <input
+                    type="number"
+                    min="0"
+                    max="20"
+                    value={x}
+                    onChange={(e) => setX(parseInt(e.target.value) || 0)}
+                    className="w-24 text-5xl font-black text-center border-4 border-green-300 rounded-xl bg-white"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                {expressions.map((e, i) => (
+                  <div
+                    key={i}
+                    className="bg-slate-50 rounded-xl p-4 flex items-center justify-between border-2 border-slate-200"
+                  >
+                    <span className="text-2xl font-mono font-bold text-slate-700">
+                      {e.expr}
+                    </span>
+                    <span className="text-xl">=</span>
+                    <span className="text-3xl font-black text-green-600">
+                      {e.calc}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
+                <p className="font-bold mb-2">📖 {getText("basics")}</p>
+                <ul className="list-disc list-inside space-y-1 text-sm">
+                  <li>
+                    <b>x</b> {getText("tip1")}
+                  </li>
+                  <li>
+                    <b>2x</b> {getText("tip2")}
+                  </li>
+                  <li>
+                    <b>x + 3</b> {getText("tip3")}
+                  </li>
+                  <li>{getText("tip4")}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小三數學：數形推理偵探</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #475569 0%, #0f172a 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { motion } = window.Motion;
+
+      function App() {
+        // Puzzle logic:
+        // A + A = X
+        // A + B = Y
+        // B + ? = Z (User finds ?) or Find A+B+B?
+
+        const [level, setLevel] = useState(1);
+        const [puzzles, setPuzzles] = useState([
+          {
+            id: 1,
+            rows: [
+              { items: ["🍎", "+", "🍎"], res: 10 },
+              { items: ["🍎", "+", "🍌"], res: 12 },
+            ],
+            question: ["🍌"],
+            answer: 7,
+            hint: "如果兩個蘋果是10，一個蘋果是多少？",
+          },
+          {
+            id: 2,
+            rows: [
+              { items: ["⭐", "+", "⭐", "+", "⭐"], res: 15 },
+              { items: ["⭐", "+", "🌙"], res: 9 },
+            ],
+            question: ["🌙"],
+            answer: 4,
+            hint: "先找出星星代表多少",
+          },
+        ]);
+
+        const [currentP_idx, setCurrentP_idx] = useState(0);
+        const currentP = puzzles[currentP_idx];
+
+        // Auto generate infinite puzzles later, stick to static for robustness example
+        const generateRandom = () => {
+          const shapes = ["🐱", "🐶", "🦊", "🐸", "🦁"];
+          const shape1 = shapes[Math.floor(Math.random() * shapes.length)];
+          let shape2 = shapes[Math.floor(Math.random() * shapes.length)];
+          while (shape1 === shape2)
+            shape2 = shapes[Math.floor(Math.random() * shapes.length)];
+
+          const val1 = Math.floor(Math.random() * 8) + 2;
+          const val2 = Math.floor(Math.random() * 8) + 1;
+
+          return {
+            id: Date.now(),
+            rows: [
+              { items: [shape1, "+", shape1], res: val1 * 2 },
+              { items: [shape1, "+", shape2], res: val1 + val2 },
+            ],
+            question: [shape1, "+", shape2, "+", shape2],
+            answer: val1 + val2 * 2,
+            hint: "試試代入數字計算",
+          };
+        };
+
+        const [userInput, setUserInput] = useState("");
+        const [feedback, setFeedback] = useState(null);
+
+        const nextPuzzle = () => {
+          if (currentP_idx < puzzles.length - 1) {
+            setCurrentP_idx((idx) => idx + 1);
+          } else {
+            setPuzzles([...puzzles, generateRandom()]);
+            setCurrentP_idx((idx) => idx + 1);
+          }
+          setUserInput("");
+          setFeedback(null);
+        };
+
+        const check = () => {
+          if (parseInt(userInput) === currentP.answer) {
+            setFeedback("correct");
+            setTimeout(nextPuzzle, 1500);
+          } else {
+            setFeedback("incorrect");
+          }
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center text-white">
+            <h1 className="text-5xl font-black text-yellow-400 mb-8 drop-shadow-lg">
+              🕵️ 數形推理偵探
+            </h1>
+
+            <div className="bg-slate-800/80 backdrop-blur-md rounded-3xl p-8 shadow-2xl w-full max-w-lg border border-slate-700">
+              <div className="mb-8 space-y-4">
+                {currentP.rows.map((row, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: i * 0.2 }}
+                    className="flex items-center justify-between bg-slate-700/50 p-4 rounded-xl text-3xl font-bold"
+                  >
+                    <div className="flex gap-2">
+                      {row.items.map((it, idx) => (
+                        <span key={idx}>{it}</span>
+                      ))}
+                    </div>
+                    <div className="text-yellow-400">= {row.res}</div>
+                  </motion.div>
+                ))}
+              </div>
+
+              <div className="border-t-4 border-slate-600 my-6 pt-6 text-center">
+                <div className="text-xl font-bold text-slate-400 mb-4">
+                  請問：
+                </div>
+                <div className="text-4xl font-black mb-6 flex justify-center items-center gap-2">
+                  {currentP.question.map((q, i) => (
+                    <span key={i}>{q}</span>
+                  ))}
+                  <span>= ?</span>
+                </div>
+
+                <div className="flex gap-4">
+                  <input
+                    type="number"
+                    value={userInput}
+                    onChange={(e) => setUserInput(e.target.value)}
+                    className="flex-1 bg-slate-900 border-2 border-slate-600 rounded-xl px-4 text-3xl font-black text-center text-white outline-none focus:border-yellow-400"
+                    placeholder="?"
+                    onKeyDown={(e) => e.key === "Enter" && check()}
+                  />
+                  <button
+                    onClick={check}
+                    className="bg-yellow-500 hover:bg-yellow-600 text-black px-8 rounded-xl font-black text-xl transition-all"
+                  >
+                    提交
+                  </button>
+                </div>
+              </div>
+
+              {feedback === "correct" && (
+                <div className="absolute inset-0 bg-green-500/90 backdrop-blur-sm rounded-3xl flex items-center justify-center z-10">
+                  <div className="text-5xl font-black text-white animate-bounce">
+                    ✓ 破案了！
+                  </div>
+                </div>
+              )}
+
+              {feedback === "incorrect" && (
+                <div className="mt-4 bg-red-500/20 text-red-200 p-4 rounded-xl text-center font-bold animate-pulse">
+                  ✗ 線索不對，再試試看！
+                  <br />
+                  <span className="text-sm opacity-80 mt-1 block">
+                    {currentP.hint}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

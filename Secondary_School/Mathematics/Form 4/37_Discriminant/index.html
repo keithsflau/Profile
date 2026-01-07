@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Discriminant | S4 Math 判別式</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script
+      type="text/javascript"
+      id="MathJax-script"
+      async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+    ></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Sans+TC:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-orange-50 text-slate-800 min-h-screen">
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect, useMemo } = React;
+
+      const translations = {
+          en: {
+              unit: "Unit 2: Quadratic Equations",
+              title: "The Discriminant",
+              desc: "Analyze roots using Δ = b² - 4ac.",
+              coeffA: "Coefficient a",
+              coeffB: "Coefficient b",
+              coeffC: "Coefficient c",
+              discriminant: "Discriminant (Δ)",
+              roots: "Nature of Roots",
+              real2: "2 Real Distinct Roots",
+              real1: "1 Real Repeated Root",
+              complex: "No Real Roots (Complex)"
+          },
+          zh: {
+              unit: "單元二：二次方程",
+              title: "判別式",
+              desc: "使用 Δ = b² - 4ac 分析根的性質。",
+              coeffA: "係數 a",
+              coeffB: "係數 b",
+              coeffC: "係數 c",
+              discriminant: "判別式 (Δ)",
+              roots: "根的性質",
+              real2: "兩個不等實根",
+              real1: "一個重根",
+              complex: "無實根"
+          }
+      };
+
+      const App = () => {
+          const [lang, setLang] = useState("en");
+          const t = translations[lang];
+
+          const [a, setA] = useState(1);
+          const [b, setB] = useState(-4);
+          const [c, setC] = useState(3);
+
+          const delta = b * b - 4 * a * c;
+
+          let rootType = "";
+          let color = "";
+          if (delta > 0) {
+              rootType = t.real2;
+              color = "text-green-600";
+          } else if (delta === 0) {
+              rootType = t.real1;
+              color = "text-blue-600";
+          } else {
+              rootType = t.complex;
+              color = "text-red-600";
+          }
+
+          // Function
+          const f = (x) => a * x * x + b * x + c;
+
+          // Roots for display
+          const r1 = (-b + Math.sqrt(Math.abs(delta)) * (delta >= 0 ? 1 : 1j)) / (2 * a); // Simplified logic
+          const rootDisplay = () => {
+              if (delta > 0) {
+                  const x1 = (-b + Math.sqrt(delta))/(2*a);
+                  const x2 = (-b - Math.sqrt(delta))/(2*a);
+                  return `x = ${x1.toFixed(2)}, ${x2.toFixed(2)}`;
+              } else if (delta === 0) {
+                  return `x = ${(-b/(2*a)).toFixed(2)}`;
+              } else {
+                  return "No real intersection";
+              }
+          };
+
+          // Graph
+          const w = 500, h = 300;
+          const xRange = 10, yRange = 10;
+          const toScreen = (x, y) => ({
+              x: w/2 + x * (w/(2*xRange)),
+              y: h/2 - y * (h/(2*yRange))
+          });
+
+          const curvePath = useMemo(() => {
+              let d = "";
+              for (let x = -xRange; x <= xRange; x += 0.1) {
+                  const y = f(x);
+                  if (Math.abs(y) > yRange * 1.5) continue;
+                  const pt = toScreen(x, y);
+                  d += (d ? "L" : "M") + `${pt.x.toFixed(1)},${pt.y.toFixed(1)} `;
+              }
+              return d;
+          }, [a, b, c]);
+
+          useEffect(() => {
+              if(window.MathJax) window.MathJax.typesetPromise();
+          }, [a, b, c, lang]);
+
+          return (
+              <div className="p-8 max-w-5xl mx-auto min-h-screen flex flex-col items-center select-none">
+                  <header className="mb-8 text-center w-full relative">
+                      <button
+                          onClick={() => setLang(lang === 'en' ? 'zh' : 'en')}
+                          className="absolute right-0 top-0 px-4 py-2 bg-white rounded-full shadow border border-orange-200 text-sm font-bold text-orange-600 hover:bg-orange-50 transition"
+                      >
+                          <i className="fa-solid fa-globe mr-2"></i>
+                          {lang === 'en' ? '中文' : 'ENG'}
+                      </button>
+                      <div className="text-orange-600 font-bold uppercase text-xs tracking-widest mb-2">{t.unit}</div>
+                      <h1 className="text-4xl font-extrabold text-slate-900 mb-2">{t.title}</h1>
+                      <p className="text-slate-500">{t.desc}</p>
+                  </header>
+
+                  <div className="flex flex-col lg:flex-row gap-8 w-full">
+                      {/* Graph */}
+                      <div className="bg-white p-4 rounded-3xl shadow-lg border border-orange-100 flex-[2]">
+                          <svg width={w} height={h} className="bg-slate-50 rounded-xl mx-auto overflow-hidden">
+                              <line x1="0" y1={h/2} x2={w} y2={h/2} stroke="#94a3b8" strokeWidth="2" />
+                              <line x1={w/2} y1="0" x2={w/2} y2={h} stroke="#94a3b8" strokeWidth="2" />
+                              <path d={curvePath} stroke="#f97316" strokeWidth="3" fill="none" />
+                          </svg>
+                      </div>
+
+                      {/* Controls */}
+                      <div className="bg-white p-6 rounded-3xl shadow-lg border border-orange-100 flex-1 space-y-6">
+                          <div className="bg-orange-50 p-4 rounded-xl font-mono text-center text-lg">
+                              y = {a}x² {b>=0 ? '+' : ''}{b}x {c>=0 ? '+' : ''}{c}
+                          </div>
+
+                          <div className="space-y-4">
+                              <div>
+                                  <label className="text-sm font-bold text-slate-500 block mb-1">{t.coeffA} = {a}</label>
+                                  <input type="range" min="-5" max="5" step="0.5" value={a} onChange={e => setA(Number(e.target.value))} className="w-full accent-orange-500" />
+                              </div>
+                              <div>
+                                  <label className="text-sm font-bold text-slate-500 block mb-1">{t.coeffB} = {b}</label>
+                                  <input type="range" min="-10" max="10" step="1" value={b} onChange={e => setB(Number(e.target.value))} className="w-full accent-orange-500" />
+                              </div>
+                              <div>
+                                  <label className="text-sm font-bold text-slate-500 block mb-1">{t.coeffC} = {c}</label>
+                                  <input type="range" min="-10" max="10" step="1" value={c} onChange={e => setC(Number(e.target.value))} className="w-full accent-orange-500" />
+                              </div>
+                          </div>
+
+                          <div className="border-t pt-4">
+                              <div className="text-center mb-4">
+                                  <div className="text-xs font-bold text-slate-400 uppercase">{t.discriminant}</div>
+                                  <div className="font-mono text-2xl font-bold text-slate-700">
+                                      Δ = ({b})² - 4({a})({c}) = {delta}
+                                  </div>
+                              </div>
+
+                              <div className={`p-4 rounded-xl text-center font-bold text-xl ${delta > 0 ? "bg-green-50 text-green-700" : delta === 0 ? "bg-blue-50 text-blue-700" : "bg-red-50 text-red-700"}`}>
+                                  {rootType}
+                                  <div className="text-sm font-normal mt-1 opacity-80">{rootDisplay()}</div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+
+                  <footer className="mt-8">
+                      <a href="../index.html" className="text-orange-500 hover:text-orange-700 font-bold">
+                          <i className="fa-solid fa-arrow-left mr-2"></i> Back to Dashboard
+                      </a>
+                  </footer>
+              </div>
+          );
+      };
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

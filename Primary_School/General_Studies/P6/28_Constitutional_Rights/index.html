@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Constitutional Rights</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #fdf4ff;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Know Your Rights",
+          zh: "認識你的權利",
+          ja: "あなたの権利を知ろう",
+          ko: "당신의 권리를 아세요",
+          es: "Conoce tus derechos",
+          de: "Kenne deine Rechte",
+          fi: "Tunne oikeutesi",
+          fr: "Connaissez vos droits",
+          ar: "اعرف حقوقك",
+          it: "Conosci i tuoi Diritti",
+        },
+        instruction: {
+          en: "Match the scenario to the Right.",
+          zh: "將情境與權利配對。",
+          ja: "シナリオを権利と一致させてください。",
+          ko: "시나리오를 권리와 일치시키세요.",
+          es: "Empareja el escenario con el Derecho.",
+          de: "Ordne das Szenario dem Recht zu.",
+          fi: "Yhdistä tilanne oikeuteen.",
+          fr: "Associez le scénario au Droit.",
+          ar: "طابق السيناريو بالحق.",
+          it: "Abbina lo scenario al Diritto.",
+        },
+        speech: {
+          en: "Freedom of Speech",
+          zh: "言論自由",
+          ja: "言論の自由",
+          ko: "표현의 자유",
+        },
+        vote: { en: "Right to Vote", zh: "選舉權", ja: "投票権", ko: "투표권" },
+        religion: {
+          en: "Freedom of Religion",
+          zh: "宗教自由",
+          ja: "信教の自由",
+          ko: "종교의 자유",
+        },
+        travel: {
+          en: "Freedom of Movement",
+          zh: "出入境自由",
+          ja: "移動の自由",
+          ko: "이동의 자유",
+        },
+
+        s_speech: {
+          en: "Writing an opinion in a newspaper.",
+          zh: "在報紙上發表意見。",
+          ja: "新聞に意見を書く。",
+          ko: "신문에 의견 쓰기.",
+        },
+        s_vote: {
+          en: "Choosing a class monitor.",
+          zh: "選擇班長。",
+          ja: "クラス委員を選ぶ。",
+          ko: "반장 뽑기.",
+        },
+        s_religion: {
+          en: "Going to a church or temple.",
+          zh: "去教堂或寺廟。",
+          ja: "教会や寺に行く。",
+          ko: "교회나 절에 가기.",
+        },
+        s_travel: {
+          en: "Flying to another country for holiday.",
+          zh: "飛往另一個國家度假。",
+          ja: "休日に別の国へ飛ぶ。",
+          ko: "휴가 때 다른 나라로 비행하기.",
+        },
+
+        correct: {
+          en: "Correct! You have this right.",
+          zh: "正確！你擁有這項權利。",
+          ja: "正解！あなたにはこの権利があります。",
+          ko: "정답! 당신에게는 이 권리가 있습니다.",
+        },
+      };
+
+      const pairs = [
+        { id: "speech", scenario: "s_speech", icon: "🗣️" },
+        { id: "vote", scenario: "s_vote", icon: "🗳️" },
+        { id: "religion", scenario: "s_religion", icon: "🛐" },
+        { id: "travel", scenario: "s_travel", icon: "✈️" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [index, setIndex] = useState(0);
+        const [feedback, setFeedback] = useState(null);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+        const current = pairs[index];
+
+        // Shuffle options? Let's just list Rights and match to Scenario
+        const options = [...pairs]; // simplistic
+
+        const handleChoice = (optId) => {
+          if (feedback) return;
+          if (optId === current.id) {
+            setFeedback("correct");
+            setTimeout(() => {
+              setFeedback(null);
+              setIndex((index + 1) % pairs.length);
+            }, 1500);
+          } else {
+            setFeedback("wrong"); // Add 'wrong' key if needed or simplify
+            setTimeout(() => setFeedback(null), 500);
+          }
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col items-center justify-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-8 text-purple-800">
+              {getText("title")}
+            </h1>
+
+            <div className="w-full max-w-2xl bg-white p-8 rounded-3xl shadow-xl border-4 border-purple-200 flex flex-col items-center">
+              <p className="mb-8 font-bold text-slate-500">
+                {getText("instruction")}
+              </p>
+
+              {/* Scenario Card */}
+              <div className="bg-purple-50 p-6 rounded-2xl w-full text-center mb-8 border-2 border-purple-100 min-h-[120px] flex items-center justify-center">
+                <div className="text-2xl font-bold text-slate-800">
+                  {getText(current.scenario)}
+                </div>
+              </div>
+
+              {/* Options Grid */}
+              <div className="grid grid-cols-2 gap-4 w-full">
+                {options.map((opt) => (
+                  <button
+                    key={opt.id}
+                    onClick={() => handleChoice(opt.id)}
+                    className="p-4 bg-slate-50 hover:bg-slate-100 border-2 border-slate-200 rounded-xl flex flex-col items-center gap-2 transition-transform active:scale-95"
+                  >
+                    <div className="text-4xl">{opt.icon}</div>
+                    <div className="font-bold text-sm text-center">
+                      {getText(opt.id)}
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              {feedback && (
+                <div className="mt-8 text-2xl font-black text-green-600 animate-bounce">
+                  {getText(feedback) || "Try again!"}
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

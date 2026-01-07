@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小二常識：指南針方向 | Compass Directions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Compass Directions",
+          zh: "指南針方向",
+          ja: "コンパスの方角",
+        },
+        instruction: {
+          en: "Where is the treasure?",
+          zh: "寶藏在哪個方向？",
+          ja: "宝物はどの方角にありますか？",
+        },
+
+        north: { en: "North", zh: "北方" },
+        east: { en: "East", zh: "東方" },
+        south: { en: "South", zh: "南方" },
+        west: { en: "West", zh: "西方" },
+
+        correct: { en: "Found it!", zh: "找到了！" },
+        wrong: { en: "Wrong direction.", zh: "方向錯了。" },
+        score: { en: "Score", zh: "分數" },
+
+        park: { en: "Park", zh: "公園" },
+        school: { en: "School", zh: "學校" },
+        home: { en: "Home", zh: "家" },
+        zoos: { en: "Zoo", zh: "動物園" },
+      };
+
+      const directions = [
+        { id: "north", label: "north", deg: 0, x: 0, y: -1 },
+        { id: "east", label: "east", deg: 90, x: 1, y: 0 },
+        { id: "south", label: "south", deg: 180, x: 0, y: 1 },
+        { id: "west", label: "west", deg: 270, x: -1, y: 0 },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [targetDir, setTargetDir] = useState(directions[0]);
+        const [showResult, setShowResult] = useState(null);
+        const [score, setScore] = useState(0);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        useEffect(() => {
+          newRound();
+        }, []);
+
+        const newRound = () => {
+          const d = directions[Math.floor(Math.random() * directions.length)];
+          setTargetDir(d);
+          setShowResult(null);
+        };
+
+        const check = (dirId) => {
+          if (showResult) return;
+          if (dirId === targetDir.id) {
+            setShowResult("correct");
+            setScore((s) => s + 10);
+            setTimeout(newRound, 1500);
+          } else {
+            setShowResult("wrong");
+            setScore((s) => Math.max(0, s - 5));
+            setTimeout(() => setShowResult(null), 1000);
+          }
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center select-none">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-teal-800 mb-4 mt-8 drop-shadow-sm bg-white/50 px-6 py-2 rounded-full">
+              🧭 {getText("title")}
+            </h1>
+
+            <div className="bg-white/90 p-8 rounded-3xl shadow-xl w-full max-w-md flex flex-col items-center relative">
+              <div className="absolute top-4 right-4 font-bold text-teal-600 bg-teal-100 px-3 py-1 rounded-full">
+                {getText("score")}: {score}
+              </div>
+
+              <p className="text-xl font-bold text-slate-700 mb-8 mt-4 text-center">
+                {getText("instruction")} <br />
+                <span className="text-teal-600 text-2xl">
+                  "{getText(targetDir.label)}"
+                </span>
+              </p>
+
+              {/* Compass Visual */}
+              <div className="relative w-64 h-64 mb-8">
+                {/* Background Dial */}
+                <div className="absolute inset-0 rounded-full border-8 border-slate-300 bg-slate-100 shadow-inner flex items-center justify-center">
+                  <div className="absolute top-2 font-black text-slate-400">
+                    N
+                  </div>
+                  <div className="absolute bottom-2 font-black text-slate-400">
+                    S
+                  </div>
+                  <div className="absolute left-2 font-black text-slate-400">
+                    W
+                  </div>
+                  <div className="absolute right-2 font-black text-slate-400">
+                    E
+                  </div>
+
+                  {/* Center */}
+                  <div className="w-4 h-4 bg-slate-400 rounded-full z-10"></div>
+                </div>
+
+                {/* Needle (Not animating to answer, user must choose) 
+                          Actually let's animate needle to Random sometimes to confuse? 
+                          No, keep static or just wobble. 
+                          Maybe show the TARGET icon at the direction?
+                      */}
+
+                {/* Target Icon Placement */}
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  key={targetDir.id} // Re-render on change
+                  className="absolute w-12 h-12 text-4xl flex items-center justify-center filter drop-shadow-md z-20"
+                  style={{
+                    top: "50%",
+                    left: "50%",
+                    marginLeft:
+                      targetDir.id === "west"
+                        ? -80
+                        : targetDir.id === "east"
+                        ? 32
+                        : -24,
+                    marginTop:
+                      targetDir.id === "north"
+                        ? -80
+                        : targetDir.id === "south"
+                        ? 32
+                        : -24,
+                  }}
+                >
+                  🎁
+                </motion.div>
+              </div>
+
+              {/* Buttons */}
+              <div className="grid grid-cols-2 gap-4 w-full">
+                {directions.map((d) => (
+                  <button
+                    key={d.id}
+                    onClick={() => check(d.id)}
+                    className="bg-teal-500 hover:bg-teal-600 active:bg-teal-700 text-white font-black py-4 rounded-xl shadow-lg border-b-4 border-teal-800 active:border-b-0 active:translate-y-1 transition-all"
+                  >
+                    {getText(d.label)}
+                  </button>
+                ))}
+              </div>
+
+              {showResult && (
+                <div
+                  className={`absolute inset-0 flex items-center justify-center bg-white/80 rounded-3xl z-30 font-black text-3xl ${
+                    showResult === "correct" ? "text-green-600" : "text-red-500"
+                  }`}
+                >
+                  {getText(showResult)}
+                </div>
+              )}
+            </div>
+
+            {/* Legend / Helper */}
+            <div className="mt-8 bg-white/60 p-4 rounded-xl text-center text-slate-600 text-sm">
+              Top = {getText("north")} | Bottom = {getText("south")} <br />
+              Left = {getText("west")} | Right = {getText("east")}
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

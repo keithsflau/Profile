@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小一數學：數線加法 | Number Line Addition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #e0f2fe 0%, #0ea5e9 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "🦗 Number Line Addition",
+          zh: "🦗 數線加法",
+          ja: "🦗 数直線足し算",
+          ko: "🦗 수직선 덧셈",
+          es: "🦗 Suma en recta numérica",
+          de: "🦗 Zahlengerade Addition",
+          fi: "🦗 Lukusuora yhteenlasku",
+          fr: "🦗 Addition sur droite numérique",
+          ar: "🦗 الجمع على خط الأعداد",
+          it: "🦗 Addizione su retta numerica",
+        },
+        start: {
+          en: "Start",
+          zh: "開始",
+          ja: "開始",
+          ko: "시작",
+          es: "Inicio",
+          de: "Start",
+          fi: "Alku",
+          fr: "Début",
+          ar: "البداية",
+          it: "Inizio",
+        },
+        add: {
+          en: "Add",
+          zh: "加",
+          ja: "足す",
+          ko: "더하기",
+          es: "Más",
+          de: "Addieren",
+          fi: "Lisää",
+          fr: "Ajouter",
+          ar: "إضافة",
+          it: "Aggungi",
+        },
+        jumping: {
+          en: "Jumping...",
+          zh: "跳躍中...",
+          ja: "ジャンプ中...",
+          ko: "점프 중...",
+          es: "Saltando...",
+          de: "Springen...",
+          fi: "Hypätään...",
+          fr: "Saut...",
+          ar: "يقفز...",
+          it: "Saltando...",
+        },
+        jump: {
+          en: "Jump!",
+          zh: "開始跳！",
+          ja: "ジャンプ！",
+          ko: "점프!",
+          es: "¡Salta!",
+          de: "Spring!",
+          fi: "Hyppää!",
+          fr: "Sauter!",
+          ar: "اقفز!",
+          it: "Salta!",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [start, setStart] = useState(2);
+        const [add, setAdd] = useState(3);
+        const [animating, setAnimating] = useState(false);
+        const [current, setCurrent] = useState(start);
+
+        const play = () => {
+          if (animating) return;
+          setAnimating(true);
+          setCurrent(start);
+
+          let steps = 0;
+          const interval = setInterval(() => {
+            steps++;
+            setCurrent((prev) => prev + 1);
+            if (steps >= add) {
+              clearInterval(interval);
+              setAnimating(false);
+            }
+          }, 800);
+        };
+
+        const reset = () => {
+          setCurrent(start);
+          setAnimating(false);
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center justify-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+
+            <h1 className="text-5xl font-black text-sky-800 mb-8 max-w-2xl text-center">
+              {t.title[lang] || t.title["en"]}
+            </h1>
+
+            <div className="bg-white/90 rounded-3xl p-8 shadow-2xl w-full max-w-4xl border-4 border-sky-300">
+              <div className="mb-12 relative h-32 flex items-center px-8">
+                {/* Line */}
+                <div className="absolute top-1/2 left-8 right-8 h-2 bg-slate-300"></div>
+
+                {/* Ticks */}
+                <div className="flex justify-between w-full relative z-10">
+                  {[...Array(11)].map((_, i) => (
+                    <div key={i} className="flex flex-col items-center">
+                      <div className="w-1 h-6 bg-slate-400 mb-2"></div>
+                      <span className="font-bold text-slate-500">{i}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Froggy */}
+                <motion.div
+                  animate={{ left: `${(current / 10) * 100}%` }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  className="absolute top-0 -mt-8 text-6xl"
+                  style={{ marginLeft: "-20px" }} // centering
+                >
+                  🐸
+                </motion.div>
+              </div>
+
+              <div className="flex justify-center gap-8 items-end mb-8">
+                <div className="text-center">
+                  <label className="font-bold text-sky-700">
+                    {t.start[lang] || t.start["en"]}
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="5"
+                    value={start}
+                    onChange={(e) => {
+                      setStart(parseInt(e.target.value));
+                      setCurrent(parseInt(e.target.value));
+                    }}
+                    className="block text-4xl p-2 w-24 text-center border-4 border-sky-200 rounded-xl"
+                  />
+                </div>
+                <div className="text-4xl font-black text-sky-500 mb-4">+</div>
+                <div className="text-center">
+                  <label className="font-bold text-sky-700">
+                    {t.add[lang] || t.add["en"]}
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="5"
+                    value={add}
+                    onChange={(e) => setAdd(parseInt(e.target.value))}
+                    className="block text-4xl p-2 w-24 text-center border-4 border-sky-200 rounded-xl"
+                  />
+                </div>
+                <div className="text-4xl font-black text-sky-500 mb-4">=</div>
+                <div className="text-6xl font-black text-sky-700 mb-2">
+                  {current}
+                </div>
+              </div>
+
+              <button
+                onClick={play}
+                disabled={animating}
+                className="w-full py-4 bg-sky-500 text-white rounded-2xl font-black text-2xl shadow-lg hover:bg-sky-600 disabled:opacity-50 transition-all"
+              >
+                {animating
+                  ? t.jumping[lang] || t.jumping["en"]
+                  : t.jump[lang] || t.jump["en"]}
+              </button>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General Studies - Immune Warriors</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: #fef2f2;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Immune Warriors",
+          zh: "免疫戰士",
+          ja: "免疫戦士",
+          ko: "면역 전사",
+          es: "Guerreros inmunes",
+          de: "Immun-Krieger",
+          fi: "Immuunisoturit",
+          fr: "Guerriers immunitaires",
+          ar: "محاربو المناعة",
+          it: "Guerrieri Immunitari",
+        },
+        instruction: {
+          en: "Tap viruses to destroy them!",
+          zh: "點擊病毒消滅它們！",
+          ja: "ウイルスをタップして破壊しましょう！",
+          ko: "바이러스를 탭하여 파괴하세요!",
+          es: "¡Toca los virus para destruirlos!",
+          de: "Tippe auf Viren, um sie zu zerstören!",
+          fi: "Napauta viruksia tuhotaksesi ne!",
+          fr: "Tapez sur les virus pour les détruire !",
+          ar: "اضغط على الفيروسات لتدميرها!",
+          it: "Tocca i virus per distruggerli!",
+        },
+        score: { en: "Score", zh: "分數", ja: "スコア", ko: "점수" },
+        start: {
+          en: "Start Defending",
+          zh: "開始防禦",
+          ja: "防御開始",
+          ko: "방어 시작",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [score, setScore] = useState(0);
+        const [enemies, setEnemies] = useState([]);
+        const [playing, setPlaying] = useState(false);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        useEffect(() => {
+          if (!playing) return;
+          const interval = setInterval(() => {
+            setEnemies((prev) => [
+              ...prev,
+              {
+                id: Date.now(),
+                x: Math.random() * 90,
+                y: -10,
+              },
+            ]);
+          }, 1000);
+          return () => clearInterval(interval);
+        }, [playing]);
+
+        useEffect(() => {
+          if (!playing) return;
+          const loop = setInterval(() => {
+            setEnemies((prev) =>
+              prev.map((e) => ({ ...e, y: e.y + 1 })).filter((e) => e.y < 100)
+            );
+          }, 50);
+          return () => clearInterval(loop);
+        }, [playing]);
+
+        const hit = (id) => {
+          setEnemies((prev) => prev.filter((e) => e.id !== id));
+          setScore((s) => s + 10);
+        };
+
+        const startGame = () => {
+          setScore(0);
+          setEnemies([]);
+          setPlaying(true);
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl font-bold mb-4 text-red-600">
+              {getText("title")}
+            </h1>
+            <p className="mb-4 font-bold text-slate-500">
+              {getText("instruction")}
+            </p>
+
+            <div className="relative w-full max-w-lg h-[500px] bg-red-50 rounded-xl border-4 border-red-300 overflow-hidden shadow-2xl">
+              {/* Blood cells background decoration */}
+              <div className="absolute inset-0 opacity-20 pointer-events-none">
+                {Array.from({ length: 20 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="absolute w-8 h-8 bg-red-400 rounded-full"
+                    style={{
+                      left: Math.random() * 100 + "%",
+                      top: Math.random() * 100 + "%",
+                    }}
+                  ></div>
+                ))}
+              </div>
+
+              {/* White Blood Cell (Player - Cursor proxy) */}
+
+              {/* Viruses */}
+              {enemies.map((e) => (
+                <motion.button
+                  key={e.id}
+                  className="absolute text-4xl"
+                  style={{ left: `${e.x}%`, top: `${e.y}%` }}
+                  onClick={() => hit(e.id)}
+                  whileTap={{ scale: 1.5, opacity: 0 }}
+                >
+                  🦠
+                </motion.button>
+              ))}
+
+              {!playing && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                  <button
+                    onClick={startGame}
+                    className="px-8 py-4 bg-white text-red-600 font-black rounded-xl shadow-xl text-xl hover:scale-105 transition-transform"
+                  >
+                    {getText("start")}
+                  </button>
+                </div>
+              )}
+
+              <div className="absolute top-4 right-4 text-2xl font-black text-red-800">
+                {getText("score")}: {score}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

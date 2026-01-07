@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小六數學：折扣計算 | Discount Calculation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #ecfeff 0%, #06b6d4 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      function App() {
+        const [mode, setMode] = useState("findPrice"); // findPrice, findDiscount
+        const [original, setOriginal] = useState(200);
+        const [discountRate, setDiscountRate] = useState(20); // %
+        const [salePrice, setSalePrice] = useState(160);
+
+        const calcSalePrice = (original * (100 - discountRate)) / 100;
+        const calcDiscountAmount = original - calcSalePrice;
+
+        const calcRate = ((original - salePrice) / original) * 100;
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-5xl font-black text-cyan-900 mb-2">
+              🏷️ 折扣計算
+            </h1>
+            <p className="text-xl text-cyan-700 font-bold mb-8">
+              Discount Calculation
+            </p>
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-2xl w-full">
+              <div className="flex bg-slate-100 p-1 rounded-xl mb-8">
+                <button
+                  onClick={() => setMode("findPrice")}
+                  className={`flex-1 py-2 rounded-lg font-bold transition-all ${
+                    mode === "findPrice"
+                      ? "bg-white shadow text-cyan-700"
+                      : "text-slate-500"
+                  }`}
+                >
+                  找售價 Find Price
+                </button>
+                <button
+                  onClick={() => setMode("findDiscount")}
+                  className={`flex-1 py-2 rounded-lg font-bold transition-all ${
+                    mode === "findDiscount"
+                      ? "bg-white shadow text-cyan-700"
+                      : "text-slate-500"
+                  }`}
+                >
+                  找折扣率 Find Discount %
+                </button>
+              </div>
+
+              {mode === "findPrice" && (
+                <div className="space-y-6">
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <label className="block font-bold text-cyan-800 mb-2">
+                        原價 Original ($)
+                      </label>
+                      <input
+                        type="number"
+                        value={original}
+                        onChange={(e) =>
+                          setOriginal(
+                            Math.max(0, parseInt(e.target.value) || 0)
+                          )
+                        }
+                        className="w-full text-3xl p-3 border-4 border-cyan-300 rounded-xl font-mono text-center"
+                      />
+                    </div>
+                    <div className="relative">
+                      <label className="block font-bold text-cyan-800 mb-2">
+                        折扣 Discount (%)
+                      </label>
+                      <input
+                        type="number"
+                        value={discountRate}
+                        onChange={(e) =>
+                          setDiscountRate(
+                            Math.min(
+                              100,
+                              Math.max(0, parseInt(e.target.value) || 0)
+                            )
+                          )
+                        }
+                        className="w-full text-3xl p-3 border-4 border-red-300 rounded-xl font-mono text-center text-red-600"
+                      />
+                      <div className="absolute top-10 right-4 text-red-300 font-black text-xl">
+                        % OFF
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-50 p-6 rounded-2xl border-2 border-slate-200">
+                    <p className="font-mono text-lg text-slate-600">
+                      折扣額: {original} × {discountRate}% = $
+                      {calcDiscountAmount.toFixed(0)}
+                    </p>
+                    <p className="font-mono text-lg text-slate-600">
+                      售價: {original} - {calcDiscountAmount.toFixed(0)}
+                    </p>
+                  </div>
+
+                  <div className="bg-emerald-100 p-6 rounded-2xl border-4 border-emerald-300 text-center">
+                    <div className="text-emerald-700 font-bold">
+                      折實價 Sale Price
+                    </div>
+                    <div className="text-5xl font-black text-emerald-800 font-mono">
+                      ${calcSalePrice.toFixed(0)}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {mode === "findDiscount" && (
+                <div className="space-y-6">
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <label className="block font-bold text-cyan-800 mb-2">
+                        原價 Original ($)
+                      </label>
+                      <input
+                        type="number"
+                        value={original}
+                        onChange={(e) =>
+                          setOriginal(
+                            Math.max(1, parseInt(e.target.value) || 1)
+                          )
+                        }
+                        className="w-full text-3xl p-3 border-4 border-cyan-300 rounded-xl font-mono text-center"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-cyan-800 mb-2">
+                        售價 Sale Price ($)
+                      </label>
+                      <input
+                        type="number"
+                        value={salePrice}
+                        onChange={(e) =>
+                          setSalePrice(
+                            Math.max(0, parseInt(e.target.value) || 0)
+                          )
+                        }
+                        className="w-full text-3xl p-3 border-4 border-green-300 rounded-xl font-mono text-center text-green-700"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-50 p-6 rounded-2xl border-2 border-slate-200">
+                    <p className="font-mono text-lg text-slate-600">
+                      相差: {original} - {salePrice} = ${original - salePrice}
+                    </p>
+                    <p className="font-mono text-lg text-slate-600">
+                      折扣率: ({original - salePrice} ÷ {original}) × 100%
+                    </p>
+                  </div>
+
+                  <div className="bg-red-100 p-6 rounded-2xl border-4 border-red-300 text-center">
+                    <div className="text-red-700 font-bold">折扣 Discount</div>
+                    <div className="text-5xl font-black text-red-800 font-mono">
+                      {original > salePrice
+                        ? `${calcRate.toFixed(0)}% OFF`
+                        : "無折扣 No Discount"}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

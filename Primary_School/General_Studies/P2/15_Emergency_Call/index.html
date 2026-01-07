@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小二常識：求助電話 | Emergency Call</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fecaca 0%, #fca5a5 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Emergency Call",
+          zh: "求助電話",
+          ja: "緊急電話",
+        },
+        instruction: {
+          en: "Dial 999 for Emergency!",
+          zh: "發生緊急事故，請撥打 999！",
+          ja: "緊急の場合は999にダイヤルしてください！",
+        },
+        whatNeed: { en: "Who do you need?", zh: "你需要誰的幫助？" },
+
+        fire: { en: "Fire! Need Fire Truck!", zh: "火警！需要消防車！" },
+        sick: { en: "Injured! Need Ambulance!", zh: "受傷了！需要救護車！" },
+        thief: { en: "Thief! Need Police!", zh: "有賊！需要警察！" },
+
+        call: { en: "CALL", zh: "撥出" },
+        del: { en: "DEL", zh: "刪除" },
+
+        connecting: { en: "Connecting...", zh: "正在接通..." },
+        police: { en: "Police", zh: "警察" },
+        ambulance: { en: "Ambulance", zh: "救護車" },
+        firefighter: { en: "Firefighter", zh: "消防員" },
+
+        wrong: { en: "Wrong Number!", zh: "撥錯號碼了！" },
+        success: { en: "Help is coming!", zh: "救援人員正在前往！" },
+        restart: { en: "New Scenario", zh: "新情境" },
+      };
+
+      const scenarios = [
+        { id: "fire", type: "firefighter", icon: "🔥", helpIcon: "🚒" },
+        { id: "sick", type: "ambulance", icon: "🤕", helpIcon: "🚑" },
+        { id: "thief", type: "police", icon: "🦹", helpIcon: "🚓" },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [currentScenario, setCurrentScenario] = useState(null);
+        const [input, setInput] = useState("");
+        const [status, setStatus] = useState("start"); // start, dial, calling, success
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        useEffect(() => {
+          newGame();
+        }, []);
+
+        const newGame = () => {
+          setCurrentScenario(
+            scenarios[Math.floor(Math.random() * scenarios.length)]
+          );
+          setInput("");
+          setStatus("start");
+        };
+
+        const handlePress = (num) => {
+          if (input.length < 3) {
+            setInput((prev) => prev + num);
+          }
+        };
+
+        const handleDelete = () => {
+          setInput((prev) => prev.slice(0, -1));
+        };
+
+        const handleCall = () => {
+          if (input === "999") {
+            setStatus("calling");
+            setTimeout(() => {
+              setStatus("choose");
+            }, 1500);
+          } else {
+            alert(getText("wrong"));
+            setInput("");
+          }
+        };
+
+        const handleServiceChoice = (type) => {
+          if (type === currentScenario.type) {
+            setStatus("success");
+          } else {
+            alert(getText("wrong")); // Or "Wrong Service"
+          }
+        };
+
+        return (
+          <div className="min-h-screen p-4 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-red-900 mb-4 mt-8 drop-shadow-sm bg-white/50 px-6 py-2 rounded-full">
+              🚨 {getText("title")}
+            </h1>
+
+            {status === "start" && currentScenario && (
+              <div className="w-full max-w-sm bg-white p-8 rounded-3xl shadow-2xl text-center mt-8">
+                <div className="text-9xl mb-6 animate-bounce">
+                  {currentScenario.icon}
+                </div>
+                <h2 className="text-2xl font-black text-red-600 mb-6">
+                  {getText(currentScenario.id)}
+                </h2>
+                <button
+                  onClick={() => setStatus("dial")}
+                  className="bg-red-500 text-white px-10 py-4 rounded-full font-black text-2xl hover:bg-red-600 shadow-xl border-b-4 border-red-700 active:border-b-0 active:translate-y-1"
+                >
+                  Start 📞
+                </button>
+              </div>
+            )}
+
+            {status === "dial" && (
+              <div className="w-full max-w-sm bg-slate-800 p-6 rounded-[3rem] shadow-2xl border-8 border-slate-900 mt-4">
+                {/* Screen */}
+                <div className="bg-white h-24 rounded-2xl mb-6 flex items-center justify-center text-4xl font-mono tracking-widest border-4 border-slate-200 shadow-inner">
+                  {input}
+                  <span className="w-1 h-8 bg-black animate-pulse ml-1"></span>
+                </div>
+
+                <p className="text-white text-center mb-4 font-bold">
+                  {getText("instruction")}
+                </p>
+
+                {/* Keypad */}
+                <div className="grid grid-cols-3 gap-3 mb-6">
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
+                    <button
+                      key={n}
+                      onClick={() => handlePress(n)}
+                      className="bg-slate-700 text-white w-16 h-16 rounded-full text-2xl font-bold shadow-lg hover:bg-slate-600 active:bg-slate-500 mx-auto"
+                    >
+                      {n}
+                    </button>
+                  ))}
+                  <div className="col-start-2">
+                    <button
+                      onClick={() => handlePress(0)}
+                      className="bg-slate-700 text-white w-16 h-16 rounded-full text-2xl font-bold shadow-lg hover:bg-slate-600 active:bg-slate-500 mx-auto"
+                    >
+                      0
+                    </button>
+                  </div>
+                  <div className="col-start-3 flex items-center justify-center">
+                    <button
+                      onClick={handleDelete}
+                      className="bg-transparent text-slate-400 text-xl font-bold hover:text-white"
+                    >
+                      ⌫
+                    </button>
+                  </div>
+                </div>
+
+                {/* Call Button */}
+                <button
+                  onClick={handleCall}
+                  className="w-full bg-green-500 text-white py-4 rounded-full font-bold text-2xl hover:bg-green-600 shadow-xl flex items-center justify-center gap-2"
+                >
+                  📞 {getText("call")}
+                </button>
+              </div>
+            )}
+
+            {status === "calling" && (
+              <div className="flex flex-col items-center mt-20">
+                <div className="text-6xl animate-ping mb-8">📞</div>
+                <div className="text-2xl font-black text-slate-700">
+                  {getText("connecting")}
+                </div>
+              </div>
+            )}
+
+            {status === "choose" && (
+              <div className="w-full max-w-lg bg-white p-8 rounded-3xl shadow-xl mt-8 text-center">
+                <p className="text-2xl font-bold text-slate-700 mb-8">
+                  {getText("whatNeed")}
+                </p>
+                <div className="grid grid-cols-3 gap-4">
+                  <button
+                    onClick={() => handleServiceChoice("firefighter")}
+                    className="flex flex-col items-center bg-red-100 p-4 rounded-2xl hover:bg-red-200 border-2 border-red-300"
+                  >
+                    <span className="text-5xl mb-2">🚒</span>
+                    <span className="font-bold text-red-800">
+                      {getText("firefighter")}
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => handleServiceChoice("ambulance")}
+                    className="flex flex-col items-center bg-blue-100 p-4 rounded-2xl hover:bg-blue-200 border-2 border-blue-300"
+                  >
+                    <span className="text-5xl mb-2">🚑</span>
+                    <span className="font-bold text-blue-800">
+                      {getText("ambulance")}
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => handleServiceChoice("police")}
+                    className="flex flex-col items-center bg-slate-100 p-4 rounded-2xl hover:bg-slate-200 border-2 border-slate-300"
+                  >
+                    <span className="text-5xl mb-2">🚓</span>
+                    <span className="font-bold text-slate-800">
+                      {getText("police")}
+                    </span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {status === "success" && (
+              <div className="bg-white/90 p-12 rounded-3xl shadow-xl text-center mt-12">
+                <div className="text-9xl mb-4">{currentScenario.helpIcon}</div>
+                <h2 className="text-3xl font-black text-green-600 mb-6">
+                  {getText("success")}
+                </h2>
+                <button
+                  onClick={newGame}
+                  className="bg-red-500 text-white px-10 py-4 rounded-full font-black text-xl hover:bg-red-600 shadow-xl"
+                >
+                  {getText("restart")} 🔄
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

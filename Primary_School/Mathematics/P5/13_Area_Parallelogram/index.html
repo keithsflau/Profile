@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小五數學：平行四邊形面積 | Parallelogram Area</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #fef9c3 0%, #facc15 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Parallelogram Area",
+          zh: "平行四邊形面積",
+          ja: "平行四辺形の面積",
+          ko: "평행사변형의 넓이",
+          es: "Área del Paralelogramo",
+          de: "Fläche des Parallelogramms",
+          fi: "Suunnikkaan pinta-ala",
+          fr: "Aire du Parallélogramme",
+          ar: "مساحة متوازي الأضلاع",
+          it: "Area del Parallelogramma",
+        },
+        base: {
+          en: "Base",
+          zh: "底",
+          ja: "底辺",
+          ko: "밑변",
+          es: "Base",
+          de: "Basis",
+          fi: "Kanta",
+          fr: "Base",
+          ar: "القاعدة",
+          it: "Base",
+        },
+        height: {
+          en: "Height",
+          zh: "高",
+          ja: "高さ",
+          ko: "높이",
+          es: "Altura",
+          de: "Höhe",
+          fi: "Korkeus",
+          fr: "Hauteur",
+          ar: "الارتفاع",
+          it: "Altezza",
+        },
+        skew: {
+          en: "Skew",
+          zh: "傾斜度",
+          ja: "歪み",
+          ko: "기울기",
+          es: "Inclinación",
+          de: "Neigung",
+          fi: "Vino",
+          fr: "Inclinaison",
+          ar: "الانحراف",
+          it: "Inclinazione",
+        },
+        formulaTitle: {
+          en: "Formula:",
+          zh: "公式:",
+          ja: "公式:",
+          ko: "공식:",
+          es: "Fórmula:",
+          de: "Formel:",
+          fi: "Kaava:",
+          fr: "Formule :",
+          ar: "الصيغة:",
+          it: "Formula:",
+        },
+        formula: {
+          en: "Area = Base × Height",
+          zh: "面積 = 底 × 高",
+          ja: "面積 = 底辺 × 高さ",
+          ko: "넓이 = 밑변 × 높이",
+          es: "Área = Base × Altura",
+          de: "Fläche = Basis × Höhe",
+          fi: "Pinta-ala = Kanta × Korkeus",
+          fr: "Aire = Base × Hauteur",
+          ar: "المساحة = القاعدة × الارتفاع",
+          it: "Area = Base × Altezza",
+        },
+        area: {
+          en: "Area",
+          zh: "面積",
+          ja: "面積",
+          ko: "넓이",
+          es: "Área",
+          de: "Fläche",
+          fi: "Pinta-ala",
+          fr: "Aire",
+          ar: "المساحة",
+          it: "Area",
+        },
+        tipsTitle: {
+          en: "Learning Focus:",
+          zh: "學習重點:",
+          ja: "学習のポイント:",
+          ko: "학습 포인트:",
+          es: "Enfoque de Aprendizaje:",
+          de: "Lernschwerpunkt:",
+          fi: "Oppimisen kohokohta:",
+          fr: "Objectif d'apprentissage :",
+          ar: "نقطة التعلم:",
+          it: "Obiettivo di apprendimento:",
+        },
+        tipContent: {
+          en: "No matter how the skew changes, as long as the base and height remain the same, the area remains the same!",
+          zh: "無論傾斜度如何變化，只要底和高不變，面積就不變！",
+          ja: "歪みが変わっても、底辺と高さが変わらなければ、面積は変わりません！",
+          ko: "기울기가 바뀌더라도 밑변과 높이가 변하지 않으면 넓이는 변하지 않습니다!",
+          es: "¡No importa cómo cambie la inclinación, siempre que la base y la altura sigan siendo las mismas, el área sigue siendo la misma!",
+          de: "Egal wie sich die Neigung ändert, solange Basis und Höhe gleich bleiben, bleibt die Fläche gleich!",
+          fi: "Riippumatta siitä, miten vino muuttuu, niin kauan kuin kanta ja korkeus pysyvät samoina, pinta-ala pysyy samana!",
+          fr: "Peu importe comment l'inclinaison change, tant que la base et la hauteur restent les mêmes, l'aire reste la même !",
+          ar: "بغض النظر عن كيفية تغير الانحراف، طالما أن القاعدة والارتفاع يظلان كما هما، تظل المساحة كما هي!",
+          it: "Non importa come cambia l'inclinazione, finché la base e l'altezza rimangono le stesse, l'area rimane la stessa!",
+        },
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const [base, setBase] = useState(10);
+        const [height, setHeight] = useState(6);
+        const [skew, setSkew] = useState(3);
+        const area = base * height;
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-5xl font-black text-yellow-900 mb-2 mt-8">
+              ▱ {getText("title")}
+            </h1>
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-4xl w-full mt-8">
+              <div className="flex flex-col md:flex-row gap-8 items-center">
+                <div className="flex-1">
+                  <svg
+                    viewBox="0 0 320 220"
+                    className="w-full max-w-sm mx-auto"
+                  >
+                    {/* Parallelogram */}
+                    <polygon
+                      points={`${50 + skew * 10},50 ${
+                        50 + base * 15 + skew * 10
+                      },50 ${50 + base * 15},${50 + height * 20} 50,${
+                        50 + height * 20
+                      }`}
+                      fill="#eab308"
+                      stroke="#ca8a04"
+                      strokeWidth="3"
+                    />
+                    {/* Height line */}
+                    <line
+                      x1={50 + skew * 5}
+                      y1="50"
+                      x2={50 + skew * 5}
+                      y2={50 + height * 20}
+                      stroke="#ef4444"
+                      strokeWidth="2"
+                      strokeDasharray="4,4"
+                    />
+                    <text
+                      x={50 + skew * 5 - 10}
+                      y={50 + height * 10}
+                      textAnchor="end"
+                      className="text-sm font-bold fill-red-600"
+                    >
+                      h={height}
+                    </text>
+                    {/* Base label */}
+                    <text
+                      x={50 + base * 7.5}
+                      y={50 + height * 20 + 25}
+                      textAnchor="middle"
+                      className="text-sm font-bold fill-yellow-800"
+                    >
+                      {getText("base")} = {base} cm
+                    </text>
+                  </svg>
+                </div>
+                <div className="flex-1 space-y-4">
+                  <div>
+                    <label className="block font-bold text-yellow-800 mb-1">
+                      {getText("base")} (cm)
+                    </label>
+                    <input
+                      type="range"
+                      min="4"
+                      max="14"
+                      value={base}
+                      onChange={(e) => setBase(parseInt(e.target.value))}
+                      className="w-full accent-yellow-500"
+                    />
+                    <div className="text-center text-xl font-black text-yellow-600">
+                      {base} cm
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block font-bold text-yellow-800 mb-1">
+                      {getText("height")} (cm)
+                    </label>
+                    <input
+                      type="range"
+                      min="2"
+                      max="8"
+                      value={height}
+                      onChange={(e) => setHeight(parseInt(e.target.value))}
+                      className="w-full accent-yellow-500"
+                    />
+                    <div className="text-center text-xl font-black text-yellow-600">
+                      {height} cm
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block font-bold text-yellow-800 mb-1">
+                      {getText("skew")}
+                    </label>
+                    <input
+                      type="range"
+                      min="0"
+                      max="5"
+                      value={skew}
+                      onChange={(e) => setSkew(parseInt(e.target.value))}
+                      className="w-full accent-yellow-500"
+                    />
+                  </div>
+                  <div className="bg-yellow-50 rounded-2xl p-4 border-2 border-yellow-200">
+                    <p className="text-lg font-bold text-center">
+                      {getText("formulaTitle")}
+                    </p>
+                    <p className="text-xl font-mono text-center mt-1">
+                      {getText("formula")}
+                    </p>
+                  </div>
+                  <div className="bg-emerald-100 rounded-2xl p-4 text-center border-4 border-emerald-300">
+                    <div className="text-emerald-600 font-bold">
+                      {getText("area")}
+                    </div>
+                    <div className="text-4xl font-black text-emerald-800">
+                      {area} cm²
+                    </div>
+                    <div className="text-sm text-emerald-600">
+                      {base} × {height} = {area}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-6 bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
+                <p className="font-bold">💡 {getText("tipsTitle")}</p>
+                <p className="text-sm">{getText("tipContent")}</p>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

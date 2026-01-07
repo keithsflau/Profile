@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小四數學：質數與合成數</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Fredoka", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #f3e8ff 0%, #a855f7 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      function App() {
+        // Eratosthenes Sieve simplified
+        const [nums, setNums] = useState(
+          Array(51)
+            .fill(null)
+            .map((_, i) => ({ val: i, status: "unknown" }))
+        ); // 0-50
+
+        // Status: unknown, prime, composite
+
+        const check = (n) => {
+          if (n < 2) return;
+          // Count factors
+          let factors = 0;
+          for (let i = 1; i <= n; i++) if (n % i === 0) factors++;
+
+          const newNums = [...nums];
+          newNums[n].status = factors === 2 ? "prime" : "composite";
+          setNums(newNums);
+        };
+
+        const autoSieve = () => {
+          const newNums = [...nums];
+          for (let i = 2; i <= 50; i++) {
+            if (i === 2 || i === 3 || i === 5 || i === 7) {
+              newNums[i].status = "prime";
+            } else if (
+              i % 2 === 0 ||
+              i % 3 === 0 ||
+              i % 5 === 0 ||
+              i % 7 === 0
+            ) {
+              newNums[i].status = "composite";
+            } else {
+              let factors = 0;
+              for (let j = 1; j <= i; j++) if (i % j === 0) factors++;
+              newNums[i].status = factors === 2 ? "prime" : "composite";
+            }
+          }
+          setNums(newNums);
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-5xl font-black text-purple-900 mb-8">
+              🔢 質數與合成數 (Prime & Composite)
+            </h1>
+
+            <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-5xl w-full">
+              <div className="flex gap-4 justify-center mb-8">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded bg-green-500"></div>
+                  <span className="font-bold text-slate-700">
+                    質數 (只有 1 和自己兩個因數)
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded bg-red-400"></div>
+                  <span className="font-bold text-slate-700">
+                    合成數 (多於兩個因數)
+                  </span>
+                </div>
+              </div>
+
+              <div className="text-center mb-8">
+                <button
+                  onClick={autoSieve}
+                  className="bg-purple-600 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-purple-700 transition-all"
+                >
+                  一鍵篩選 (Eratosthenes Sieve)
+                </button>
+              </div>
+
+              <div className="grid grid-cols-10 gap-3">
+                {nums.map((item, i) => {
+                  if (i === 0) return null; // Skip 0
+                  let bg = "bg-slate-100 hover:bg-slate-200";
+                  if (item.status === "prime")
+                    bg = "bg-green-500 text-white scale-105 shadow-lg";
+                  if (item.status === "composite")
+                    bg = "bg-red-200 text-red-900 opacity-60 scale-90";
+                  if (i === 1) bg = "bg-slate-300 text-slate-500"; // 1 is neither
+
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => check(i)}
+                      className={`w-full aspect-square rounded-xl font-black text-xl transition-all ${bg}`}
+                    >
+                      {i}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="mt-8 text-center text-slate-500">
+                提示：點擊數字查看它是質數還是合成數！
+                <br />
+                注意：1 既不是質數也不是合成數。
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

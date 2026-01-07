@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dynamic Periodic Table | 動態元素週期表</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .element-card {
+        aspect-ratio: 1;
+        transition: all 0.2s ease;
+      }
+      .element-card:hover {
+        transform: scale(1.15);
+        z-index: 10;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      }
+      /* Grid Layout for Periodic Table (18 columns) */
+      .periodic-grid {
+        display: grid;
+        grid-template-columns: repeat(18, 1fr);
+        gap: 4px;
+        width: 100%;
+        max-width: 1400px;
+      }
+      /* Categories Colors */
+      .cat-alkali {
+        background-color: #ef4444;
+        border-color: #b91c1c;
+        color: white;
+      } /* Group 1 */
+      .cat-alkaline {
+        background-color: #f97316;
+        border-color: #c2410c;
+        color: white;
+      } /* Group 2 */
+      .cat-transition {
+        background-color: #eab308;
+        border-color: #a16207;
+        color: black;
+      }
+      .cat-post-transition {
+        background-color: #84cc16;
+        border-color: #4d7c0f;
+        color: black;
+      }
+      .cat-metalloid {
+        background-color: #10b981;
+        border-color: #047857;
+        color: white;
+      }
+      .cat-nonmetal {
+        background-color: #06b6d4;
+        border-color: #0e7490;
+        color: white;
+      }
+      .cat-halogen {
+        background-color: #3b82f6;
+        border-color: #1d4ed8;
+        color: white;
+      } /* Group 7 */
+      .cat-noble {
+        background-color: #8b5cf6;
+        border-color: #6d28d9;
+        color: white;
+      } /* Group 0 */
+
+      .cat-lanthanide {
+        background-color: #d946ef;
+      }
+      .cat-actinide {
+        background-color: #ec4899;
+      }
+
+      .empty-cell {
+        pointer-events: none;
+        visibility: hidden;
+      }
+    </style>
+  </head>
+
+  <body class="bg-slate-950 text-white min-h-screen flex flex-col">
+    <!-- Header -->
+    <header
+      class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex flex-col md:flex-row justify-between items-center z-10 sticky top-0"
+    >
+      <div class="flex items-center gap-4 mb-4 md:mb-0">
+        <a
+          href="../index.html"
+          class="text-slate-400 hover:text-white transition-colors"
+        >
+          <svg
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M10 19l-7-7m0 0l7-7m-7 7h18"
+            />
+          </svg>
+        </a>
+        <h1 class="text-xl font-bold">
+          Scientific Periodic Table
+          <span class="text-slate-500 font-normal text-sm ml-2"
+            >元素週期表</span
+          >
+        </h1>
+      </div>
+
+      <div class="flex gap-4 items-center">
+        <div class="text-sm text-slate-400">View Mode:</div>
+        <div class="bg-slate-800 p-1 rounded-lg flex">
+          <button
+            class="px-3 py-1 bg-slate-700 rounded text-xs font-semibold text-white shadow"
+            onclick="setMode('standard')"
+          >
+            Groups
+          </button>
+          <button
+            class="px-3 py-1 hover:bg-slate-700 rounded text-xs text-slate-400 font-medium transition-colors"
+            onclick="setMode('mp')"
+          >
+            Melting Point
+          </button>
+          <button
+            class="px-3 py-1 hover:bg-slate-700 rounded text-xs text-slate-400 font-medium transition-colors"
+            onclick="setMode('radius')"
+          >
+            Atomic Radius
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main
+      class="flex-grow p-4 md:p-8 flex flex-col items-center justify-start overflow-y-auto"
+    >
+      <!-- Legend/Info Bar -->
+      <div
+        class="w-full max-w-[1400px] mb-8 flex flex-wrap gap-4 text-xs justify-center"
+        id="legend-container"
+      >
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 bg-red-500 rounded"></div>
+          Alkali Metals
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 bg-orange-500 rounded"></div>
+          Alkaline Earth
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 bg-yellow-500 rounded"></div>
+          Transition Metals
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 bg-blue-500 rounded"></div>
+          Halogens
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 bg-purple-500 rounded"></div>
+          Noble Gases
+        </div>
+      </div>
+
+      <div id="grid-container" class="periodic-grid">
+        <!-- JS will populate this -->
+      </div>
+
+      <!-- Lanthanides / Actinides separate rows placeholder if needed, 
+             but for F3 simple table usually puts them in grid or below.
+             We will simulate standard 18-col layout. -->
+    </main>
+
+    <!-- Detail Modal -->
+    <div
+      id="modal"
+      class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300"
+    >
+      <div
+        class="bg-slate-900 border border-slate-700 rounded-2xl p-8 max-w-2xl w-full mx-4 shadow-2xl transform scale-95 transition-transform duration-300"
+        id="modal-content"
+      >
+        <div class="flex justify-between items-start mb-6">
+          <div>
+            <h2
+              class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400"
+              id="m-name"
+            >
+              Hydrogen
+            </h2>
+            <p class="text-slate-400 text-lg" id="m-category">Non-metal</p>
+          </div>
+          <button
+            onclick="closeModal()"
+            class="text-slate-400 hover:text-white"
+          >
+            <svg
+              class="w-8 h-8"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-8">
+          <!-- Visual Box -->
+          <div
+            class="w-40 h-40 flex items-center justify-center bg-slate-800 rounded-xl border border-slate-700 relative overflow-hidden group"
+          >
+            <span class="text-6xl font-bold text-white z-10" id="m-symbol"
+              >H</span
+            >
+            <span
+              class="absolute top-2 left-3 text-sm text-slate-500"
+              id="m-number"
+              >1</span
+            >
+            <span
+              class="absolute bottom-2 right-3 text-xs text-slate-500 font-mono"
+              id="m-mass"
+              >1.008</span
+            >
+            <!-- Background glow -->
+            <div
+              class="absolute inset-0 bg-blue-500/20 blur-xl group-hover:bg-blue-500/30 transition-colors"
+            ></div>
+          </div>
+
+          <!-- Stats Grid -->
+          <div class="flex-grow grid grid-cols-2 gap-4">
+            <div class="bg-slate-800/50 p-4 rounded-lg">
+              <div class="text-xs text-slate-500 uppercase">
+                Electron Config
+              </div>
+              <div class="text-lg font-mono text-blue-300" id="m-config">1</div>
+            </div>
+            <div class="bg-slate-800/50 p-4 rounded-lg">
+              <div class="text-xs text-slate-500 uppercase">Phase (RTP)</div>
+              <div class="text-lg text-slate-200" id="m-phase">Gas</div>
+            </div>
+            <div class="bg-slate-800/50 p-4 rounded-lg">
+              <div class="text-xs text-slate-500 uppercase">Melting Point</div>
+              <div class="text-lg text-slate-200" id="m-mp">-259 °C</div>
+            </div>
+            <div class="bg-slate-800/50 p-4 rounded-lg">
+              <div class="text-xs text-slate-500 uppercase">Boiling Point</div>
+              <div class="text-lg text-slate-200" id="m-bp">-253 °C</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-slate-800">
+          <p class="text-slate-400 text-sm leading-relaxed" id="m-desc">
+            Hydrogen is the chemical element with the symbol H and atomic number
+            1. It is the lightest element and, at standard conditions, is a gas
+            of diatomic molecules having the formula H2.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // --- Data (Condensed for F3 focus, but full structural placeholders) ---
+      // Format: [Number, Symbol, Name, Mass, Group, Period, Category, MP(C), BP(C), Config, Desc]
+      const ELEMENTS_DATA = [
+        // Period 1
+        {
+          n: 1,
+          s: "H",
+          name: "Hydrogen",
+          m: "1.008",
+          g: 1,
+          p: 1,
+          cat: "nonmetal",
+          mp: -259,
+          bp: -253,
+          c: "1",
+          desc: "Lightest element, fuel of stars.",
+        },
+        {
+          n: 2,
+          s: "He",
+          name: "Helium",
+          m: "4.003",
+          g: 18,
+          p: 1,
+          cat: "noble",
+          mp: -272,
+          bp: -269,
+          c: "2",
+          desc: "Inert gas, used in balloons.",
+        },
+
+        // Period 2
+        {
+          n: 3,
+          s: "Li",
+          name: "Lithium",
+          m: "6.94",
+          g: 1,
+          p: 2,
+          cat: "alkali",
+          mp: 180,
+          bp: 1342,
+          c: "2,1",
+          desc: "Lightest metal, used in batteries.",
+        },
+        {
+          n: 4,
+          s: "Be",
+          name: "Beryllium",
+          m: "9.01",
+          g: 2,
+          p: 2,
+          cat: "alkaline",
+          mp: 1287,
+          bp: 2469,
+          c: "2,2",
+          desc: "Strong but toxic lightweight metal.",
+        },
+        {
+          n: 5,
+          s: "B",
+          name: "Boron",
+          m: "10.81",
+          g: 13,
+          p: 2,
+          cat: "metalloid",
+          mp: 2075,
+          bp: 4000,
+          c: "2,3",
+          desc: "Crucial for plant growth.",
+        },
+        {
+          n: 6,
+          s: "C",
+          name: "Carbon",
+          m: "12.01",
+          g: 14,
+          p: 2,
+          cat: "nonmetal",
+          mp: 3550,
+          bp: 4827,
+          c: "2,4",
+          desc: "Basis of life and organic chemistry.",
+        },
+        {
+          n: 7,
+          s: "N",
+          name: "Nitrogen",
+          m: "14.01",
+          g: 15,
+          p: 2,
+          cat: "nonmetal",
+          mp: -210,
+          bp: -196,
+          c: "2,5",
+          desc: "78% of Earth's atmosphere.",
+        },
+        {
+          n: 8,
+          s: "O",
+          name: "Oxygen",
+          m: "16.00",
+          g: 16,
+          p: 2,
+          cat: "nonmetal",
+          mp: -218,
+          bp: -183,
+          c: "2,6",
+          desc: "Essential for respiration and combustion.",
+        },
+        {
+          n: 9,
+          s: "F",
+          name: "Fluorine",
+          m: "19.00",
+          g: 17,
+          p: 2,
+          cat: "halogen",
+          mp: -220,
+          bp: -188,
+          c: "2,7",
+          desc: "Most reactive non-metal.",
+        },
+        {
+          n: 10,
+          s: "Ne",
+          name: "Neon",
+          m: "20.18",
+          g: 18,
+          p: 2,
+          cat: "noble",
+          mp: -249,
+          bp: -246,
+          c: "2,8",
+          desc: "Used in glowing signs.",
+        },
+
+        // Period 3
+        {
+          n: 11,
+          s: "Na",
+          name: "Sodium",
+          m: "22.99",
+          g: 1,
+          p: 3,
+          cat: "alkali",
+          mp: 98,
+          bp: 883,
+          c: "2,8,1",
+          desc: "Reactive metal, component of salt.",
+        },
+        {
+          n: 12,
+          s: "Mg",
+          name: "Magnesium",
+          m: "24.31",
+          g: 2,
+          p: 3,
+          cat: "alkaline",
+          mp: 650,
+          bp: 1090,
+          c: "2,8,2",
+          desc: "Burns with bright white light.",
+        },
+        {
+          n: 13,
+          s: "Al",
+          name: "Aluminium",
+          m: "26.98",
+          g: 13,
+          p: 3,
+          cat: "post-transition",
+          mp: 660,
+          bp: 2519,
+          c: "2,8,3",
+          desc: "Low density, resists corrosion.",
+        },
+        {
+          n: 14,
+          s: "Si",
+          name: "Silicon",
+          m: "28.09",
+          g: 14,
+          p: 3,
+          cat: "metalloid",
+          mp: 1414,
+          bp: 3265,
+          c: "2,8,4",
+          desc: "Basis of semiconductors.",
+        },
+        {
+          n: 15,
+          s: "P",
+          name: "Phosphorus",
+          m: "30.97",
+          g: 15,
+          p: 3,
+          cat: "nonmetal",
+          mp: 44,
+          bp: 280,
+          c: "2,8,5",
+          desc: "Highly reactive, found in DNA.",
+        },
+        {
+          n: 16,
+          s: "S",
+          name: "Sulfur",
+          m: "32.06",
+          g: 16,
+          p: 3,
+          cat: "nonmetal",
+          mp: 115,
+          bp: 445,
+          c: "2,8,6",
+          desc: "Yellow solid, volcanic.",
+        },
+        {
+          n: 17,
+          s: "Cl",
+          name: "Chlorine",
+          m: "35.45",
+          g: 17,
+          p: 3,
+          cat: "halogen",
+          mp: -101,
+          bp: -34,
+          c: "2,8,7",
+          desc: "Green poison gas, disinfectant.",
+        },
+        {
+          n: 18,
+          s: "Ar",
+          name: "Argon",
+          m: "39.95",
+          g: 18,
+          p: 3,
+          cat: "noble",
+          mp: -189,
+          bp: -186,
+          c: "2,8,8",
+          desc: "Inert gas in lightbulbs.",
+        },
+
+        // Period 4 (Selected key ones for F3 + Transitions)
+        {
+          n: 19,
+          s: "K",
+          name: "Potassium",
+          m: "39.10",
+          g: 1,
+          p: 4,
+          cat: "alkali",
+          mp: 63,
+          bp: 759,
+          c: "2,8,8,1",
+          desc: "Highly reactive alkali metal.",
+        },
+        {
+          n: 20,
+          s: "Ca",
+          name: "Calcium",
+          m: "40.08",
+          g: 2,
+          p: 4,
+          cat: "alkaline",
+          mp: 842,
+          bp: 1484,
+          c: "2,8,8,2",
+          desc: "Essential for bones and shells.",
+        },
+      ];
+
+      // Fill gaps manually for layout (simplified approach: we will place elements by coordinate in grid)
+      // Grid 18 columns.
+      // H: 1,1
+      // He: 1,18
+      // Li: 2,1 ... Ne: 2,18 (gap 2-12 skipped)
+      // We need a map of Atomic Number -> Grid Column/Row or just compute it.
+      // Standard Periodic Table Layout logic:
+
+      function getGridPos(n) {
+        // Hardcoded typical layout
+        if (n == 1) return { r: 1, c: 1 };
+        if (n == 2) return { r: 1, c: 18 };
+        if (n >= 3 && n <= 4) return { r: 2, c: n - 2 }; // 3->1, 4->2
+        if (n >= 5 && n <= 10) return { r: 2, c: n + 8 }; // 5->13, 10->18
+        if (n >= 11 && n <= 12) return { r: 3, c: n - 10 };
+        if (n >= 13 && n <= 18) return { r: 3, c: n + 0 };
+        if (n >= 19 && n <= 36) return { r: 4, c: n - 18 }; // 19->1, 20->2...
+        // Limit to 20 for this demo as per data
+        return { r: 5, c: 1 };
+      }
+
+      const container = document.getElementById("grid-container");
+      let currentMode = "standard";
+
+      function renderGrid() {
+        container.innerHTML = "";
+
+        // Create 18x7 grid cells? No, CSS Grid auto-placement is tricky with gaps.
+        // Best to use explicit grid-column-start/end
+
+        ELEMENTS_DATA.forEach((el) => {
+          const pos = getGridPos(el.n);
+          const card = document.createElement("div");
+          card.className = `element-card rounded-lg border border-slate-700/50 p-1 flex flex-col items-center justify-between cursor-pointer relative overflow-hidden`;
+          card.style.gridColumn = pos.c;
+          card.style.gridRow = pos.r;
+
+          // Color Logic
+          let bgColor = "";
+          if (currentMode === "standard") {
+            card.classList.add(`cat-${el.cat}`);
+          } else if (currentMode === "mp") {
+            // Heatmap logic for Melting Point
+            // Min approx -270 (Blue), Max 3500 (Red)
+            // Normalize -273 to 1500 for display contrast
+            const temp = el.mp;
+            const tNorm = Math.min(Math.max((temp + 273) / 1500, 0), 1);
+            // Blue to Red gradient
+            const r = Math.floor(tNorm * 255);
+            const b = Math.floor((1 - tNorm) * 255);
+            card.style.backgroundColor = `rgb(${r}, 50, ${b})`;
+            card.style.borderColor = `rgb(${r}, 50, ${b})`;
+          }
+
+          card.innerHTML = `
+                    <span class="text-[10px] self-start opacity-70 font-mono">${el.n}</span>
+                    <span class="text-xl font-bold -mt-1">${el.s}</span>
+                    <span class="text-[9px] truncate w-full text-center opacity-80">${el.name}</span>
+                `;
+
+          card.onclick = () => openModal(el);
+          container.appendChild(card);
+        });
+      }
+
+      function setMode(mode) {
+        currentMode = mode;
+        renderGrid();
+      }
+
+      function openModal(el) {
+        document.getElementById("m-name").innerText = el.name;
+        document.getElementById("m-symbol").innerText = el.s;
+        document.getElementById("m-number").innerText = el.n;
+        document.getElementById("m-mass").innerText = el.m;
+        document.getElementById("m-category").innerText =
+          el.cat.charAt(0).toUpperCase() + el.cat.slice(1);
+        document.getElementById("m-desc").innerText = el.desc;
+        document.getElementById("m-mp").innerText = el.mp + " °C";
+        document.getElementById("m-bp").innerText = el.bp + " °C";
+        document.getElementById("m-config").innerText = el.c;
+
+        const m = document.getElementById("modal");
+        m.classList.remove("hidden");
+        // Allow display:block to apply before opacity transition
+        requestAnimationFrame(() => {
+          m.classList.remove("opacity-0");
+          document.getElementById("modal-content").classList.remove("scale-95");
+          document.getElementById("modal-content").classList.add("scale-100");
+        });
+      }
+
+      function closeModal() {
+        const m = document.getElementById("modal");
+        m.classList.add("opacity-0");
+        document.getElementById("modal-content").classList.remove("scale-100");
+        document.getElementById("modal-content").classList.add("scale-95");
+        setTimeout(() => {
+          m.classList.add("hidden");
+        }, 300);
+      }
+
+      // Init
+      renderGrid();
+    </script>
+  </body>
+</html>

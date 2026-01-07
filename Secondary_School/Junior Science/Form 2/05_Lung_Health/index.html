@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lung Health | S2 Science</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        font-family: "Outfit", sans-serif;
+        background: #fff1f2;
+      }
+      .lung-texture {
+        transition: all 1s ease;
+      }
+      .tar-spot {
+        animation: grow 30s forwards;
+      }
+      @keyframes grow {
+        from {
+          transform: scale(0);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1);
+          opacity: 0.8;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-rose-50 text-slate-800 min-h-screen">
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState } = React;
+
+      const App = () => {
+        const [years, setYears] = useState(0);
+
+        // Calculate effects 0-30 years
+        const getLungColor = () => {
+          if (years < 5) return "bg-rose-300"; // Healthy pink
+          if (years < 15) return "bg-stone-400"; // Greyish
+          return "bg-stone-800"; // Black
+        };
+
+        const getHealthStatus = () => {
+          if (years === 0)
+            return {
+              title: "Healthy Lungs",
+              color: "text-green-600",
+              desc: "Clear alveoli, efficient gas exchange, clean cilia.",
+            };
+          if (years < 10)
+            return {
+              title: "Early Damage",
+              color: "text-yellow-600",
+              desc: "Cilia damaged (Smoker's cough). Tar accumulating.",
+            };
+          if (years < 20)
+            return {
+              title: "Chronic Bronchitis",
+              color: "text-orange-600",
+              desc: "Inflammation of bronchi. Excess mucus production.",
+            };
+          return {
+            title: "Emphysema / Cancer Risk",
+            color: "text-red-700",
+            desc: "Alveoli walls break down (Shortness of breath). High cancer risk.",
+          };
+        };
+
+        const status = getHealthStatus();
+
+        return (
+          <div className="p-8 max-w-6xl mx-auto min-h-screen flex flex-col items-center">
+            <header className="text-center mb-10 w-full">
+              <span className="text-rose-600 font-bold uppercase text-xs tracking-widest">
+                Form 2 Science • Unit 7
+              </span>
+              <h1 className="text-4xl font-extrabold text-slate-800 mb-2">
+                Smoking & Health
+              </h1>
+              <p className="text-slate-500">
+                Visualize the long-term damage of smoking on lung tissues.
+              </p>
+            </header>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 w-full">
+              {/* Visualization */}
+              <div className="bg-white rounded-3xl shadow-xl p-8 border border-rose-100 flex flex-col items-center justify-center relative min-h-[500px]">
+                {/* Lungs Graphic (Simplified) */}
+                <div className="relative w-64 h-80">
+                  {/* Trachea */}
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-20 bg-rose-200 rounded-full z-10"></div>
+
+                  {/* Left Lung */}
+                  <div
+                    className={`absolute top-16 left-0 w-28 h-60 rounded-full rounded-tl-none lung-texture ${getLungColor()} flex items-center justify-center overflow-hidden`}
+                  >
+                    {/* Tar Spots */}
+                    {Array.from({ length: years * 2 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="absolute w-4 h-4 bg-black/40 rounded-full blur-[2px]"
+                        style={{
+                          top: `${Math.random() * 100}%`,
+                          left: `${Math.random() * 100}%`,
+                        }}
+                      ></div>
+                    ))}
+                    {/* Alveoli Breakage Visual */}
+                    {years > 20 && (
+                      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cracked-concrete.png')] opacity-30"></div>
+                    )}
+                  </div>
+
+                  {/* Right Lung */}
+                  <div
+                    className={`absolute top-16 right-0 w-28 h-60 rounded-full rounded-tr-none lung-texture ${getLungColor()} flex items-center justify-center overflow-hidden`}
+                  >
+                    {/* Tar Spots */}
+                    {Array.from({ length: years * 2 }).map((_, i) => (
+                      <div
+                        key={i + 100}
+                        className="absolute w-4 h-4 bg-black/40 rounded-full blur-[2px]"
+                        style={{
+                          top: `${Math.random() * 100}%`,
+                          left: `${Math.random() * 100}%`,
+                        }}
+                      ></div>
+                    ))}
+                    {years > 20 && (
+                      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cracked-concrete.png')] opacity-30"></div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-8 text-center bg-slate-50 p-4 rounded-xl border border-slate-200 w-full">
+                  <h2
+                    className={`text-2xl font-extrabold ${status.color} mb-2`}
+                  >
+                    {status.title}
+                  </h2>
+                  <p className="text-slate-600">{status.desc}</p>
+                </div>
+              </div>
+
+              {/* Controls & Harmful Substances Info */}
+              <div className="space-y-8">
+                <div className="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+                  <label className="block text-slate-400 font-bold uppercase text-xs tracking-widest mb-4">
+                    Years of Smoking
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <input
+                      type="range"
+                      min="0"
+                      max="30"
+                      step="1"
+                      value={years}
+                      onChange={(e) => setYears(Number(e.target.value))}
+                      className="w-full h-4 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-rose-600"
+                    />
+                    <span className="font-mono text-3xl font-bold text-slate-800 w-20 text-right">
+                      {years}y
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs text-slate-400 mt-2">
+                    <span>New</span>
+                    <span>Heavy Smoker (30y)</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="bg-stone-800 text-stone-200 p-6 rounded-2xl flex gap-4 items-start">
+                    <div className="w-12 h-12 bg-stone-700 rounded-full flex items-center justify-center text-2xl">
+                      <i className="fa-solid fa-road"></i>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-lg text-white">Tar</h3>
+                      <p className="text-sm">
+                        Brown, sticky substance. Coats alveoli, causing cancer
+                        and emphysema.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="bg-yellow-100 text-yellow-800 p-6 rounded-2xl flex gap-4 items-start border border-yellow-200">
+                    <div className="w-12 h-12 bg-yellow-200 rounded-full flex items-center justify-center text-2xl">
+                      <i className="fa-solid fa-bolt"></i>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-lg text-yellow-900">
+                        Nicotine
+                      </h3>
+                      <p className="text-sm">
+                        Addictive drug. Increases heart rate and blood pressure.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="bg-red-50 text-red-800 p-6 rounded-2xl flex gap-4 items-start border border-red-200">
+                    <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-2xl">
+                      <i className="fa-solid fa-ban-smoking"></i>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-lg text-red-900">
+                        Carbon Monoxide
+                      </h3>
+                      <p className="text-sm">
+                        Poisonous gas. Binds to haemoglobin, reducing oxygen in
+                        blood.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <footer className="mt-12 text-center">
+              <a
+                href="../index.html"
+                className="text-rose-600/50 hover:text-rose-600 transition font-bold"
+              >
+                <i className="fa-solid fa-arrow-left mr-2"></i> Back to
+                Dashboard
+              </a>
+            </footer>
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

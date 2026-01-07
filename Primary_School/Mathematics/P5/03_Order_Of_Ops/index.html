@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小五數學：四則運算 (無括號) | Order of Operations</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: linear-gradient(135deg, #f0fdf4 0%, #bbf7d0 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const { motion, AnimatePresence } = window.Motion;
+
+      function App() {
+        const problems = [
+          { expr: "3 + 4 × 5", steps: ["3 + 20", "23"], answer: 23 },
+          { expr: "12 - 6 ÷ 2", steps: ["12 - 3", "9"], answer: 9 },
+          {
+            expr: "8 × 2 + 6 ÷ 3",
+            steps: ["16 + 6 ÷ 3", "16 + 2", "18"],
+            answer: 18,
+          },
+          {
+            expr: "20 ÷ 4 × 3 + 1",
+            steps: ["5 × 3 + 1", "15 + 1", "16"],
+            answer: 16,
+          },
+          {
+            expr: "15 - 3 × 4 + 2",
+            steps: ["15 - 12 + 2", "3 + 2", "5"],
+            answer: 5,
+          },
+        ];
+
+        const [current, setCurrent] = useState(0);
+        const [step, setStep] = useState(0);
+
+        const p = problems[current];
+        const nextStep = () => setStep((s) => Math.min(s + 1, p.steps.length));
+        const nextProblem = () => {
+          setCurrent((current + 1) % problems.length);
+          setStep(0);
+        };
+
+        return (
+          <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-5xl font-black text-emerald-900 mb-2">
+              🔢 四則運算 (無括號)
+            </h1>
+            <p className="text-xl text-emerald-700 font-bold mb-8">
+              Order of Operations (No Brackets)
+            </p>
+
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-2xl w-full">
+              <div className="bg-emerald-50 rounded-2xl p-6 mb-6 text-center">
+                <div className="text-sm text-emerald-600 font-bold mb-2">
+                  題目 Problem {current + 1}/{problems.length}
+                </div>
+                <div className="text-5xl font-black text-slate-800 font-mono">
+                  {p.expr}
+                </div>
+              </div>
+
+              <div className="bg-slate-50 rounded-2xl p-6 mb-6 min-h-[200px]">
+                <h3 className="font-bold text-slate-600 mb-4">
+                  計算步驟 Steps:
+                </h3>
+                <div className="space-y-3">
+                  <AnimatePresence>
+                    {p.steps.map(
+                      (s, i) =>
+                        step > i && (
+                          <motion.div
+                            key={i}
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className={`text-2xl font-mono p-3 rounded-lg ${
+                              i === p.steps.length - 1
+                                ? "bg-emerald-100 text-emerald-700 font-black"
+                                : "bg-white text-slate-700"
+                            }`}
+                          >
+                            {i === p.steps.length - 1 ? "= " : "→ "}
+                            {s}
+                          </motion.div>
+                        )
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+
+              <div className="flex justify-center gap-4">
+                <button
+                  onClick={nextStep}
+                  disabled={step >= p.steps.length}
+                  className="px-8 py-3 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 disabled:opacity-50 shadow-lg"
+                >
+                  下一步 Next
+                </button>
+                <button
+                  onClick={nextProblem}
+                  className="px-8 py-3 bg-slate-200 text-slate-700 rounded-xl font-bold hover:bg-slate-300 shadow-lg"
+                >
+                  下一題 Next Problem
+                </button>
+              </div>
+
+              <div className="mt-8 bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
+                <h3 className="font-black mb-2">📖 運算次序規則 Rules:</h3>
+                <ol className="list-decimal list-inside space-y-1">
+                  <li>
+                    先做 <span className="font-bold">乘法 ×</span> 和{" "}
+                    <span className="font-bold">除法 ÷</span> (由左至右)
+                  </li>
+                  <li>
+                    後做 <span className="font-bold">加法 +</span> 和{" "}
+                    <span className="font-bold">減法 −</span> (由左至右)
+                  </li>
+                </ol>
+                <p className="mt-2 text-sm">
+                  First: Multiplication & Division (left to right), Then:
+                  Addition & Subtraction (left to right)
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>
