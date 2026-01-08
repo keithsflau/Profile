@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>常識科：全球暖化模擬器 | Global Warming Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect, useRef } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
+
+      const t = {
+        title: {
+          en: "Global Warming Simulator",
+          zh: "全球暖化模擬器",
+          ja: "地球温暖化シミュレーター",
+          ko: "지구 온난화 시뮬레이터",
+          es: "Simulador de Calentamiento Global",
+          de: "Erderwärmungs-Simulator",
+          fi: "Ilmastonlämpenemissimulaattori",
+          fr: "Simulateur de réchauffement climatique",
+          ar: "محاكي الاحتباس الحراري",
+          it: "Simulatore Riscaldamento Globale",
+        },
+        instruction: {
+          en: "Balance CO2 levels to save the ice caps!",
+          zh: "平衡二氧化碳水平以拯救冰冠！",
+          ja: "CO2レベルのバランスをとって氷冠を救おう！",
+          ko: "CO2 수치의 균형을 맞춰 빙관을 구하세요!",
+          es: "¡Equilibra los niveles de CO2 para salvar los casquetes polares!",
+          de: "Gleiche die CO2-Werte aus, um die Eiskappen zu retten!",
+          fi: "Tasapainota CO2-tasot pelastaaksesi jäätiköt!",
+          fr: "Équilibrez les niveaux de CO2 pour sauver les calottes glaciaires !",
+          ar: "وازن مستويات ثاني أكسيد الكربون لإنقاذ القمم الجليدية!",
+          it: "Bilancia la CO2 per salvare le calotte polari!",
+        },
+        co2: {
+          en: "CO2 Emission",
+          zh: "二氧化碳排放",
+          ja: "CO2排出量",
+          ko: "CO2 배출",
+          es: "Emisión de CO2",
+          de: "CO2-Emission",
+          fi: "CO2-päästöt",
+          fr: "Émission de CO2",
+          ar: "انبعاثات CO2",
+          it: "Emissione CO2",
+        },
+        temp: {
+          en: "Temperature",
+          zh: "溫度",
+          ja: "温度",
+          ko: "온도",
+          es: "Temperatura",
+          de: "Temperatur",
+          fi: "Lämpötila",
+          fr: "Température",
+          ar: "درجة الحرارة",
+          it: "Temperatura",
+        },
+        sea: {
+          en: "Sea Level",
+          zh: "海平面",
+          ja: "海面",
+          ko: "해수면",
+          es: "Nivel del mar",
+          de: "Meeresspiegel",
+          fi: "Merenpinta",
+          fr: "Niveau de la mer",
+          ar: "مستوى سطح البحر",
+          it: "Livello del mare",
+        },
+
+        factory: {
+          en: "Factories",
+          zh: "工廠",
+          ja: "工場",
+          ko: "공장",
+          es: "Fábricas",
+          de: "Fabriken",
+          fi: "Tehtaat",
+          fr: "Usines",
+          ar: "مصانع",
+          it: "Fabbriche",
+        },
+        car: {
+          en: "Cars",
+          zh: "汽車",
+          ja: "車",
+          ko: "자동차",
+          es: "Coches",
+          de: "Autos",
+          fi: "Autot",
+          fr: "Voitures",
+          ar: "سيارات",
+          it: "Auto",
+        },
+        tree: {
+          en: "Trees",
+          zh: "樹木",
+          ja: "木",
+          ko: "나무",
+          es: "Árboles",
+          de: "Bäume",
+          fi: "Puut",
+          fr: "Arbres",
+          ar: "أشجار",
+          it: "Alberi",
+        },
+
+        status_safe: {
+          en: "Stable Condition",
+          zh: "狀況穩定",
+          ja: "安定状態",
+          ko: "안정 상태",
+          es: "Condición estable",
+          de: "Stabiler Zustand",
+          fi: "Vakaa tila",
+          fr: "État stable",
+          ar: "حالة مستقرة",
+          it: "Condizione stabile",
+        },
+        status_warning: {
+          en: "Warning",
+          zh: "警告",
+          ja: "警告",
+          ko: "경고",
+          es: "Advertencia",
+          de: "Warnung",
+          fi: "Varoitus",
+          fr: "Avertissement",
+          ar: "تحذير",
+          it: "Avvertimento",
+        },
+        status_danger: {
+          en: "CRITICAL DANGER",
+          zh: "極度危險",
+          ja: "危険状態",
+          ko: "위험 상태",
+          es: "PELIGRO CRÍTICO",
+          de: "KRITISCHE GEFAHR",
+          fi: "KRIITTINEN VAARA",
+          fr: "DANGER CRITIQUE",
+          ar: "خطر جسيم",
+          it: "PERICOLO CRITICO",
+        },
+      };
+
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [factoryCount, setFactoryCount] = useState(2);
+        const [carCount, setCarCount] = useState(2);
+        const [treeCount, setTreeCount] = useState(2);
+
+        // Simulation Vars
+        const co2Level =
+          50 + factoryCount * 15 + carCount * 10 - treeCount * 12;
+        const temp = 14 + (co2Level - 50) * 0.15;
+        const seaLevel = Math.max(0, (temp - 14) * 8);
+        const isDanger = temp > 18;
+        const isWarning = temp > 16 && temp <= 18;
+
+        // Chart State
+        const chartRef = useRef(null);
+        const chartInstance = useRef(null);
+        const [history, setHistory] = useState([]);
+
+        // Update history periodically
+        useEffect(() => {
+          const interval = setInterval(() => {
+            const now = new Date();
+            const timeLabel = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+            setHistory((prev) => {
+              const newH = [...prev, { time: timeLabel, temp, co2: co2Level }];
+              if (newH.length > 20) newH.shift();
+              return newH;
+            });
+          }, 2000);
+          return () => clearInterval(interval);
+        }, [temp, co2Level]);
+
+        // Update Chart
+        useEffect(() => {
+          if (chartRef.current) {
+            if (chartInstance.current) {
+              chartInstance.current.data.labels = history.map((h) => h.time);
+              chartInstance.current.data.datasets[0].data = history.map(
+                (h) => h.temp
+              );
+              chartInstance.current.data.datasets[1].data = history.map(
+                (h) => h.co2
+              );
+              chartInstance.current.update();
+            } else {
+              const ctx = chartRef.current.getContext("2d");
+              chartInstance.current = new Chart(ctx, {
+                type: "line",
+                data: {
+                  labels: [],
+                  datasets: [
+                    {
+                      label: "Temp (°C)",
+                      borderColor: "#f87171",
+                      data: [],
+                      yAxisID: "y",
+                    },
+                    {
+                      label: "CO2 (ppm)",
+                      borderColor: "#fbbf24",
+                      data: [],
+                      yAxisID: "y1",
+                    },
+                  ],
+                },
+                options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: { labels: { color: "white" } },
+                  },
+                  scales: {
+                    x: { ticks: { display: false } },
+                    y: {
+                      type: "linear",
+                      display: true,
+                      position: "left",
+                      ticks: { color: "white" },
+                    },
+                    y1: {
+                      type: "linear",
+                      display: true,
+                      position: "right",
+                      ticks: { color: "white" },
+                      grid: { drawOnChartArea: false },
+                    },
+                  },
+                },
+              });
+            }
+          }
+        }, [history]);
+
+        // Clean up chart
+        useEffect(() => {
+          return () => {
+            if (chartInstance.current) chartInstance.current.destroy();
+          };
+        }, []);
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <div className="w-full max-w-6xl flex justify-between items-center mb-6">
+              <h1 className="text-3xl font-black text-blue-400">
+                🌍 {getText("title", lang)}
+              </h1>
+              <div className="flex gap-2 flex-wrap justify-end">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-2 py-1 rounded font-bold text-xs uppercase ${
+                      lang === l
+                        ? "bg-blue-600 text-white"
+                        : "text-slate-500 bg-slate-800"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full max-w-6xl">
+              {/* Main Visualizer */}
+              <div className="lg:col-span-2 glass-panel rounded-3xl overflow-hidden relative min-h-[400px] flex flex-col">
+                <div className="absolute inset-0 bg-gradient-to-b from-sky-900 to-black z-0"></div>
+
+                {/* Danger Tint */}
+                <div
+                  className={`absolute inset-0 bg-red-500/30 transition-opacity duration-1000 z-10 pointer-events-none ${
+                    isDanger ? "opacity-100" : "opacity-0"
+                  }`}
+                ></div>
+                <div
+                  className={`absolute inset-0 bg-orange-500/20 transition-opacity duration-1000 z-10 pointer-events-none ${
+                    isWarning ? "opacity-100" : "opacity-0"
+                  }`}
+                ></div>
+
+                {/* Scene Content */}
+                <div className="relative z-20 flex-1 w-full h-full overflow-hidden">
+                  {/* Stars */}
+                  <div
+                    className="absolute inset-0 opacity-50"
+                    style={{
+                      backgroundImage:
+                        "radial-gradient(white 1px, transparent 1px)",
+                      backgroundSize: "50px 50px",
+                    }}
+                  ></div>
+
+                  {/* Sun */}
+                  <motion.div
+                    className="absolute top-10 right-10 w-24 h-24 bg-yellow-400 rounded-full shadow-[0_0_80px_orange]"
+                    animate={{
+                      scale: isDanger ? 1.2 : 1,
+                      filter: isDanger ? "brightness(1.5)" : "brightness(1)",
+                    }}
+                  />
+
+                  {/* Ice Cap */}
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full flex justify-center items-end">
+                    <motion.div
+                      className="w-[500px] h-[300px] bg-slate-100 rounded-t-[100%] absolute bottom-0 shadow-[0_0_50px_rgba(255,255,255,0.2)]"
+                      style={{ transformOrigin: "bottom" }}
+                      animate={{
+                        scaleY: Math.max(0.1, 1 - (temp - 14) * 0.15),
+                        y: seaLevel, // Actually if sea level rises, visually ice looks smaller or submerged. Let's just shrink it.
+                      }}
+                    >
+                      {/* Bear */}
+                      <div className="absolute -top-10 left-1/2 -translate-x-1/2 text-4xl">
+                        🐻‍❄️
+                      </div>
+                    </motion.div>
+                  </div>
+
+                  {/* Sea */}
+                  <motion.div
+                    className="absolute bottom-0 w-full bg-blue-500/50 backdrop-blur-sm border-t border-blue-400/50"
+                    animate={{ height: `${20 + seaLevel}%` }}
+                    transition={{ type: "spring", stiffness: 20 }}
+                  >
+                    <div className="w-full h-2 bg-blue-300/30 animate-pulse"></div>
+                  </motion.div>
+                </div>
+
+                {/* Stats Grid */}
+                <div className="relative z-30 bg-black/50 backdrop-blur-md p-4 grid grid-cols-3 gap-4 border-t border-white/10">
+                  <Metric
+                    label="CO2"
+                    value={Math.round(co2Level)}
+                    unit="ppm"
+                    color={co2Level > 100 ? "text-red-400" : "text-emerald-400"}
+                  />
+                  <Metric
+                    label="Temp"
+                    value={temp.toFixed(1)}
+                    unit="°C"
+                    color={
+                      temp > 18
+                        ? "text-red-500"
+                        : temp > 16
+                        ? "text-orange-400"
+                        : "text-blue-300"
+                    }
+                  />
+                  <Metric
+                    label="Sea Level"
+                    value={`+${seaLevel.toFixed(1)}`}
+                    unit="m"
+                    color="text-cyan-300"
+                  />
+                </div>
+              </div>
+
+              {/* Controls & Charts */}
+              <div className="flex flex-col gap-6">
+                <div className="glass-panel p-6 rounded-3xl flex-1 flex flex-col gap-4">
+                  <Control
+                    label={getText("factory", lang)}
+                    icon="🏭"
+                    val={factoryCount}
+                    setVal={setFactoryCount}
+                    color="bg-gray-700"
+                  />
+                  <Control
+                    label={getText("car", lang)}
+                    icon="🚗"
+                    val={carCount}
+                    setVal={setCarCount}
+                    color="bg-red-900/40"
+                  />
+                  <Control
+                    label={getText("tree", lang)}
+                    icon="🌳"
+                    val={treeCount}
+                    setVal={setTreeCount}
+                    color="bg-emerald-900/40"
+                  />
+
+                  <div
+                    className={`mt-4 p-4 rounded-xl text-center font-black uppercase tracking-widest border ${
+                      isDanger
+                        ? "bg-red-500/20 border-red-500 text-red-500 animate-pulse"
+                        : isWarning
+                        ? "bg-orange-500/20 border-orange-500 text-orange-500"
+                        : "bg-emerald-500/20 border-emerald-500 text-emerald-500"
+                    }`}
+                  >
+                    {getText(
+                      isDanger
+                        ? "status_danger"
+                        : isWarning
+                        ? "status_warning"
+                        : "status_safe",
+                      lang
+                    )}
+                  </div>
+                </div>
+
+                <div className="glass-panel p-4 rounded-3xl h-64 border border-white/10">
+                  <canvas ref={chartRef}></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      function Metric({ label, value, unit, color }) {
+        return (
+          <div className="flex flex-col items-center">
+            <span className="text-slate-400 text-xs uppercase font-bold tracking-wider">
+              {label}
+            </span>
+            <span className={`text-2xl font-mono font-black ${color}`}>
+              {value}
+              <span className="text-sm ml-1 text-slate-500">{unit}</span>
+            </span>
+          </div>
+        );
+      }
+
+      function Control({ label, icon, val, setVal, color }) {
+        return (
+          <div
+            className={`p-3 rounded-xl flex items-center justify-between border border-white/5 ${color}`}
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">{icon}</span>
+              <span className="font-bold text-slate-200">{label}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setVal(Math.max(0, val - 1))}
+                className="w-8 h-8 rounded-lg bg-black/40 hover:bg-black/60 text-white font-bold transition-all"
+              >
+                -
+              </button>
+              <span className="w-6 text-center font-mono font-bold text-lg">
+                {val}
+              </span>
+              <button
+                onClick={() => setVal(Math.min(10, val + 1))}
+                className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold transition-all"
+              >
+                +
+              </button>
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

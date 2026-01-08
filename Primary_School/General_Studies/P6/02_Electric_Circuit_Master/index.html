@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>常識科：電路大師 | Circuit Master</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="../../common/i18n.js"></script>
+    <style>
+      body {
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      }
+      .component-drag {
+        cursor: grab;
+      }
+      .component-drag:active {
+        cursor: grabbing;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect, useRef } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
+
+      const t = {
+        title: {
+          en: "Circuit Master",
+          zh: "電路大師",
+          ja: "回路マスター",
+          ko: "회로 마스터",
+          es: "Maestro de Circuitos",
+          de: "Schaltungsmeister",
+          fi: "Piirimestari",
+          fr: "Maître du Circuit",
+          ar: "سيد الدائرة",
+          it: "Maestro del Circuito",
+        },
+        instruction: {
+          en: "Drag components to build!",
+          zh: "拖動組件來構建！",
+          ja: "コンポーネントをドラッグして構築！",
+          ko: "부품을 드래그하여 만드세요!",
+          es: "¡Arrastra componentes para construir!",
+          de: "Ziehe Komponenten zum Bauen!",
+          fi: "Vedä komponentteja rakentaaksesi!",
+          fr: "Faites glisser les composants pour construire !",
+          ar: "اسحب المكونات للبناء!",
+          it: "Trascina i componenti per costruire!",
+        },
+        battery: {
+          en: "Battery",
+          zh: "電池",
+          ja: "電池",
+          ko: "배터리",
+          es: "Batería",
+          de: "Batterie",
+          fi: "Paristo",
+          fr: "Batterie",
+          ar: "بطارية",
+          it: "Batteria",
+        },
+        bulb: {
+          en: "Bulb",
+          zh: "燈泡",
+          ja: "電球",
+          ko: "전구",
+          es: "Bombilla",
+          de: "Glühbirne",
+          fi: "Lamppu",
+          fr: "Ampoule",
+          ar: "مصباح",
+          it: "Lampadina",
+        },
+        switch: {
+          en: "Switch",
+          zh: "開關",
+          ja: "スイッチ",
+          ko: "스위치",
+          es: "Interruptor",
+          de: "Schalter",
+          fi: "Kytkin",
+          fr: "Interrupteur",
+          ar: "مفتاح",
+          it: "Interruttore",
+        },
+        wire: {
+          en: "Wire",
+          zh: "電線",
+          ja: "ワイヤー",
+          ko: "전선",
+          es: "Cable",
+          de: "Drht",
+          fi: "Johto",
+          fr: "Fil",
+          ar: "سلك",
+          it: "Cavo",
+        },
+        clear: {
+          en: "Clear",
+          zh: "清除",
+          ja: "クリア",
+          ko: "지우기",
+          es: "Borrar",
+          de: "Löschen",
+          fi: "Tyhjennä",
+          fr: "Effacer",
+          ar: "مسح",
+          it: "Cancella",
+        },
+        on: {
+          en: "ON",
+          zh: "開",
+          ja: "オン",
+          ko: "켜짐",
+          es: "ENCENDIDO",
+          de: "AN",
+          fi: "PÄÄLLÄ",
+          fr: "MARCHE",
+          ar: "تشغيل",
+          it: "ACCESO",
+        },
+        off: {
+          en: "OFF",
+          zh: "關",
+          ja: "オフ",
+          ko: "꺼짐",
+          es: "APAGADO",
+          de: "AUS",
+          fi: "POIS",
+          fr: "ARRÊT",
+          ar: "إيقاف",
+          it: "SPENTO",
+        },
+      };
+
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
+      // Simple Grid System
+      const GRID_SIZE = 40;
+      const SNAP = (val) => Math.round(val / GRID_SIZE) * GRID_SIZE;
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [components, setComponents] = useState([]);
+        const [wires, setWires] = useState([]);
+        const [drawingWire, setDrawingWire] = useState(null);
+        const containerRef = useRef(null);
+
+        // Simulation State
+        const [isPowered, setIsPowered] = useState(false);
+
+        // Check Connectivity
+        useEffect(() => {
+          // Simple loop check:
+          // Do we have a battery?
+          const bat = components.find((c) => c.type === "battery");
+          if (!bat) {
+            setIsPowered(false);
+            return;
+          }
+
+          // If we have switches, are they all closed?
+          const openSwitch = components.find(
+            (c) => c.type === "switch" && !c.state
+          );
+          if (openSwitch) {
+            setIsPowered(false);
+            return;
+          }
+
+          // Visual Approximation Logic for P6 level
+          setIsPowered(true);
+        }, [components, wires]);
+
+        const addComponent = (type) => {
+          setComponents([
+            ...components,
+            {
+              id: Date.now(),
+              type,
+              x: 100 + Math.random() * 50,
+              y: 100 + Math.random() * 50,
+              state: type === "switch" ? false : true,
+            },
+          ]);
+        };
+
+        const updateCompPos = (id, x, y) => {
+          setComponents((prev) =>
+            prev.map((c) =>
+              c.id === id ? { ...c, x: SNAP(x), y: SNAP(y) } : c
+            )
+          );
+        };
+
+        const toggleSwitch = (id) => {
+          setComponents((prev) =>
+            prev.map((c) => (c.id === id ? { ...c, state: !c.state } : c))
+          );
+        };
+
+        const handleMouseDown = (e, x, y, isPort) => {
+          // Not Implemented: Start wire from port directly. Using global drag logic in component.
+        };
+
+        const handleMouseMove = (e) => {
+          if (drawingWire) {
+            const rect = containerRef.current.getBoundingClientRect();
+            setDrawingWire({
+              ...drawingWire,
+              current: { x: e.clientX - rect.left, y: e.clientY - rect.top },
+            });
+          }
+        };
+
+        const handleMouseUp = (e) => {
+          if (drawingWire) {
+            const rect = containerRef.current.getBoundingClientRect();
+            const endX = SNAP(e.clientX - rect.left);
+            const endY = SNAP(e.clientY - rect.top);
+
+            if (
+              Math.abs(endX - drawingWire.start.x) > 10 ||
+              Math.abs(endY - drawingWire.start.y) > 10
+            ) {
+              setWires([
+                ...wires,
+                {
+                  id: Date.now(),
+                  p1: drawingWire.start,
+                  p2: { x: endX, y: endY },
+                },
+              ]);
+            }
+            setDrawingWire(null);
+          }
+        };
+
+        const clear = () => {
+          setComponents([]);
+          setWires([]);
+          setDrawingWire(null);
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <div className="w-full max-w-6xl flex justify-between items-center mb-6">
+              <h1 className="text-3xl font-black text-yellow-400">
+                {getText("title", lang)}
+              </h1>
+              <div className="flex gap-2 flex-wrap justify-end">
+                <button
+                  onClick={clear}
+                  className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg font-bold transition-all text-sm"
+                >
+                  {getText("clear", lang)}
+                </button>
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-slate-700 text-white"
+                        : "text-slate-500 hover:text-white"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Toolbox */}
+            <div className="flex gap-4 mb-4 glass-panel p-4 rounded-xl flex-wrap justify-center">
+              {[
+                { type: "battery", icon: "🔋", label: "battery" },
+                { type: "bulb", icon: "💡", label: "bulb" },
+                { type: "switch", icon: "🔌", label: "switch" },
+              ].map((tool) => (
+                <button
+                  key={tool.type}
+                  onClick={() => addComponent(tool.type)}
+                  className="flex flex-col items-center gap-2 px-6 py-2 bg-slate-800 rounded-lg hover:bg-slate-700 active:scale-95 transition-all border border-slate-600"
+                >
+                  <span className="text-2xl">{tool.icon}</span>
+                  <span className="font-bold text-sm text-slate-300">
+                    {getText(tool.label, lang)}
+                  </span>
+                </button>
+              ))}
+              <div className="border-l border-slate-600 pl-4 flex items-center text-sm text-slate-400 font-bold">
+                {getText("instruction", lang)}
+              </div>
+            </div>
+
+            {/* Workspace */}
+            <div
+              ref={containerRef}
+              className="relative w-full max-w-5xl aspect-video bg-[#1e293b] rounded-3xl overflow-hidden shadow-2xl border-4 border-slate-700 cursor-crosshair touch-none"
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={() => setDrawingWire(null)}
+            >
+              {/* Grid */}
+              <div
+                className="absolute inset-0 pointer-events-none opacity-20"
+                style={{
+                  backgroundImage: `radial-gradient(#94a3b8 1px, transparent 1px)`,
+                  backgroundSize: `${GRID_SIZE}px ${GRID_SIZE}px`,
+                }}
+              ></div>
+
+              {/* Wires */}
+              <svg className="absolute inset-0 w-full h-full pointer-events-none">
+                {wires.map((w) => (
+                  <line
+                    key={w.id}
+                    x1={w.p1.x}
+                    y1={w.p1.y}
+                    x2={w.p2.x}
+                    y2={w.p2.y}
+                    stroke="#facc15"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                    className="opacity-80"
+                  />
+                ))}
+                {drawingWire && (
+                  <line
+                    x1={drawingWire.start.x}
+                    y1={drawingWire.start.y}
+                    x2={drawingWire.current.x}
+                    y2={drawingWire.current.y}
+                    stroke="#facc15"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                    strokeDasharray="10,10"
+                    opacity="0.5"
+                  />
+                )}
+              </svg>
+
+              {/* Components */}
+              {components.map((c) => (
+                <Component
+                  key={c.id}
+                  data={c}
+                  onMove={updateCompPos}
+                  onToggle={() => toggleSwitch(c.id)}
+                  powered={isPowered}
+                />
+              ))}
+            </div>
+
+            <div className="mt-4 text-slate-500 text-sm">
+              Pro Tip: Wires snap to grid points.
+            </div>
+          </div>
+        );
+      }
+
+      function Component({ data, onMove, onToggle, powered }) {
+        const [dragging, setDragging] = useState(false);
+        const ref = useRef(null);
+
+        const handleMouseDown = (e) => {
+          e.stopPropagation();
+          setDragging(true);
+        };
+
+        useEffect(() => {
+          const handleGlobalMove = (e) => {
+            if (dragging && ref.current) {
+              // Use offset parent relative coords
+              // The parent is the container.
+              // We need parent rect.
+              // But ref.current.parentElement might not be ready or reliable via refs in effect?
+              // Actually we can just querySelector closest container or use ref.current.parentElement
+              if (ref.current.parentElement) {
+                const parent =
+                  ref.current.parentElement.getBoundingClientRect();
+                onMove(
+                  data.id,
+                  e.clientX - parent.left,
+                  e.clientY - parent.top
+                );
+              }
+            }
+          };
+          const handleGlobalUp = () => setDragging(false);
+
+          if (dragging) {
+            window.addEventListener("mousemove", handleGlobalMove);
+            window.addEventListener("mouseup", handleGlobalUp);
+          }
+          return () => {
+            window.removeEventListener("mousemove", handleGlobalMove);
+            window.removeEventListener("mouseup", handleGlobalUp);
+          };
+        }, [dragging, data.id, onMove]);
+
+        return (
+          <div
+            ref={ref}
+            onMouseDown={handleMouseDown}
+            className="absolute w-20 h-20 -ml-10 -mt-10 flex items-center justify-center component-drag group z-10"
+            style={{ left: data.x, top: data.y }}
+          >
+            {/* Selection Ring */}
+            <div className="absolute inset-0 border-2 border-transparent group-hover:border-blue-400/50 rounded-lg pointer-events-none"></div>
+
+            {/* Visuals */}
+            {data.type === "battery" && (
+              <div className="w-16 h-8 bg-slate-600 border-2 border-slate-400 rounded flex items-center justify-center relative">
+                <span className="text-xs font-bold text-yellow-400">⚡</span>
+                {/* Terminals */}
+                <div className="absolute -left-2 w-2 h-4 bg-gray-400 rounded-l"></div>
+                <div className="absolute -right-2 w-2 h-4 bg-gray-400 rounded-r"></div>
+              </div>
+            )}
+
+            {data.type === "bulb" && (
+              <div className="relative flex flex-col items-center">
+                <div
+                  className={`w-10 h-10 rounded-full border-2 border-slate-500 transition-all duration-300 ${
+                    powered
+                      ? "bg-yellow-400 shadow-[0_0_30px_#facc15]"
+                      : "bg-slate-700"
+                  }`}
+                ></div>
+                <div className="w-6 h-4 bg-gray-500 rounded-b"></div>
+              </div>
+            )}
+
+            {data.type === "switch" && (
+              <div
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggle();
+                }}
+                className="cursor-pointer w-16 h-8 bg-black/50 rounded flex items-center justify-center border border-slate-500"
+              >
+                <div
+                  className={`w-8 h-4 rounded transition-all ${
+                    data.state ? "bg-green-500 ml-6" : "bg-red-500 mr-6"
+                  }`}
+                ></div>
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>
