@@ -1,940 +1,721 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>HKDSE ICT - Master Interactive Lab</title>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
-      rel="stylesheet"
-    />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HKDSE ICT - Master Interactive Lab</title>
 
-    <style>
-      body {
-        font-family: "Inter", sans-serif;
-        background-color: #020617;
-        color: #e2e8f0;
-      } /* Slate 950 */
-      .glass-panel {
-        background: rgba(30, 41, 59, 0.4);
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(148, 163, 184, 0.1);
-      }
-      .glass-panel:hover {
-        background: rgba(30, 41, 59, 0.6);
-        border-color: rgba(56, 189, 248, 0.3);
-        transform: translateY(-2px);
-        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
-      }
-      .grid-bg {
-        background-image: radial-gradient(
-          rgba(56, 189, 248, 0.1) 1px,
-          transparent 1px
-        );
-        background-size: 30px 30px;
-      }
-    </style>
-  </head>
-  <body class="min-h-screen p-8 grid-bg relative overflow-x-hidden">
-    <div class="max-w-7xl mx-auto space-y-12 relative z-10">
-      <!-- Header -->
-      <header class="text-center space-y-4 pt-12 animate-fade-in-down">
-        <div
-          class="inline-flex items-center justify-center p-4 bg-cyan-900/20 rounded-full mb-4 border border-cyan-500/30 shadow-[0_0_50px_-10px_rgba(6,182,212,0.3)]"
-        >
-          <i data-lucide="cpu" class="w-12 h-12 text-cyan-400"></i>
-        </div>
-        <h1
-          class="text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 pb-2"
-        >
-          HKDSE ICT Master Labs
-        </h1>
-        <p class="text-slate-400 text-xl max-w-2xl mx-auto">
-          30 Interactive Applications covering Paper 1A & 1B (2025 Syllabus).
-          <br />Visualizing complex concepts in Information Processing.
-        </p>
-      </header>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet" />
 
-      <!-- Stats -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-        <div class="glass-panel rounded-2xl p-6 text-center">
-          <div class="text-4xl font-bold text-cyan-400 font-mono mb-1">30</div>
-          <div
-            class="text-xs text-slate-400 uppercase tracking-widest font-bold"
-          >
-            Total Apps
-          </div>
-        </div>
-        <div class="glass-panel rounded-2xl p-6 text-center">
-          <div class="text-4xl font-bold text-green-400 font-mono mb-1">
-            100%
-          </div>
-          <div
-            class="text-xs text-slate-400 uppercase tracking-widest font-bold"
-          >
-            Syllabus Covered
-          </div>
-        </div>
-        <div class="glass-panel rounded-2xl p-6 text-center">
-          <div class="text-4xl font-bold text-purple-400 font-mono mb-1">
-            P1A
-          </div>
-          <div
-            class="text-xs text-slate-400 uppercase tracking-widest font-bold"
-          >
-            Section A Focus
-          </div>
-        </div>
-        <div class="glass-panel rounded-2xl p-6 text-center">
-          <div class="text-4xl font-bold text-pink-400 font-mono mb-1">P1B</div>
-          <div
-            class="text-xs text-slate-400 uppercase tracking-widest font-bold"
-          >
-            Section B Focus
-          </div>
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      background-color: #020617;
+      color: #e2e8f0;
+    }
+
+    /* Slate 950 */
+    .glass-panel {
+      background: rgba(30, 41, 59, 0.4);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(148, 163, 184, 0.1);
+    }
+
+    .glass-panel:hover {
+      background: rgba(30, 41, 59, 0.6);
+      border-color: rgba(56, 189, 248, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    }
+
+    .grid-bg {
+      background-image: radial-gradient(rgba(56, 189, 248, 0.1) 1px,
+          transparent 1px);
+      background-size: 30px 30px;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen p-8 grid-bg relative overflow-x-hidden">
+  <div class="max-w-7xl mx-auto space-y-12 relative z-10">
+    <!-- Header -->
+    <header class="text-center space-y-4 pt-12 animate-fade-in-down">
+      <div
+        class="inline-flex items-center justify-center p-4 bg-cyan-900/20 rounded-full mb-4 border border-cyan-500/30 shadow-[0_0_50px_-10px_rgba(6,182,212,0.3)]">
+        <i data-lucide="cpu" class="w-12 h-12 text-cyan-400"></i>
+      </div>
+      <h1
+        class="text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 pb-2">
+        HKDSE ICT Master Labs
+      </h1>
+      <p class="text-slate-400 text-xl max-w-2xl mx-auto">
+        30 Interactive Applications covering Paper 1A & 1B (2025 Syllabus).
+        <br />Visualizing complex concepts in Information Processing.
+      </p>
+    </header>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div class="glass-panel rounded-2xl p-6 text-center">
+        <div class="text-4xl font-bold text-cyan-400 font-mono mb-1">30</div>
+        <div class="text-xs text-slate-400 uppercase tracking-widest font-bold">
+          Total Apps
         </div>
       </div>
+      <div class="glass-panel rounded-2xl p-6 text-center">
+        <div class="text-4xl font-bold text-green-400 font-mono mb-1">
+          100%
+        </div>
+        <div class="text-xs text-slate-400 uppercase tracking-widest font-bold">
+          Syllabus Covered
+        </div>
+      </div>
+      <div class="glass-panel rounded-2xl p-6 text-center">
+        <div class="text-4xl font-bold text-purple-400 font-mono mb-1">
+          P1A
+        </div>
+        <div class="text-xs text-slate-400 uppercase tracking-widest font-bold">
+          Section A Focus
+        </div>
+      </div>
+      <div class="glass-panel rounded-2xl p-6 text-center">
+        <div class="text-4xl font-bold text-pink-400 font-mono mb-1">P1B</div>
+        <div class="text-xs text-slate-400 uppercase tracking-widest font-bold">
+          Section B Focus
+        </div>
+      </div>
+    </div>
 
-      <!-- Labs Grid -->
-      <div class="space-y-12">
-        <!-- 2025 Past Paper Series -->
-        <section>
-          <div
-            className="flex items-center justify-between mb-6 border-b border-slate-800 pb-4"
-          >
-            <h2
-              className="text-2xl font-bold text-white flex items-center gap-3"
-            >
-              <i data-lucide="sparkles" class="text-yellow-400"></i>
+    <!-- Labs Grid -->
+    <div class="space-y-12">
+      <!-- 2025 Past Paper Series -->
+      <section>
+        <div className="flex items-center justify-between mb-6 border-b border-slate-800 pb-4">
+          <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+            <i data-lucide="sparkles" class="text-yellow-400"></i>
+            <span class="bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-orange-500">2025 Past Paper
+              Series</span>
+          </h2>
+          <span
+            class="bg-yellow-500/10 text-yellow-500 text-xs px-2 py-1 rounded border border-yellow-500/20 font-bold">NEW</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <a href="2025/P1A_Q1/index.html"
+            class="glass-panel p-6 rounded-2xl block transition-all group border-yellow-500/20 hover:border-yellow-500/50">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-yellow-500/10 p-3 rounded-xl text-yellow-400 group-hover:bg-yellow-500 group-hover:text-white transition-colors">
+                <i data-lucide="sheet"></i>
+              </div>
               <span
-                class="bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-orange-500"
-                >2025 Past Paper Series</span
-              >
-            </h2>
-            <span
-              class="bg-yellow-500/10 text-yellow-500 text-xs px-2 py-1 rounded border border-yellow-500/20 font-bold"
-              >NEW</span
-            >
-          </div>
+                class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">Paper 1A
+                Q1</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">
+              Spreadsheet Absolute Ref
+            </h3>
+            <p class="text-sm text-slate-400">
+              Interactive simulation of copying formulas ($B$1 vs B1) down a
+              column.
+            </p>
+          </a>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <a
-              href="2025/P1A_Q1/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group border-yellow-500/20 hover:border-yellow-500/50"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-yellow-500/10 p-3 rounded-xl text-yellow-400 group-hover:bg-yellow-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="sheet"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >Paper 1A Q1</span
-                >
+          <a href="2025/P1A_Q2/index.html"
+            class="glass-panel p-6 rounded-2xl block transition-all group border-yellow-500/20 hover:border-yellow-500/50">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-yellow-500/10 p-3 rounded-xl text-yellow-400 group-hover:bg-yellow-500 group-hover:text-white transition-colors">
+                <i data-lucide="cpu"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">
-                Spreadsheet Absolute Ref
-              </h3>
-              <p class="text-sm text-slate-400">
-                Interactive simulation of copying formulas ($B$1 vs B1) down a
-                column.
-              </p>
-            </a>
+              <span
+                class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">Paper 1A
+                Q2</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">
+              System Factors Logic
+            </h3>
+            <p class="text-sm text-slate-400">
+              Experiment: Does Input, CPU, or Storage affect numerical output
+              or speed?
+            </p>
+          </a>
 
-            <a
-              href="2025/P1A_Q2/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group border-yellow-500/20 hover:border-yellow-500/50"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-yellow-500/10 p-3 rounded-xl text-yellow-400 group-hover:bg-yellow-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="cpu"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >Paper 1A Q2</span
-                >
+          <a href="2025/P1B_Q1/index.html"
+            class="glass-panel p-6 rounded-2xl block transition-all group border-yellow-500/20 hover:border-yellow-500/50">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-yellow-500/10 p-3 rounded-xl text-yellow-400 group-hover:bg-yellow-500 group-hover:text-white transition-colors">
+                <i data-lucide="sigma"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">
-                System Factors Logic
-              </h3>
-              <p class="text-sm text-slate-400">
-                Experiment: Does Input, CPU, or Storage affect numerical output
-                or speed?
-              </p>
-            </a>
+              <span
+                class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">Paper 1B
+                Q1</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">
+              CountIf & Average
+            </h3>
+            <p class="text-sm text-slate-400">
+              Formula Builder: Constructing COUNTIF with "&" operator and
+              Absolute Ranges.
+            </p>
+          </a>
 
-            <a
-              href="2025/P1B_Q1/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group border-yellow-500/20 hover:border-yellow-500/50"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-yellow-500/10 p-3 rounded-xl text-yellow-400 group-hover:bg-yellow-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="sigma"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >Paper 1B Q1</span
-                >
+          <a href="2025/P1B_Q9/index.html"
+            class="glass-panel p-6 rounded-2xl block transition-all group border-yellow-500/20 hover:border-yellow-500/50">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-yellow-500/10 p-3 rounded-xl text-yellow-400 group-hover:bg-yellow-500 group-hover:text-white transition-colors">
+                <i data-lucide="qr-code"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">
-                CountIf & Average
-              </h3>
-              <p class="text-sm text-slate-400">
-                Formula Builder: Constructing COUNTIF with "&" operator and
-                Absolute Ranges.
-              </p>
-            </a>
+              <span
+                class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">Paper 1B
+                Q9</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">
+              Check Digit Flowchart
+            </h3>
+            <p class="text-sm text-slate-400">
+              Tracing the Check Digit algorithm (Class A vs B logic).
+            </p>
+          </a>
+        </div>
+      </section>
 
-            <a
-              href="2025_Paper1B_Q9_Check_Digit/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group border-yellow-500/20 hover:border-yellow-500/50"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-yellow-500/10 p-3 rounded-xl text-yellow-400 group-hover:bg-yellow-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="qr-code"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >Paper 1B Q9</span
-                >
+      <!-- Information Processing (Data & Arithmetic) -->
+      <section>
+        <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3 border-b border-slate-800 pb-4">
+          <i data-lucide="binary" class="text-cyan-400"></i>
+          Data Representation & Arithmetic
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <a href="2025/Paper1A_Number_Systems/index.html"
+            class="glass-panel p-6 rounded-2xl block transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-cyan-500/10 p-3 rounded-xl text-cyan-400 group-hover:bg-cyan-500 group-hover:text-white transition-colors">
+                <i data-lucide="calculator"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">
-                Check Digit Flowchart
-              </h3>
-              <p class="text-sm text-slate-400">
-                Tracing the Check Digit algorithm (Class A vs B logic).
-              </p>
-            </a>
-          </div>
-        </section>
+              <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">App
+                01 | Paper 1A</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Number Systems</h3>
+            <p class="text-sm text-slate-400">
+              Bin/Oct/Hex/Dec Conversion with step-by-step division working.
+            </p>
+          </a>
 
-        <!-- Information Processing (Data & Arithmetic) -->
-        <section>
-          <h2
-            class="text-2xl font-bold text-white mb-6 flex items-center gap-3 border-b border-slate-800 pb-4"
-          >
-            <i data-lucide="binary" class="text-cyan-400"></i>
-            Data Representation & Arithmetic
-          </h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <a
-              href="Paper1A_Number_Systems/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-cyan-500/10 p-3 rounded-xl text-cyan-400 group-hover:bg-cyan-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="calculator"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >App 01 | Paper 1A</span
-                >
+          <a href="2025/Paper1A_Twos_Complement/index.html"
+            class="glass-panel p-6 rounded-2xl block transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-blue-500/10 p-3 rounded-xl text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                <i data-lucide="minus-square"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">Number Systems</h3>
-              <p class="text-sm text-slate-400">
-                Bin/Oct/Hex/Dec Conversion with step-by-step division working.
-              </p>
-            </a>
+              <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">App
+                02 | Paper 1A</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">2's Complement</h3>
+            <p class="text-sm text-slate-400">
+              Negative binary numbers visualization and overflow detection.
+            </p>
+          </a>
 
-            <a
-              href="Paper1A_Twos_Complement/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-blue-500/10 p-3 rounded-xl text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="minus-square"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >App 02 | Paper 1A</span
-                >
+          <a href="04_Character_Encoding/index.html" class="glass-panel p-6 rounded-2xl block transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-pink-500/10 p-3 rounded-xl text-pink-400 group-hover:bg-pink-500 group-hover:text-white transition-colors">
+                <i data-lucide="languages"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">2's Complement</h3>
-              <p class="text-sm text-slate-400">
-                Negative binary numbers visualization and overflow detection.
-              </p>
-            </a>
+              <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">App
+                04</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">
+              Character Encoding
+            </h3>
+            <p class="text-sm text-slate-400">
+              ASCII vs Big5 vs Unicode bit-level inspection.
+            </p>
+          </a>
 
-            <a
-              href="04_Character_Encoding/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-pink-500/10 p-3 rounded-xl text-pink-400 group-hover:bg-pink-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="languages"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >App 04</span
-                >
+          <a href="13_Color_Depth/index.html" class="glass-panel p-6 rounded-2xl block transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-purple-500/10 p-3 rounded-xl text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition-colors">
+                <i data-lucide="palette"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">
-                Character Encoding
-              </h3>
-              <p class="text-sm text-slate-400">
-                ASCII vs Big5 vs Unicode bit-level inspection.
-              </p>
-            </a>
+              <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">App
+                13</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Color Depth</h3>
+            <p class="text-sm text-slate-400">
+              Bit-depth impact on image filesize and color count.
+            </p>
+          </a>
 
-            <a
-              href="13_Color_Depth/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-purple-500/10 p-3 rounded-xl text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="palette"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >App 13</span
-                >
+          <a href="03_Multimedia_Calc/index.html" class="glass-panel p-6 rounded-2xl block transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-indigo-500/10 p-3 rounded-xl text-indigo-400 group-hover:bg-indigo-500 group-hover:text-white transition-colors">
+                <i data-lucide="file-video"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">Color Depth</h3>
-              <p class="text-sm text-slate-400">
-                Bit-depth impact on image filesize and color count.
-              </p>
-            </a>
+              <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">App
+                03</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Multimedia Calc</h3>
+            <p class="text-sm text-slate-400">
+              Estimating file sizes for Audio (MP3/WAV) and Images.
+            </p>
+          </a>
 
-            <a
-              href="03_Multimedia_Calc/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-indigo-500/10 p-3 rounded-xl text-indigo-400 group-hover:bg-indigo-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="file-video"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >App 03</span
-                >
+          <a href="2025/P2_Q3/index.html" class="glass-panel p-6 rounded-2xl block transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-yellow-500/10 p-3 rounded-xl text-yellow-400 group-hover:bg-yellow-500 group-hover:text-white transition-colors">
+                <i data-lucide="pen-tool"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">Multimedia Calc</h3>
-              <p class="text-sm text-slate-400">
-                Estimating file sizes for Audio (MP3/WAV) and Images.
-              </p>
-            </a>
+              <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">App
+                06</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">
+              Bitmap vs Vector
+            </h3>
+            <p class="text-sm text-slate-400">
+              Zoom simulation: Pixels vs Mathematical paths.
+            </p>
+          </a>
+        </div>
+      </section>
 
-            <a
-              href="06_Bitmap_Vector/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-yellow-500/10 p-3 rounded-xl text-yellow-400 group-hover:bg-yellow-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="pen-tool"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >App 06</span
-                >
+      <!-- Hardware & Networking -->
+      <section>
+        <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3 border-b border-slate-800 pb-4">
+          <i data-lucide="server" class="text-green-400"></i>
+          Hardware & Networking
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <a href="2025/P1B_Q7/index.html" class="glass-panel p-6 rounded-2xl block transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-green-500/10 p-3 rounded-xl text-green-400 group-hover:bg-green-500 group-hover:text-white transition-colors">
+                <i data-lucide="git-merge"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">
-                Bitmap vs Vector
-              </h3>
-              <p class="text-sm text-slate-400">
-                Zoom simulation: Pixels vs Mathematical paths.
-              </p>
-            </a>
-          </div>
-        </section>
+              <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">App
+                07 | Paper 1B</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Logic Gates</h3>
+            <p class="text-sm text-slate-400">
+              AND/OR/NOT/XOR Truth tables and interactive visualizer.
+            </p>
+          </a>
 
-        <!-- Hardware & Networking -->
-        <section>
-          <h2
-            class="text-2xl font-bold text-white mb-6 flex items-center gap-3 border-b border-slate-800 pb-4"
-          >
-            <i data-lucide="server" class="text-green-400"></i>
-            Hardware & Networking
-          </h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <a
-              href="Paper1B_Logic_Gate_Simulator/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-green-500/10 p-3 rounded-xl text-green-400 group-hover:bg-green-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="git-merge"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >App 07 | Paper 1B</span
-                >
+          <a href="08_Hardware_Spec/index.html" class="glass-panel p-6 rounded-2xl block transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-slate-500/10 p-3 rounded-xl text-slate-400 group-hover:bg-slate-500 group-hover:text-white transition-colors">
+                <i data-lucide="cpu"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">Logic Gates</h3>
-              <p class="text-sm text-slate-400">
-                AND/OR/NOT/XOR Truth tables and interactive visualizer.
-              </p>
-            </a>
+              <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">App
+                08</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Hardware Specs</h3>
+            <p class="text-sm text-slate-400">
+              Upgrade PC components (RAM/SSD) and see performance impact.
+            </p>
+          </a>
 
-            <a
-              href="08_Hardware_Spec/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-slate-500/10 p-3 rounded-xl text-slate-400 group-hover:bg-slate-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="cpu"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >App 08</span
-                >
+          <a href="15_Memory_Hierarchy/index.html" class="glass-panel p-6 rounded-2xl block transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-orange-500/10 p-3 rounded-xl text-orange-400 group-hover:bg-orange-500 group-hover:text-white transition-colors">
+                <i data-lucide="layers"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">Hardware Specs</h3>
-              <p class="text-sm text-slate-400">
-                Upgrade PC components (RAM/SSD) and see performance impact.
-              </p>
-            </a>
+              <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">App
+                15</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">
+              Memory Hierarchy
+            </h3>
+            <p class="text-sm text-slate-400">
+              Pyramid visualizer of Cache, RAM, HDD speeds and costs.
+            </p>
+          </a>
 
-            <a
-              href="15_Memory_Hierarchy/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-orange-500/10 p-3 rounded-xl text-orange-400 group-hover:bg-orange-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="layers"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >App 15</span
-                >
+          <a href="2025/P2_Q2/index.html" class="glass-panel p-6 rounded-2xl block transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-blue-500/10 p-3 rounded-xl text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                <i data-lucide="network"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">
-                Memory Hierarchy
-              </h3>
-              <p class="text-sm text-slate-400">
-                Pyramid visualizer of Cache, RAM, HDD speeds and costs.
-              </p>
-            </a>
+              <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">App
+                09</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">IP & Networking</h3>
+            <p class="text-sm text-slate-400">
+              IPv4 Validator and Switch vs Hub traffic simulation.
+            </p>
+          </a>
 
-            <a
-              href="09_IP_Networking/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-blue-500/10 p-3 rounded-xl text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="network"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >App 09</span
-                >
+          <a href="10_Web_Protocols/index.html" class="glass-panel p-6 rounded-2xl block transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-red-500/10 p-3 rounded-xl text-red-400 group-hover:bg-red-500 group-hover:text-white transition-colors">
+                <i data-lucide="lock"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">IP & Networking</h3>
-              <p class="text-sm text-slate-400">
-                IPv4 Validator and Switch vs Hub traffic simulation.
-              </p>
-            </a>
+              <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">App
+                10</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Web Security</h3>
+            <p class="text-sm text-slate-400">
+              OTP generation, PKI Encryption visualizer.
+            </p>
+          </a>
 
-            <a
-              href="10_Web_Protocols/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-red-500/10 p-3 rounded-xl text-red-400 group-hover:bg-red-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="lock"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >App 10</span
-                >
+          <a href="14_VM_Simulator/index.html" class="glass-panel p-6 rounded-2xl block transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-teal-500/10 p-3 rounded-xl text-teal-400 group-hover:bg-teal-500 group-hover:text-white transition-colors">
+                <i data-lucide="monitor"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">Web Security</h3>
-              <p class="text-sm text-slate-400">
-                OTP generation, PKI Encryption visualizer.
-              </p>
-            </a>
+              <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">App
+                14</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">VM Simulator</h3>
+            <p class="text-sm text-slate-400">
+              Concept of Guest OS vs Host OS isolation.
+            </p>
+          </a>
+        </div>
+      </section>
 
-            <a
-              href="14_VM_Simulator/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-teal-500/10 p-3 rounded-xl text-teal-400 group-hover:bg-teal-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="monitor"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >App 14</span
-                >
+      <!-- Algorithm & Programming (The Heavy Hitters) -->
+      <section>
+        <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3 border-b border-slate-800 pb-4">
+          <i data-lucide="code-2" class="text-purple-400"></i>
+          Algorithm & Programming
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <a href="2025/P1B_Q10/index.html" class="glass-panel p-6 rounded-2xl block transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-purple-500/10 p-3 rounded-xl text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition-colors">
+                <i data-lucide="rotate-cw"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">VM Simulator</h3>
-              <p class="text-sm text-slate-400">
-                Concept of Guest OS vs Host OS isolation.
-              </p>
-            </a>
-          </div>
-        </section>
+              <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">App
+                21 | Paper 1B</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Loop Logic</h3>
+            <p class="text-sm text-slate-400">
+              While loop tracer with index (i) tracking visualization.
+            </p>
+          </a>
 
-        <!-- Algorithm & Programming (The Heavy Hitters) -->
-        <section>
-          <h2
-            class="text-2xl font-bold text-white mb-6 flex items-center gap-3 border-b border-slate-800 pb-4"
-          >
-            <i data-lucide="code-2" class="text-purple-400"></i>
-            Algorithm & Programming
-          </h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <a
-              href="Paper1B_Loop_Logic/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-purple-500/10 p-3 rounded-xl text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="rotate-cw"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >App 21 | Paper 1B</span
-                >
+          <a href="2025/Paper1A_Q37_Swap_Logic/index.html"
+            class="glass-panel p-6 rounded-2xl block transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-yellow-500/10 p-3 rounded-xl text-yellow-400 group-hover:bg-yellow-500 group-hover:text-white transition-colors">
+                <i data-lucide="arrow-right-left"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">Loop Logic</h3>
-              <p class="text-sm text-slate-400">
-                While loop tracer with index (i) tracking visualization.
-              </p>
-            </a>
+              <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">App
+                27 | Paper 1A Q37</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Swap Logic</h3>
+            <p class="text-sm text-slate-400">
+              Standard variable swapping using a Temp variable.
+            </p>
+          </a>
 
-            <a
-              href="Paper1A_Q37_Swap_Logic/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-yellow-500/10 p-3 rounded-xl text-yellow-400 group-hover:bg-yellow-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="arrow-right-left"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >App 27 | Paper 1A Q37</span
-                >
+          <a href="26_Array_Accumulator/index.html" class="glass-panel p-6 rounded-2xl block transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-pink-500/10 p-3 rounded-xl text-pink-400 group-hover:bg-pink-500 group-hover:text-white transition-colors">
+                <i data-lucide="sigma"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">Swap Logic</h3>
-              <p class="text-sm text-slate-400">
-                Standard variable swapping using a Temp variable.
-              </p>
-            </a>
+              <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">App
+                26</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">
+              Array Accumulator
+            </h3>
+            <p class="text-sm text-slate-400">
+              Tracing recursive array logic: A[i] = A[i-1] + K.
+            </p>
+          </a>
 
-            <a
-              href="26_Array_Accumulator/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-pink-500/10 p-3 rounded-xl text-pink-400 group-hover:bg-pink-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="sigma"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >App 26</span
-                >
+          <a href="2025/P2_Q4/index.html" class="glass-panel p-6 rounded-2xl block transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-red-500/10 p-3 rounded-xl text-red-400 group-hover:bg-red-500 group-hover:text-white transition-colors">
+                <i data-lucide="timer"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">
-                Array Accumulator
-              </h3>
-              <p class="text-sm text-slate-400">
-                Tracing recursive array logic: A[i] = A[i-1] + K.
-              </p>
-            </a>
+              <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">App
+                24</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">
+              Algorithm Efficiency
+            </h3>
+            <p class="text-sm text-slate-400">
+              Comparing O(N) vs Optimized algorithms visually.
+            </p>
+          </a>
 
-            <a
-              href="24_Algorithm_Efficiency/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-red-500/10 p-3 rounded-xl text-red-400 group-hover:bg-red-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="timer"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >App 24</span
-                >
+          <a href="2025/P1B_Q11/index.html" class="glass-panel p-6 rounded-2xl block transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-orange-500/10 p-3 rounded-xl text-orange-400 group-hover:bg-orange-500 group-hover:text-white transition-colors">
+                <i data-lucide="table"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">
-                Algorithm Efficiency
-              </h3>
-              <p class="text-sm text-slate-400">
-                Comparing O(N) vs Optimized algorithms visually.
-              </p>
-            </a>
+              <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">App
+                28 | Paper 1B</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Trace Table</h3>
+            <p class="text-sm text-slate-400">
+              Interactive trace table generation for exam questions.
+            </p>
+          </a>
 
-            <a
-              href="Paper1B_Trace_Table/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-orange-500/10 p-3 rounded-xl text-orange-400 group-hover:bg-orange-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="table"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >App 28 | Paper 1B</span
-                >
+          <a href="11_Array_Trace_STEAM/index.html" class="glass-panel p-6 rounded-2xl block transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-green-500/10 p-3 rounded-xl text-green-400 group-hover:bg-green-500 group-hover:text-white transition-colors">
+                <i data-lucide="list-ordered"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">Trace Table</h3>
-              <p class="text-sm text-slate-400">
-                Interactive trace table generation for exam questions.
-              </p>
-            </a>
+              <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">App
+                11</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Array Reversal</h3>
+            <p class="text-sm text-slate-400">
+              STEAM Lab: Reversing array contents logic.
+            </p>
+          </a>
 
-            <a
-              href="11_Array_Trace_STEAM/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-green-500/10 p-3 rounded-xl text-green-400 group-hover:bg-green-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="list-ordered"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >App 11</span
-                >
+          <a href="23_Bus_Fare_Algo/index.html" class="glass-panel p-6 rounded-2xl block transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-yellow-500/10 p-3 rounded-xl text-yellow-400 group-hover:bg-yellow-500 group-hover:text-white transition-colors">
+                <i data-lucide="bus"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">Array Reversal</h3>
-              <p class="text-sm text-slate-400">
-                STEAM Lab: Reversing array contents logic.
-              </p>
-            </a>
+              <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">App
+                23</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Bus Fare Logic</h3>
+            <p class="text-sm text-slate-400">
+              Visualizing nested IF-THEN-ELSE decision trees.
+            </p>
+          </a>
+        </div>
+      </section>
 
-            <a
-              href="23_Bus_Fare_Algo/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-yellow-500/10 p-3 rounded-xl text-yellow-400 group-hover:bg-yellow-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="bus"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >App 23</span
-                >
+      <!-- Applications & Society (Spreadsheets, DB, Internet) -->
+      <section class="pb-16">
+        <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3 border-b border-slate-800 pb-4">
+          <i data-lucide="globe" class="text-pink-400"></i>
+          Internet, Database & Society
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <a href="01_Spreadsheet_Logic/index.html" class="glass-panel p-6 rounded-2xl block transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-green-500/10 p-3 rounded-xl text-green-400 group-hover:bg-green-500 group-hover:text-white transition-colors">
+                <i data-lucide="sheet"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">Bus Fare Logic</h3>
-              <p class="text-sm text-slate-400">
-                Visualizing nested IF-THEN-ELSE decision trees.
-              </p>
-            </a>
-          </div>
-        </section>
+              <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">App
+                01</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Spreadsheet Sim</h3>
+            <p class="text-sm text-slate-400">
+              COUNTIF, AVERAGE functions and Formula bar simulator.
+            </p>
+          </a>
 
-        <!-- Applications & Society (Spreadsheets, DB, Internet) -->
-        <section class="pb-16">
-          <h2
-            class="text-2xl font-bold text-white mb-6 flex items-center gap-3 border-b border-slate-800 pb-4"
-          >
-            <i data-lucide="globe" class="text-pink-400"></i>
-            Internet, Database & Society
-          </h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <a
-              href="01_Spreadsheet_Logic/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-green-500/10 p-3 rounded-xl text-green-400 group-hover:bg-green-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="sheet"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >App 01</span
-                >
+          <a href="11_Spreadsheet_Addr/index.html" class="glass-panel p-6 rounded-2xl block transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-green-500/10 p-3 rounded-xl text-green-400 group-hover:bg-green-500 group-hover:text-white transition-colors">
+                <i data-lucide="dollar-sign"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">Spreadsheet Sim</h3>
-              <p class="text-sm text-slate-400">
-                COUNTIF, AVERAGE functions and Formula bar simulator.
-              </p>
-            </a>
+              <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">App
+                11</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">
+              Absolute Addressing
+            </h3>
+            <p class="text-sm text-slate-400">
+              Relative vs Absolute ($) Reference Quiz.
+            </p>
+          </a>
 
-            <a
-              href="11_Spreadsheet_Addr/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-green-500/10 p-3 rounded-xl text-green-400 group-hover:bg-green-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="dollar-sign"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >App 11</span
-                >
+          <a href="2025/P2_Q1/index.html" class="glass-panel p-6 rounded-2xl block transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-blue-500/10 p-3 rounded-xl text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                <i data-lucide="database"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">
-                Absolute Addressing
-              </h3>
-              <p class="text-sm text-slate-400">
-                Relative vs Absolute ($) Reference Quiz.
-              </p>
-            </a>
+              <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">App
+                17</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">SQL Lab</h3>
+            <p class="text-sm text-slate-400">
+              SELECT, GROUP BY, ORDER BY interactive query runner.
+            </p>
+          </a>
 
-            <a
-              href="15_SQL_Lab/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-blue-500/10 p-3 rounded-xl text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="database"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >App 17</span
-                >
+          <a href="2025/P1B_Q9/index.html" class="glass-panel p-6 rounded-2xl block transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-purple-500/10 p-3 rounded-xl text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition-colors">
+                <i data-lucide="qr-code"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">SQL Lab</h3>
-              <p class="text-sm text-slate-400">
-                SELECT, GROUP BY, ORDER BY interactive query runner.
-              </p>
-            </a>
+              <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">App
+                05 | Paper 1B Q9</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Check Digit</h3>
+            <p class="text-sm text-slate-400">
+              Modulo-11 Check Digit algorithm flowchart visualizer.
+            </p>
+          </a>
 
-            <a
-              href="2025_Paper1B_Q9_Check_Digit/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-purple-500/10 p-3 rounded-xl text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="qr-code"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >App 05 | Paper 1B Q9</span
-                >
+          <a href="2025/P1B_Q8/index.html" class="glass-panel p-6 rounded-2xl block transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-yellow-500/10 p-3 rounded-xl text-yellow-400 group-hover:bg-yellow-500 group-hover:text-white transition-colors">
+                <i data-lucide="bar-chart-2"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">Check Digit</h3>
-              <p class="text-sm text-slate-400">
-                Modulo-11 Check Digit algorithm flowchart visualizer.
-              </p>
-            </a>
+              <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">App
+                12 | Paper 1B Q8</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Score Analyzer</h3>
+            <p class="text-sm text-slate-400">
+              Algorithm to drop the lowest score from a set.
+            </p>
+          </a>
 
-            <a
-              href="Paper1B_Q8_Score_Analyzer/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-yellow-500/10 p-3 rounded-xl text-yellow-400 group-hover:bg-yellow-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="bar-chart-2"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >App 12 | Paper 1B Q8</span
-                >
+          <a href="18_Browser_Error/index.html" class="glass-panel p-6 rounded-2xl block transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-red-500/10 p-3 rounded-xl text-red-400 group-hover:bg-red-500 group-hover:text-white transition-colors">
+                <i data-lucide="alert-triangle"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">Score Analyzer</h3>
-              <p class="text-sm text-slate-400">
-                Algorithm to drop the lowest score from a set.
-              </p>
-            </a>
+              <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">App
+                18</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Browser Errors</h3>
+            <p class="text-sm text-slate-400">
+              Debugging broken image links: Relative vs Absolute paths.
+            </p>
+          </a>
 
-            <a
-              href="18_Browser_Error/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-red-500/10 p-3 rounded-xl text-red-400 group-hover:bg-red-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="alert-triangle"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >App 18</span
-                >
+          <a href="19_URL_Anatomy/index.html" class="glass-panel p-6 rounded-2xl block transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-cyan-500/10 p-3 rounded-xl text-cyan-400 group-hover:bg-cyan-500 group-hover:text-white transition-colors">
+                <i data-lucide="link"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">Browser Errors</h3>
-              <p class="text-sm text-slate-400">
-                Debugging broken image links: Relative vs Absolute paths.
-              </p>
-            </a>
+              <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">App
+                19</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">URL Anatomy</h3>
+            <p class="text-sm text-slate-400">
+              Interactive dissection of Protocol, Domain, and Path.
+            </p>
+          </a>
 
-            <a
-              href="19_URL_Anatomy/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-cyan-500/10 p-3 rounded-xl text-cyan-400 group-hover:bg-cyan-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="link"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >App 19</span
-                >
+          <a href="22_Flowchart_Canning/index.html" class="glass-panel p-6 rounded-2xl block transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-orange-500/10 p-3 rounded-xl text-orange-400 group-hover:bg-orange-500 group-hover:text-white transition-colors">
+                <i data-lucide="workflow"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">URL Anatomy</h3>
-              <p class="text-sm text-slate-400">
-                Interactive dissection of Protocol, Domain, and Path.
-              </p>
-            </a>
+              <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">App
+                22</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">
+              Industrial Flowchart
+            </h3>
+            <p class="text-sm text-slate-400">
+              Canning factory logic control & decision making.
+            </p>
+          </a>
 
-            <a
-              href="22_Flowchart_Canning/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-orange-500/10 p-3 rounded-xl text-orange-400 group-hover:bg-orange-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="workflow"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >App 22</span
-                >
+          <a href="25_Range_Check/index.html" class="glass-panel p-6 rounded-2xl block transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-red-500/10 p-3 rounded-xl text-red-400 group-hover:bg-red-500 group-hover:text-white transition-colors">
+                <i data-lucide="shield-check"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">
-                Industrial Flowchart
-              </h3>
-              <p class="text-sm text-slate-400">
-                Canning factory logic control & decision making.
-              </p>
-            </a>
+              <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">App
+                25</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Range Check</h3>
+            <p class="text-sm text-slate-400">
+              Data validation logic: Min &lt;= Input &lt;= Max.
+            </p>
+          </a>
 
-            <a
-              href="25_Range_Check/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-red-500/10 p-3 rounded-xl text-red-400 group-hover:bg-red-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="shield-check"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >App 25</span
-                >
+          <a href="29_Open_Source/index.html" class="glass-panel p-6 rounded-2xl block transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-green-500/10 p-3 rounded-xl text-green-400 group-hover:bg-green-500 group-hover:text-white transition-colors">
+                <i data-lucide="unlock"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">Range Check</h3>
-              <p class="text-sm text-slate-400">
-                Data validation logic: Min &lt;= Input &lt;= Max.
-              </p>
-            </a>
+              <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">App
+                29</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Open Source</h3>
+            <p class="text-sm text-slate-400">
+              OSS vs Freeware vs Shareware classification game.
+            </p>
+          </a>
 
-            <a
-              href="29_Open_Source/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-green-500/10 p-3 rounded-xl text-green-400 group-hover:bg-green-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="unlock"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >App 29</span
-                >
+          <a href="30_Ethics_Quiz/index.html" class="glass-panel p-6 rounded-2xl block transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div
+                class="bg-gray-500/10 p-3 rounded-xl text-gray-400 group-hover:bg-gray-500 group-hover:text-white transition-colors">
+                <i data-lucide="scale"></i>
               </div>
-              <h3 class="text-lg font-bold text-white mb-2">Open Source</h3>
-              <p class="text-sm text-slate-400">
-                OSS vs Freeware vs Shareware classification game.
-              </p>
-            </a>
-
-            <a
-              href="30_Ethics_Quiz/index.html"
-              class="glass-panel p-6 rounded-2xl block transition-all group"
-            >
-              <div class="flex justify-between items-start mb-4">
-                <div
-                  class="bg-gray-500/10 p-3 rounded-xl text-gray-400 group-hover:bg-gray-500 group-hover:text-white transition-colors"
-                >
-                  <i data-lucide="scale"></i>
-                </div>
-                <span
-                  class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700"
-                  >App 30</span
-                >
-              </div>
-              <h3 class="text-lg font-bold text-white mb-2">Ethics Quiz</h3>
-              <p class="text-sm text-slate-400">
-                Copyright, Privacy, and Social Issues scenarios.
-              </p>
-            </a>
-          </div>
-        </section>
-      </div>
+              <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">App
+                30</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Ethics Quiz</h3>
+            <p class="text-sm text-slate-400">
+              Copyright, Privacy, and Social Issues scenarios.
+            </p>
+          </a>
+        </div>
+      </section>
     </div>
+  </div>
 
-    <!-- Background Elements -->
-    <div class="fixed top-0 left-0 w-full h-full pointer-events-none -z-0">
-      <div
-        class="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-3xl"
-      ></div>
-      <div
-        class="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-3xl"
-      ></div>
-    </div>
+  <!-- Background Elements -->
+  <div class="fixed top-0 left-0 w-full h-full pointer-events-none -z-0">
+    <div class="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-3xl"></div>
+  </div>
 
-    <script>
-      lucide.createIcons();
-    </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
+  <script>
+    lucide.createIcons();
+  </script>
+
+
+  <!-- Footer -->
+  <footer class="text-center py-4 text-slate-500 text-sm">
+    <p class="italic mb-1">
+      But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
+      understanding. Jeremiah 10:12
+    </p>
+    <p class="text-xs mb-1 mt-2">
+      「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
+    </p>
+    <p class="text-xs mt-2 pt-2 border-t border-slate-300">
+      @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
+    </p>
+  </footer>
 </body>
+
 </html>
