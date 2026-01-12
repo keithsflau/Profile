@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>HKDSE 2022 Q3: Data Control</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.development.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+      body {
+        background-color: #0f172a;
+        color: #e2e8f0;
+        font-family: sans-serif;
+      }
+    </style>
+  </head>
+  <body class="p-4 flex justify-center min-h-screen">
+    <div id="root" class="w-full max-w-4xl"></div>
+    <script type="text/babel">
+      const { useState } = React;
+      const createLucideIcon = (name) => {
+        const iconData = window.lucide?.icons[name];
+        if (!iconData) return (props) => <span>?</span>;
+        return ({ size, className, ...props }) =>
+          React.createElement(
+            "svg",
+            {
+              width: size || 24,
+              height: size || 24,
+              fill: "none",
+              stroke: "currentColor",
+              strokeWidth: 2,
+              strokeLinecap: "round",
+              strokeLinejoin: "round",
+              className: `lucide lucide-${name.toLowerCase()} ${
+                className || ""
+              }`,
+              viewBox: "0 0 24 24",
+              ...props,
+            },
+            iconData.map(([tag, attrs], i) =>
+              React.createElement(tag, { ...attrs, key: i })
+            )
+          );
+      };
+      const Icon = ({ name, ...p }) => {
+        const C = createLucideIcon(name);
+        return <C {...p} />;
+      };
+
+      const TEXT = {
+        en: {
+          title: "HKDSE 2022 Q3: Data Control",
+          subtitle: "Verification vs Validation (GIGO)",
+          intro:
+            "Ensuring data accuracy is critical. 'GIGO' means Garbage In, Garbage Out.",
+          task1: "Task A: Data Verification (Double Entry)",
+          prompt1: "Enter Password:",
+          prompt2: "Re-enter Password:",
+          statusMatch: "Match! Data Verified.",
+          statusFail: "Mismatch! Verification Failed.",
+          task2: "Task B: Data Validation (Check Digit)",
+          prompt3: "Enter ID (4 digits + 1 check digit, Mod 11)",
+          valid: "Valid ID. Modulo check passed.",
+          invalid: "Invalid ID. Check digit incorrect.",
+          explain:
+            "Verification checks 'correctness' against source. Validation checks 'logic' rules.",
+        },
+        tc: {
+          title: "HKDSE 2022 Q3: 數據控制",
+          subtitle: "數據校驗 vs 數據驗證 (GIGO)",
+          intro: "確保數據準確至關重要。「GIGO」意指垃圾進，垃圾出。",
+          task1: "任務 A：數據校驗 (雙重輸入)",
+          prompt1: "輸入密碼：",
+          prompt2: "再次輸入密碼：",
+          statusMatch: "吻合！校驗成功。",
+          statusFail: "不吻合！校驗失敗。",
+          task2: "任務 B：數據驗證 (核對數位)",
+          prompt3: "輸入 ID (4位數字 + 1位核對數位, Mod 11)",
+          valid: "有效 ID。模數檢查通過。",
+          invalid: "無效 ID。核對數位不正確。",
+          explain:
+            "校驗 (Verification) 檢查是否與來源一致。驗證 (Validation) 檢查是否符合邏輯規則。",
+        },
+      };
+
+      const App = () => {
+        const [lang, setLang] = useState("en");
+        const t = TEXT[lang];
+
+        const [pw1, setPw1] = useState("");
+        const [pw2, setPw2] = useState("");
+
+        const [idInput, setIdInput] = useState("");
+        const [idStatus, setIdStatus] = useState(null); // null, true, false
+
+        const checkId = (val) => {
+          setIdInput(val);
+          if (val.length !== 5) {
+            setIdStatus(null);
+            return;
+          }
+          // Simple Mod 10 or 11 logic simulator
+          // Let's pretend it's Sum digits % 10 === 0
+          const sum = val
+            .split("")
+            .reduce((acc, c) => acc + parseInt(c || 0), 0);
+          setIdStatus(sum % 10 === 0);
+        };
+
+        return (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-pink-600 rounded-lg">
+                  <Icon name="ShieldCheck" className="text-white" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-white">{t.title}</h1>
+                  <p className="text-slate-400 text-xs">{t.subtitle}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setLang((l) => (l === "en" ? "tc" : "en"))}
+                className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-white font-bold border border-slate-500"
+              >
+                {lang === "en" ? "中文" : "English"}
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Verification */}
+              <div className="bg-slate-900 border border-slate-700 rounded-xl p-6">
+                <h2 className="text-white font-bold mb-4 flex items-center gap-2">
+                  <Icon name="Copy" /> {t.task1}
+                </h2>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs text-slate-400 mb-1">
+                      {t.prompt1}
+                    </label>
+                    <input
+                      type="password"
+                      value={pw1}
+                      onChange={(e) => setPw1(e.target.value)}
+                      className="w-full bg-slate-800 border-slate-600 rounded p-2 text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-slate-400 mb-1">
+                      {t.prompt2}
+                    </label>
+                    <input
+                      type="password"
+                      value={pw2}
+                      onChange={(e) => setPw2(e.target.value)}
+                      className="w-full bg-slate-800 border-slate-600 rounded p-2 text-white"
+                    />
+                  </div>
+                  {pw1 && pw2 && (
+                    <div
+                      className={`p-3 rounded text-sm font-bold flex items-center gap-2 ${
+                        pw1 === pw2
+                          ? "bg-green-900/30 text-green-400"
+                          : "bg-red-900/30 text-red-400"
+                      }`}
+                    >
+                      <Icon name={pw1 === pw2 ? "Check" : "X"} size={16} />
+                      {pw1 === pw2 ? t.statusMatch : t.statusFail}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Validation */}
+              <div className="bg-slate-900 border border-slate-700 rounded-xl p-6">
+                <h2 className="text-white font-bold mb-4 flex items-center gap-2">
+                  <Icon name="FileCheck" /> {t.task2}
+                </h2>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs text-slate-400 mb-1">
+                      {t.prompt3}
+                    </label>
+                    <input
+                      placeholder="e.g. 12340 (Sum=10)"
+                      type="text"
+                      maxLength={5}
+                      value={idInput}
+                      onChange={(e) => checkId(e.target.value)}
+                      className="w-full bg-slate-800 border-slate-600 rounded p-2 text-white font-mono tracking-widest"
+                    />
+                  </div>
+                  {idStatus !== null && (
+                    <div
+                      className={`p-3 rounded text-sm font-bold flex items-center gap-2 ${
+                        idStatus
+                          ? "bg-green-900/30 text-green-400"
+                          : "bg-red-900/30 text-red-400"
+                      }`}
+                    >
+                      <Icon
+                        name={idStatus ? "Check" : "AlertTriangle"}
+                        size={16}
+                      />
+                      {idStatus ? t.valid : t.invalid}
+                    </div>
+                  )}
+                  <div className="mt-4 text-xs text-slate-500 italic p-2 border-t border-slate-700">
+                    {t.explain}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      };
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

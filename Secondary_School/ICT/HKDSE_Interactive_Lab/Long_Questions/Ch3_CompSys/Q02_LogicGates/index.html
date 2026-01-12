@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>HKDSE ICT Ch3 - Logic Gates & Truth Tables</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.development.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+      body {
+        background-color: #0f172a;
+        color: #e2e8f0;
+        font-family: sans-serif;
+      }
+      .font-mono {
+        font-family: monospace;
+      }
+    </style>
+  </head>
+  <body class="p-4 flex justify-center min-h-screen">
+    <div id="root" class="w-full max-w-5xl"></div>
+    <script type="text/babel">
+      const { useState, useEffect, useMemo } = React;
+      const createLucideIcon = (name) => {
+        const iconData = window.lucide?.icons[name];
+        if (!iconData) return (props) => <span>?</span>;
+        return ({ size, className, ...props }) =>
+          React.createElement(
+            "svg",
+            {
+              width: size || 24,
+              height: size || 24,
+              fill: "none",
+              stroke: "currentColor",
+              strokeWidth: 2,
+              strokeLinecap: "round",
+              strokeLinejoin: "round",
+              className: `lucide lucide-${name.toLowerCase()} ${
+                className || ""
+              }`,
+              viewBox: "0 0 24 24",
+              ...props,
+            },
+            iconData.map(([tag, attrs], i) =>
+              React.createElement(tag, { ...attrs, key: i })
+            )
+          );
+      };
+      const Icon = ({ name, ...p }) => {
+        const C = createLucideIcon(name);
+        return <C {...p} />;
+      };
+
+      const App = () => {
+        const [expr, setExpr] = useState("(A AND B) OR C");
+        const [inputs, setInputs] = useState({ A: false, B: false, C: false });
+        const [error, setError] = useState(null);
+
+        const evaluate = (expression, scope) => {
+          try {
+            let jsExpr = expression
+              .replace(/AND/gi, "&&")
+              .replace(/OR/gi, "||")
+              .replace(/NOT/gi, "!")
+              .replace(/XOR/gi, "!==") // boolean xor
+              .replace(/[A-Z]/g, (m) => `scope.${m}`);
+
+            // Simple safety check
+            if (
+              /[^a-zA-Z0-9\s&|!()\.]/.test(
+                expression.replace(/AND|OR|NOT|XOR/gi, "")
+              )
+            ) {
+              // Allow mostly basic chars
+            }
+
+            const func = new Function("scope", `return (${jsExpr});`);
+            return func(scope);
+          } catch (e) {
+            return null;
+          }
+        };
+
+        const truthTable = useMemo(() => {
+          const rows = [];
+          for (let i = 0; i < 8; i++) {
+            const a = !!(i & 4);
+            const b = !!(i & 2);
+            const c = !!(i & 1);
+            const res = evaluate(expr, { A: a, B: b, C: c });
+            rows.push({ A: a, B: b, C: c, res });
+          }
+          return rows;
+        }, [expr]);
+
+        const currentResult = evaluate(expr, inputs);
+        const isValid = truthTable.every((r) => r.res !== null);
+
+        return (
+          <div className="w-full space-y-6">
+            <header className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex items-center gap-4">
+              <div className="p-3 bg-purple-600 rounded-xl">
+                <Icon name="Zap" className="text-white" size={32} />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-white">
+                  Logic Gates Evaluator
+                </h1>
+                <p className="text-slate-400 text-sm">
+                  HKDSE ICT Ch3 - Truth Tables
+                </p>
+              </div>
+            </header>
+
+            {/* Expression Input */}
+            <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">
+              <label className="block text-purple-400 font-bold mb-2">
+                Boolean Expression
+              </label>
+              <div className="flex gap-2 mb-4">
+                {["AND", "OR", "NOT", "(", ")"].map((op) => (
+                  <button
+                    key={op}
+                    onClick={() => setExpr(expr + " " + op + " ")}
+                    className="px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-sm text-white font-mono"
+                  >
+                    {op}
+                  </button>
+                ))}
+                <button
+                  onClick={() => setExpr("")}
+                  className="px-3 py-1 bg-red-900/50 hover:bg-red-800 text-red-200 rounded text-sm ml-auto"
+                >
+                  Clear
+                </button>
+              </div>
+              <input
+                type="text"
+                value={expr}
+                onChange={(e) => setExpr(e.target.value)}
+                className="w-full bg-slate-900 border border-slate-600 rounded-lg p-4 text-xl font-mono text-white focus:border-purple-500 outline-none"
+              />
+              {!isValid && (
+                <p className="text-red-400 text-sm mt-2">Invalid Syntax</p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Live Testing */}
+              <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">
+                <h3 className="text-white font-bold mb-4 flex items-center gap-2">
+                  <Icon name="Activity" /> Live Inputs
+                </h3>
+                <div className="flex gap-4 justify-center mb-6">
+                  {["A", "B", "C"].map((k) => (
+                    <div key={k} className="flex flex-col items-center gap-2">
+                      <button
+                        onClick={() =>
+                          setInputs({ ...inputs, [k]: !inputs[k] })
+                        }
+                        className={`w-12 h-12 rounded-lg font-bold text-xl flex items-center justify-center border-b-4 transition-all ${
+                          inputs[k]
+                            ? "bg-green-600 border-green-800 text-white"
+                            : "bg-slate-700 border-slate-900 text-slate-500"
+                        }`}
+                      >
+                        {inputs[k] ? 1 : 0}
+                      </button>
+                      <span className="text-slate-400 font-mono">{k}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="text-center p-4 bg-slate-900 rounded-xl border border-slate-700">
+                  <div className="text-slate-500 text-sm mb-1">Result (Z)</div>
+                  <div
+                    className={`text-4xl font-bold ${
+                      currentResult ? "text-green-400" : "text-slate-600"
+                    }`}
+                  >
+                    {currentResult === null ? "?" : currentResult ? 1 : 0}
+                  </div>
+                </div>
+              </div>
+
+              {/* Truth Table */}
+              <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">
+                <h3 className="text-white font-bold mb-4 flex items-center gap-2">
+                  <Icon name="Table" /> Truth Table
+                </h3>
+                <div className="overflow-hidden rounded-lg border border-slate-700">
+                  <table className="w-full text-center text-sm font-mono">
+                    <thead className="bg-slate-900 text-slate-400">
+                      <tr>
+                        <th className="p-2">A</th>
+                        <th className="p-2">B</th>
+                        <th className="p-2">C</th>
+                        <th className="p-2 text-white bg-purple-900/50">Z</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {truthTable.map((row, i) => (
+                        <tr
+                          key={i}
+                          className={`border-t border-slate-700 ${
+                            row.A === inputs.A &&
+                            row.B === inputs.B &&
+                            row.C === inputs.C
+                              ? "bg-purple-900/30"
+                              : "hover:bg-slate-700/30"
+                          }`}
+                        >
+                          <td className="p-2 text-slate-300">
+                            {row.A ? 1 : 0}
+                          </td>
+                          <td className="p-2 text-slate-300">
+                            {row.B ? 1 : 0}
+                          </td>
+                          <td className="p-2 text-slate-300">
+                            {row.C ? 1 : 0}
+                          </td>
+                          <td
+                            className={`p-2 font-bold ${
+                              row.res ? "text-green-400" : "text-slate-500"
+                            } bg-slate-900/30`}
+                          >
+                            {row.res === null ? "Err" : row.res ? 1 : 0}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      };
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>
