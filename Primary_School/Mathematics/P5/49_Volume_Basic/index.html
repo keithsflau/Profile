@@ -3,129 +3,182 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小五數學：體積初探</title>
+    <title>小五數學：體積初探 | Volume Explorer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.min.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <style>
       body {
-        font-family: "Fredoka", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
       }
+      .glass-panel {
+        background: rgba(14, 165, 233, 0.15); /* Sky 500 alpha */
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(56, 189, 248, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+
+      /* CSS 3D Engine */
       .scene {
-        perspective: 1000px;
+        perspective: 1200px;
         transform-style: preserve-3d;
       }
       .cuboid-container {
         position: relative;
         transform-style: preserve-3d;
-        transform: rotateX(-30deg) rotateY(45deg);
-        transition: transform 0.5s ease;
+        transform: rotateX(-25deg) rotateY(45deg);
+        transition: transform 0.1s ease-out; /* Smooth drag */
       }
       .cube {
         position: absolute;
         width: 40px;
         height: 40px;
         transform-style: preserve-3d;
+        transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
       }
       .face {
         position: absolute;
         width: 40px;
         height: 40px;
-        border: 1px solid rgba(255, 255, 255, 0.4);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 10px;
-        font-weight: bold;
-        color: rgba(0, 0, 0, 0.1);
+        box-sizing: border-box;
+        border: 1px solid rgba(56, 189, 248, 0.5); /* Sky 400 borders */
+        background: rgba(14, 165, 233, 0.1);
+        backface-visibility: visible; /* Glass effect needs backface? Actually standard CSS 3D usually hides backface for opacity but here we want transparency */
       }
+      /* Individual faces transforms */
       .front {
         transform: rotateY(0deg) translateZ(20px);
-        background: rgba(59, 130, 246, 0.9);
       }
       .right {
         transform: rotateY(90deg) translateZ(20px);
-        background: rgba(37, 99, 235, 0.9);
       }
       .left {
         transform: rotateY(-90deg) translateZ(20px);
-        background: rgba(37, 99, 235, 0.9);
       }
       .back {
         transform: rotateY(180deg) translateZ(20px);
-        background: rgba(59, 130, 246, 0.9);
       }
       .top {
         transform: rotateX(90deg) translateZ(20px);
-        background: rgba(96, 165, 250, 0.9);
       }
       .bottom {
         transform: rotateX(-90deg) translateZ(20px);
-        background: rgba(96, 165, 250, 0.9);
       }
 
-      /* Slider Styling */
-      input[type="range"] {
-        -webkit-appearance: none;
-        background: transparent;
-      }
-      input[type="range"]::-webkit-slider-thumb {
-        -webkit-appearance: none;
-      }
-      input[type="range"]:focus {
-        outline: none;
+      /* Neon glow for faces */
+      .face {
+        box-shadow: inset 0 0 10px rgba(56, 189, 248, 0.2);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
+      const { useState, useEffect, useRef } = React;
+      const { motion } = window.Motion;
+      const { Box, Expand, Move3d } = window.LucideReact;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
 
-      const Box = (props) => (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width={props.size || 24}
-          height={props.size || 24}
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          {...props}
-        >
-          <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
-          <path d="m3.3 7 8.7 5 8.7-5" />
-          <path d="M12 22V12" />
-        </svg>
-      );
+      const t = {
+        title: {
+          en: "Volume Explorer",
+          zh: "體積初探",
+          ja: "体積の探求",
+          ko: "부피 탐구",
+          es: "Explorador de Volumen",
+          de: "Volumen-Explorer",
+          fi: "Tilavuuden tutkiminen",
+          fr: "Explorateur de volume",
+          ar: "مستكشف الحجم",
+          it: "Esploratore di volume",
+        },
+        length: {
+          en: "Length",
+          zh: "長",
+          ja: "長さ",
+          ko: "길이",
+          es: "Largo",
+          de: "Länge",
+          fi: "Pituus",
+          fr: "Longueur",
+          ar: "الطول",
+          it: "Lunghezza",
+        },
+        width: {
+          en: "Width",
+          zh: "闊",
+          ja: "幅",
+          ko: "너비",
+          es: "Ancho",
+          de: "Breite",
+          fi: "Leveys",
+          fr: "Largeur",
+          ar: "العرض",
+          it: "Larghezza",
+        },
+        height: {
+          en: "Height",
+          zh: "高",
+          ja: "高さ",
+          ko: "높이",
+          es: "Alto",
+          de: "Höhe",
+          fi: "Korkeus",
+          fr: "Hauteur",
+          ar: "الارتفاع",
+          it: "Altezza",
+        },
+        formula: {
+          en: "V = L × W × H",
+          zh: "體積 = 長 × 闊 × 高",
+          ja: "体積 = 長さ × 幅 × 高さ",
+          ko: "부피 = 길이 × 너비 × 높이",
+          es: "V = Largo × Ancho × Alto",
+          de: "V = L × B × H",
+          fi: "V = P × L × K",
+          fr: "V = L × l × h",
+          ar: "الحجم = الطول × العرض × الارتفاع",
+          it: "V = L × L × A",
+        },
+        explode: {
+          en: "Explode View",
+          zh: "分解視圖",
+          ja: "分解ビュー",
+          ko: "분해 보기",
+          es: "Vista Explosiva",
+          de: "Explosionsansicht",
+          fi: "Räjäytyskuva",
+          fr: "Vue éclatée",
+          ar: "عرض مفصل",
+          it: "Vista esplosa",
+        },
+      };
+
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
 
       function App() {
+        const [lang, setLang] = useState("zh");
         const [dims, setDims] = useState({ l: 3, w: 2, h: 4 });
         const [isExploded, setIsExploded] = useState(false);
-
-        const updateDim = (k, v) =>
-          setDims((p) => ({ ...p, [k]: parseInt(v) }));
+        const [rotation, setRotation] = useState({ x: -25, y: 45 });
+        const [isDragging, setIsDragging] = useState(false);
+        const lastMousePos = useRef({ x: 0, y: 0 });
 
         const cubes = [];
-        // Generate cubes
-        // We center the whole block
-        // x goes from 0 to l-1
-        // y goes from 0 to h-1 (height usually maps to -y or z in web)
-        // z goes from 0 to w-1
-
-        // CSS 3D coordinate system:
-        // X right, Y down, Z towards viewer
-        // We want Y up (negative Y) for height
-
         for (let x = 0; x < dims.l; x++) {
           for (let y = 0; y < dims.h; y++) {
             for (let z = 0; z < dims.w; z++) {
@@ -136,148 +189,194 @@
 
         const size = 40;
         const offsetStep = isExploded ? 60 : 40;
+        const cx = (dims.l * offsetStep) / 2 - offsetStep / 2;
+        const cy = (dims.h * offsetStep) / 2 - offsetStep / 2;
+        const cz = (dims.w * offsetStep) / 2 - offsetStep / 2;
 
-        // Center offsets
-        const cx = (dims.l * offsetStep) / 2;
-        const cy = (dims.h * offsetStep) / 2;
-        const cz = (dims.w * offsetStep) / 2;
+        const handleMouseDown = (e) => {
+          setIsDragging(true);
+          lastMousePos.current = { x: e.clientX, y: e.clientY };
+        };
+
+        const handleMouseMove = (e) => {
+          if (!isDragging) return;
+          const deltaX = e.clientX - lastMousePos.current.x;
+          const deltaY = e.clientY - lastMousePos.current.y;
+          setRotation((prev) => ({
+            x: prev.x - deltaY * 0.5,
+            y: prev.y + deltaX * 0.5,
+          }));
+          lastMousePos.current = { x: e.clientX, y: e.clientY };
+        };
+
+        const handleMouseUp = () => setIsDragging(false);
+
+        useEffect(() => {
+          window.addEventListener("mouseup", handleMouseUp);
+          window.addEventListener("mousemove", handleMouseMove);
+          return () => {
+            window.removeEventListener("mouseup", handleMouseUp);
+            window.removeEventListener("mousemove", handleMouseMove);
+          };
+        }, [isDragging]);
 
         return (
-          <div className="min-h-screen flex flex-col items-center justify-center p-4 overflow-hidden">
-            <div className="flex w-fullmax-w-6xl gap-8 flex-col lg:flex-row items-center justify-center">
-              {/* Controls */}
-              <div className="bg-white/90 backdrop-blur-xl p-8 rounded-3xl shadow-2xl w-full max-w-md border-4 border-white z-10">
-                <h1 className="text-3xl font-black text-slate-800 mb-8 flex items-center gap-3">
-                  <Box className="text-blue-500" size={32} />
-                  體積計算機
-                </h1>
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <div className="w-full max-w-6xl flex justify-between items-center mb-6">
+              <h1 className="text-3xl md:text-5xl font-black text-sky-400 drop-shadow-[0_0_15px_rgba(56,189,248,0.5)]">
+                🧊 {getText("title", lang)}
+              </h1>
+              <div className="bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex flex-wrap justify-end gap-1">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-sky-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-                {["l", "w", "h"].map((d, i) => {
-                  const labels = {
-                    l: "長 Length",
-                    w: "闊 Width",
-                    h: "高 Height",
-                  };
-                  const colors = {
-                    l: "text-blue-500",
-                    w: "text-purple-500",
-                    h: "text-green-500",
-                  };
-                  const bgColors = {
-                    l: "accent-blue-500",
-                    w: "accent-purple-500",
-                    h: "accent-green-500",
-                  };
-                  return (
-                    <div key={d} className="mb-6">
-                      <div className="flex justify-between font-bold text-slate-500 mb-2">
-                        <span className={colors[d]}>{labels[d]}</span>
-                        <span className="text-2xl text-slate-800">
-                          {dims[d]}
-                        </span>
+            <main className="w-full max-w-6xl grid lg:grid-cols-3 gap-8">
+              {/* Control Panel */}
+              <div className="flex flex-col gap-6">
+                <div className="glass-panel p-8 rounded-3xl">
+                  {["l", "w", "h"].map((d) => {
+                    const labels = { l: "length", w: "width", h: "height" };
+                    const colors = {
+                      l: "text-blue-400",
+                      w: "text-purple-400",
+                      h: "text-green-400",
+                    };
+                    const accents = {
+                      l: "accent-blue-500",
+                      w: "accent-purple-500",
+                      h: "accent-green-500",
+                    };
+
+                    return (
+                      <div key={d} className="mb-6 last:mb-0">
+                        <div className="flex justify-between text-sm font-bold text-slate-300 mb-2">
+                          <span className={colors[d]}>
+                            {getText(labels[d], lang)}
+                          </span>
+                          <span className="bg-slate-900 px-2 py-0.5 rounded text-white">
+                            {dims[d]}
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min="1"
+                          max="6"
+                          value={dims[d]}
+                          onChange={(e) =>
+                            setDims({ ...dims, [d]: parseInt(e.target.value) })
+                          }
+                          className={`w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer ${accents[d]}`}
+                        />
                       </div>
-                      <input
-                        type="range"
-                        min="1"
-                        max="6"
-                        value={dims[d]}
-                        onChange={(e) => updateDim(d, e.target.value)}
-                        className={`w-full h-3 bg-slate-200 rounded-full cursor-pointer appearance-none ${bgColors[d]}`}
-                      />
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
 
-                <div className="mt-8 pt-8 border-t-2 border-slate-100">
-                  <div className="flex items-center justify-center gap-4 text-4xl font-black text-slate-700 bg-slate-50 p-4 rounded-2xl">
-                    <span className="text-blue-500">{dims.l}</span>
-                    <span className="text-slate-300">×</span>
-                    <span className="text-purple-500">{dims.w}</span>
-                    <span className="text-slate-300">×</span>
-                    <span className="text-green-500">{dims.h}</span>
-                    <span className="text-slate-300">=</span>
-                    <span className="text-slate-800">
+                <div className="glass-panel p-6 rounded-3xl flex flex-col items-center">
+                  <div className="text-sky-300 font-bold uppercase tracking-widest text-sm mb-2">
+                    {getText("formula", lang)}
+                  </div>
+                  <div className="flex items-center gap-2 text-4xl font-mono font-black text-white">
+                    <span className="text-blue-400">{dims.l}</span>
+                    <span className="text-slate-500">×</span>
+                    <span className="text-purple-400">{dims.w}</span>
+                    <span className="text-slate-500">×</span>
+                    <span className="text-green-400">{dims.h}</span>
+                    <span className="text-slate-500">=</span>
+                    <span className="text-sky-400">
                       {dims.l * dims.w * dims.h}
                     </span>
                   </div>
-                  <div className="text-center mt-2 text-slate-400 font-bold text-sm">
-                    體積 (Volume) = 長 × 闊 × 高
+                </div>
+
+                <button
+                  onClick={() => setIsExploded(!isExploded)}
+                  className={`w-full py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2 shadow-lg ${
+                    isExploded
+                      ? "bg-sky-500 text-white"
+                      : "bg-slate-800 text-sky-400 hover:bg-slate-700"
+                  }`}
+                >
+                  <Expand size={20} /> {getText("explode", lang)}
+                </button>
+              </div>
+
+              {/* 3D Scene */}
+              <div
+                className="lg:col-span-2 glass-panel rounded-3xl relative overflow-hidden flex items-center justify-center min-h-[500px]"
+                onMouseDown={handleMouseDown}
+              >
+                <div className="absolute top-4 left-4 flex gap-2">
+                  <div className="bg-black/40 backdrop-blur px-3 py-1 rounded-lg text-xs text-sky-300 border border-sky-500/20 flex items-center gap-2">
+                    <Move3d size={14} /> Drag to Rotate
                   </div>
                 </div>
 
-                <div className="mt-6 flex justify-center">
-                  <label className="flex items-center gap-2 cursor-pointer bg-slate-100 px-4 py-2 rounded-full font-bold text-slate-600 hover:bg-slate-200 transition-colors">
-                    <input
-                      type="checkbox"
-                      checked={isExploded}
-                      onChange={(e) => setIsExploded(e.target.checked)}
-                      className="w-5 h-5 rounded text-blue-500"
-                    />
-                    <span>分解方塊 (Explode)</span>
-                  </label>
-                </div>
-              </div>
-
-              {/* 3D View */}
-              <div
-                className="w-full lg:w-[600px] h-[500px] relative flex items-center justify-center scene ml-0 lg:ml-12"
-                style={{ perspective: "1200px" }}
-              >
-                <div className="cuboid-container">
-                  {cubes.map((c, i) => (
-                    <div
-                      key={i}
-                      className="cube transition-all duration-500 ease-out"
-                      style={{
-                        transform: `translate3d(${c.x * offsetStep - cx}px, ${
-                          -c.y * offsetStep + cy
-                        }px, ${c.z * offsetStep - cz}px)`,
-                      }}
-                    >
-                      <div className="face front"></div>
-                      <div className="face back"></div>
-                      <div className="face right"></div>
-                      <div className="face left"></div>
-                      <div className="face top"></div>
-                      <div className="face bottom"></div>
-                    </div>
-                  ))}
+                <div className="scene w-full h-full flex items-center justify-center pointer-events-none">
+                  <div
+                    className="cuboid-container"
+                    style={{
+                      transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
+                    }}
+                  >
+                    {cubes.map((c, i) => (
+                      <div
+                        key={i}
+                        className="cube"
+                        style={{
+                          transform: `translate3d(${c.x * offsetStep - cx}px, ${
+                            -c.y * offsetStep + cy
+                          }px, ${c.z * offsetStep - cz}px)`,
+                        }}
+                      >
+                        <div className="face front"></div>
+                        <div className="face back"></div>
+                        <div className="face right"></div>
+                        <div className="face left"></div>
+                        <div className="face top"></div>
+                        <div className="face bottom"></div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
-                {/* Floor circle for grounding */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-black/10 rounded-full blur-xl -z-10 transform rotateX(60deg) translateZ(-200px)"></div>
+                {/* Grid Floor */}
+                <div
+                  className="absolute w-[800px] h-[800px] bg-[radial-gradient(circle,rgba(56,189,248,0.1)_1px,transparent_1px)] bg-[length:20px_20px] pointer-events-none opacity-50"
+                  style={{ transform: `rotateX(60deg) scale(2)` }}
+                ></div>
               </div>
-            </div>
-
-            <div className="fixed bottom-4 left-4">
-              <a
-                href="../index.html"
-                className="bg-white/80 backdrop-blur hover:bg-white text-slate-600 px-6 py-3 rounded-full font-bold shadow-lg flex items-center gap-2 transition-all"
-              >
-                ← 返回目錄
-              </a>
-            </div>
+            </main>
           </div>
         );
       }
 
-      lucide.createIcons();
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

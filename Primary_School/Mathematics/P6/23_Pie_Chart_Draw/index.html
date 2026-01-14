@@ -3,191 +3,456 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小六數學：繪製圓形圖 | Drawing Pie Charts</title>
+    <title>小六數學：繪製圓形圖 | Pie Chart Creator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #fce7f3 0%, #ec4899 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
+
+      const t = {
+        title: {
+          en: "Pie Chart Creator",
+          zh: "圓形圖繪製器",
+          ja: "円グラフ作成",
+          ko: "파이 차트 생성기",
+          es: "Creador de Gráficos Circulares",
+          de: "Tortendiagramm-Ersteller",
+          fi: "Ympyräkaavion Luoja",
+          fr: "Créateur de camemberts",
+          ar: "منشئ المخطط الدائري",
+          it: "Creatore Grafici a Torta",
+        },
+        dataInput: {
+          en: "Data Input",
+          zh: "數據輸入",
+          ja: "データ入力",
+          ko: "데이터 입력",
+          es: "Entrada de Datos",
+          de: "Dateneingabe",
+          fi: "Tietojen syöttö",
+          fr: "Saisie de données",
+          ar: "إدخال البيانات",
+          it: "Inserimento Dati",
+        },
+        item: {
+          en: "Item",
+          zh: "項目",
+          ja: "項目",
+          ko: "항목",
+          es: "Elemento",
+          de: "Artikel",
+          fi: "Kohde",
+          fr: "Article",
+          ar: "بند",
+          it: "Articolo",
+        },
+        value: {
+          en: "Value",
+          zh: "數值",
+          ja: "値",
+          ko: "값",
+          es: "Valor",
+          de: "Wert",
+          fi: "Arvo",
+          fr: "Valeur",
+          ar: "قيمة",
+          it: "Valore",
+        },
+        addItem: {
+          en: "Add Item",
+          zh: "添加項目",
+          ja: "項目を追加",
+          ko: "항목 추가",
+          es: "Añadir Elemento",
+          de: "Element hinzufügen",
+          fi: "Lisää kohde",
+          fr: "Ajouter un élément",
+          ar: "إضافة عنصر",
+          it: "Aggiungi elemento",
+        },
+        total: {
+          en: "Total",
+          zh: "總計",
+          ja: "合計",
+          ko: "합계",
+          es: "Total",
+          de: "Gesamt",
+          fi: "Yhteensä",
+          fr: "Total",
+          ar: "مجموع",
+          it: "Totale",
+        },
+        fraction: {
+          en: "Fraction",
+          zh: "分數",
+          ja: "分数",
+          ko: "분수",
+          es: "Fracción",
+          de: "Bruch",
+          fi: "Murtoluku",
+          fr: "Fraction",
+          ar: "كسر",
+          it: "Frazione",
+        },
+        angle: {
+          en: "Angle (°)",
+          zh: "角度 (°)",
+          ja: "角度 (°)",
+          ko: "각도 (°)",
+          es: "Ángulo (°)",
+          de: "Winkel (°)",
+          fi: "Kulma (°)",
+          fr: "Angle (°)",
+          ar: "زاوية (°)",
+          it: "Angolo (°)",
+        },
+        percent: {
+          en: "Percent (%)",
+          zh: "百分比 (%)",
+          ja: "パーセント (%)",
+          ko: "백분율 (%)",
+          es: "Porcentaje (%)",
+          de: "Prozent (%)",
+          fi: "Prosentti (%)",
+          fr: "Pourcentage (%)",
+          ar: "نسبة مئوية (%)",
+          it: "Percentuale (%)",
+        },
+      };
+
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
+      const COLORS = [
+        "#ef4444",
+        "#3b82f6",
+        "#22c55e",
+        "#eab308",
+        "#a855f7",
+        "#ec4899",
+        "#f97316",
+        "#06b6d4",
+      ];
+
       function App() {
-        // Data input
-        const [data, setData] = useState([
-          { name: "Red", val: 10, color: "#ef4444" },
-          { name: "Blue", val: 20, color: "#3b82f6" },
-          { name: "Green", val: 15, color: "#22c55e" },
+        const [lang, setLang] = useState("zh");
+        const [items, setItems] = useState([
+          { id: 1, name: "A", val: 30, color: COLORS[0] },
+          { id: 2, name: "B", val: 50, color: COLORS[1] },
+          { id: 3, name: "C", val: 20, color: COLORS[2] },
         ]);
 
-        const total = data.reduce((acc, cur) => acc + cur.val, 0);
+        const total = items.reduce((acc, item) => acc + item.val, 0);
 
-        // Helper to calc angles
-        let currentAngle = 0;
-        const slices = data.map((d) => {
-          const angle = (d.val / total) * 360;
-          const start = currentAngle;
-          const end = currentAngle + angle;
-          currentAngle += angle;
-          return { ...d, angle, start, end };
+        // Calculate angles
+        let startAngle = 0;
+        const slices = items.map((item) => {
+          const angle = total === 0 ? 0 : (item.val / total) * 360;
+          const slice = {
+            ...item,
+            angle,
+            start: startAngle,
+            end: startAngle + angle,
+            percent: total === 0 ? 0 : (item.val / total) * 100,
+          };
+          startAngle += angle;
+          return slice;
         });
 
-        // SVG Path generator for arc
+        const addItem = () => {
+          if (items.length >= 8) return;
+          const newId = Math.max(...items.map((i) => i.id), 0) + 1;
+          setItems([
+            ...items,
+            {
+              id: newId,
+              name: String.fromCharCode(65 + items.length),
+              val: 10,
+              color: COLORS[items.length % COLORS.length],
+            },
+          ]);
+        };
+
+        const updateItem = (id, key, val) => {
+          setItems(items.map((i) => (i.id === id ? { ...i, [key]: val } : i)));
+        };
+
+        const removeItem = (id) => {
+          if (items.length <= 2) return;
+          setItems(items.filter((i) => i.id !== id));
+        };
+
+        // Pie SVG Path
         const getPiePath = (cx, cy, r, startAngle, endAngle) => {
-          // Convert to radians, subtract 90 deg to start top
+          if (endAngle - startAngle >= 360) {
+            return `M ${cx} ${cy - r} A ${r} ${r} 0 1 0 ${cx} ${
+              cy + r
+            } A ${r} ${r} 0 1 0 ${cx} ${cy - r} Z`;
+          }
+          // Math for converting degrees to radians, shifted -90deg to start at 12 o'clock
           const start = ((startAngle - 90) * Math.PI) / 180;
           const end = ((endAngle - 90) * Math.PI) / 180;
           const x1 = cx + r * Math.cos(start);
           const y1 = cy + r * Math.sin(start);
           const x2 = cx + r * Math.cos(end);
           const y2 = cy + r * Math.sin(end);
-
-          // Flag for large arcs (> 180 deg)
           const largeArc = endAngle - startAngle > 180 ? 1 : 0;
-
-          if (Math.abs(endAngle - startAngle) >= 360) {
-            return `M ${cx} ${cy - r} A ${r} ${r} 0 1 0 ${cx} ${
-              cy + r
-            } A ${r} ${r} 0 1 0 ${cx} ${cy - r}`;
-          }
 
           return `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z`;
         };
 
-        const updateVal = (idx, newUserVal) => {
-          const newData = [...data];
-          newData[idx].val = parseInt(newUserVal) || 0;
-          setData(newData);
-        };
-
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-pink-900 mb-2">
-              🥧 繪製圓形圖
-            </h1>
-            <p className="text-xl text-pink-700 font-bold mb-8">
-              Drawing Pie Charts
-            </p>
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-4xl w-full flex flex-col md:flex-row items-center gap-12">
-              <div className="flex-1 w-full max-w-sm">
-                <svg
-                  viewBox="0 0 300 300"
-                  className="w-full h-auto drop-shadow-xl"
-                >
-                  {total > 0 ? (
-                    slices.map((s, i) => (
-                      <g key={i}>
-                        <path
-                          d={getPiePath(150, 150, 140, s.start, s.end)}
-                          fill={s.color}
-                          stroke="white"
-                          strokeWidth="2"
-                          className="transition-all duration-500 hover:opacity-90"
-                        />
-                        {s.angle > 15 && (
-                          <text
-                            x={
-                              150 +
-                              90 *
-                                Math.cos(
-                                  ((s.start + s.angle / 2 - 90) * Math.PI) / 180
-                                )
-                            }
-                            y={
-                              150 +
-                              90 *
-                                Math.sin(
-                                  ((s.start + s.angle / 2 - 90) * Math.PI) / 180
-                                )
-                            }
-                            textAnchor="middle"
-                            dominantBaseline="middle"
-                            className="font-bold fill-white text-sm pointer-events-none drop-shadow-md"
-                          >
-                            {Math.round((s.val / total) * 100)}%
-                          </text>
-                        )}
-                      </g>
-                    ))
-                  ) : (
-                    <circle cx="150" cy="150" r="140" fill="#cbd5e1" />
-                  )}
-                  <circle cx="150" cy="150" r="5" fill="white" />
-                </svg>
+          <div className="min-h-screen flex flex-col items-center p-4 font-sans bg-slate-900 text-white">
+            <div className="w-full max-w-6xl flex justify-between items-center mb-10">
+              <h1 className="text-4xl font-black text-purple-400 drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]">
+                🥧 {getText("title", lang)}
+              </h1>
+              <div className="flex bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-purple-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
               </div>
+            </div>
 
-              <div className="flex-1 w-full">
-                <h3 className="text-2xl font-bold text-slate-700 mb-4">
-                  輸入數據 Data Input
-                </h3>
-                <div className="space-y-4">
-                  {data.map((d, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center gap-4 bg-slate-50 p-3 rounded-xl border border-slate-200"
-                    >
-                      <div
-                        className="w-8 h-8 rounded-full shadow-sm"
-                        style={{ backgroundColor: d.color }}
-                      ></div>
-                      <div className="flex-1 font-bold text-slate-700">
-                        {d.name}
-                      </div>
-                      <input
-                        type="number"
-                        min="0"
-                        value={d.val}
-                        onChange={(e) => updateVal(i, e.target.value)}
-                        className="w-20 p-2 text-center font-bold border-2 border-slate-300 rounded-lg focus:border-pink-400 outline-none"
-                      />
-                      <div className="text-slate-500 text-sm font-mono w-16 text-right">
-                        {total > 0 ? ((d.val / total) * 360).toFixed(0) : 0}°
-                      </div>
-                    </div>
-                  ))}
-
-                  <div className="pt-4 border-t-2 border-slate-200 flex justify-between items-center font-bold text-lg text-slate-800">
-                    <span>總計 Total: {total}</span>
-                    <span>360°</span>
-                  </div>
+            <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Controls */}
+              <div className="glass-panel p-6 rounded-3xl flex flex-col h-full">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-bold text-white">
+                    {getText("dataInput", lang)}
+                  </h2>
+                  <button
+                    onClick={addItem}
+                    className="px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-lg font-bold text-sm transition-all shadow-lg"
+                  >
+                    + {getText("addItem", lang)}
+                  </button>
                 </div>
 
-                <div className="mt-6 bg-pink-50 p-4 rounded-xl text-pink-800 text-sm border border-pink-100">
-                  <p>💡 計算圓心角公式:</p>
-                  <p className="font-mono mt-1">(數值 ÷ 總和) × 360°</p>
+                <div className="flex-1 overflow-y-auto pr-2 space-y-3 custom-scrollbar">
+                  <AnimatePresence>
+                    {items.map((item, idx) => (
+                      <motion.div
+                        key={item.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        className="flex items-center gap-3 bg-slate-800/50 p-3 rounded-xl border border-slate-700"
+                      >
+                        <div
+                          className="w-6 h-6 rounded-full shrink-0"
+                          style={{ backgroundColor: item.color }}
+                        ></div>
+                        <input
+                          type="text"
+                          value={item.name}
+                          onChange={(e) =>
+                            updateItem(item.id, "name", e.target.value)
+                          }
+                          className="w-24 bg-transparent border-b border-transparent focus:border-purple-500 outline-none text-white font-bold"
+                          placeholder={getText("item", lang)}
+                        />
+                        <input
+                          type="number"
+                          value={item.val}
+                          onChange={(e) =>
+                            updateItem(
+                              item.id,
+                              "val",
+                              Math.max(0, parseInt(e.target.value) || 0)
+                            )
+                          }
+                          className="flex-1 bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-right font-mono"
+                        />
+                        <button
+                          onClick={() => removeItem(item.id)}
+                          className="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-red-400 transition-colors"
+                        >
+                          ×
+                        </button>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+
+                <div className="mt-6 pt-6 border-t border-white/10 flex justify-between items-center">
+                  <span className="text-slate-400 font-bold uppercase">
+                    {getText("total", lang)}
+                  </span>
+                  <span className="text-2xl font-black text-white">
+                    {total}
+                  </span>
+                </div>
+              </div>
+
+              {/* Visualization */}
+              <div className="flex flex-col gap-6">
+                <div className="glass-panel p-8 rounded-3xl flex items-center justify-center min-h-[400px] relative">
+                  <div className="absolute inset-0 bg-purple-900/10 -z-10 rounded-3xl"></div>
+
+                  <svg
+                    width="360"
+                    height="360"
+                    viewBox="0 0 360 360"
+                    className="overflow-visible filter drop-shadow-2xl"
+                  >
+                    {total > 0 &&
+                      slices.map((slice) => {
+                        // Calculate text position
+                        const midAngle = slice.start + slice.angle / 2;
+                        const rad = ((midAngle - 90) * Math.PI) / 180;
+                        const textR = 140; // radius for text
+                        const textX = 180 + textR * Math.cos(rad);
+                        const textY = 180 + textR * Math.sin(rad);
+
+                        return (
+                          <g key={slice.id} className="group cursor-pointer">
+                            <motion.path
+                              d={getPiePath(
+                                180,
+                                180,
+                                160,
+                                slice.start,
+                                slice.end
+                              )}
+                              fill={slice.color}
+                              stroke="rgba(255,255,255,0.1)"
+                              strokeWidth="1"
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              transition={{
+                                type: "spring",
+                                delay: slice.id * 0.1,
+                              }}
+                              whileHover={{
+                                scale: 1.05,
+                                originX: "180px",
+                                originY: "180px",
+                              }}
+                            />
+                            {slice.angle > 15 && (
+                              <text
+                                x={textX}
+                                y={textY}
+                                textAnchor="middle"
+                                dominantBaseline="middle"
+                                className="pointer-events-none fill-white font-bold text-sm drop-shadow-md"
+                              >
+                                {Math.round(slice.percent)}%
+                              </text>
+                            )}
+                          </g>
+                        );
+                      })}
+                    {total === 0 && (
+                      <circle cx="180" cy="180" r="160" fill="#334155" />
+                    )}
+                  </svg>
+                </div>
+
+                {/* Data Table */}
+                <div className="glass-panel p-6 rounded-3xl overflow-hidden">
+                  <table className="w-full text-sm text-left">
+                    <thead className="text-xs text-slate-400 uppercase bg-slate-800/50">
+                      <tr>
+                        <th className="px-4 py-3 rounded-l-lg">
+                          {getText("item", lang)}
+                        </th>
+                        <th className="px-4 py-3">
+                          {getText("fraction", lang)}
+                        </th>
+                        <th className="px-4 py-3">
+                          {getText("percent", lang)}
+                        </th>
+                        <th className="px-4 py-3 rounded-r-lg text-right">
+                          {getText("angle", lang)}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {slices.map((slice) => (
+                        <tr
+                          key={slice.id}
+                          className="hover:bg-white/5 transition-colors"
+                        >
+                          <td className="px-4 py-3 font-bold flex items-center gap-2">
+                            <div
+                              className="w-3 h-3 rounded-full"
+                              style={{ backgroundColor: slice.color }}
+                            ></div>
+                            {slice.name}
+                          </td>
+                          <td className="px-4 py-3 font-mono text-slate-300">
+                            {slice.val}/{total}
+                          </td>
+                          <td className="px-4 py-3 font-mono text-slate-300">
+                            {slice.percent.toFixed(1)}%
+                          </td>
+                          <td className="px-4 py-3 font-mono font-bold text-right text-purple-300">
+                            {slice.angle.toFixed(1)}°
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

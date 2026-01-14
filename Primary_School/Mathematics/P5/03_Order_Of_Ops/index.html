@@ -10,92 +10,230 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #f0fdf4 0%, #bbf7d0 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
+      const { useState, useEffect } = React;
       const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
+
+      const t = {
+        title: {
+          en: "Order of Operations",
+          zh: "四則運算 (無括號)",
+          ja: "演算の順序",
+          ko: "연산 순서",
+          es: "Orden de Operaciones",
+          de: "Rechenregeln",
+          fi: "Laskujärjestys",
+          fr: "Ordre des opérations",
+          ar: "ترتيب العمليات",
+          it: "Ordine delle Operazioni",
+        },
+        step: {
+          en: "Step",
+          zh: "步驟",
+          ja: "ステップ",
+          ko: "단계",
+          es: "Paso",
+          de: "Schritt",
+          fi: "Vaihe",
+          fr: "Étape",
+          ar: "خطوة",
+          it: "Passo",
+        },
+        next: {
+          en: "Next",
+          zh: "下一步",
+          ja: "次へ",
+          ko: "다음",
+          es: "Siguiente",
+          de: "Weiter",
+          fi: "Seuraava",
+          fr: "Suivant",
+          ar: "التالي",
+          it: "Avanti",
+        },
+        newProblem: {
+          en: "New Problem",
+          zh: "新題目",
+          ja: "新しい問題",
+          ko: "새 문제",
+          es: "Nuevo Problema",
+          de: "Neue Aufgabe",
+          fi: "Uusi tehtävä",
+          fr: "Nouveau problème",
+          ar: "مسألة جديدة",
+          it: "Nuovo Problema",
+        },
+        rule: {
+          en: "Rule: × ÷ before + -",
+          zh: "口訣：先乘除，後加減",
+          ja: "ルール: × ÷ が先",
+          ko: "규칙: 곱셈 나눗셈 먼저",
+          es: "Regla: × ÷ antes de + -",
+          de: "Regel: Punkt vor Strich",
+          fi: "Sääntö: × ÷ ennen + -",
+          fr: "Règle : × ÷ avant + -",
+          ar: "القاعدة: × ÷ قبل + -",
+          it: "Regola: × ÷ prima di + -",
+        },
+      };
+
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
 
       function App() {
-        const problems = [
-          { expr: "3 + 4 × 5", steps: ["3 + 20", "23"], answer: 23 },
-          { expr: "12 - 6 ÷ 2", steps: ["12 - 3", "9"], answer: 9 },
-          {
-            expr: "8 × 2 + 6 ÷ 3",
-            steps: ["16 + 6 ÷ 3", "16 + 2", "18"],
-            answer: 18,
-          },
-          {
-            expr: "20 ÷ 4 × 3 + 1",
-            steps: ["5 × 3 + 1", "15 + 1", "16"],
-            answer: 16,
-          },
-          {
-            expr: "15 - 3 × 4 + 2",
-            steps: ["15 - 12 + 2", "3 + 2", "5"],
-            answer: 5,
-          },
-        ];
-
-        const [current, setCurrent] = useState(0);
+        const [lang, setLang] = useState("zh");
+        const [problemIdx, setProblemIdx] = useState(0);
         const [step, setStep] = useState(0);
 
-        const p = problems[current];
-        const nextStep = () => setStep((s) => Math.min(s + 1, p.steps.length));
-        const nextProblem = () => {
-          setCurrent((current + 1) % problems.length);
+        const problems = [
+          {
+            id: 1,
+            expr: "3 + 4 × 5",
+            steps: ["3 + 20", "23"],
+            highlight: [
+              [4, 6],
+              [0, 2],
+            ],
+          },
+          {
+            id: 2,
+            expr: "18 - 6 ÷ 3",
+            steps: ["18 - 2", "16"],
+            highlight: [
+              [5, 7],
+              [0, 2],
+            ],
+          },
+          {
+            id: 3,
+            expr: "2 + 3 × 4 - 5",
+            steps: ["2 + 12 - 5", "14 - 5", "9"],
+            highlight: [
+              [4, 6],
+              [0, 2],
+              [0, 2],
+            ],
+          },
+          {
+            id: 4,
+            expr: "20 ÷ 5 × 2",
+            steps: ["4 × 2", "8"],
+            highlight: [
+              [0, 2],
+              [0, 2],
+            ],
+          }, // Left to right
+        ];
+
+        const p = problems[problemIdx];
+
+        const nextStep = () =>
+          setStep((prev) => Math.min(prev + 1, p.steps.length));
+        const newProblem = () => {
+          setProblemIdx((prev) => (prev + 1) % problems.length);
           setStep(0);
         };
 
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-emerald-900 mb-2">
-              🔢 四則運算 (無括號)
-            </h1>
-            <p className="text-xl text-emerald-700 font-bold mb-8">
-              Order of Operations (No Brackets)
-            </p>
+          <div className="min-h-screen flex flex-col items-center p-4 font-sans bg-slate-900 text-white">
+            <div className="w-full max-w-4xl flex justify-between items-center mb-10">
+              <h1 className="text-4xl font-black text-emerald-400 drop-shadow-[0_0_15px_rgba(52,211,153,0.5)]">
+                🔢 {getText("title", lang)}
+              </h1>
+              <div className="flex bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-emerald-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-2xl w-full">
-              <div className="bg-emerald-50 rounded-2xl p-6 mb-6 text-center">
-                <div className="text-sm text-emerald-600 font-bold mb-2">
-                  題目 Problem {current + 1}/{problems.length}
-                </div>
-                <div className="text-5xl font-black text-slate-800 font-mono">
-                  {p.expr}
-                </div>
+            <div className="w-full max-w-3xl glass-panel p-8 md:p-12 rounded-3xl flex flex-col items-center gap-8 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-2 bg-emerald-500/30">
+                <motion.div
+                  className="h-full bg-emerald-500"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${(step / p.steps.length) * 100}%` }}
+                />
               </div>
 
-              <div className="bg-slate-50 rounded-2xl p-6 mb-6 min-h-[200px]">
-                <h3 className="font-bold text-slate-600 mb-4">
-                  計算步驟 Steps:
-                </h3>
-                <div className="space-y-3">
+              {/* Primary Display */}
+              <div className="text-center space-y-4">
+                <div className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-4">
+                  Problem {problemIdx + 1}
+                </div>
+
+                <div className="space-y-4">
+                  {/* Original Expression */}
+                  <div
+                    className={`text-4xl md:text-6xl font-black font-mono transition-opacity ${
+                      step > 0 ? "opacity-50 blur-[1px]" : "text-white"
+                    }`}
+                  >
+                    {p.expr}
+                  </div>
+
+                  {/* Steps */}
                   <AnimatePresence>
                     {p.steps.map(
                       (s, i) =>
                         step > i && (
                           <motion.div
                             key={i}
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className={`text-2xl font-mono p-3 rounded-lg ${
+                            initial={{ opacity: 0, scale: 0.9, y: -20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            className={`font-mono font-bold ${
                               i === p.steps.length - 1
-                                ? "bg-emerald-100 text-emerald-700 font-black"
-                                : "bg-white text-slate-700"
+                                ? "text-5xl md:text-7xl text-emerald-400 mt-6"
+                                : "text-3xl md:text-5xl text-slate-300"
                             }`}
                           >
-                            {i === p.steps.length - 1 ? "= " : "→ "}
+                            <span className="text-slate-600 mr-4 text-2xl align-middle">
+                              =
+                            </span>
                             {s}
                           </motion.div>
                         )
@@ -104,59 +242,40 @@
                 </div>
               </div>
 
-              <div className="flex justify-center gap-4">
-                <button
-                  onClick={nextStep}
-                  disabled={step >= p.steps.length}
-                  className="px-8 py-3 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 disabled:opacity-50 shadow-lg"
-                >
-                  下一步 Next
-                </button>
-                <button
-                  onClick={nextProblem}
-                  className="px-8 py-3 bg-slate-200 text-slate-700 rounded-xl font-bold hover:bg-slate-300 shadow-lg"
-                >
-                  下一題 Next Problem
-                </button>
-              </div>
+              {/* Controls Area */}
+              <div className="mt-8 flex flex-col gap-4 w-full max-w-md">
+                <div className="p-4 bg-emerald-900/20 border border-emerald-500/30 rounded-xl text-center text-emerald-300 font-bold">
+                  {getText("rule", lang)}
+                </div>
 
-              <div className="mt-8 bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
-                <h3 className="font-black mb-2">📖 運算次序規則 Rules:</h3>
-                <ol className="list-decimal list-inside space-y-1">
-                  <li>
-                    先做 <span className="font-bold">乘法 ×</span> 和{" "}
-                    <span className="font-bold">除法 ÷</span> (由左至右)
-                  </li>
-                  <li>
-                    後做 <span className="font-bold">加法 +</span> 和{" "}
-                    <span className="font-bold">減法 −</span> (由左至右)
-                  </li>
-                </ol>
-                <p className="mt-2 text-sm">
-                  First: Multiplication & Division (left to right), Then:
-                  Addition & Subtraction (left to right)
-                </p>
+                <div className="flex gap-4">
+                  <button
+                    onClick={nextStep}
+                    disabled={step >= p.steps.length}
+                    className={`flex-1 py-4 rounded-xl font-black text-xl shadow-lg transition-transform active:scale-95 ${
+                      step >= p.steps.length
+                        ? "bg-slate-700 text-slate-500"
+                        : "bg-emerald-500 hover:bg-emerald-400 text-slate-900"
+                    }`}
+                  >
+                    {getText("next", lang)} ➔
+                  </button>
+
+                  <button
+                    onClick={newProblem}
+                    className="flex-1 py-4 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-bold transition-colors"
+                  >
+                    {getText("newProblem", lang)}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

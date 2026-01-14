@@ -3,12 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小三數學：神奇陣列圖</title>
+    <title>小三數學：神奇陣列圖 | Magic Array</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -25,31 +26,161 @@
     <script type="text/babel">
       const { useState } = React;
       const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Magic Array",
+          zh: "神奇陣列圖",
+          ja: "魔法の配列",
+          ko: "마법 배열",
+          es: "Matriz mágica",
+          de: "Magisches Array",
+          fi: "Taikataulukko",
+          fr: "Tableau magique",
+          ar: "المصفوفة السحرية",
+          it: "Matrice magica",
+        },
+        settings: {
+          en: "Array Settings",
+          zh: "設定陣列",
+          ja: "配列設定",
+          ko: "배열 설정",
+          es: "Configuración de la matriz",
+          de: "Array-Einstellungen",
+          fi: "Taulukon asetukset",
+          fr: "Paramètres du tableau",
+          ar: "إعدادات المصفوفة",
+          it: "Impostazioni matrice",
+        },
+        rows: {
+          en: "Rows",
+          zh: "行數",
+          ja: "行",
+          ko: "행",
+          es: "Filas",
+          de: "Zeilen",
+          fi: "Rivit",
+          fr: "Lignes",
+          ar: "الصفوف",
+          it: "Righe",
+        },
+        cols: {
+          en: "Columns",
+          zh: "列數",
+          ja: "列",
+          ko: "열",
+          es: "Columnas",
+          de: "Spalten",
+          fi: "Sarakkeet",
+          fr: "Colonnes",
+          ar: "الأعمدة",
+          it: "Colonne",
+        },
+        selectIcon: {
+          en: "Select Icon",
+          zh: "選擇圖案",
+          ja: "アイコンを選択",
+          ko: "아이콘 선택",
+          es: "Seleccionar icono",
+          de: "Symbol wählen",
+          fi: "Valitse kuvake",
+          fr: "Sélectionner l'icône",
+          ar: "اختر الرمز",
+          it: "Seleziona icona",
+        },
+        formula: {
+          en: "Multiplication Formula",
+          zh: "乘法算式",
+          ja: "掛け算の式",
+          ko: "곱셈 공식",
+          es: "Fórmula de multiplicación",
+          de: "Multiplikationsformel",
+          fi: "Kertolaskukaava",
+          fr: "Formule de multiplication",
+          ar: "صيغة الضرب",
+          it: "Formula di moltiplicazione",
+        },
+        legendTitle: {
+          en: "Legend",
+          zh: "圖例",
+          ja: "凡例",
+          ko: "범례",
+          es: "Leyenda",
+          de: "Legende",
+          fi: "Selite",
+          fr: "Légende",
+          ar: "المفتاح",
+          it: "Legenda",
+        },
+        vertical: {
+          en: "Rows (Vertical)",
+          zh: "行數 (縱向)",
+          ja: "行 (垂直)",
+          ko: "행 (수직)",
+          es: "Filas (Vertical)",
+          de: "Zeilen (Vertikal)",
+          fi: "Rivit (Pysty)",
+          fr: "Lignes (Vertical)",
+          ar: "الصفوف (عمودي)",
+          it: "Righe (Verticale)",
+        },
+        horizontal: {
+          en: "Columns (Horizontal)",
+          zh: "列數 (橫向)",
+          ja: "列 (水平)",
+          ko: "열 (수평)",
+          es: "Columnas (Horizontal)",
+          de: "Spalten (Horizontal)",
+          fi: "Sarakkeet (Vaaka)",
+          fr: "Colonnes (Horizontal)",
+          ar: "الأعمدة (أفقي)",
+          it: "Colonne (Orizzontale)",
+        },
+        desc: {
+          en: "{r} Rows, {c} per row",
+          zh: "{r} 行，每行 {c} 個",
+          ja: "{r} 行、各行 {c} 個",
+          ko: "{r} 행, 각 행에 {c} 개",
+          es: "{r} Filas, {c} por fila",
+          de: "{r} Zeilen, {c} pro Zeile",
+          fi: "{r} riviä, {c} per rivi",
+          fr: "{r} Lignes, {c} par ligne",
+          ar: "{r} صفوف، {c} في كل صف",
+          it: "{r} Righe, {c} per riga",
+        },
+      };
 
       function App() {
+        const [lang, setLang] = useState("zh");
         const [rows, setRows] = useState(3);
         const [cols, setCols] = useState(4);
         const icons = ["🍎", "⭐", "⚽", "🐱", "🚀", "💎"];
         const [icon, setIcon] = useState("🍎");
 
         const total = rows * cols;
+        const getDescText = () =>
+          (t.desc[lang] || t.desc["en"])
+            .replace("{r}", rows)
+            .replace("{c}", cols);
 
         return (
           <div className="min-h-screen p-8 flex flex-col items-center text-white">
-            <h1 className="text-6xl font-black text-indigo-100 mb-8 drop-shadow-md">
-              神奇陣列圖
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-6xl font-black text-indigo-100 mb-8 mt-8 drop-shadow-md text-center">
+              {t.title[lang] || t.title["en"]}
             </h1>
 
             <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8">
               {/* Control Panel */}
               <div className="lg:col-span-4 bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 shadow-xl">
                 <h2 className="text-2xl font-bold mb-6 text-indigo-200">
-                  設定陣列
+                  {t.settings[lang] || t.settings["en"]}
                 </h2>
 
                 <div className="mb-8">
                   <label className="flex justify-between text-lg font-bold mb-2">
-                    <span>行數 (Rows)</span>
+                    <span>{t.rows[lang] || t.rows["en"]}</span>
                     <span className="text-indigo-300">{rows}</span>
                   </label>
                   <input
@@ -64,7 +195,7 @@
 
                 <div className="mb-8">
                   <label className="flex justify-between text-lg font-bold mb-2">
-                    <span>列數 (Columns)</span>
+                    <span>{t.cols[lang] || t.cols["en"]}</span>
                     <span className="text-indigo-300">{cols}</span>
                   </label>
                   <input
@@ -78,7 +209,9 @@
                 </div>
 
                 <div className="mb-8">
-                  <div className="text-lg font-bold mb-3">選擇圖案</div>
+                  <div className="text-lg font-bold mb-3">
+                    {t.selectIcon[lang] || t.selectIcon["en"]}
+                  </div>
                   <div className="flex gap-2 flex-wrap">
                     {icons.map((ic) => (
                       <button
@@ -97,7 +230,9 @@
                 </div>
 
                 <div className="bg-indigo-600 rounded-2xl p-6 text-center">
-                  <div className="text-indigo-200 font-bold mb-2">乘法算式</div>
+                  <div className="text-indigo-200 font-bold mb-2">
+                    {t.formula[lang] || t.formula["en"]}
+                  </div>
                   <div className="text-4xl font-black">
                     <span className="text-pink-300">{rows}</span> ×{" "}
                     <span className="text-cyan-300">{cols}</span> ={" "}
@@ -109,7 +244,7 @@
               {/* Visualization Area */}
               <div className="lg:col-span-8 bg-white rounded-3xl p-8 shadow-2xl text-slate-800 flex flex-col items-center justify-center min-h-[500px] relative overflow-hidden">
                 <div className="absolute top-4 left-4 text-slate-400 font-bold text-sm">
-                  {rows} 行，每行 {cols} 個
+                  {getDescText()}
                 </div>
 
                 <motion.div
@@ -138,14 +273,14 @@
                   )}
                 </motion.div>
 
-                <div className="mt-8 flex gap-8 text-sm font-bold text-slate-400">
+                <div className="mt-8 flex flex-wrap gap-8 text-sm font-bold text-slate-400 justify-center">
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 rounded-full bg-pink-400"></div>{" "}
-                    行數 (Vertical)
+                    {t.vertical[lang] || t.vertical["en"]}
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 rounded-full bg-cyan-400"></div>{" "}
-                    列數 (Horizontal)
+                    {t.horizontal[lang] || t.horizontal["en"]}
                   </div>
                 </div>
               </div>
@@ -157,20 +292,5 @@
       const root = ReactDOM.createRoot(document.getElementById("root"));
       root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

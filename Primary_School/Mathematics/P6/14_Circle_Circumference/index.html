@@ -3,128 +3,409 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小六數學：圓周長 | Circumference</title>
+    <title>小六數學：圓周長 | Circumference Roller</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #ecfccb 0%, #84cc16 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
+      const { useState, useEffect, useRef } = React;
+      const { motion, useAnimation } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
+
+      const t = {
+        title: {
+          en: "Circumference Roller",
+          zh: "圓周滾動實驗",
+          ja: "円周ローラー",
+          ko: "원둘레 롤러",
+          es: "Rodillo de Circunferencia",
+          de: "Umfangsroller",
+          fi: "Kehärulla",
+          fr: "Rouleau de circonférence",
+          ar: "أسطوانة المحيط",
+          it: "Rullo Circonferenza",
+        },
+        diameter: {
+          en: "Diameter",
+          zh: "直徑",
+          ja: "直径",
+          ko: "지름",
+          es: "Diámetro",
+          de: "Durchmesser",
+          fi: "Halkaisija",
+          fr: "Diamètre",
+          ar: "القطر",
+          it: "Diametro",
+        },
+        circumference: {
+          en: "Circumference",
+          zh: "圓周",
+          ja: "円周",
+          ko: "원둘레",
+          es: "Circunferencia",
+          de: "Umfang",
+          fi: "Kehä",
+          fr: "Circonférence",
+          ar: "المحيط",
+          it: "Circonferenza",
+        },
+        roll: {
+          en: "Roll It!",
+          zh: "滾動它！",
+          ja: "転がそう！",
+          ko: "굴려보세요!",
+          es: "¡Ruedalo!",
+          de: "Roll es!",
+          fi: "Pyöritä!",
+          fr: "Roulez !",
+          ar: "دحرجها!",
+          it: "Rotola!",
+        },
+        reset: {
+          en: "Reset",
+          zh: "重置",
+          ja: "リセット",
+          ko: "초기화",
+          es: "Reiniciar",
+          de: "Zurücksetzen",
+          fi: "Nollaa",
+          fr: "Rétablir",
+          ar: "إعادة ضبط",
+          it: "Reimposta",
+        },
+        formula: {
+          en: "C = π × d",
+          zh: "圓周 = π × 直徑",
+          ja: "C = π × d",
+          ko: "C = π × d",
+          es: "C = π × d",
+          de: "C = π × d",
+          fi: "C = π × d",
+          fr: "C = π × d",
+          ar: "C = π × d",
+          it: "C = π × d",
+        },
+        explanation: {
+          en: "When a circle rolls one full turn, the distance it covers is equal to its circumference.",
+          zh: "當圓形滾動一整圈時，它覆蓋的距離等於它的圓周。",
+          ja: "円が1回転すると、移動距離は円周に等しくなります。",
+          ko: "원이 한 바퀴 구르면 이동한 거리는 원둘레와 같습니다.",
+          es: "Cuando un círculo da una vuelta completa, la distancia que cubre es igual a su circunferencia.",
+          de: "Wenn ein Kreis eine volle Umdrehung macht, entspricht die zurückgelegte Strecke seinem Umfang.",
+          fi: "Kun ympyrä pyörii yhden täyden kierroksen, sen kattama matka on yhtä suuri kuin sen kehä.",
+          fr: "Lorsqu'un cercle fait un tour complet, la distance parcourue est égale à sa circonférence.",
+          ar: "عندما تدور الدائرة دورة كاملة، تكون المسافة التي تقطعها مساوية لمحيطها.",
+          it: "Quando un cerchio fa un giro completo, la distanza che copre è uguale alla sua circonferenza.",
+        },
+      };
+
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
       function App() {
+        const [lang, setLang] = useState("zh");
         const [d, setD] = useState(10);
-        const pi = 3.14;
-        const c = d * pi;
+        const [isRolling, setIsRolling] = useState(false);
+        const [rollProgress, setRollProgress] = useState(0); // 0 to 1
+
+        // Animation
+        const controls = useAnimation();
+
+        const PI = 3.14159;
+        const C = d * PI;
+
+        // Canvas Scale: 1 unit = 10px
+        const SCALE = 10;
+        const radiusPx = (d / 2) * SCALE;
+        const circumPx = C * SCALE;
+
+        const animateRoll = async () => {
+          if (isRolling) return;
+          setIsRolling(true);
+
+          // Animate progress 0 -> 1
+          await controls.start({
+            x: circumPx,
+            rotate: 360,
+            transition: { duration: 3, ease: "easeInOut" },
+          });
+
+          setRollProgress(1);
+        };
+
+        const reset = () => {
+          controls.set({ x: 0, rotate: 0 });
+          setRollProgress(0);
+          setIsRolling(false);
+        };
+
+        // Reset when diameter changes
+        useEffect(() => {
+          reset();
+        }, [d]);
 
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-lime-900 mb-2">
-              📏 圓周長
-            </h1>
-            <p className="text-xl text-lime-700 font-bold mb-8">
-              Circumference
-            </p>
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-2xl w-full">
-              <div className="flex flex-col items-center mb-8">
-                <svg viewBox="0 0 220 220" className="w-64 h-64 mb-6">
-                  <circle
-                    cx="110"
-                    cy="110"
-                    r="100"
-                    fill="none"
-                    stroke="#84cc16"
-                    strokeWidth="4"
-                    strokeDasharray="10,5"
-                  />
-                  <line
-                    x1="10"
-                    y1="110"
-                    x2="210"
-                    y2="110"
-                    stroke="#ef4444"
-                    strokeWidth="2"
-                    markerEnd="url(#arrow)"
-                  />
-                  <text
-                    x="110"
-                    y="100"
-                    textAnchor="middle"
-                    className="font-bold fill-red-600 text-lg"
+          <div className="min-h-screen flex flex-col items-center p-4 font-sans bg-slate-900 text-white">
+            <div className="w-full max-w-5xl flex justify-between items-center mb-8">
+              <h1 className="text-4xl font-black text-lime-400 drop-shadow-[0_0_10px_rgba(163,230,53,0.5)]">
+                🌀 {getText("title", lang)}
+              </h1>
+              <div className="flex bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-lime-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
                   >
-                    直徑 d = {d} cm
-                  </text>
-                  <circle cx="110" cy="110" r="4" fill="#1e293b" />
-                </svg>
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-                <div className="w-full flex items-center gap-4">
-                  <span className="font-bold text-lime-900 text-lg whitespace-nowrap">
-                    直徑 Diameter (cm):
-                  </span>
+            <div className="w-full max-w-5xl glass-panel p-8 rounded-3xl mb-8 overflow-hidden relative border border-white/10 shadow-2xl">
+              <div className="absolute inset-0 bg-slate-900/50 -z-10"></div>
+
+              {/* Rolling Stage */}
+              <div className="h-64 relative border-b-4 border-slate-600 mb-8 flex items-end">
+                {/* Ruler Markings */}
+                <div className="absolute bottom-0 left-10 right-0 h-4 flex items-end overflow-hidden">
+                  {Array.from({ length: 40 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="absolute bottom-0 w-px bg-slate-500"
+                      style={{
+                        left: `${i * SCALE * 10}px`,
+                        height: i % 5 === 0 ? "16px" : "8px",
+                      }}
+                    >
+                      {i % 5 === 0 && (
+                        <span className="absolute -top-6 -left-2 text-xs text-slate-500 font-mono">
+                          {i * 10}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* The Circle Group */}
+                {/* Initial Position: x = 10 (padding) + radiusPx */}
+                {/* But we animate x offset. */}
+                <motion.div
+                  animate={controls}
+                  className="absolute bottom-[4px]" // Sit on the line
+                  style={{
+                    left: "40px", // Start padding
+                    width: d * SCALE,
+                    height: d * SCALE,
+                    originX: 0.5,
+                    originY: 0.5,
+                  }}
+                >
+                  <svg
+                    width={d * SCALE}
+                    height={d * SCALE}
+                    viewBox={`0 0 ${d * SCALE} ${d * SCALE}`}
+                    className="overflow-visible"
+                  >
+                    {/* Wheel */}
+                    <circle
+                      cx={(d * SCALE) / 2}
+                      cy={(d * SCALE) / 2}
+                      r={(d * SCALE) / 2 - 2}
+                      fill="rgba(132, 204, 22, 0.2)"
+                      stroke="#a3e635"
+                      strokeWidth="4"
+                    />
+                    {/* Spokes for rotation visibility */}
+                    <line
+                      x1={(d * SCALE) / 2}
+                      y1={(d * SCALE) / 2}
+                      x2={(d * SCALE) / 2}
+                      y2={0}
+                      stroke="#a3e635"
+                      strokeWidth="2"
+                    />
+                    <line
+                      x1={(d * SCALE) / 2}
+                      y1={(d * SCALE) / 2}
+                      x2={d * SCALE}
+                      y2={(d * SCALE) / 2}
+                      stroke="#a3e635"
+                      strokeWidth="2"
+                    />
+                    <line
+                      x1={(d * SCALE) / 2}
+                      y1={(d * SCALE) / 2}
+                      x2={0}
+                      y2={(d * SCALE) / 2}
+                      stroke="#a3e635"
+                      strokeWidth="2"
+                    />
+                    <line
+                      x1={(d * SCALE) / 2}
+                      y1={(d * SCALE) / 2}
+                      x2={(d * SCALE) / 2}
+                      y2={d * SCALE}
+                      stroke="#a3e635"
+                      strokeWidth="2"
+                    />
+
+                    {/* Diameter Line */}
+                    <line
+                      x1="0"
+                      y1={(d * SCALE) / 2}
+                      x2={d * SCALE}
+                      y2={(d * SCALE) / 2}
+                      stroke="#ef4444"
+                      strokeWidth="4"
+                      strokeDasharray="8,4"
+                    />
+
+                    {/* Label */}
+                    <foreignObject
+                      x={0}
+                      y={(d * SCALE) / 2 - 30}
+                      width={d * SCALE}
+                      height="30"
+                    >
+                      <div className="w-full text-center text-red-400 font-bold text-xs bg-black/50 rounded backdrop-blur-sm">
+                        d={d}
+                      </div>
+                    </foreignObject>
+                  </svg>
+                </motion.div>
+
+                {/* Trailing Line (Unwrapped Circumference) */}
+                <svg
+                  className="absolute bottom-[4px] left-[40px] overflow-visible pointer-events-none"
+                  width={circumPx + 100}
+                  height="20"
+                >
+                  {isRolling && (
+                    <motion.line
+                      x1="0"
+                      y1="0"
+                      x2={circumPx}
+                      y2="0"
+                      stroke="#ec4899"
+                      strokeWidth="6"
+                      strokeLinecap="round"
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ duration: 3, ease: "easeInOut" }}
+                    />
+                  )}
+                </svg>
+              </div>
+
+              {/* Controls & Result */}
+              <div className="flex flex-col md:flex-row gap-8 items-center justify-between">
+                <div className="w-full md:w-1/2 space-y-4">
+                  <div className="flex justify-between font-bold text-lime-200">
+                    <label>{getText("diameter", lang)}</label>
+                    <span className="font-mono text-xl">{d} cm</span>
+                  </div>
                   <input
                     type="range"
-                    min="1"
-                    max="50"
+                    min="2"
+                    max="25"
+                    step="1"
                     value={d}
-                    onChange={(e) => setD(parseInt(e.target.value))}
-                    className="w-full accent-lime-600 h-2 bg-lime-200 rounded-lg appearance-none cursor-pointer"
+                    onChange={(e) => setD(Number(e.target.value))}
+                    disabled={isRolling}
+                    className={`w-full h-4 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-lime-500 ${
+                      isRolling ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                   />
-                  <span className="font-bold text-lime-900 text-xl w-12 text-center">
-                    {d}
-                  </span>
-                </div>
-              </div>
 
-              <div className="bg-lime-50 rounded-2xl p-6 mb-6 text-center border-2 border-lime-200">
-                <p className="text-lg font-bold mb-2">圓周率 π ≈ 3.14</p>
-                <p className="text-xl">圓周 = 直徑 × π &nbsp;&nbsp; (C = πd)</p>
-                <p className="text-sm text-lime-600 mt-1">
-                  或 2 × 半徑 × π &nbsp;&nbsp; (C = 2πr)
-                </p>
-              </div>
+                  <div className="flex gap-4 mt-4">
+                    <button
+                      onClick={animateRoll}
+                      disabled={isRolling && rollProgress < 1}
+                      className={`flex-1 py-3 rounded-xl font-black text-lg uppercase tracking-wide transition-all ${
+                        isRolling
+                          ? "bg-slate-700 text-slate-500"
+                          : "bg-lime-500 hover:bg-lime-400 text-slate-900 shadow-[0_0_20px_rgba(132,204,22,0.4)]"
+                      }`}
+                    >
+                      {getText("roll", lang)}
+                    </button>
+                    <button
+                      onClick={reset}
+                      className="px-6 py-3 rounded-xl font-bold bg-slate-700 text-white hover:bg-slate-600"
+                    >
+                      {getText("reset", lang)}
+                    </button>
+                  </div>
+                </div>
 
-              <div className="bg-emerald-100 rounded-2xl p-6 text-center border-4 border-emerald-300">
-                <div className="text-emerald-600 font-bold">
-                  圓周長 Circumference
-                </div>
-                <div className="text-sm text-emerald-600 mb-1">
-                  {d} × 3.14 =
-                </div>
-                <div className="text-5xl font-black text-emerald-800 flex items-baseline justify-center gap-2">
-                  {c.toFixed(2)} <span className="text-2xl font-bold">cm</span>
+                <div className="flex-1 bg-black/30 p-6 rounded-2xl border border-white/5 w-full">
+                  <div className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">
+                    {getText("circumference", lang)}
+                  </div>
+                  <div className="text-4xl font-black text-white font-mono mb-2">
+                    {C.toFixed(2)}{" "}
+                    <span className="text-lg text-slate-500">cm</span>
+                  </div>
+                  <div className="flex flex-col gap-1 text-sm text-lime-400 font-mono">
+                    <div>{getText("formula", lang)}</div>
+                    <div>
+                      {PI.toFixed(4)} × {d} ≈ {C.toFixed(2)}
+                    </div>
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-white/10 text-xs text-slate-400 italic">
+                    {getText("explanation", lang)}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

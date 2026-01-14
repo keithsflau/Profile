@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小四數學：分數探索樂園</title>
+    <title>小四數學：分數探索樂園 | Fraction Explorer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script
       src="https://unpkg.com/react@18/umd/react.development.js"
@@ -15,14 +15,11 @@
     ></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.min.js"></script>
-
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
     />
-
     <style>
       body {
         font-family: "Fredoka", "Noto Sans TC", sans-serif;
@@ -42,9 +39,235 @@
     <script type="text/babel">
       const { useState, useEffect } = React;
       const { motion } = window.Motion;
-      const { PieChart, Cake, Star, Check } = window.LucideReact;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Fraction Explorer",
+          zh: "分數探索樂園",
+          ja: "分数エクスプローラー",
+          ko: "분수 탐험가",
+          es: "Explorador de Fracciones",
+          de: "Bruchforscher",
+          fi: "Murtolukututkika",
+          fr: "Explorateur de fractions",
+          ar: "مستكشف الكسور",
+          it: "Esploratore di frazioni",
+        },
+        header: {
+          en: "P4 Math",
+          zh: "小四數學",
+          ja: "小4算数",
+          ko: "초4 수학",
+          es: "Matemáticas P4",
+          de: "Mathe 4. Klasse",
+          fi: "4. luokan matematiikka",
+          fr: "Maths P4",
+          ar: "الرياضيات للصف الرابع",
+          it: "Matematica 4a elementare",
+        },
+        subtitle: {
+          en: "Visual Learning",
+          zh: "可視化分數學習",
+          ja: "視覚的学習",
+          ko: "시각적 학습",
+          es: "Aprendizaje visual",
+          de: "Visuelles Lernen",
+          fi: "Visuaalinen oppiminen",
+          fr: "Apprentissage visuel",
+          ar: "التعلم البصري",
+          it: "Apprendimento visivo",
+        },
+        simplified: {
+          en: "Simplified",
+          zh: "最簡分數",
+          ja: "簡約分数",
+          ko: "기약분수",
+          es: "Simplificado",
+          de: "Vereinfacht",
+          fi: "Yksinkertaistettu",
+          fr: "Simplifié",
+          ar: "مبسط",
+          it: "Semplificato",
+        },
+        circle: {
+          en: "Circle",
+          zh: "圓形",
+          ja: "円",
+          ko: "원",
+          es: "Círculo",
+          de: "Kreis",
+          fi: "Ympyrä",
+          fr: "Cercle",
+          ar: "دائرة",
+          it: "Cerchio",
+        },
+        rectangle: {
+          en: "Grid",
+          zh: "方格",
+          ja: "グリッド",
+          ko: "그리드",
+          es: "Cuadrícula",
+          de: "Gitter",
+          fi: "Ruudukko",
+          fr: "Grille",
+          ar: "شبكة",
+          it: "Griglia",
+        },
+        strip: {
+          en: "Strip",
+          zh: "長條",
+          ja: "帯",
+          ko: "띠",
+          es: "Tira",
+          de: "Streifen",
+          fi: "Kaistale",
+          fr: "Bande",
+          ar: "شريط",
+          it: "Striscia",
+        },
+        decimal: {
+          en: "Decimal",
+          zh: "小數",
+          ja: "小数",
+          ko: "소수",
+          es: "Decimal",
+          de: "Dezimal",
+          fi: "Desimaali",
+          fr: "Décimal",
+          ar: "عشري",
+          it: "Decimale",
+        },
+        percentage: {
+          en: "Percentage",
+          zh: "百分比",
+          ja: "パーセンテージ",
+          ko: "백분율",
+          es: "Porcentaje",
+          de: "Prozentsatz",
+          fi: "Prosenttiosuus",
+          fr: "Pourcentage",
+          ar: "النسبة المئوية",
+          it: "Percentuale",
+        },
+        adjust: {
+          en: "Adjust Fraction",
+          zh: "調整分數",
+          ja: "分数を調整",
+          ko: "분수 조정",
+          es: "Ajustar fracción",
+          de: "Bruch anpassen",
+          fi: "Säädä murtolukua",
+          fr: "Ajuster la fraction",
+          ar: "ضبط الكسر",
+          it: "Regola frazione",
+        },
+        numerator: {
+          en: "Numerator (Used)",
+          zh: "分子 (已用部分)",
+          ja: "分子 (使用済み)",
+          ko: "분자 (사용됨)",
+          es: "Numerador (Usado)",
+          de: "Zähler (Verwendet)",
+          fi: "Osoittaja (Käytetty)",
+          fr: "Numérateur (Utilisé)",
+          ar: "البسط (المستخدم)",
+          it: "Numeratore (Usato)",
+        },
+        denominator: {
+          en: "Denominator (Total)",
+          zh: "分母 (總共幾份)",
+          ja: "分母 (合計)",
+          ko: "분모 (총)",
+          es: "Denominador (Total)",
+          de: "Nenner (Gesamt)",
+          fi: "Nimittäjä (Yhteensä)",
+          fr: "Dénominateur (Total)",
+          ar: "المقام (الإجمالي)",
+          it: "Denominatore (Totale)",
+        },
+        knowledge: {
+          en: "Fraction Facts",
+          zh: "分數知識",
+          ja: "分数の知識",
+          ko: "분수 지식",
+          es: "Datos de fracciones",
+          de: "Fakten zu Brüchen",
+          fi: "Murtolukutietoa",
+          fr: "Faits sur les fractions",
+          ar: "حقائق الكسور",
+          it: "Fatti sulle frazioni",
+        },
+        factNum: {
+          en: "Numerator: Top number, parts taken",
+          zh: "分子：分數線上面的數字，代表取了幾份",
+          ja: "分子：上の数字、取られた部分",
+          ko: "분자: 위쪽 숫자, 취한 부분",
+          es: "Numerador: Número superior, partes tomadas",
+          de: "Zähler: Obere Zahl, genommene Teile",
+          fi: "Osoittaja: Ylempi luku, otetut osat",
+          fr: "Numérateur : Nombre du haut, parties prises",
+          ar: "البسط: الرقم العلوي، الأجزاء المأخوذة",
+          it: "Numeratore: Numero superiore, parti prese",
+        },
+        factDen: {
+          en: "Denominator: Bottom number, total parts",
+          zh: "分母：分數線下面的數字，代表總共分成幾份",
+          ja: "分母：下の数字、合計部分",
+          ko: "분모: 아래쪽 숫자, 총 부분",
+          es: "Denominador: Número inferior, partes totales",
+          de: "Nenner: Untere Zahl, Gesamtteile",
+          fi: "Nimittäjä: Alempi luku, kokonaisosat",
+          fr: "Dénominateur : Nombre du bas, parties totales",
+          ar: "المقام: الرقم السفلي، الأجزاء الكلية",
+          it: "Denominatore: Numero inferiore, parti totali",
+        },
+        factProper: {
+          en: "Proper Fraction: Numerator < Denominator",
+          zh: "真分數：分子 < 分母",
+          ja: "真分数：分子 < 分母",
+          ko: "진분수: 분자 < 분모",
+          es: "Fracción propia: Numerador < Denominador",
+          de: "Echter Bruch: Zähler < Nenner",
+          fi: "Aito murtoluku: Osoittaja < Nimittäjä",
+          fr: "Fraction propre : Numérateur < Dénominateur",
+          ar: "كسر حقيقي: البسط < المقام",
+          it: "Frazione propria: Numeratore < Denominatore",
+        },
+        factImproper: {
+          en: "Improper Fraction: Numerator ≥ Denominator",
+          zh: "假分數：分子 ≥ 分母",
+          ja: "仮分数：分子 ≥ 分母",
+          ko: "가분수: 분자 ≥ 분모",
+          es: "Fracción impropia: Numerador ≥ Denominador",
+          de: "Unechter Bruch: Zähler ≥ Nenner",
+          fi: "Epäaito murtoluku: Osoittaja ≥ Nimittäjä",
+          fr: "Fraction impropre : Numérateur ≥ Dénominateur",
+          ar: "كسر غير حقيقي: البسط ≥ المقام",
+          it: "Frazione impropria: Numeratore ≥ Denominatore",
+        },
+      };
+
+      const PieChart = ({ size = 24, className = "" }) => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={className}
+        >
+          <path d="M21.21 15.89A10 10 0 1 1 8 2.83" />
+          <path d="M22 12A10 10 0 0 0 12 2v10z" />
+        </svg>
+      );
 
       function App() {
+        const [lang, setLang] = useState("zh");
         const [numerator, setNumerator] = useState(1);
         const [denominator, setDenominator] = useState(4);
         const [shape, setShape] = useState("circle"); // circle, rectangle, strip
@@ -64,33 +287,6 @@
         const renderCircle = () => {
           const anglePerPart = 360 / denominator;
           const parts = [];
-
-          for (let i = 0; i < denominator; i++) {
-            const angle = anglePerPart * i - 90;
-            const isFilled = i < numerator;
-
-            parts.push(
-              <div
-                key={i}
-                className="absolute w-full h-full"
-                style={{
-                  transformOrigin: "center",
-                  transform: `rotate(${angle}deg)`,
-                }}
-              >
-                <div
-                  className={`absolute w-1/2 h-1/2 origin-bottom-right ${
-                    isFilled ? "bg-yellow-400" : "bg-white/30"
-                  } border-2 border-white`}
-                  style={{
-                    clipPath: `polygon(100% 100%, 100% 0, ${
-                      Math.cos((anglePerPart * Math.PI) / 180) * 100
-                    }% ${Math.sin((anglePerPart * Math.PI) / 180) * 100}%)`,
-                  }}
-                />
-              </div>
-            );
-          }
 
           return (
             <div className="relative w-64 h-64 mx-auto">
@@ -121,6 +317,23 @@
                       Math.sin(
                         ((angle - 90 + 360 / denominator) * Math.PI) / 180
                       );
+
+                  // Handle full circle case
+                  if (denominator === 1) {
+                    return (
+                      <motion.circle
+                        key={i}
+                        cx="100"
+                        cy="100"
+                        r="100"
+                        fill={isFilled ? "#fbbf24" : "#ffffff40"}
+                        stroke="white"
+                        strokeWidth="2"
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                      />
+                    );
+                  }
 
                   return (
                     <motion.path
@@ -187,18 +400,23 @@
           );
         };
 
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <header className="text-center mb-8">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <header className="text-center mb-8 mt-8">
               <div className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-md px-6 py-3 rounded-full mb-4">
                 <PieChart className="text-white" size={24} />
-                <span className="text-white font-bold text-lg">小四數學</span>
+                <span className="text-white font-bold text-lg">
+                  {getText("header")}
+                </span>
               </div>
-              <h1 className="text-5xl md:text-6xl font-black text-white mb-2 tracking-tight">
-                分數探索樂園
+              <h1 className="text-4xl md:text-6xl font-black text-white mb-2 tracking-tight">
+                {getText("title")}
               </h1>
               <p className="text-xl text-white/80 font-medium">
-                可視化分數學習
+                {getText("subtitle")}
               </p>
             </header>
 
@@ -215,13 +433,13 @@
                   {simplified.num !== numerator && (
                     <div className="mt-4 text-2xl font-bold text-purple-600">
                       = {simplified.num}/{simplified.den}{" "}
-                      <span className="text-lg">(最簡分數)</span>
+                      <span className="text-lg">({getText("simplified")})</span>
                     </div>
                   )}
                 </div>
 
                 {/* Shape Selector */}
-                <div className="flex justify-center gap-4 mb-8">
+                <div className="flex justify-center gap-4 mb-8 flex-wrap">
                   <button
                     onClick={() => setShape("circle")}
                     className={`px-6 py-3 rounded-2xl font-bold transition-all ${
@@ -230,7 +448,7 @@
                         : "bg-white/50 text-slate-700"
                     }`}
                   >
-                    圓形
+                    {getText("circle")}
                   </button>
                   <button
                     onClick={() => setShape("rectangle")}
@@ -240,7 +458,7 @@
                         : "bg-white/50 text-slate-700"
                     }`}
                   >
-                    方格
+                    {getText("rectangle")}
                   </button>
                   <button
                     onClick={() => setShape("strip")}
@@ -250,7 +468,7 @@
                         : "bg-white/50 text-slate-700"
                     }`}
                   >
-                    長條
+                    {getText("strip")}
                   </button>
                 </div>
 
@@ -265,7 +483,7 @@
                 <div className="grid grid-cols-2 gap-4 mt-8">
                   <div className="bg-blue-50 rounded-2xl p-4 text-center">
                     <div className="text-sm font-bold text-slate-600 mb-1">
-                      小數
+                      {getText("decimal")}
                     </div>
                     <div className="text-3xl font-black text-blue-600">
                       {decimal}
@@ -273,7 +491,7 @@
                   </div>
                   <div className="bg-green-50 rounded-2xl p-4 text-center">
                     <div className="text-sm font-bold text-slate-600 mb-1">
-                      百分比
+                      {getText("percentage")}
                     </div>
                     <div className="text-3xl font-black text-green-600">
                       {percentage}%
@@ -286,12 +504,12 @@
               <div className="lg:col-span-4 flex flex-col gap-6">
                 <div className="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-lg">
                   <h3 className="text-xl font-black text-purple-600 mb-4">
-                    調整分數
+                    {getText("adjust")}
                   </h3>
 
                   <div className="mb-6">
                     <label className="block text-sm font-bold text-slate-600 mb-2">
-                      分子 (已用部分)
+                      {getText("numerator")}
                     </label>
                     <input
                       type="range"
@@ -308,7 +526,7 @@
 
                   <div className="mb-6">
                     <label className="block text-sm font-bold text-slate-600 mb-2">
-                      分母 (總共幾份)
+                      {getText("denominator")}
                     </label>
                     <input
                       type="range"
@@ -369,20 +587,20 @@
 
                 <div className="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-lg">
                   <h3 className="text-lg font-black text-slate-800 mb-3 flex items-center gap-2">
-                    💡 分數知識
+                    💡 {getText("knowledge")}
                   </h3>
                   <div className="text-sm text-slate-600 leading-relaxed space-y-2">
                     <p>
-                      <strong>分子</strong>：分數線上面的數字，代表取了幾份
+                      <strong>{getText("factNum")}</strong>
                     </p>
                     <p>
-                      <strong>分母</strong>：分數線下面的數字，代表總共分成幾份
+                      <strong>{getText("factDen")}</strong>
                     </p>
                     <p>
-                      <strong>真分數</strong>：分子 &lt; 分母
+                      <strong>{getText("factProper")}</strong>
                     </p>
                     <p>
-                      <strong>假分數</strong>：分子 ≥ 分母
+                      <strong>{getText("factImproper")}</strong>
                     </p>
                   </div>
                 </div>
@@ -395,20 +613,5 @@
       const root = ReactDOM.createRoot(document.getElementById("root"));
       root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

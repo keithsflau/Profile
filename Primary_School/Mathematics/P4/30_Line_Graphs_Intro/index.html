@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小四數學：折線圖入門</title>
+    <title>小四數學：折線圖入門 | Line Graphs Intro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -22,7 +23,76 @@
   <body>
     <div id="root"></div>
     <script type="text/babel">
+      const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Line Graphs Intro",
+          zh: "折線圖入門",
+          ja: "折れ線グラフ入門",
+          ko: "선 그래프 소개",
+          es: "Introducción a los Gráficos de Líneas",
+          de: "Einführung in Liniendiagramme",
+          fi: "Viivakaavioiden esittely",
+          fr: "Introduction aux graphiques linéaires",
+          ar: "مقدمة في الرسوم البيانية الخطية",
+          it: "Introduzione ai grafici lineari",
+        },
+        chartTitle: {
+          en: "Weekly Temperature Change",
+          zh: "一週氣溫變化",
+          ja: "週間気温変化",
+          ko: "주간 기온 변화",
+          es: "Cambio de Temperatura Semanal",
+          de: "Wöchentliche Temperaturänderung",
+          fi: "Viikoittainen lämpötilan muutos",
+          fr: "Changement de température hebdomadaire",
+          ar: "تغير درجة الحرارة الأسبوعي",
+          it: "Variazione della temperatura settimanale",
+        },
+        featuresTitle: {
+          en: "Features of Line Graphs",
+          zh: "折線圖特點",
+          ja: "折れ線グラフの特徴",
+          ko: "선 그래프의 특징",
+          es: "Características de los Gráficos de Líneas",
+          de: "Merkmale von Liniendiagrammen",
+          fi: "Viivakaavioiden ominaisuudet",
+          fr: "Caractéristiques des graphiques linéaires",
+          ar: "ميزات الرسوم البيانية الخطية",
+          it: "Caratteristiche dei grafici lineari",
+        },
+        explanation: {
+          en: "Line graphs are best for showing trends! e.g. temperature changes, grade progress.",
+          zh: "折線圖最適合用來顯示變化趨勢！例如氣溫升降、成績進步退步等。",
+          ja: "折れ線グラフは傾向を示すのに最適です！例：気温の変化、成績の進歩など。",
+          ko: "선 그래프는 추세를 보여주는 데 가장 좋습니다! 예: 기온 변화, 성적 향상 등.",
+          es: "¡Los gráficos de líneas son mejores para mostrar tendencias! p. ej., cambios de temperatura, progreso de calificaciones.",
+          de: "Liniendiagramme eignen sich am besten, um Trends zu zeigen! z. B. Temperaturänderungen, Notenfortschritt.",
+          fi: "Viivakaaviot sopivat parhaiten trendien osoittamiseen! esim. lämpötilan muutokset, arvosanojen kehitys.",
+          fr: "Les graphiques linéaires sont les meilleurs pour montrer les tendances ! par ex. changements de température, progrès scolaire.",
+          ar: "الرسوم البيانية الخطية هي الأفضل لإظهار الاتجاهات! على سبيل المثال تغيرات درجة الحرارة، تقدم الدرجات.",
+          it: "I grafici lineari sono i migliori per mostrare le tendenze! ad es. variazioni di temperatura, progressi scolastici.",
+        },
+        day: {
+          en: "Day",
+          zh: "第",
+          ja: "日目",
+          ko: "일차",
+          es: "Día",
+          de: "Tag",
+          fi: "Päivä",
+          fr: "Jour",
+          ar: "اليوم",
+          it: "Giorno",
+        },
+      };
+
       function App() {
+        const [lang, setLang] = useState("zh");
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
         // Data: Temperature over a week
         const data = [22, 24, 21, 25, 28, 26, 23];
         const max = 30;
@@ -47,13 +117,14 @@
 
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-sky-900 mb-8">
-              📈 折線圖入門 (Line Graphs)
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-sky-900 mb-8 mt-8">
+              📈 {getText("title")}
             </h1>
 
             <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full">
               <h2 className="text-2xl font-bold text-sky-800 mb-6 text-center">
-                一週氣溫變化
+                {getText("chartTitle")}
               </h2>
 
               <div className="overflow-x-auto">
@@ -114,7 +185,7 @@
                         textAnchor="middle"
                         className="text-xs fill-slate-500 font-bold"
                       >
-                        Day {p.day}
+                        {lang === "zh" ? `第${p.day}天` : `Day ${p.day}`}
                       </text>
 
                       {/* Tooltip */}
@@ -143,12 +214,10 @@
               </div>
 
               <div className="mt-8 bg-sky-50 p-6 rounded-2xl text-center text-sky-800">
-                <h3 className="text-xl font-bold mb-2">折線圖特點</h3>
-                <p>
-                  折線圖最適合用來顯示
-                  <span className="font-black text-sky-600">變化趨勢</span>
-                  ！例如氣溫升降、成績進步退步等。
-                </p>
+                <h3 className="text-xl font-bold mb-2">
+                  {getText("featuresTitle")}
+                </h3>
+                <p>{getText("explanation")}</p>
               </div>
             </div>
           </div>
@@ -156,20 +225,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

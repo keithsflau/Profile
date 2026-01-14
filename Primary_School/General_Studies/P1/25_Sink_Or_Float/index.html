@@ -33,28 +33,176 @@
           en: "Sink or Float?",
           zh: "浮沈實驗室",
           ja: "沈む？浮く？",
+          ko: "가라앉을까요, 뜰까요?",
+          es: "¿Hundirse o flotar?",
+          de: "Sinken oder Schwimmen?",
+          fi: "Uppoaako vai kelluuko?",
+          fr: "Couler ou flotter ?",
+          ar: "يغرق أم يطفو؟",
+          it: "Affondare o galleggiare?",
         },
         instruction: {
           en: "Will this object sink or float?",
           zh: "這件物件會浮還是沉？",
           ja: "この物体は沈みますか、それとも浮きますか？",
+          ko: "이 물체는 가라앉을까요, 아니면 뜰까요?",
+          es: "¿Este objeto se hundirá o flotará?",
+          de: "Wird dieses Objekt sinken oder schwimmen?",
+          fi: "Uppoaako vai kelluuko tämä esine?",
+          fr: "Cet objet va-t-il couler ou flotter ?",
+          ar: "هل سيغرق هذا الجسم أم يطفو؟",
+          it: "Questo oggetto affonderà o galleggerà?",
         },
-        sink: { en: "Sink", zh: "沉下去 ↓" },
-        float: { en: "Float", zh: "浮起來 ↑" },
-        correct: { en: "Correct!", zh: "答對了！" },
-        wrong: { en: "Oops! Try to remember.", zh: "哎呀！記住結果哦。" },
-        next: { en: "Next Object", zh: "下一個物件" },
-        completed: { en: "Great Scientist!", zh: "小小科學家！" },
-        restart: { en: "Experiment Again", zh: "再做一次實驗" },
-
-        stone: { en: "Stone", zh: "石頭" },
-        leaf: { en: "Leaf", zh: "樹葉" },
-        coin: { en: "Coin", zh: "硬幣" },
-        duck: { en: "Rubber Duck", zh: "橡皮鴨" },
-        key: { en: "Key", zh: "鑰匙" },
-        sponge: { en: "Sponge", zh: "海綿" },
-        spoon: { en: "Metal Spoon", zh: "鐵匙羹" },
-        boat: { en: "Paper Boat", zh: "紙船" },
+        sink: {
+          en: "Sink",
+          zh: "沉下去 ↓",
+          es: "Hundirse",
+          de: "Sinken",
+          fi: "Uppoaa",
+          fr: "Couler",
+          ar: "يغرق",
+          it: "Affondare",
+        },
+        float: {
+          en: "Float",
+          zh: "浮起來 ↑",
+          es: "Flotar",
+          de: "Schwimmen",
+          fi: "Kelluu",
+          fr: "Flotter",
+          ar: "يطفو",
+          it: "Galleggiare",
+        },
+        correct: {
+          en: "Correct!",
+          zh: "答對了！",
+          es: "¡Correcto!",
+          de: "Richtig!",
+          fi: "Oikein!",
+          fr: "Correct !",
+          ar: "صحيح!",
+          it: "Corretto!",
+        },
+        wrong: {
+          en: "Oops! Try to remember.",
+          zh: "哎呀！記住結果哦。",
+          es: "¡Vaya! Intenta recordar.",
+          de: "Hoppla! Versuch dich zu erinnern.",
+          fi: "Hups! Yritä muistaa.",
+          fr: "Oups ! Essayez de vous souvenir.",
+          ar: "أوبس! حاول أن تتذكر.",
+          it: "Ops! Cerca di ricordare.",
+        },
+        next: {
+          en: "Next Object",
+          zh: "下一個物件",
+          es: "Siguiente objeto",
+          de: "Nächstes Objekt",
+          fi: "Seuraava esine",
+          fr: "Objet suivant",
+          ar: "الجسم التالي",
+          it: "Oggetto successivo",
+        },
+        completed: {
+          en: "Great Scientist!",
+          zh: "小小科學家！",
+          es: "¡Gran científico!",
+          de: "Toller Wissenschaftler!",
+          fi: "Hieno tieteilijä!",
+          fr: "Grand scientifique !",
+          ar: "عالم عظيم!",
+          it: "Grande scienziato!",
+        },
+        restart: {
+          en: "Experiment Again",
+          zh: "再做一次實驗",
+          es: "Experimentar de nuevo",
+          de: "Wieder experimentieren",
+          fi: "Kokeile uudelleen",
+          fr: "Expérimenter à nouveau",
+          ar: "التجربة مرة أخرى",
+          it: "Sperimenta di nuovo",
+        },
+        stone: {
+          en: "Stone",
+          zh: "石頭",
+          es: "Piedra",
+          de: "Stein",
+          fi: "Kivi",
+          fr: "Pierre",
+          ar: "حجر",
+          it: "Pietra",
+        },
+        leaf: {
+          en: "Leaf",
+          zh: "樹葉",
+          es: "Hoja",
+          de: "Blatt",
+          fi: "Lehti",
+          fr: "Feuille",
+          ar: "ورقة",
+          it: "Foglia",
+        },
+        coin: {
+          en: "Coin",
+          zh: "硬幣",
+          es: "Moneda",
+          de: "Münze",
+          fi: "Kolikko",
+          fr: "Pièce",
+          ar: "عملة",
+          it: "Moneta",
+        },
+        duck: {
+          en: "Rubber Duck",
+          zh: "橡皮鴨",
+          es: "Pato de goma",
+          de: "Gummiente",
+          fi: "Kumiankka",
+          fr: "Canard en caoutchouc",
+          ar: "بطة مطاطية",
+          it: "Papera di gomma",
+        },
+        key: {
+          en: "Key",
+          zh: "鑰匙",
+          es: "Llave",
+          de: "Schlüssel",
+          fi: "Avain",
+          fr: "Clé",
+          ar: "مفتاح",
+          it: "Chiave",
+        },
+        sponge: {
+          en: "Sponge",
+          zh: "海綿",
+          es: "Esponja",
+          de: "Schwamm",
+          fi: "Sieni",
+          fr: "Éponge",
+          ar: "إسفنجة",
+          it: "Spugna",
+        },
+        spoon: {
+          en: "Metal Spoon",
+          zh: "鐵匙羹",
+          es: "Cuchara de metal",
+          de: "Metalllöffel",
+          fi: "Metallilusikka",
+          fr: "Cuillère en métal",
+          ar: "ملعقة معدنية",
+          it: "Cucchiaio di metallo",
+        },
+        boat: {
+          en: "Paper Boat",
+          zh: "紙船",
+          es: "Barco de papel",
+          de: "Papierboot",
+          fi: "Paperivene",
+          fr: "Bateau en papier",
+          ar: "قارب ورقي",
+          it: "Barca di carta",
+        },
       };
 
       const items = [
@@ -227,20 +375,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

@@ -3,12 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小三數學：平行與垂直</title>
+    <title>小三數學：平行與垂直 | Parallel & Perpendicular</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -24,19 +24,123 @@
     <div id="root"></div>
     <script type="text/babel">
       const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Parallel & Perpendicular",
+          zh: "平行與垂直",
+          ja: "平行と垂直",
+          ko: "평행과 수직",
+          es: "Paralelo y perpendicular",
+          de: "Parallel und senkrecht",
+          fi: "Samansuuntainen ja kohtisuora",
+          fr: "Parallèle et perpendiculaire",
+          ar: "متوازي ومتعامد",
+          it: "Parallelo e perpendicolare",
+        },
+        parallel: {
+          en: "Parallel Lines",
+          zh: "平行線",
+          ja: "平行線",
+          ko: "평행선",
+          es: "Líneas paralelas",
+          de: "Parallele Linien",
+          fi: "Yhdensuuntaiset viivat",
+          fr: "Lignes parallèles",
+          ar: "خطوط متوازية",
+          it: "Linee parallele",
+        },
+        perpendicular: {
+          en: "Perpendicular Lines",
+          zh: "垂直線",
+          ja: "垂直線",
+          ko: "수직선",
+          es: "Líneas perpendiculares",
+          de: "Senkrechte Linien",
+          fi: "Kohtisuorat viivat",
+          fr: "Lignes perpendiculaires",
+          ar: "خطوط متعامدة",
+          it: "Linee perpendicolari",
+        },
+        rotate: {
+          en: "Rotate to see",
+          zh: "旋轉看看",
+          ja: "回して見る",
+          ko: "회전하여 보기",
+          es: "Girar para ver",
+          de: "Zum Sehen drehen",
+          fi: "Kierrä nähdäksesi",
+          fr: "Faire pivoter pour voir",
+          ar: "تدوير للعرض",
+          it: "Ruota per vedere",
+        },
+        neverIntersect: {
+          en: "Never Intersect",
+          zh: "永不相交",
+          ja: "交わらない",
+          ko: "절대 만나지 않음",
+          es: "Nunca se cruzan",
+          de: "Schneiden sich nie",
+          fi: "Ei koskaan leikkaa",
+          fr: "Ne se croisent jamais",
+          ar: "لا تتقاطع أبدًا",
+          it: "Non si intersecano mai",
+        },
+        paraFeature: {
+          en: "Always same distance apart, never meet (like train tracks).",
+          zh: "兩條直線之間的距離永遠相等，而且永不相交，像火車軌一樣。",
+          ja: "常に同じ距離離れており、決して交わりません（線路のように）。",
+          ko: "항상 같은 거리를 유지하며 절대 만나지 않습니다 (기차 선로처럼).",
+          es: "Siempre a la misma distancia, nunca se encuentran (como vías de tren).",
+          de: "Immer gleicher Abstand, treffen sich nie (wie Bahngleise).",
+          fi: "Aina sama etäisyys, eivät koskaan kohtaa (kuin junaradat).",
+          fr: "Toujours à la même distance, ne se rencontrent jamais (comme des rails).",
+          ar: "دائمًا نفس المسافة، لا تلتقي أبدًا (مثل مسارات القطار).",
+          it: "Sempre alla stessa distanza, non si incontrano mai (come i binari del treno).",
+        },
+        perpFeature: {
+          en: "Lines meet at a right angle (90°), like a corner.",
+          zh: "兩條直線相交成直角 (90度)，像十字路口或書本的角一樣。",
+          ja: "線は直角（90度）で交わります（角のように）。",
+          ko: "선들이 직각(90도)으로 만납니다 (모서리처럼).",
+          es: "Las líneas se encuentran en un ángulo recto (90°), como una esquina.",
+          de: "Linien treffen sich im rechten Winkel (90°), wie eine Ecke.",
+          fi: "Viivat kohtaavat suorassa kulmassa (90°), kuten kulma.",
+          fr: "Les lignes se rencontrent à angle droit (90°), comme un coin.",
+          ar: "تلتقي الخطوط بزاوية قائمة (90 درجة)، مثل الزاوية.",
+          it: "Le linee si incontrano ad angolo retto (90°), come un angolo.",
+        },
+        features: {
+          en: "Features",
+          zh: "特點",
+          ja: "特徴",
+          ko: "특징",
+          es: "Características",
+          de: "Eigenschaften",
+          fi: "Ominaisuudet",
+          fr: "Caractéristiques",
+          ar: "الميزات",
+          it: "Caratteristiche",
+        },
+      };
 
       function App() {
+        const [lang, setLang] = useState("zh");
         const [mode, setMode] = useState("parallel"); // parallel, perpendicular
         const [angle, setAngle] = useState(0);
 
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-teal-900 mb-8">
-              平行與垂直
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-6xl font-black text-teal-900 mb-8 mt-8 text-center">
+              {getText("title")}
             </h1>
 
             <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full">
-              <div className="flex gap-4 justify-center mb-8">
+              <div className="flex gap-4 justify-center mb-8 flex-wrap">
                 <button
                   onClick={() => {
                     setMode("parallel");
@@ -48,7 +152,7 @@
                       : "bg-teal-100 text-teal-800"
                   }`}
                 >
-                  平行線 (Parallel)
+                  {getText("parallel")}
                 </button>
                 <button
                   onClick={() => {
@@ -61,7 +165,7 @@
                       : "bg-teal-100 text-teal-800"
                   }`}
                 >
-                  垂直線 (Perpendicular)
+                  {getText("perpendicular")}
                 </button>
               </div>
 
@@ -104,8 +208,8 @@
                         className="absolute h-20 w-px border-l-2 border-dashed border-slate-400 flex items-center justify-center"
                         style={{ left: "50%" }}
                       >
-                        <span className="bg-slate-50 px-1 text-xs text-slate-500 font-bold">
-                          永不相交
+                        <span className="bg-slate-50 px-1 text-xs text-slate-500 font-bold whitespace-nowrap">
+                          {getText("neverIntersect")}
                         </span>
                       </div>
                     </>
@@ -134,7 +238,7 @@
 
               <div className="mt-8">
                 <label className="block text-center font-bold text-teal-800 mb-2">
-                  旋轉看看
+                  {getText("rotate")}
                 </label>
                 <input
                   type="range"
@@ -150,12 +254,15 @@
                 <div className="text-4xl">💡</div>
                 <div>
                   <h3 className="font-bold text-teal-900 text-lg mb-2">
-                    {mode === "parallel" ? "平行線特點" : "垂直線特點"}
+                    {mode === "parallel"
+                      ? getText("parallel")
+                      : getText("perpendicular")}{" "}
+                    {getText("features")}
                   </h3>
                   <p className="text-teal-700">
                     {mode === "parallel"
-                      ? "兩條直線之間的距離永遠相等，而且永不相交，像火車軌一樣。"
-                      : "兩條直線相交成直角 (90度)，像十字路口或書本的角一樣。"}
+                      ? getText("paraFeature")
+                      : getText("perpFeature")}
                   </p>
                 </div>
               </div>
@@ -163,24 +270,7 @@
           </div>
         );
       }
-
-      const root = ReactDOM.createRoot(document.getElementById("root"));
-      root.render(<App />);
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

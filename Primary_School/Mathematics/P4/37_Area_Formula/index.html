@@ -3,12 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小四數學：面積公式</title>
+    <title>小四數學：面積公式 | Area Formula</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -25,23 +26,115 @@
     <script type="text/babel">
       const { useState } = React;
       const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Area Formula",
+          zh: "面積公式由來",
+          ja: "面積の公式",
+          ko: "면적 공식",
+          es: "Fórmula del Área",
+          de: "Flächenformel",
+          fi: "Pinta-alan kaava",
+          fr: "Formule de l'aire",
+          ar: "صيغة المساحة",
+          it: "Formula dell'area",
+        },
+        length: {
+          en: "Length (L)",
+          zh: "長 (L)",
+          ja: "長さ (L)",
+          ko: "길이 (L)",
+          es: "Largo (L)",
+          de: "Länge (L)",
+          fi: "Pituus (L)",
+          fr: "Longueur (L)",
+          ar: "الطول (L)",
+          it: "Lunghezza (L)",
+        },
+        width: {
+          en: "Width (W)",
+          zh: "闊 (W)",
+          ja: "幅 (W)",
+          ko: "너비 (W)",
+          es: "Ancho (W)",
+          de: "Breite (W)",
+          fi: "Leveys (W)",
+          fr: "Largeur (W)",
+          ar: "العرض (W)",
+          it: "Larghezza (W)",
+        },
+        showSquares: {
+          en: "Show Squares",
+          zh: "顯示 單位方格",
+          ja: "正方形を表示",
+          ko: "사각형 표시",
+          es: "Mostrar Cuadrados",
+          de: "Quadrate anzeigen",
+          fi: "Näytä neliöt",
+          fr: "Afficher les carrés",
+          ar: "إظهار المربعات",
+          it: "Mostra quadrati",
+        },
+        hideSquares: {
+          en: "Hide Squares",
+          zh: "隱藏 單位方格",
+          ja: "正方形を隠す",
+          ko: "사각형 숨기기",
+          es: "Ocultar Cuadrados",
+          de: "Quadrate ausblenden",
+          fi: "Piilota neliöt",
+          fr: "Masquer les carrés",
+          ar: "إخفاء المربعات",
+          it: "Nascondi quadrati",
+        },
+        formula: {
+          en: "Formula:",
+          zh: "算式：",
+          ja: "式：",
+          ko: "공식:",
+          es: "Fórmula:",
+          de: "Formel:",
+          fi: "Kaava:",
+          fr: "Formule :",
+          ar: "الصيغة:",
+          it: "Formula:",
+        },
+        explanation: {
+          en: "Length × Width = Area",
+          zh: "長 × 闊 = 面積",
+          ja: "長さ × 幅 = 面積",
+          ko: "길이 × 너비 = 면적",
+          es: "Largo × Ancho = Área",
+          de: "Länge × Breite = Fläche",
+          fi: "Pituus × Leveys = Pinta-ala",
+          fr: "Longueur × Largeur = Aire",
+          ar: "الطول × العرض = المساحة",
+          it: "Lunghezza × Larghezza = Area",
+        },
+      };
 
       function App() {
+        const [lang, setLang] = useState("zh");
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
         const [w, setW] = useState(5);
         const [h, setH] = useState(4);
         const [showSquares, setShowSquares] = useState(true);
 
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-lime-900 mb-8">
-              🟩 面積公式由來
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-lime-900 mb-8 mt-8">
+              🟩 {getText("title")}
             </h1>
 
             <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full flex flex-col md:flex-row gap-12 items-center">
               <div className="flex flex-col gap-6">
                 <div className="flex items-center gap-4">
-                  <label className="font-bold text-lime-800 text-xl w-16">
-                    長 (L)
+                  <label className="font-bold text-lime-800 text-xl w-24">
+                    {getText("length")}
                   </label>
                   <input
                     type="range"
@@ -54,8 +147,8 @@
                   <span className="text-2xl font-black text-lime-700">{w}</span>
                 </div>
                 <div className="flex items-center gap-4">
-                  <label className="font-bold text-lime-800 text-xl w-16">
-                    闊 (W)
+                  <label className="font-bold text-lime-800 text-xl w-24">
+                    {getText("width")}
                   </label>
                   <input
                     type="range"
@@ -72,16 +165,20 @@
                   onClick={() => setShowSquares(!showSquares)}
                   className="py-3 bg-lime-100 text-lime-800 rounded-xl font-bold hover:bg-lime-200"
                 >
-                  {showSquares ? "隱藏" : "顯示"} 單位方格
+                  {showSquares
+                    ? getText("hideSquares")
+                    : getText("showSquares")}
                 </button>
 
                 <div className="bg-lime-50 p-6 rounded-2xl border-2 border-lime-200">
-                  <h3 className="font-bold text-lime-800 mb-2">算式：</h3>
+                  <h3 className="font-bold text-lime-800 mb-2">
+                    {getText("formula")}
+                  </h3>
                   <div className="text-4xl font-black text-lime-900">
                     {w} × {h} = {w * h}
                   </div>
                   <div className="mt-2 font-bold text-lime-600">
-                    長 × 闊 = 面積
+                    {getText("explanation")}
                   </div>
                 </div>
               </div>
@@ -113,13 +210,13 @@
 
                 {/* Dimensions Labels */}
                 <div className="absolute top-2 font-bold text-lime-700">
-                  {w} (長)
+                  {w} ({getText("length")})
                 </div>
                 <div
                   className="absolute left-2 font-bold text-lime-700"
                   style={{ writingMode: "vertical-lr" }}
                 >
-                  {h} (闊)
+                  {h} ({getText("width")})
                 </div>
               </div>
             </div>
@@ -128,20 +225,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

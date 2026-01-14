@@ -10,13 +10,22 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
@@ -25,153 +34,255 @@
     <script type="text/babel">
       const { useState, useEffect } = React;
       const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
+
+      const t = {
+        title: {
+          en: "Multi-Digit Multiplication",
+          zh: "多位數乘法",
+          ja: "多桁の掛け算",
+          ko: "다자리 곱셈",
+          es: "Multiplicación de Varios Dígitos",
+          de: "Mehrstellige Multiplikation",
+          fi: "Moninumeroinen Kertolasku",
+          fr: "Multiplication à Plusieurs Chiffres",
+          ar: "الضرب متعدد الأرقام",
+          it: "Moltiplicazione a Più Cifre",
+        },
+        nextStep: {
+          en: "Next Step",
+          zh: "下一步",
+          ja: "次へ",
+          ko: "다음 단계",
+          es: "Siguiente Paso",
+          de: "Nächster Schritt",
+          fi: "Seuraava vaihe",
+          fr: "Étape Suivante",
+          ar: "الخطوة التالية",
+          it: "Passo Successivo",
+        },
+        reset: {
+          en: "Reset",
+          zh: "重置",
+          ja: "リセット",
+          ko: "초기화",
+          es: "Reiniciar",
+          de: "Zurücksetzen",
+          fi: "Nollaa",
+          fr: "Réinitialiser",
+          ar: "إعادة ضبط",
+          it: "Reimposta",
+        },
+        calculate: {
+          en: "Calculate",
+          zh: "計算",
+          ja: "計算",
+          ko: "계산",
+          es: "Calcular",
+          de: "Berechnen",
+          fi: "Laske",
+          fr: "Calculer",
+          ar: "حساب",
+          it: "Calcola",
+        },
+        tip1: {
+          en: "Break down into partial products",
+          zh: "拆解為部分積",
+          ja: "部分積に分解",
+          ko: "부분 곱으로 분해",
+          es: "Desglosar en productos parciales",
+          de: "In Teilprodukte zerlegen",
+          fi: "Jaa osatuloihin",
+          fr: "Décomposer en produits partiels",
+          ar: "تقسيم إلى نواتج جزئية",
+          it: "Scomponi in prodotti parziali",
+        },
+      };
+
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
 
       function App() {
+        const [lang, setLang] = useState("zh");
         const [n1, setN1] = useState(234);
         const [n2, setN2] = useState(56);
         const [step, setStep] = useState(0);
 
-        const s1 = n1.toString();
         const s2 = n2.toString();
 
-        // Calculate partial products for each digit of n2
+        // Calculate partial products: from last digit to first
         const partials = s2
           .split("")
           .reverse()
           .map((d, i) => {
-            return parseInt(d) * n1 * Math.pow(10, i);
-          })
-          .reverse();
+            const digit = parseInt(d);
+            const val = digit * n1;
+            const shift = i;
+            const realVal = val * Math.pow(10, shift);
+            return {
+              digit,
+              shift,
+              val,
+              realVal,
+              display: val + "0".repeat(shift),
+            };
+          });
 
         const total = n1 * n2;
 
-        const nextStep = () => setStep((s) => Math.min(s + 1, partials.length));
+        const nextStep = () =>
+          setStep((prev) => Math.min(prev + 1, partials.length + 1));
         const reset = () => setStep(0);
 
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-sky-900 mb-2">
-              ✖️ 多位數乘法
-            </h1>
-            <p className="text-xl text-sky-700 font-bold mb-8">
-              Multi-Digit Multiplication
-            </p>
-
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-3xl w-full">
-              <div className="flex justify-center gap-6 mb-8">
-                <input
-                  type="number"
-                  value={n1}
-                  onChange={(e) => {
-                    setN1(parseInt(e.target.value) || 0);
-                    reset();
-                  }}
-                  className="w-32 text-4xl font-black text-center border-4 border-sky-200 rounded-xl p-2 focus:border-sky-500 outline-none"
-                />
-                <span className="text-4xl font-black text-sky-400">×</span>
-                <input
-                  type="number"
-                  value={n2}
-                  onChange={(e) => {
-                    setN2(parseInt(e.target.value) || 0);
-                    reset();
-                  }}
-                  className="w-24 text-4xl font-black text-center border-4 border-sky-200 rounded-xl p-2 focus:border-sky-500 outline-none"
-                />
-              </div>
-
-              {/* Step-by-step breakdown */}
-              <div className="bg-slate-50 rounded-2xl p-6 mb-6 font-mono text-xl">
-                <div className="text-right text-3xl font-black text-slate-700 mb-2">
-                  {n1}
-                </div>
-                <div className="text-right text-3xl font-black text-slate-700 border-b-4 border-slate-400 pb-2 mb-4">
-                  × {n2}
-                </div>
-
-                <AnimatePresence>
-                  {partials.map(
-                    (p, i) =>
-                      step > i && (
-                        <motion.div
-                          key={i}
-                          initial={{ opacity: 0, x: 20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          className="text-right text-2xl font-bold text-sky-600 mb-2"
-                        >
-                          {p.toLocaleString()}
-                          <span className="text-sm text-slate-400 ml-2">
-                            ({n1} × {s2[i]} × {Math.pow(10, s2.length - 1 - i)})
-                          </span>
-                        </motion.div>
-                      )
-                  )}
-                </AnimatePresence>
-
-                {step >= partials.length && (
-                  <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    className="text-right text-4xl font-black text-emerald-600 border-t-4 border-slate-400 pt-4 mt-4"
+          <div className="min-h-screen flex flex-col items-center p-4 font-sans bg-slate-900 text-white">
+            <div className="w-full max-w-4xl flex justify-between items-center mb-10">
+              <h1 className="text-4xl font-black text-sky-400 drop-shadow-[0_0_15px_rgba(56,189,248,0.5)]">
+                ✖️ {getText("title", lang)}
+              </h1>
+              <div className="flex bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-sky-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
                   >
-                    {total.toLocaleString()}
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-8 w-full max-w-5xl">
+              {/* Visualizer Panel */}
+              <div className="flex-1 glass-panel p-8 rounded-3xl min-h-[400px] flex flex-col items-center justify-center relative">
+                <div className="font-mono text-5xl md:text-7xl font-bold tracking-widest text-right leading-tight">
+                  <div className="text-slate-300 mb-2">{n1}</div>
+                  <div className="text-slate-300 border-b-4 border-slate-500 pb-2 mb-4 relative">
+                    <span className="absolute left-[-40px] text-sky-500">
+                      ×
+                    </span>
+                    {n2}
+                  </div>
+
+                  <div className="space-y-1">
+                    {partials.map((p, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{
+                          opacity: step > i ? 1 : 0,
+                          x: step > i ? 0 : -20,
+                        }}
+                        className="text-sky-300/80 text-right pr-0 relative"
+                      >
+                        {/* The number itself */}
+                        {p.val}
+                        {/* Trailing Zeros in ghost color */}
+                        <span className="text-slate-700">
+                          {"0".repeat(p.shift)}
+                        </span>
+
+                        {/* Annotation */}
+                        <span className="absolute right-[120%] top-1/2 -translate-y-1/2 text-xs md:text-sm text-slate-500 whitespace-nowrap hidden md:block opacity-50 font-sans">
+                          {n1} × {p.digit}0^{p.shift}
+                        </span>
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  {/* Total Line */}
+                  <motion.div
+                    initial={{ opacity: 0, scaleX: 0 }}
+                    animate={{
+                      opacity: step > partials.length ? 1 : 0,
+                      scaleX: step > partials.length ? 1 : 0,
+                    }}
+                    className="border-t-4 border-slate-500 pt-2 mt-2 text-emerald-400 text-right"
+                  >
+                    {total}
                   </motion.div>
-                )}
+                </div>
               </div>
 
-              <div className="flex justify-center gap-4">
-                <button
-                  onClick={nextStep}
-                  disabled={step >= partials.length}
-                  className="px-8 py-3 bg-sky-500 text-white rounded-xl font-bold hover:bg-sky-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
-                >
-                  下一步 Next Step
-                </button>
-                <button
-                  onClick={reset}
-                  className="px-8 py-3 bg-slate-200 text-slate-700 rounded-xl font-bold hover:bg-slate-300 shadow-lg"
-                >
-                  重置 Reset
-                </button>
-              </div>
+              {/* Controls Panel */}
+              <div className="w-full md:w-80 flex flex-col gap-6">
+                <div className="glass-panel p-6 rounded-2xl">
+                  <div className="flex items-center justify-between mb-4">
+                    <input
+                      type="number"
+                      value={n1}
+                      onChange={(e) => {
+                        setN1(Number(e.target.value));
+                        reset();
+                      }}
+                      className="bg-slate-800 text-white text-2xl font-bold p-3 rounded-lg w-full mr-2 text-center outline-none focus:ring-2 ring-sky-500"
+                    />
+                    <span className="text-2xl text-slate-500">×</span>
+                    <input
+                      type="number"
+                      value={n2}
+                      onChange={(e) => {
+                        setN2(Number(e.target.value));
+                        reset();
+                      }}
+                      className="bg-slate-800 text-white text-2xl font-bold p-3 rounded-lg w-full ml-2 text-center outline-none focus:ring-2 ring-sky-500"
+                    />
+                  </div>
 
-              <div className="mt-8 bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
-                <h3 className="font-black mb-2">💡 學習重點 Learning Tips:</h3>
-                <ul className="list-disc list-inside space-y-1 text-sm">
-                  <li>
-                    多位數乘法可拆解為多個部分積 Break down into partial
-                    products
-                  </li>
-                  <li>
-                    每一位數字代表不同的位值 Each digit represents different
-                    place values
-                  </li>
-                  <li>
-                    最後將所有部分積相加 Sum all partial products for final
-                    answer
-                  </li>
-                </ul>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={nextStep}
+                      disabled={step > partials.length}
+                      className={`flex-1 py-3 rounded-xl font-bold uppercase tracking-wider transition-all shadow-lg ${
+                        step > partials.length
+                          ? "bg-slate-700 text-slate-500"
+                          : "bg-sky-600 hover:bg-sky-500 text-white"
+                      }`}
+                    >
+                      {step === 0
+                        ? getText("calculate", lang)
+                        : getText("nextStep", lang)}
+                    </button>
+                    <button
+                      onClick={reset}
+                      className="px-4 py-3 bg-slate-700 text-slate-300 hover:text-white rounded-xl font-bold"
+                    >
+                      ↺
+                    </button>
+                  </div>
+                </div>
+
+                <div className="glass-panel p-6 rounded-2xl border-l-4 border-amber-500">
+                  <div className="text-amber-400 font-bold mb-2">💡 Tips</div>
+                  <p className="text-sm text-slate-300 leading-relaxed">
+                    {getText("tip1", lang)}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

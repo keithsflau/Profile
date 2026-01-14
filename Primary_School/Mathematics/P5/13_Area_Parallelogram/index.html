@@ -3,39 +3,51 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小五數學：平行四邊形面積 | Parallelogram Area</title>
+    <title>小五數學：平行四邊形面積 | Area of Parallelogram</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #fef9c3 0%, #facc15 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
-      const { LanguageSelector, get } = window.MathI18n;
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
 
       const t = {
         title: {
-          en: "Parallelogram Area",
+          en: "Area of Parallelogram",
           zh: "平行四邊形面積",
           ja: "平行四辺形の面積",
           ko: "평행사변형의 넓이",
           es: "Área del Paralelogramo",
           de: "Fläche des Parallelogramms",
           fi: "Suunnikkaan pinta-ala",
-          fr: "Aire du Parallélogramme",
+          fr: "Aire du parallélogramme",
           ar: "مساحة متوازي الأضلاع",
           it: "Area del Parallelogramma",
         },
@@ -65,39 +77,15 @@
         },
         skew: {
           en: "Skew",
-          zh: "傾斜度",
-          ja: "歪み",
+          zh: "傾斜",
+          ja: "スキュー",
           ko: "기울기",
           es: "Inclinación",
           de: "Neigung",
           fi: "Vino",
           fr: "Inclinaison",
-          ar: "الانحراف",
+          ar: "انحراف",
           it: "Inclinazione",
-        },
-        formulaTitle: {
-          en: "Formula:",
-          zh: "公式:",
-          ja: "公式:",
-          ko: "공식:",
-          es: "Fórmula:",
-          de: "Formel:",
-          fi: "Kaava:",
-          fr: "Formule :",
-          ar: "الصيغة:",
-          it: "Formula:",
-        },
-        formula: {
-          en: "Area = Base × Height",
-          zh: "面積 = 底 × 高",
-          ja: "面積 = 底辺 × 高さ",
-          ko: "넓이 = 밑변 × 높이",
-          es: "Área = Base × Altura",
-          de: "Fläche = Basis × Höhe",
-          fi: "Pinta-ala = Kanta × Korkeus",
-          fr: "Aire = Base × Hauteur",
-          ar: "المساحة = القاعدة × الارتفاع",
-          it: "Area = Base × Altezza",
         },
         area: {
           en: "Area",
@@ -111,185 +99,338 @@
           ar: "المساحة",
           it: "Area",
         },
-        tipsTitle: {
-          en: "Learning Focus:",
-          zh: "學習重點:",
-          ja: "学習のポイント:",
-          ko: "학습 포인트:",
-          es: "Enfoque de Aprendizaje:",
-          de: "Lernschwerpunkt:",
-          fi: "Oppimisen kohokohta:",
-          fr: "Objectif d'apprentissage :",
-          ar: "نقطة التعلم:",
-          it: "Obiettivo di apprendimento:",
+        proof: {
+          en: "Proof: Cut & Move",
+          zh: "證明：剪切並移動",
+          ja: "証明：切って動かす",
+          ko: "증명: 자르고 이동",
+          es: "Prueba: Cortar y Mover",
+          de: "Beweis: Schneiden & Bewegen",
+          fi: "Todistus: Leikkaa ja siirrä",
+          fr: "Preuve : Couper et Déplacer",
+          ar: "برهان: قص ونقل",
+          it: "Prova: Taglia e Sposta",
         },
-        tipContent: {
-          en: "No matter how the skew changes, as long as the base and height remain the same, the area remains the same!",
-          zh: "無論傾斜度如何變化，只要底和高不變，面積就不變！",
-          ja: "歪みが変わっても、底辺と高さが変わらなければ、面積は変わりません！",
-          ko: "기울기가 바뀌더라도 밑변과 높이가 변하지 않으면 넓이는 변하지 않습니다!",
-          es: "¡No importa cómo cambie la inclinación, siempre que la base y la altura sigan siendo las mismas, el área sigue siendo la misma!",
-          de: "Egal wie sich die Neigung ändert, solange Basis und Höhe gleich bleiben, bleibt die Fläche gleich!",
-          fi: "Riippumatta siitä, miten vino muuttuu, niin kauan kuin kanta ja korkeus pysyvät samoina, pinta-ala pysyy samana!",
-          fr: "Peu importe comment l'inclinaison change, tant que la base et la hauteur restent les mêmes, l'aire reste la même !",
-          ar: "بغض النظر عن كيفية تغير الانحراف، طالما أن القاعدة والارتفاع يظلان كما هما، تظل المساحة كما هي!",
-          it: "Non importa come cambia l'inclinazione, finché la base e l'altezza rimangono le stesse, l'area rimane la stessa!",
+        formula: {
+          en: "Area = Base × Height",
+          zh: "面積 = 底 × 高",
+          ja: "面積 = 底辺 × 高さ",
+          ko: "넓이 = 밑변 × 높이",
+          es: "Área = Base × Altura",
+          de: "Fläche = Basis × Höhe",
+          fi: "Pinta-ala = Kanta × Korkeus",
+          fr: "Aire = Base × Hauteur",
+          ar: "المساحة = القاعدة × الارتفاع",
+          it: "Area = Base × Altezza",
+        },
+        rectText: {
+          en: "Forms a Rectangle!",
+          zh: "形成一個長方形！",
+          ja: "長方形になります！",
+          ko: "직사각형을 형성합니다!",
+          es: "¡Forma un rectángulo!",
+          de: "Bildet ein Rechteck!",
+          fi: "Muodostaa suorakulmion!",
+          fr: "Forme un rectangle !",
+          ar: "يشكل مستطيلاً!",
+          it: "Forma un rettangolo!",
         },
       };
 
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
       function App() {
         const [lang, setLang] = useState("zh");
-        const getText = (key) => t[key][lang] || t[key]["en"];
-
-        const [base, setBase] = useState(10);
-        const [height, setHeight] = useState(6);
+        const [base, setBase] = useState(8);
+        const [height, setHeight] = useState(5);
         const [skew, setSkew] = useState(3);
+        const [showProof, setShowProof] = useState(false);
+
         const area = base * height;
+        const U = 40;
+        const CX = 400;
+        const CY = 300;
+
+        // Points
+        // We defined parallelogram by Base, Height, Skew.
+        // It's convenient to define Top-Left as (Skew, 0) relative to bounding box top-left.
+        // But for "Cut and Move" proof, we typically cut the "sticking out" triangle on one side (say Left) and move it to Right.
+
+        // Let's model:
+        // Left Triangle: Vertices (0, H), (Skew, H), (Skew, 0) relative to... ?
+        // Standard Parallelogram (leaning right):
+        // pBL = (0, H)
+        // pBR = (Base, H)
+        // pTL = (Skew, 0)
+        // pTR = (Base+Skew, 0)
+
+        // Wait, if pBL is (0,H) and pTL is (Skew,0), the left edge leans right.
+        // Cut vertical from pTL downwards to (Skew, H).
+        // The triangle is (0, H) -> (Skew, H) -> (Skew, 0).
+        // Moves to Right side: New position based on pTR.
+        // pTR is (Base+Skew, 0). Cut vertical down to (Base+Skew, H).
+        // Fill space (Base, H) -> (Base+Skew, H) -> (Base+Skew, 0).
+
+        const H_px = height * U;
+        const Base_px = base * U;
+        const Skew_px = skew * U;
+
+        // Centering
+        const shapeW = Base_px + Skew_px;
+        const startX = CX - shapeW / 2;
+        const startY = CY - H_px / 2;
+
+        // Vertices
+        const pBL = { x: 0, y: H_px };
+        const pBR = { x: Base_px, y: H_px }; // This is relative to pBL. No, Base is Width.
+
+        // Wait, Base is length of bottom side.
+        // So Bottom side is from (0,H) to (Base, H).
+        // Top side is from (Skew, 0) to (Base+Skew, 0).
+        // Horizontal distance is Base. Vertical is H.
+
+        // Cut Logic:
+        // Triangle T1 vertices: (0,H), (Skew,H), (Skew,0).
+        // Note: (Skew,H) is point on Bottom edge? No.
+        // If Skew > 0, (Skew, H) is to the right of (0,H). Yes.
+        // Is (Skew, H) on the line (0,H)-(Base,H)? Yes, assuming Skew < Base.
 
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <LanguageSelector lang={lang} setLang={setLang} />
-            <h1 className="text-5xl font-black text-yellow-900 mb-2 mt-8">
-              ▱ {getText("title")}
-            </h1>
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-4xl w-full mt-8">
-              <div className="flex flex-col md:flex-row gap-8 items-center">
-                <div className="flex-1">
-                  <svg
-                    viewBox="0 0 320 220"
-                    className="w-full max-w-sm mx-auto"
+          <div className="min-h-screen flex flex-col items-center p-4 font-sans bg-slate-900 text-white">
+            <div className="w-full max-w-5xl flex justify-between items-center mb-10">
+              <h1 className="text-4xl font-black text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]">
+                img {getText("title", lang)}
+              </h1>
+              <div className="flex bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-amber-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
                   >
-                    {/* Parallelogram */}
-                    <polygon
-                      points={`${50 + skew * 10},50 ${
-                        50 + base * 15 + skew * 10
-                      },50 ${50 + base * 15},${50 + height * 20} 50,${
-                        50 + height * 20
-                      }`}
-                      fill="#eab308"
-                      stroke="#ca8a04"
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="w-full max-w-6xl flex flex-col lg:flex-row gap-8 items-start">
+              {/* Visual Stage */}
+              <div className="flex-1 w-full glass-panel rounded-3xl overflow-hidden relative min-h-[400px] flex items-center justify-center border-4 border-slate-700/50">
+                {/* Grid */}
+                <div
+                  className="absolute inset-0 opacity-20 pointer-events-none"
+                  style={{
+                    backgroundImage:
+                      "linear-gradient(#475569 1px, transparent 1px), linear-gradient(90deg, #475569 1px, transparent 1px)",
+                    backgroundSize: `${U}px ${U}px`,
+                  }}
+                ></div>
+
+                <svg
+                  width="100%"
+                  height="500"
+                  viewBox="0 0 800 600"
+                  className="overflow-visible"
+                >
+                  <defs>
+                    <linearGradient id="paraGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#facc15" stopOpacity="0.6" />
+                      <stop
+                        offset="100%"
+                        stopColor="#ca8a04"
+                        stopOpacity="0.8"
+                      />
+                    </linearGradient>
+                  </defs>
+
+                  <g transform={`translate(${startX}, ${startY})`}>
+                    {/* Main Body (Trapezoid part remaining after cut) */}
+                    {/* Vertices: (Skew, 0), (Base+Skew, 0), (Base, H), (Skew, H) */}
+                    {/* Wait. pBR is (Base, H). If we cut at Skew...
+                                  Right Shape is (Skew, 0) -> (Base+Skew, 0) -> Wait...
+                                  We are moving the LEFT triangle to the RIGHT.
+                                  So the "Static" part is the middle? No.
+                                  Let's keep things simple.
+                                  Original: (Skew, 0) - (Base+Skew, 0) - (Base, H) - (0, H).
+                                  Cut line: Vertical from (Skew, 0) down to (Skew, H).
+                                  Left Triangle (to move): (0, H) - (Skew, H) - (Skew, 0).
+                                  Right Trapezoid (Static): (Skew, 0) - (Base+Skew, 0) - (Base, H) - (Skew, H).
+                              */}
+
+                    <path
+                      d={`M ${Skew_px} 0 L ${
+                        Base_px + Skew_px
+                      } 0 L ${Base_px} ${H_px} L ${Skew_px} ${H_px} Z`}
+                      fill="url(#paraGrad)"
+                      stroke="#fef08a"
                       strokeWidth="3"
                     />
-                    {/* Height line */}
+
+                    {/* Moving Triangle */}
+                    <motion.path
+                      d={`M 0 ${H_px} L ${Skew_px} ${H_px} L ${Skew_px} 0 Z`}
+                      fill="#fde047"
+                      stroke="#fef08a"
+                      strokeWidth="3"
+                      initial={{ x: 0 }}
+                      animate={{ x: showProof ? Base_px : 0 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 60,
+                        damping: 12,
+                      }}
+                    />
+
+                    {/* Dimensions */}
                     <line
-                      x1={50 + skew * 5}
-                      y1="50"
-                      x2={50 + skew * 5}
-                      y2={50 + height * 20}
-                      stroke="#ef4444"
+                      x1={0}
+                      y1={H_px + 20}
+                      x2={Base_px}
+                      y2={H_px + 20}
+                      stroke="white"
                       strokeWidth="2"
-                      strokeDasharray="4,4"
+                      markerStart="url(#tick)"
+                      markerEnd="url(#tick)"
                     />
                     <text
-                      x={50 + skew * 5 - 10}
-                      y={50 + height * 10}
-                      textAnchor="end"
-                      className="text-sm font-bold fill-red-600"
+                      x={Base_px / 2}
+                      y={H_px + 45}
+                      fill="white"
+                      textAnchor="middle"
+                      fontWeight="bold"
+                    >
+                      Base = {base}
+                    </text>
+
+                    <line
+                      x1={Skew_px}
+                      y1={0}
+                      x2={Skew_px}
+                      y2={H_px}
+                      stroke="#fb7185"
+                      strokeDasharray="5,5"
+                      strokeWidth="2"
+                    />
+                    <text
+                      x={Skew_px + 5}
+                      y={H_px / 2}
+                      fill="#fb7185"
+                      fontWeight="bold"
                     >
                       h={height}
                     </text>
-                    {/* Base label */}
-                    <text
-                      x={50 + base * 7.5}
-                      y={50 + height * 20 + 25}
+                  </g>
+
+                  {showProof && (
+                    <motion.text
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.5 }}
+                      x="400"
+                      y="550"
                       textAnchor="middle"
-                      className="text-sm font-bold fill-yellow-800"
+                      fill="#fde047"
+                      fontSize="18"
+                      fontWeight="bold"
                     >
-                      {getText("base")} = {base} cm
-                    </text>
-                  </svg>
-                </div>
-                <div className="flex-1 space-y-4">
-                  <div>
-                    <label className="block font-bold text-yellow-800 mb-1">
-                      {getText("base")} (cm)
-                    </label>
-                    <input
-                      type="range"
-                      min="4"
-                      max="14"
-                      value={base}
-                      onChange={(e) => setBase(parseInt(e.target.value))}
-                      className="w-full accent-yellow-500"
-                    />
-                    <div className="text-center text-xl font-black text-yellow-600">
-                      {base} cm
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block font-bold text-yellow-800 mb-1">
-                      {getText("height")} (cm)
-                    </label>
-                    <input
-                      type="range"
-                      min="2"
-                      max="8"
-                      value={height}
-                      onChange={(e) => setHeight(parseInt(e.target.value))}
-                      className="w-full accent-yellow-500"
-                    />
-                    <div className="text-center text-xl font-black text-yellow-600">
-                      {height} cm
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block font-bold text-yellow-800 mb-1">
-                      {getText("skew")}
-                    </label>
-                    <input
-                      type="range"
-                      min="0"
-                      max="5"
-                      value={skew}
-                      onChange={(e) => setSkew(parseInt(e.target.value))}
-                      className="w-full accent-yellow-500"
-                    />
-                  </div>
-                  <div className="bg-yellow-50 rounded-2xl p-4 border-2 border-yellow-200">
-                    <p className="text-lg font-bold text-center">
-                      {getText("formulaTitle")}
-                    </p>
-                    <p className="text-xl font-mono text-center mt-1">
-                      {getText("formula")}
-                    </p>
-                  </div>
-                  <div className="bg-emerald-100 rounded-2xl p-4 text-center border-4 border-emerald-300">
-                    <div className="text-emerald-600 font-bold">
-                      {getText("area")}
-                    </div>
-                    <div className="text-4xl font-black text-emerald-800">
-                      {area} cm²
-                    </div>
-                    <div className="text-sm text-emerald-600">
-                      {base} × {height} = {area}
-                    </div>
-                  </div>
-                </div>
+                      {getText("rectText", lang)} (Area = Base × Height)
+                    </motion.text>
+                  )}
+                </svg>
               </div>
-              <div className="mt-6 bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
-                <p className="font-bold">💡 {getText("tipsTitle")}</p>
-                <p className="text-sm">{getText("tipContent")}</p>
+
+              {/* Controls */}
+              <div className="w-full lg:w-80 flex flex-col gap-6">
+                <div className="glass-panel p-6 rounded-3xl flex flex-col gap-6">
+                  <ControlSlider
+                    label={getText("base", lang)}
+                    val={base}
+                    set={setBase}
+                    min={4}
+                    max={12}
+                    color="accent-amber-400"
+                    text="text-amber-300"
+                  />
+                  <ControlSlider
+                    label={getText("height", lang)}
+                    val={height}
+                    set={setHeight}
+                    min={2}
+                    max={8}
+                    color="accent-yellow-400"
+                    text="text-yellow-300"
+                  />
+                  <ControlSlider
+                    label={getText("skew", lang)}
+                    val={skew}
+                    set={setSkew}
+                    min={0}
+                    max={6}
+                    color="accent-orange-400"
+                    text="text-orange-300"
+                  />
+
+                  <div className="h-px bg-white/10 my-2"></div>
+
+                  <button
+                    onClick={() => setShowProof(!showProof)}
+                    className={`py-3 rounded-xl font-bold text-lg transition-all border border-white/10 ${
+                      showProof
+                        ? "bg-cyan-500/80 text-white shadow-[0_0_20px_rgba(6,182,212,0.3)]"
+                        : "bg-slate-700/50 text-slate-300 hover:bg-slate-600/50"
+                    }`}
+                  >
+                    {getText("proof", lang)}
+                  </button>
+
+                  <div className="bg-slate-950/50 p-4 rounded-xl border border-white/5 text-center">
+                    <div className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">
+                      {getText("formula", lang)}
+                    </div>
+                    <div className="text-4xl font-black text-white">{area}</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const ControlSlider = ({ label, val, set, min, max, color, text }) => (
+        <div className="flex flex-col gap-2">
+          <div className={`flex justify-between font-bold ${text}`}>
+            <label>{label}</label>
+            <span>{val}</span>
+          </div>
+          <input
+            type="range"
+            min={min}
+            max={max}
+            value={val}
+            onChange={(e) => set(Number(e.target.value))}
+            className={`w-full ${color}`}
+          />
+        </div>
+      );
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

@@ -3,26 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小四數學：乘數表互動探索</title>
+    <title>小四數學：乘數表互動探索 | Multiplication Exploration</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script
-      src="https://unpkg.com/react@18/umd/react.development.js"
-      crossorigin
-    ></script>
-    <script
-      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
-      crossorigin
-    ></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.min.js"></script>
-
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
     />
-
     <style>
       body {
         font-family: "Fredoka", "Noto Sans TC", sans-serif;
@@ -57,9 +48,312 @@
     <script type="text/babel">
       const { useState, useEffect } = React;
       const { motion, AnimatePresence } = window.Motion;
-      const { Grid3x3, Zap, Trophy, Target, RefreshCw } = window.LucideReact;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Multiplication Exploration",
+          zh: "乘數表探索",
+          ja: "掛け算の探求",
+          ko: "구구단 탐험",
+          es: "Exploración de Multiplicación",
+          de: "Multiplikationserkundung",
+          fi: "Kertolaskun tutkimus",
+          fr: "Exploration de la multiplication",
+          ar: "استكشاف الضرب",
+          it: "Esplorazione della moltiplicazione",
+        },
+        header: {
+          en: "P4 Math",
+          zh: "小四數學",
+          ja: "小4算数",
+          ko: "초4 수학",
+          es: "Matemáticas P4",
+          de: "Mathe 4. Klasse",
+          fi: "4. luokan matematiikka",
+          fr: "Maths P4",
+          ar: "الرياضيات للصف الرابع",
+          it: "Matematica 4a elementare",
+        },
+        exploreMode: {
+          en: "Explore Mode",
+          zh: "探索模式",
+          ja: "探求モード",
+          ko: "탐험 모드",
+          es: "Modo Exploración",
+          de: "Erkundungsmodus",
+          fi: "Tutkimustila",
+          fr: "Mode Exploration",
+          ar: "وضع الاستكشاف",
+          it: "Modalità Esplorazione",
+        },
+        quizMode: {
+          en: "Challenge Mode",
+          zh: "挑戰模式",
+          ja: "チャレンジモード",
+          ko: "도전 모드",
+          es: "Modo Desafío",
+          de: "Herausforderungsmodus",
+          fi: "Haastetila",
+          fr: "Mode Défi",
+          ar: "وضع التحدي",
+          it: "Modalità Sfida",
+        },
+        patternMode: {
+          en: "Pattern Discovery",
+          zh: "規律探索",
+          ja: "パターンの発見",
+          ko: "규칙 탐험",
+          es: "Descubrimiento de Patrones",
+          de: "Mustererkennung",
+          fi: "Kuvioiden löytäminen",
+          fr: "Découverte de motifs",
+          ar: "اكتشاف الأنماط",
+          it: "Scoperta dei modelli",
+        },
+        selectedMultiplier: {
+          en: "Selected Multiplier",
+          zh: "選擇的乘數",
+          ja: "選択された乗数",
+          ko: "선택된 곱셈",
+          es: "Multiplicador seleccionado",
+          de: "Ausgewählter Multiplikator",
+          fi: "Valittu kertoja",
+          fr: "Multiplicateur sélectionné",
+          ar: "المضاعف المختار",
+          it: "Moltiplicatore selezionato",
+        },
+        explorePrompt: {
+          en: "Click cells to explore!",
+          zh: "點擊格子來探索乘數！",
+          ja: "セルをクリックして探索しよう！",
+          ko: "칸을 클릭하여 구구단을 탐험하세요!",
+          es: "¡Haz clic en las celdas para explorar!",
+          de: "Klicke auf Zellen, um zu erkunden!",
+          fi: "Napsauta soluja tutkiaksesi!",
+          fr: "Cliquez sur les cellules pour explorer !",
+          ar: "انقر فوق الخلايا للاستكشاف!",
+          it: "Clicca sulle celle per esplorare!",
+        },
+        quickChallenge: {
+          en: "Quick Challenge",
+          zh: "快速挑戰",
+          ja: "クイックチャレンジ",
+          ko: "빠른 도전",
+          es: "Desafío Rápido",
+          de: "Schnelle Herausforderung",
+          fi: "Pika Haaste",
+          fr: "Défi Rapide",
+          ar: "تحدي سريع",
+          it: "Sfida Veloce",
+        },
+        checkAnswer: {
+          en: "Check Answer",
+          zh: "確認答案",
+          ja: "答え合わせ",
+          ko: "정답 확인",
+          es: "Comprobar respuesta",
+          de: "Antwort überprüfen",
+          fi: "Tarkista vastaus",
+          fr: "Vérifier la réponse",
+          ar: "تحقق من الإجابة",
+          it: "Controlla la risposta",
+        },
+        correct: {
+          en: "✓ Correct! Keep going!",
+          zh: "✓ 答對了！繼續加油！",
+          ja: "✓ 正解！がんばれ！",
+          ko: "✓ 정답! 계속하세요!",
+          es: "✓ ¡Correcto! ¡Sigue así!",
+          de: "✓ Richtig! Weiter so!",
+          fi: "✓ Oikein! Jatka samaan malliin!",
+          fr: "✓ Correct ! Continuez !",
+          ar: "✓ صحيح! استمر!",
+          it: "✓ Corretto! Continua così!",
+        },
+        incorrect: {
+          en: "✗ Try again!",
+          zh: "✗ 再想想看！",
+          ja: "✗ もう一度考えてみて！",
+          ko: "✗ 다시 생각해보세요!",
+          es: "✗ ¡Inténtalo de nuevo!",
+          de: "✗ Versuch es nochmal!",
+          fi: "✗ Yritä uudelleen!",
+          fr: "✗ Réessayez !",
+          ar: "✗ حاول مرة أخرى!",
+          it: "✗ Riprova!",
+        },
+        nextQuestion: {
+          en: "Next Question",
+          zh: "下一題",
+          ja: "次の問題",
+          ko: "다음 문제",
+          es: "Siguiente pregunta",
+          de: "Nächste Frage",
+          fi: "Seuraava kysymys",
+          fr: "Question suivante",
+          ar: "السؤال التالي",
+          it: "Domanda successiva",
+        },
+        discoverPatterns: {
+          en: "Discover Patterns",
+          zh: "發現規律",
+          ja: "パターンを発見する",
+          ko: "규칙 발견하기",
+          es: "Descubrir patrones",
+          de: "Muster entdecken",
+          fi: "Löydä kuvioita",
+          fr: "Découvrir des motifs",
+          ar: "اكتشاف الأنماط",
+          it: "Scopri i modelli",
+        },
+        diagonalPattern: {
+          en: "Diagonal Pattern",
+          zh: "對角線規律",
+          ja: "対角線パターン",
+          ko: "대각선 규칙",
+          es: "Patrón Diagonal",
+          de: "Diagonales Muster",
+          fi: "Diagonaalinen kuvio",
+          fr: "Motif diagonal",
+          ar: "نمط قطري",
+          it: "Modello diagonale",
+        },
+        squareNumbers: {
+          en: "Square Numbers",
+          zh: "完全平方數",
+          ja: "平方数",
+          ko: "완전제곱수",
+          es: "Números cuadrados",
+          de: "Quadratzahlen",
+          fi: "Neliöluvut",
+          fr: "Nombres carrés",
+          ar: "الأعداد المربعة",
+          it: "Numeri quadrati",
+        },
+        evenPattern: {
+          en: "Even Numbers",
+          zh: "雙數規律",
+          ja: "偶数パターン",
+          ko: "짝수 규칙",
+          es: "Números Pares",
+          de: "Gerade Zahlen",
+          fi: "Parilliset luvut",
+          fr: "Nombres pairs",
+          ar: "الأرقام الزوجية",
+          it: "Numeri pari",
+        },
+        patternPrompt: {
+          en: "Click buttons to see patterns!",
+          zh: "點擊按鈕來看看乘數表中的數學規律！",
+          ja: "ボタンをクリックしてパターンを見よう！",
+          ko: "버튼을 클릭하여 규칙을 확인하세요!",
+          es: "¡Haz clic en los botones para ver patrones!",
+          de: "Klicke auf die Schaltflächen, um Muster zu sehen!",
+          fi: "Napsauta painikkeita nähdäksesi kuvioita!",
+          fr: "Cliquez sur les boutons pour voir les motifs !",
+          ar: "انقر فوق الأزرار لرؤية الأنماط!",
+          it: "Clicca sui pulsanti per vedere i modelli!",
+        },
+      };
+
+      const Grid3x3 = ({ size = 24, className = "" }) => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={className}
+        >
+          <rect width="18" height="18" x="3" y="3" rx="2" />
+          <path d="M3 9h18" />
+          <path d="M3 15h18" />
+          <path d="M9 3v18" />
+          <path d="M15 3v18" />
+        </svg>
+      );
+      const Zap = ({ size = 24, className = "" }) => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={className}
+        >
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+        </svg>
+      );
+      const Trophy = ({ size = 24, className = "" }) => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={className}
+        >
+          <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+          <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+          <path d="M4 22h16" />
+          <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+          <path d="M14 14.66V17c0 .55.47.98.97 1.21 1.15.53 2.03 2.02 2.03 3.79" />
+          <rect width="8" height="8" x="8" y="2" rx="1" />
+        </svg>
+      );
+      const Target = ({ size = 24, className = "" }) => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={className}
+        >
+          <circle cx="12" cy="12" r="10" />
+          <circle cx="12" cy="12" r="6" />
+          <circle cx="12" cy="12" r="2" />
+        </svg>
+      );
+      const RefreshCw = ({ size = 24, className = "" }) => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={className}
+        >
+          <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+          <path d="M21 3v5h-5" />
+          <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+          <path d="M8 16H3v5" />
+        </svg>
+      );
 
       function App() {
+        const [lang, setLang] = useState("zh");
         const [mode, setMode] = useState("explore"); // explore, quiz, pattern
         const [selectedRow, setSelectedRow] = useState(null);
         const [selectedCol, setSelectedCol] = useState(null);
@@ -106,18 +400,23 @@
           return false;
         };
 
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
             {/* Header */}
-            <header className="text-center mb-8">
+            <header className="text-center mb-8 mt-8">
               <div className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-md px-6 py-3 rounded-full mb-4">
                 <Grid3x3 className="text-white" size={24} />
-                <span className="text-white font-bold text-lg">小四數學</span>
+                <span className="text-white font-bold text-lg">
+                  {getText("header")}
+                </span>
               </div>
-              <h1 className="text-5xl md:text-6xl font-black text-white mb-4 tracking-tight">
-                乘數表探索
+              <h1 className="text-4xl md:text-6xl font-black text-white mb-4 tracking-tight">
+                {getText("title")}
               </h1>
-              <div className="flex gap-4 justify-center">
+              <div className="flex gap-4 justify-center flex-wrap">
                 <button
                   onClick={() => setMode("explore")}
                   className={`px-6 py-3 rounded-2xl font-bold transition-all ${
@@ -126,7 +425,7 @@
                       : "bg-white/20 text-white hover:bg-white/30"
                   }`}
                 >
-                  探索模式
+                  {getText("exploreMode")}
                 </button>
                 <button
                   onClick={() => setMode("quiz")}
@@ -136,7 +435,7 @@
                       : "bg-white/20 text-white hover:bg-white/30"
                   }`}
                 >
-                  挑戰模式
+                  {getText("quizMode")}
                 </button>
                 <button
                   onClick={() => setMode("pattern")}
@@ -146,17 +445,17 @@
                       : "bg-white/20 text-white hover:bg-white/30"
                   }`}
                 >
-                  規律探索
+                  {getText("patternMode")}
                 </button>
               </div>
             </header>
 
             <main className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8">
               {/* Grid */}
-              <div className="lg:col-span-8 bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl">
-                <div className="grid grid-cols-13 gap-2">
+              <div className="lg:col-span-8 bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl overflow-x-auto">
+                <div className="grid grid-cols-13 gap-2 min-w-[500px]">
                   {/* Corner cell */}
-                  <div className="w-12 h-12 flex items-center justify-center bg-purple-600 text-white font-black rounded-xl">
+                  <div className="w-8 h-8 md:w-12 md:h-12 flex items-center justify-center bg-purple-600 text-white font-black rounded-xl">
                     ×
                   </div>
 
@@ -164,7 +463,7 @@
                   {[...Array(MAX)].map((_, i) => (
                     <div
                       key={`col-${i}`}
-                      className="w-12 h-12 flex items-center justify-center bg-purple-100 text-purple-700 font-black rounded-xl cursor-pointer hover:bg-purple-200"
+                      className="w-8 h-8 md:w-12 md:h-12 flex items-center justify-center bg-purple-100 text-purple-700 font-black rounded-xl cursor-pointer hover:bg-purple-200"
                       onClick={() => setSelectedCol(i + 1)}
                     >
                       {i + 1}
@@ -176,7 +475,7 @@
                     <React.Fragment key={`row-${rowIdx}`}>
                       {/* Row header */}
                       <div
-                        className="w-12 h-12 flex items-center justify-center bg-purple-100 text-purple-700 font-black rounded-xl cursor-pointer hover:bg-purple-200"
+                        className="w-8 h-8 md:w-12 md:h-12 flex items-center justify-center bg-purple-100 text-purple-700 font-black rounded-xl cursor-pointer hover:bg-purple-200"
                         onClick={() => setSelectedRow(rowIdx + 1)}
                       >
                         {rowIdx + 1}
@@ -196,7 +495,7 @@
                         return (
                           <motion.div
                             key={`cell-${row}-${col}`}
-                            className={`cell w-12 h-12 flex items-center justify-center font-bold rounded-xl ${
+                            className={`cell w-8 h-8 md:w-12 md:h-12 flex items-center justify-center font-bold rounded-xl text-sm md:text-base ${
                               isTarget
                                 ? "bg-yellow-400 text-yellow-900 shadow-lg scale-110"
                                 : isSelected
@@ -229,7 +528,7 @@
                 {mode === "explore" && (
                   <div className="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-lg">
                     <h3 className="text-xl font-black text-purple-600 mb-4">
-                      選擇的乘數
+                      {getText("selectedMultiplier")}
                     </h3>
                     {selectedRow && selectedCol ? (
                       <div className="text-center">
@@ -242,7 +541,7 @@
                       </div>
                     ) : (
                       <div className="text-center text-slate-400 py-8">
-                        點擊格子來探索乘數！
+                        {getText("explorePrompt")}
                       </div>
                     )}
                   </div>
@@ -253,7 +552,7 @@
                   <div className="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-lg">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-xl font-black text-purple-600">
-                        快速挑戰
+                        {getText("quickChallenge")}
                       </h3>
                       <div className="flex items-center gap-2 bg-yellow-100 px-4 py-2 rounded-full">
                         <Trophy className="text-yellow-600" size={20} />
@@ -281,7 +580,7 @@
                       onClick={checkAnswer}
                       className="w-full py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-2xl font-bold text-lg shadow-lg transition-all"
                     >
-                      確認答案
+                      {getText("checkAnswer")}
                     </button>
 
                     {feedback === "correct" && (
@@ -290,7 +589,7 @@
                         animate={{ opacity: 1, y: 0 }}
                         className="mt-4 bg-green-100 text-green-700 p-4 rounded-xl font-bold text-center"
                       >
-                        ✓ 答對了！繼續加油！
+                        {getText("correct")}
                       </motion.div>
                     )}
 
@@ -300,7 +599,7 @@
                         animate={{ opacity: 1, y: 0 }}
                         className="mt-4 bg-red-100 text-red-700 p-4 rounded-xl font-bold text-center"
                       >
-                        ✗ 再想想看！
+                        {getText("incorrect")}
                       </motion.div>
                     )}
 
@@ -309,7 +608,7 @@
                         onClick={generateQuiz}
                         className="w-full mt-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition-all flex items-center justify-center gap-2"
                       >
-                        <RefreshCw size={18} /> 下一題
+                        <RefreshCw size={18} /> {getText("nextQuestion")}
                       </button>
                     )}
                   </div>
@@ -319,30 +618,30 @@
                 {mode === "pattern" && (
                   <div className="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-lg">
                     <h3 className="text-xl font-black text-purple-600 mb-4">
-                      發現規律
+                      {getText("discoverPatterns")}
                     </h3>
                     <div className="flex flex-col gap-3">
                       <button
                         onClick={() => showPattern("diagonal")}
                         className="w-full py-4 bg-green-500 hover:bg-green-600 text-white rounded-xl font-bold transition-all"
                       >
-                        對角線規律
+                        {getText("diagonalPattern")}
                       </button>
                       <button
                         onClick={() => showPattern("square")}
                         className="w-full py-4 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-bold transition-all"
                       >
-                        完全平方數
+                        {getText("squareNumbers")}
                       </button>
                       <button
                         onClick={() => showPattern("even")}
                         className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold transition-all"
                       >
-                        雙數規律
+                        {getText("evenPattern")}
                       </button>
                     </div>
                     <div className="mt-4 p-4 bg-purple-50 rounded-xl text-sm text-slate-600">
-                      點擊按鈕來看看乘數表中的數學規律！
+                      {getText("patternPrompt")}
                     </div>
                   </div>
                 )}
@@ -355,20 +654,5 @@
       const root = ReactDOM.createRoot(document.getElementById("root"));
       root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

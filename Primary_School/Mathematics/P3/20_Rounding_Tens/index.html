@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小三數學：約數（四捨五入至十位）</title>
+    <title>小三數學：約數（四捨五入至十位） | Rounding (Tens)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -37,8 +38,145 @@
     <div id="root"></div>
     <script type="text/babel">
       const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Rounding (Rounding to nearest ten)",
+          zh: "約數（四捨五入）",
+          ja: "四捨五入",
+          ko: "반올림",
+          es: "Redondeo",
+          de: "Runden",
+          fi: "Pyöristys",
+          fr: "Arrondissement",
+          ar: "التقريب",
+          it: "Arrotondamento",
+        },
+        input: {
+          en: "Input Number (0-100)",
+          zh: "輸入數字 (0-100)",
+          ja: "数字を入力 (0-100)",
+          ko: "숫자 입력 (0-100)",
+          es: "Ingresar número (0-100)",
+          de: "Zahl eingeben (0-100)",
+          fi: "Syötä numero (0-100)",
+          fr: "Entrer un nombre (0-100)",
+          ar: "أدخل الرقم (0-100)",
+          it: "Inserisci numero (0-100)",
+        },
+        onesDigit: {
+          en: "Ones Digit",
+          zh: "個位數字",
+          ja: "一の位",
+          ko: "일의 자리",
+          es: "Dígito de las unidades",
+          de: "Einerstelle",
+          fi: "Ykköset",
+          fr: "Chiffre des unités",
+          ar: "رقم الآحاد",
+          it: "Cifra delle unità",
+        },
+        roundUp: {
+          en: "≥ 5 (Round Up)",
+          zh: "≥ 5 (進位)",
+          ja: "≥ 5 (切り上げ)",
+          ko: "≥ 5 (올림)",
+          es: "≥ 5 (Redondear hacia arriba)",
+          de: "≥ 5 (Aufrunden)",
+          fi: "≥ 5 (Pyöristä ylöspäin)",
+          fr: "≥ 5 (Arrondir)",
+          ar: "≥ 5 (تقريب للأعلى)",
+          it: "≥ 5 (Arrotonda per eccesso)",
+        },
+        roundDown: {
+          en: "< 5 (Round Down)",
+          zh: "< 5 (捨去)",
+          ja: "< 5 (切り捨て)",
+          ko: "< 5 (내림)",
+          es: "< 5 (Redondear hacia abajo)",
+          de: "< 5 (Abrunden)",
+          fi: "< 5 (Pyöristä alaspäin)",
+          fr: "< 5 (Arrondir)",
+          ar: "< 5 (تقريب للأدنى)",
+          it: "< 5 (Arrotonda per difetto)",
+        },
+        roundToTens: {
+          en: "Round to Tens",
+          zh: "約至十位",
+          ja: "十の位に丸める",
+          ko: "십의 자리로 반올림",
+          es: "Redondear a decenas",
+          de: "Auf Zehner runden",
+          fi: "Pyöristä kymmeniin",
+          fr: "Arrondir à la dizaine",
+          ar: "التقريب للعشرات",
+          it: "Arrotonda alle decine",
+        },
+        nearest: {
+          en: "(Nearest ten to {n})",
+          zh: "(最接近 {n} 的十位數)",
+          ja: "({n}に最も近い十の位)",
+          ko: "({n}에 가장 가까운 십의 자리)",
+          es: "(Decena más cercana a {n})",
+          de: "(Nächster Zehner zu {n})",
+          fi: "({n}:n lähin kymmen)",
+          fr: "(Dizaine la plus proche de {n})",
+          ar: "(أقرب عشرة إلى {n})",
+          it: "(Decina più vicina a {n})",
+        },
+        closer: {
+          en: "{n} is closer to ",
+          zh: "{n} 比較接近 ",
+          ja: "{n} は次に近いです ",
+          ko: "{n}은(는) 다음에 더 가깝습니다 ",
+          es: "{n} está más cerca de ",
+          de: "{n} ist näher an ",
+          fi: "{n} on lähempänä ",
+          fr: "{n} est plus proche de ",
+          ar: "{n} أقرب إلى ",
+          it: "{n} è più vicino a ",
+        },
+        ruleTitle: {
+          en: "Rounding Rules",
+          zh: "四捨五入法則",
+          ja: "四捨五入のルール",
+          ko: "반올림 규칙",
+          es: "Reglas de redondeo",
+          de: "Rundungsregeln",
+          fi: "Pyöristyssäännöt",
+          fr: "Règles d'arrondissement",
+          ar: "قواعد التقريب",
+          it: "Regole di arrotondamento",
+        },
+        rule1: {
+          en: "• Ones digit is 0, 1, 2, 3, 4 ➔ Round Down",
+          zh: "• 個位是 0, 1, 2, 3, 4 ➔ 捨去 (變為 0)",
+          ja: "• 一の位が 0, 1, 2, 3, 4 ➔ 切り捨て",
+          ko: "• 일의 자리가 0, 1, 2, 3, 4 ➔ 내림",
+          es: "• Si las unidades son 0, 1, 2, 3, 4 ➔ Redondear hacia abajo",
+          de: "• Einerstelle ist 0, 1, 2, 3, 4 ➔ Abrunden",
+          fi: "• Ykköset ovat 0, 1, 2, 3, 4 ➔ Pyöristä alaspäin",
+          fr: "• Le chiffre des unités est 0, 1, 2, 3, 4 ➔ Arrondir vers le bas",
+          ar: "• رقم الآحاد هو 0، 1، 2، 3، 4 ➔ تقريب للأدنى",
+          it: "• La cifra delle unità è 0, 1, 2, 3, 4 ➔ Arrotonda per difetto",
+        },
+        rule2: {
+          en: "• Ones digit is 5, 6, 7, 8, 9 ➔ Round Up",
+          zh: "• 個位是 5, 6, 7, 8, 9 ➔ 進位 (十位 +1)",
+          ja: "• 一の位が 5, 6, 7, 8, 9 ➔ 切り上げ",
+          ko: "• 일의 자리가 5, 6, 7, 8, 9 ➔ 올림",
+          es: "• Si las unidades son 5, 6, 7, 8, 9 ➔ Redondear hacia arriba",
+          de: "• Einerstelle ist 5, 6, 7, 8, 9 ➔ Aufrunden",
+          fi: "• Ykköset ovat 5, 6, 7, 8, 9 ➔ Pyöristä ylöspäin",
+          fr: "• Le chiffre des unités est 5, 6, 7, 8, 9 ➔ Arrondir vers le haut",
+          ar: "• رقم الآحاد هو 5، 6، 7، 8، 9 ➔ تقريب للأعلى",
+          it: "• La cifra delle unità è 5, 6, 7, 8, 9 ➔ Arrotonda per eccesso",
+        },
+      };
 
       function App() {
+        const [lang, setLang] = useState("zh");
         const [num, setNum] = useState(47);
         const rounded = Math.round(num / 10) * 10;
         const onesDigit = num % 10;
@@ -49,17 +187,23 @@
         const end = start + 10;
         const position = ((num - start) / 10) * 100;
 
+        const getNearestText = () =>
+          (t.nearest[lang] || t.nearest["en"]).replace("{n}", num);
+        const getCloserText = () =>
+          (t.closer[lang] || t.closer["en"]).replace("{n}", num);
+
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-6xl font-black text-pink-900 mb-8">
-              🔢 約數（四捨五入）
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-6xl font-black text-pink-900 mb-8 mt-8 text-center">
+              🔢 {t.title[lang] || t.title["en"]}
             </h1>
 
             <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full">
               <div className="mb-12">
                 <div className="flex justify-between items-center mb-4">
-                  <label className="text-2xl font-bold text-pink-800">
-                    輸入數字 (0-100)
+                  <label className="text-xl md:text-2xl font-bold text-pink-800">
+                    {t.input[lang] || t.input["en"]}
                   </label>
                   <input
                     type="number"
@@ -90,29 +234,31 @@
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                 <div className="bg-pink-50 rounded-2xl p-8 flex flex-col justify-center items-center">
                   <div className="text-xl font-bold text-pink-700 mb-2">
-                    個位數字
+                    {t.onesDigit[lang] || t.onesDigit["en"]}
                   </div>
                   <div className="text-8xl font-black text-pink-600 mb-4">
                     {onesDigit}
                   </div>
                   <div
-                    className={`text-2xl font-bold px-6 py-2 rounded-full ${
+                    className={`text-lg md:text-2xl font-bold px-6 py-2 rounded-full ${
                       shouldRoundUp
                         ? "bg-green-100 text-green-700"
                         : "bg-orange-100 text-orange-700"
                     }`}
                   >
-                    {shouldRoundUp ? "≥ 5 (進位)" : "< 5 (捨去)"}
+                    {shouldRoundUp
+                      ? t.roundUp[lang] || t.roundUp["en"]
+                      : t.roundDown[lang] || t.roundDown["en"]}
                   </div>
                 </div>
 
                 <div className="bg-gradient-to-br from-pink-500 to-rose-600 rounded-2xl p-8 flex flex-col justify-center items-center text-white shadow-lg pulse">
                   <div className="text-2xl font-bold mb-2 opacity-90">
-                    約至十位
+                    {t.roundToTens[lang] || t.roundToTens["en"]}
                   </div>
                   <div className="text-8xl font-black mb-4">{rounded}</div>
-                  <div className="text-xl font-medium opacity-80">
-                    (最接近 {num} 的十位數)
+                  <div className="text-lg font-medium opacity-80 text-center">
+                    {getNearestText()}
                   </div>
                 </div>
               </div>
@@ -134,22 +280,18 @@
                   ></div>
                 </div>
                 <div className="mt-4 text-center text-slate-500 font-bold">
-                  {num} 比較接近{" "}
+                  {getCloserText()}
                   <span className="text-pink-600 text-xl">{rounded}</span>
                 </div>
               </div>
 
               <div className="mt-8 bg-blue-50 p-6 rounded-xl">
                 <div className="font-bold text-blue-800 text-lg mb-3">
-                  💡 四捨五入法則
+                  💡 {t.ruleTitle[lang] || t.ruleTitle["en"]}
                 </div>
-                <div className="text-blue-700 space-y-2 text-lg">
-                  <div>
-                    • 個位是 <strong>0, 1, 2, 3, 4</strong> ➔ 捨去 (變為 0)
-                  </div>
-                  <div>
-                    • 個位是 <strong>5, 6, 7, 8, 9</strong> ➔ 進位 (十位 +1)
-                  </div>
+                <div className="text-blue-700 space-y-2 text-md md:text-lg">
+                  <div>{t.rule1[lang] || t.rule1["en"]}</div>
+                  <div>{t.rule2[lang] || t.rule2["en"]}</div>
                 </div>
               </div>
             </div>
@@ -160,20 +302,5 @@
       const root = ReactDOM.createRoot(document.getElementById("root"));
       root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

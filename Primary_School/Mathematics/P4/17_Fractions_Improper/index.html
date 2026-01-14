@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小四數學：假分數</title>
+    <title>小四數學：假分數 | Improper Fractions</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -23,9 +24,53 @@
     <div id="root"></div>
     <script type="text/babel">
       const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Improper Fractions",
+          zh: "假分數認識",
+          ja: "仮分数",
+          ko: "가분수",
+          es: "Fracciones Impropias",
+          de: "Unechte Brüche",
+          fi: "Epämurtoluvut",
+          fr: "Fractions impropres",
+          ar: "الكسور غير الفعلية",
+          it: "Frazioni improprie",
+        },
+        improperLabel: {
+          en: "Improper Fraction",
+          zh: "假分數",
+          ja: "仮分数",
+          ko: "가분수",
+          es: "Fracción Impropia",
+          de: "Unechter Bruch",
+          fi: "Epämurtoluku",
+          fr: "Fraction impropre",
+          ar: "كسر غير فعلي",
+          it: "Frazione impropria",
+        },
+        rule: {
+          en: "When numerator ({num}) ≥ denominator ({den}), it is an Improper Fraction!",
+          zh: "分子 ({num}) ≥ 分母 ({den}) 時，就是假分數！",
+          ja: "分子 ({num}) ≥ 分母 ({den}) の場合、それは仮分数です！",
+          ko: "분자 ({num}) ≥ 분모 ({den}) 일 때, 그것은 가분수입니다!",
+          es: "¡Cuando el numerador ({num}) ≥ denominador ({den}), es una Fracción Impropia!",
+          de: "Wenn Zähler ({num}) ≥ Nenner ({den}), ist es ein unechter Bruch!",
+          fi: "Kun osoittaja ({num}) ≥ nimittäjä ({den}), se on epämurtoluku!",
+          fr: "Lorsque le numérateur ({num}) ≥ dénominateur ({den}), c'est une fraction impropre !",
+          ar: "عندما البسط ({num}) ≥ المقام ({den})، فهو كسر غير فعلي!",
+          it: "Quando numeratore ({num}) ≥ denominatore ({den}), è una frazione impropria!",
+        },
+      };
+
       function App() {
+        const [lang, setLang] = useState("zh");
         const [num, setNum] = useState(5);
         const [den, setDen] = useState(3);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
 
         // Visual logic:
         // num = 5, den = 3. 5/3 = 1 whole + 2/3.
@@ -37,8 +82,9 @@
 
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-fuchsia-900 mb-8">
-              🍇 假分數認識
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-fuchsia-900 mb-8 mt-8">
+              🍇 {getText("title")}
             </h1>
 
             <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full flex flex-col md:flex-row gap-8 items-center">
@@ -63,7 +109,7 @@
                   className="w-full text-5xl font-black text-center bg-transparent border-b-4 border-fuchsia-400 outline-none"
                 />
                 <div className="font-bold text-fuchsia-700 mt-2">
-                  假分數 (Improper)
+                  {getText("improperLabel")}
                 </div>
               </div>
 
@@ -71,21 +117,10 @@
 
               <div className="flex flex-wrap gap-4 items-center justify-center flex-1">
                 {[...Array(totalCircles)].map((_, i) => {
-                  const filled = i < whole ? den : rem;
-                  // If rem is 0 and it's exact multiple, last one is empty? No logic check:
-                  // If num=6, den=3. whole=2, rem=0. totalCircles=2.
-                  // i=0: filled=3. i=1: filled=0? wait.
-                  // Logic correction:
-                  // If i < whole, it's full.
-                  // If i == whole, it's rem.
-                  // If rem == 0, we don't need the extra circle if i==whole.
-                  // But Math.ceil handles count correctly. If rem=0, ceil(2)=2. 0,1.
-
                   let partsFilled = den;
                   if (i === totalCircles - 1 && rem !== 0) partsFilled = rem;
                   else if (i >= whole && rem === 0) partsFilled = den; // last one full if exact?
-                  // Actually calculate remaining for this circle
-                  // slices to fill = Math.min(den, num - i*den)
+
                   const toFill = Math.min(den, Math.max(0, num - i * den));
 
                   return (
@@ -117,6 +152,21 @@
                           50 + 48 * Math.cos(Math.PI * 2 * (end / 360));
                         const y2 =
                           50 + 48 * Math.sin(Math.PI * 2 * (end / 360));
+
+                        // Full circle path fix for den=1
+                        if (den === 1) {
+                          return (
+                            <circle
+                              key={j}
+                              cx="50"
+                              cy="50"
+                              r="48"
+                              fill={j < toFill ? "#d946ef" : "transparent"}
+                              stroke="white"
+                            />
+                          );
+                        }
+
                         return (
                           <path
                             key={j}
@@ -132,28 +182,13 @@
               </div>
             </div>
 
-            <div className="mt-8 text-white font-bold text-xl drop-shadow-md">
-              分子 ({num}) &ge; 分母 ({den}) 時，就是假分數！
+            <div className="mt-8 text-white font-bold text-xl drop-shadow-md text-center">
+              {getText("rule").replace("{num}", num).replace("{den}", den)}
             </div>
           </div>
         );
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

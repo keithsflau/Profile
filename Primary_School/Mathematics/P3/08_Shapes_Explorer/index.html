@@ -3,17 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小三數學：圖形探索家</title>
+    <title>小三數學：圖形探索家 | Shapes Explorer</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script
-      src="https://unpkg.com/react@18/umd/react.development.js"
-      crossorigin
-    ></script>
-    <script
-      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
-      crossorigin
-    ></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -29,23 +24,163 @@
     <div id="root"></div>
     <script type="text/babel">
       const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Shapes Explorer",
+          zh: "圖形探索家",
+          ja: "形探検家",
+          ko: "도형 탐험가",
+          es: "Explorador de formas",
+          de: "Formen-Entdecker",
+          fi: "Muotojen tutkimusmatkailija",
+          fr: "Explorateur de formes",
+          ar: "مستكشف الأشكال",
+          it: "Esploratore di forme",
+        },
+        select: {
+          en: "Select Shape",
+          zh: "選擇圖形",
+          ja: "形を選択",
+          ko: "도형 선택",
+          es: "Seleccionar forma",
+          de: "Form wählen",
+          fi: "Valitse muoto",
+          fr: "Sélectionner la forme",
+          ar: "اختر الشكل",
+          it: "Seleziona forma",
+        },
+        sides: {
+          en: "Sides:",
+          zh: "邊數：",
+          ja: "辺の数:",
+          ko: "변의 수:",
+          es: "Lados:",
+          de: "Seiten:",
+          fi: "Sivut:",
+          fr: "Côtés :",
+          ar: "الأضلاع:",
+          it: "Lati:",
+        },
+        feature: {
+          en: "Feature:",
+          zh: "特徵：",
+          ja: "特徴:",
+          ko: "특징:",
+          es: "Característica:",
+          de: "Merkmal:",
+          fi: "Ominaisuus:",
+          fr: "Caractéristique :",
+          ar: "الميزة:",
+          it: "Caratteristica:",
+        },
+        circleDesc: {
+          en: "No sides, it's a perfect circle",
+          zh: "沒有邊，是一個完美的圓",
+          ja: "辺はありません、完璧な円です",
+          ko: "변이 없고, 완벽한 원입니다",
+          es: "Sin lados, es un círculo perfecto",
+          de: "Keine Seiten, ein perfekter Kreis",
+          fi: "Ei sivuja, se on täydellinen ympyrä",
+          fr: "Pas de côtés, c'est un cercle parfait",
+          ar: "لا أضلاع، إنها دائرة كاملة",
+          it: "Nessun lato, è un cerchio perfetto",
+        },
+        shapes: {
+          triangle: {
+            en: "Triangle",
+            zh: "三角形",
+            ja: "三角形",
+            ko: "삼각형",
+            es: "Triángulo",
+            de: "Dreieck",
+            fi: "Kolmio",
+            fr: "Triangle",
+            ar: "مثلث",
+            it: "Triangolo",
+          },
+          square: {
+            en: "Square",
+            zh: "正方形",
+            ja: "正方形",
+            ko: "정사각형",
+            es: "Cuadrado",
+            de: "Quadrat",
+            fi: "Neliö",
+            fr: "Carré",
+            ar: "مربع",
+            it: "Quadrato",
+          },
+          rectangle: {
+            en: "Rectangle",
+            zh: "長方形",
+            ja: "長方形",
+            ko: "직사각형",
+            es: "Rectángulo",
+            de: "Rechteck",
+            fi: "Suorakulmio",
+            fr: "Rectangle",
+            ar: "مستطيل",
+            it: "Rettangolo",
+          },
+          circle: {
+            en: "Circle",
+            zh: "圓形",
+            ja: "円",
+            ko: "원",
+            es: "Círculo",
+            de: "Kreis",
+            fi: "Ympyrä",
+            fr: "Cercle",
+            ar: "دائرة",
+            it: "Cerchio",
+          },
+          pentagon: {
+            en: "Pentagon",
+            zh: "五邊形",
+            ja: "五角形",
+            ko: "오각형",
+            es: "Pentágono",
+            de: "Fünfeck",
+            fi: "Viisikulmio",
+            fr: "Pentagone",
+            ar: "خماسي الأضلاع",
+            it: "Pentagono",
+          },
+        },
+      };
+
       function App() {
+        const [lang, setLang] = useState("zh");
         const [shape, setShape] = useState("triangle");
+
         const shapes = {
-          triangle: { name: "三角形", sides: 3, color: "#ef4444" },
-          square: { name: "正方形", sides: 4, color: "#3b82f6" },
-          rectangle: { name: "長方形", sides: 4, color: "#22c55e" },
-          circle: { name: "圓形", sides: 0, color: "#f59e0b" },
-          pentagon: { name: "五邊形", sides: 5, color: "#a855f7" },
+          triangle: { sides: 3, color: "#ef4444" },
+          square: { sides: 4, color: "#3b82f6" },
+          rectangle: { sides: 4, color: "#22c55e" },
+          circle: { sides: 0, color: "#f59e0b" },
+          pentagon: { sides: 5, color: "#a855f7" },
         };
+
+        const getShapeName = (key) =>
+          t.shapes[key][lang] || t.shapes[key]["en"];
+
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-6xl font-black text-purple-900 mb-8">
-              📐 圖形探索家
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-6xl font-black text-purple-900 mb-8 mt-8 text-center">
+              📐 {t.title[lang] || t.title["en"]}
             </h1>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl w-full">
-              <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl">
-                <svg width="500" height="500" className="mx-auto">
+              <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl flex justify-center items-center">
+                <svg
+                  width="100%"
+                  height="100%"
+                  viewBox="0 0 500 500"
+                  className="mx-auto"
+                  style={{ maxWidth: "500px" }}
+                >
                   {shape === "triangle" && (
                     <polygon
                       points="250,50 450,400 50,400"
@@ -99,7 +234,7 @@
               <div className="space-y-6">
                 <div className="bg-white/90 backdrop-blur-md rounded-3xl p-6 shadow-xl">
                   <h3 className="text-2xl font-black text-purple-800 mb-4">
-                    選擇圖形
+                    {t.select[lang] || t.select["en"]}
                   </h3>
                   <div className="grid grid-cols-2 gap-4">
                     {Object.entries(shapes).map(([key, s]) => (
@@ -112,22 +247,24 @@
                             : "bg-slate-100 hover:bg-slate-200"
                         }`}
                       >
-                        {s.name}
+                        {getShapeName(key)}
                       </button>
                     ))}
                   </div>
                 </div>
                 <div className="bg-white/90 backdrop-blur-md rounded-3xl p-6 shadow-xl">
                   <h3
-                    className="text-2xl font-black mb-4"
+                    className="text-3xl font-black mb-4"
                     style={{ color: shapes[shape].color }}
                   >
-                    {shapes[shape].name}
+                    {getShapeName(shape)}
                   </h3>
                   <div className="space-y-3">
                     {shapes[shape].sides > 0 && (
                       <div className="bg-purple-50 p-4 rounded-xl">
-                        <span className="font-bold">邊數：</span>
+                        <span className="font-bold">
+                          {t.sides[lang] || t.sides["en"]}
+                        </span>
                         <span className="text-3xl font-black ml-2">
                           {shapes[shape].sides}
                         </span>
@@ -135,9 +272,11 @@
                     )}
                     {shapes[shape].sides === 0 && (
                       <div className="bg-purple-50 p-4 rounded-xl">
-                        <span className="font-bold">特徵：</span>
-                        <span className="text-xl font-black ml-2">
-                          沒有邊，是一個完美的圓
+                        <span className="font-bold">
+                          {t.feature[lang] || t.feature["en"]}
+                        </span>
+                        <span className="text-xl font-black ml-2 display-block mt-2">
+                          {t.circleDesc[lang] || t.circleDesc["en"]}
                         </span>
                       </div>
                     )}
@@ -150,20 +289,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

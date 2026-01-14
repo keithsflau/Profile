@@ -3,165 +3,305 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小六數學：多邊形內角 | Angles in Polygons</title>
+    <title>小六數學：多邊形內角 | Polygon Angles</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #ecfccb 0%, #84cc16 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
-      function App() {
-        const [sides, setSides] = useState(3); // 3 to 10
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
 
-        const sumAngles = (sides - 2) * 180;
-        const oneAngle = sumAngles / sides;
+      const t = {
+        title: {
+          en: "Polygon Angles",
+          zh: "多邊形內角",
+          ja: "多角形の角",
+          ko: "다각형의 각",
+          es: "Ángulos de Polígonos",
+          de: "Polygonwinkel",
+          fi: "Monikulmion kulmat",
+          fr: "Angles des polygones",
+          ar: "زوايا المضلع",
+          it: "Angoli dei Poligoni",
+        },
+        sides: {
+          en: "Number of Sides",
+          zh: "邊數",
+          ja: "辺の数",
+          ko: "변의 수",
+          es: "Número de lados",
+          de: "Anzahl der Seiten",
+          fi: "Sivujen määrä",
+          fr: "Nombre de côtés",
+          ar: "عدد الأضلاع",
+          it: "Numero di Lati",
+        },
+        triangles: {
+          en: "Triangles",
+          zh: "三角形數量",
+          ja: "三角形の数",
+          ko: "삼각형 수",
+          es: "Triángulos",
+          de: "Dreiecke",
+          fi: "Kolmiot",
+          fr: "Triangles",
+          ar: "مثلثات",
+          it: "Triangoli",
+        },
+        sum: {
+          en: "Sum of Interior Angles",
+          zh: "內角和",
+          ja: "内角の和",
+          ko: "내각의 합",
+          es: "Suma de Ángulos Interiores",
+          de: "Summe der Innenwinkel",
+          fi: "Sisäkulmien summa",
+          fr: "Somme des angles intérieurs",
+          ar: "مجموع الزوايا الداخلية",
+          it: "Somma degli Angoli Interni",
+        },
+        each: {
+          en: "Each Angle (Regular)",
+          zh: "每個內角 (正多邊形)",
+          ja: "各角（正多角形）",
+          ko: "각 각 (정다각형)",
+          es: "Cada Ángulo (Regular)",
+          de: "Jeder Winkel (Regulär)",
+          fi: "Jokainen kulma (säännöllinen)",
+          fr: "Chaque angle (Régulier)",
+          ar: "كل زاوية (منتظم)",
+          it: "Ogni Angolo (Regolare)",
+        },
+        formula: {
+          en: "Formula",
+          zh: "公式",
+          ja: "公式",
+          ko: "공식",
+          es: "Fórmula",
+          de: "Formel",
+          fi: "Kaava",
+          fr: "Formule",
+          ar: "صيغة",
+          it: "Formula",
+        },
+      };
 
-        const names = {
-          3: "三角形 Triangle",
-          4: "四邊形 Quadrilateral",
-          5: "五邊形 Pentagon",
-          6: "六邊形 Hexagon",
-          7: "七邊形 Heptagon",
-          8: "八邊形 Octagon",
-          9: "九邊形 Nonagon",
-          10: "十邊形 Decagon",
-        };
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
 
-        const renderPolygon = () => {
-          const r = 100;
-          const cx = 150;
-          const cy = 150;
-          const points = [];
-          for (let i = 0; i < sides; i++) {
-            // -90 to start at top
-            const angle = (((i * 360) / sides - 90) * Math.PI) / 180;
-            points.push(
-              `${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`
-            );
-          }
+      const PolyViewer = ({ n }) => {
+        const r = 120;
+        const cx = 150;
+        const cy = 150;
 
-          // Generate triangles from center
-          const triangles = [];
-          for (let i = 0; i < sides; i++) {
-            const p1 = points[i];
-            const p2 = points[(i + 1) % sides];
-            // Triangles from center would show sides, but formula uses (n-2) triangles from one vertex.
-            // Let's visualize the shape itself.
-          }
+        let points = [];
+        for (let i = 0; i < n; i++) {
+          // start angle -90deg (top)
+          const theta = (2 * Math.PI * i) / n - Math.PI / 2;
+          points.push({
+            x: cx + r * Math.cos(theta),
+            y: cy + r * Math.sin(theta),
+          });
+        }
 
-          // Lines from vertex 0 to all others to show (n-2) triangles
-          const diagLines = [];
-          for (let i = 2; i < sides - 1; i++) {
-            const pTarget = points[i];
-            const pStart = points[0];
-            // diagLines.push(<line x1={pStart.split(',')[0]} y1={pStart.split(',')[1]} x2={pTarget.split(',')[0]} y2={pTarget.split(',')[1]} stroke="white" strokeDasharray="4" />);
-            // Visualizing diagonals sometimes confusing without animation. Let's just show shape.
-          }
+        const pointsStr = points.map((p) => `${p.x},${p.y}`).join(" ");
 
-          return (
-            <svg
-              viewBox="0 0 300 300"
-              className="w-64 h-64 drop-shadow-xl mx-auto"
-            >
-              <polygon
-                points={points.join(" ")}
-                fill="#a3e635"
-                stroke="#4d7c0f"
-                strokeWidth="4"
-              />
-              {diagLines}
-            </svg>
-          );
-        };
+        // Triangulation lines from vertex 0 to others (excluding adjacents)
+        // Vertices are 0, 1, 2 ... n-1
+        // Adjacent to 0 are 1 and n-1
+        // Lines to 2, 3... n-2
+        let diagonals = [];
+        for (let i = 2; i < n - 1; i++) {
+          diagonals.push({
+            p1: points[0],
+            p2: points[i],
+          });
+        }
 
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-lime-900 mb-2">
-              🔷 多邊形內角
-            </h1>
-            <p className="text-xl text-lime-700 font-bold mb-8">
-              Interior Angles of Polygons
-            </p>
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-3xl w-full flex flex-col md:flex-row gap-8 items-center">
-              <div className="flex-1 text-center">
-                {renderPolygon()}
-                <div className="mt-4 text-2xl font-black text-lime-800">
-                  {names[sides]}
+          <svg viewBox="0 0 300 300" className="w-full h-full drop-shadow-2xl">
+            {/* Background Glow */}
+            <path
+              d={`M ${pointsStr} Z`}
+              fill="rgba(132, 204, 22, 0.1)"
+              stroke="none"
+            />
+
+            {/* Triangles fills (optional) - let's skip fill to keep clean */}
+
+            {/* Diagonals */}
+            {diagonals.map((d, i) => (
+              <line
+                key={i}
+                x1={d.p1.x}
+                y1={d.p1.y}
+                x2={d.p2.x}
+                y2={d.p2.y}
+                stroke="rgba(255,255,255,0.3)"
+                strokeWidth="1"
+                strokeDasharray="4"
+              />
+            ))}
+
+            {/* Outline */}
+            <motion.path
+              d={`M ${pointsStr} Z`}
+              fill="none"
+              stroke="#a3e635"
+              strokeWidth="4"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 0.5 }}
+            />
+
+            {/* Vertices */}
+            {points.map((p, i) => (
+              <circle key={i} cx={p.x} cy={p.y} r="4" fill="white" />
+            ))}
+          </svg>
+        );
+      };
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [n, setN] = useState(5);
+
+        const sum = (n - 2) * 180;
+        const each = sum / n;
+        const triangles = n - 2;
+
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4 font-sans bg-slate-900 text-white">
+            <div className="w-full max-w-5xl flex justify-between items-center mb-10">
+              <h1 className="text-4xl font-black text-lime-400 drop-shadow-[0_0_15px_rgba(163,230,53,0.5)]">
+                🔷 {getText("title", lang)}
+              </h1>
+              <div className="flex bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-lime-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+              {/* Visual */}
+              <div className="glass-panel p-8 rounded-3xl min-h-[400px] flex items-center justify-center relative bg-slate-800/50">
+                <div className="w-full max-w-[300px] aspect-square">
+                  <PolyViewer n={n} />
+                </div>
+                <div className="absolute bottom-4 text-center w-full text-slate-400 text-sm font-bold">
+                  {/* Name of polygon? */}
                 </div>
               </div>
 
-              <div className="flex-1 w-full space-y-6">
-                <div>
-                  <label className="block font-bold text-lime-800 mb-2">
-                    邊數 Number of Sides (n): {sides}
+              {/* Controls */}
+              <div className="flex flex-col gap-6">
+                <div className="glass-panel p-8 rounded-3xl">
+                  <label className="text-lime-400 font-bold uppercase mb-4 block flex justify-between">
+                    <span>{getText("sides", lang)} (n)</span>
+                    <span className="text-2xl font-black text-white">{n}</span>
                   </label>
                   <input
                     type="range"
                     min="3"
-                    max="10"
-                    value={sides}
-                    onChange={(e) => setSides(parseInt(e.target.value))}
-                    className="w-full accent-lime-600 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+                    max="15"
+                    step="1"
+                    value={n}
+                    onChange={(e) => setN(parseInt(e.target.value))}
+                    className="w-full accent-lime-500 h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer"
                   />
+
+                  <div className="mt-8 p-4 bg-slate-800 rounded-xl border border-white/5 flex justify-between items-center">
+                    <span className="text-slate-400 font-bold">
+                      {getText("triangles", lang)} (n-2)
+                    </span>
+                    <span className="text-2xl font-bold text-white">
+                      {n - 2}
+                    </span>
+                  </div>
                 </div>
 
-                <div className="bg-lime-50 p-4 rounded-xl border border-lime-200">
-                  <h3 className="font-bold text-lime-900 border-b border-lime-200 pb-2 mb-2">
-                    內角和 Sum of Interior Angles
+                <div className="glass-panel p-8 rounded-3xl border-l-4 border-lime-500 bg-lime-900/10">
+                  <h3 className="text-lime-400 font-bold uppercase mb-4 text-xs tracking-widest">
+                    {getText("formula", lang)}
                   </h3>
-                  <p className="font-mono text-lg text-slate-700">
-                    (n - 2) × 180°
-                  </p>
-                  <p className="font-mono text-xl font-bold text-lime-700 mt-1">
-                    ({sides} - 2) × 180° = {sumAngles}°
-                  </p>
-                </div>
 
-                <div className="bg-emerald-100 p-4 rounded-xl border border-emerald-300">
-                  <h3 className="font-bold text-emerald-900 border-b border-emerald-200 pb-2 mb-2">
-                    每個內角 (正多邊形) Each Angle
-                  </h3>
-                  <p className="font-mono text-lg text-slate-700">
-                    {sumAngles}° ÷ {sides}
-                  </p>
-                  <p className="font-mono text-3xl font-black text-emerald-700 mt-1">
-                    {oneAngle.toFixed(1)}°
-                  </p>
+                  <div className="mb-6 border-b border-white/10 pb-6">
+                    <div className="text-slate-400 text-sm mb-1">
+                      {getText("sum", lang)}
+                    </div>
+                    <div className="text-xl font-mono text-white mb-2">
+                      (n - 2) × 180°
+                    </div>
+                    <div className="text-3xl font-black text-lime-400">
+                      {n - 2} × 180° = {sum}°
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="text-slate-400 text-sm mb-1">
+                      {getText("each", lang)}
+                    </div>
+                    <div className="text-3xl font-black text-emerald-400">
+                      {each.toFixed(1)}°
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

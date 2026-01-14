@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>小三數學：數據記錄</title>
+    <title>小三數學：數據記錄 | Data Tally</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -23,27 +24,131 @@
     <div id="root"></div>
     <script type="text/babel">
       const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Data Tally",
+          zh: "數據記錄（劃記法）",
+          ja: "データ集計",
+          ko: "데이터 기록",
+          es: "Conteo de datos",
+          de: "Datenerfassung",
+          fi: "Tietojen kirjaus",
+          fr: "Comptage de données",
+          ar: "تسجيل البيانات",
+          it: "Conteggio dati",
+        },
+        total: {
+          en: "Total: ",
+          zh: "總數：",
+          ja: "合計: ",
+          ko: "합계: ",
+          es: "Total: ",
+          de: "Gesamt: ",
+          fi: "Yhteensä: ",
+          fr: "Total : ",
+          ar: "المجموع: ",
+          it: "Totale: ",
+        },
+        grandTotal: {
+          en: "Grand Total",
+          zh: "全部總數",
+          ja: "総計",
+          ko: "총합계",
+          es: "Gran total",
+          de: "Gesamtsumme",
+          fi: "Loppusumma",
+          fr: "Grand total",
+          ar: "المجموع الكلي",
+          it: "Totale complessivo",
+        },
+        items: {
+          apple: {
+            en: "Apple",
+            zh: "蘋果",
+            ja: "リンゴ",
+            ko: "사과",
+            es: "Manzana",
+            de: "Apfel",
+            fi: "Omena",
+            fr: "Pomme",
+            ar: "تفاحة",
+            it: "Mela",
+          },
+          orange: {
+            en: "Orange",
+            zh: "橙",
+            ja: "オレンジ",
+            ko: "오렌지",
+            es: "Naranja",
+            de: "Orange",
+            fi: "Appelsiini",
+            fr: "Orange",
+            ar: "برتقال",
+            it: "Arancia",
+          },
+          banana: {
+            en: "Banana",
+            zh: "香蕉",
+            ja: "バナナ",
+            ko: "바나나",
+            es: "Plátano",
+            de: "Banane",
+            fi: "Banaani",
+            fr: "Banane",
+            ar: "موز",
+            it: "Banana",
+          },
+          grape: {
+            en: "Grape",
+            zh: "葡萄",
+            ja: "ブドウ",
+            ko: "포도",
+            es: "Uva",
+            de: "Traube",
+            fi: "Rypäle",
+            fr: "Raisin",
+            ar: "عنب",
+            it: "Uva",
+          },
+        },
+      };
+
       function App() {
-        const [data, setData] = useState({ 蘋果: 0, 橙: 0, 香蕉: 0, 葡萄: 0 });
+        const [lang, setLang] = useState("zh");
+        // Using english keys for state to map easily
+        const [data, setData] = useState({
+          apple: 0,
+          orange: 0,
+          banana: 0,
+          grape: 0,
+        });
         const add = (item) =>
           setData((prev) => ({ ...prev, [item]: prev[item] + 1 }));
         const total = Object.values(data).reduce((a, b) => a + b, 0);
+
+        const getItemName = (key) => t.items[key][lang] || t.items[key]["en"];
+
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-6xl font-black text-yellow-900 mb-8">
-              📊 數據記錄（劃記法）
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-6xl font-black text-yellow-900 mb-8 mt-8 text-center">
+              📊 {t.title[lang] || t.title["en"]}
             </h1>
             <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full">
-              <div className="grid grid-cols-2 gap-6 mb-8">
-                {Object.entries(data).map(([item, count]) => (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                {Object.entries(data).map(([itemKey, count]) => (
                   <div
-                    key={item}
+                    key={itemKey}
                     className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl p-6 border-2 border-yellow-300"
                   >
                     <div className="flex justify-between items-center mb-4">
-                      <div className="text-2xl font-black">{item}</div>
+                      <div className="text-2xl font-black">
+                        {getItemName(itemKey)}
+                      </div>
                       <button
-                        onClick={() => add(item)}
+                        onClick={() => add(itemKey)}
                         className="px-6 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-xl font-bold"
                       >
                         +1
@@ -57,14 +162,15 @@
                       ))}
                     </div>
                     <div className="text-4xl font-black text-yellow-600">
-                      總數：{count}
+                      {t.total[lang] || t.total["en"]}
+                      {count}
                     </div>
                   </div>
                 ))}
               </div>
               <div className="bg-gradient-to-r from-green-100 to-emerald-100 rounded-2xl p-6 border-4 border-green-400 text-center">
                 <div className="text-2xl font-bold text-green-700 mb-2">
-                  全部總數
+                  {t.grandTotal[lang] || t.grandTotal["en"]}
                 </div>
                 <div className="text-6xl font-black text-green-600">
                   {total}
@@ -76,20 +182,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

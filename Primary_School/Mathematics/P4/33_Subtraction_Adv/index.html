@@ -3,12 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小四數學：多位數減法進階</title>
+    <title>小四數學：多位數減法進階 | Advanced Subtraction</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -25,13 +26,41 @@
     <script type="text/babel">
       const { useState } = React;
       const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Multi-digit Subtraction (Borrowing)",
+          zh: "多位數減法 (退位)",
+          ja: "多桁の引き算 (繰り下がり)",
+          ko: "여러 자릿수 뺄셈 (빌려오기)",
+          es: "Resta de Múltiples Dígitos (Préstamo)",
+          de: "Mehrstellige Subtraktion (Entleihen)",
+          fi: "Moninumeroinen vähennyslasku (lainaus)",
+          fr: "Soustraction à plusieurs chiffres (Emprunt)",
+          ar: "طرح متعدد الأرقام (استلاف)",
+          it: "Sottrazione a più cifre (Prestito)",
+        },
+        tip: {
+          en: "When subtracting from 0, borrow from previous digits! e.g. 50000 - 12345, borrow from 5.",
+          zh: "遇上 0 不夠減時，要向前一位借位！<br />如 50000 - 12345，要一直向萬位 (5) 借。",
+          ja: "0から引けない場合は、前の位から借ります！例：50000 - 12345、5から借ります。",
+          ko: "0에서 뺄 수 없을 때는 앞 자리에서 빌려오세요! 예: 50000 - 12345, 5에서 빌려옵니다.",
+          es: "¡Cuando restes de 0, toma prestado de los dígitos anteriores! ej. 50000 - 12345, toma prestado del 5.",
+          de: "Beim Subtrahieren von 0, leihe von den vorherigen Ziffern! z.B. 50000 - 12345, leihe von 5.",
+          fi: "Kun vähennät nollasta, lainaa edellisiltä numeroilta! esim. 50000 - 12345, lainaa 5:ltä.",
+          fr: "Lors de la soustraction de 0, empruntez aux chiffres précédents ! ex. 50000 - 12345, empruntez à 5.",
+          ar: "عند الطرح من 0، استلف من الأرقام السابقة! مثال 50000 - 12345، استلف من 5.",
+          it: "Quando sottrai da 0, prendi in prestito dalle cifre precedenti! es. 50000 - 12345, prendi in prestito da 5.",
+        },
+      };
 
       function App() {
+        const [lang, setLang] = useState("zh");
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
         const [n1, setN1] = useState(50000);
         const [n2, setN2] = useState(12345);
-
-        // Simplified logic: just showing result. Complex borrow viz needs lots of state logic for "striking through" numbers.
-        // Let's implement a simple version where borrows are auto-calculated for display?
 
         const res = n1 - n2;
         const resStr = res.toString().padStart(6, " ").split("");
@@ -40,12 +69,13 @@
 
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-red-900 mb-8">
-              ➖ 多位數減法 (退位)
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-red-900 mb-8 mt-8">
+              ➖ {getText("title")}
             </h1>
 
             <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-2xl w-full flex flex-col items-center">
-              <div className="flex gap-8 mb-8">
+              <div className="flex gap-8 mb-8 flex-wrap justify-center">
                 <input
                   type="number"
                   value={n1}
@@ -62,8 +92,6 @@
               </div>
 
               <div className="text-6xl font-mono grid grid-cols-6 gap-x-4 text-right relative p-8">
-                {/* Borrows hints overlay - hard to calculate dynamically in 1-shot script perfectly for all cases, but we can animate result appearance */}
-
                 {/* N1 */}
                 {s1.map((d, i) => (
                   <div key={`n1${i}`} className="text-slate-700">
@@ -100,8 +128,7 @@
               </div>
 
               <div className="mt-4 bg-red-50 p-4 rounded-xl text-red-800 font-bold border border-red-200">
-                遇上 0 不夠減時，要向前一位借位！
-                <br />如 50000 - 12345，要一直向萬位 (5) 借。
+                <span dangerouslySetInnerHTML={{ __html: getText("tip") }} />
               </div>
             </div>
           </div>
@@ -109,20 +136,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小三數學：長度單位轉換</title>
+    <title>小三數學：長度單位轉換 | Length Unit Converter</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -26,44 +27,215 @@
     <div id="root"></div>
     <script type="text/babel">
       const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Length Unit Converter",
+          zh: "長度單位轉換",
+          ja: "長さ単位変換",
+          ko: "길이 단위 변환",
+          es: "Conversor de longitud",
+          de: "Längenumrechner",
+          fi: "Pituusmuunnin",
+          fr: "Convertisseur de longueur",
+          ar: "محول الطول",
+          it: "Convertitore di lunghezza",
+        },
+        value: {
+          en: "Value",
+          zh: "數值",
+          ja: "値",
+          ko: "값",
+          es: "Valor",
+          de: "Wert",
+          fi: "Arvo",
+          fr: "Valeur",
+          ar: "القيمة",
+          it: "Valore",
+        },
+        unit: {
+          en: "Unit",
+          zh: "單位",
+          ja: "単位",
+          ko: "단위",
+          es: "Unidad",
+          de: "Einheit",
+          fi: "Yksikkö",
+          fr: "Unité",
+          ar: "الوحدة",
+          it: "Unità",
+        },
+        convertTo: {
+          en: "Convert to",
+          zh: "轉換成",
+          ja: "変換先",
+          ko: "변환 대상",
+          es: "Convertir a",
+          de: "Konvertieren in",
+          fi: "Muunna",
+          fr: "Convertir en",
+          ar: "تحويل إلى",
+          it: "Converti in",
+        },
+        targetUnit: {
+          en: "Target Unit",
+          zh: "目標單位",
+          ja: "目標単位",
+          ko: "목표 단위",
+          es: "Unidad objetivo",
+          de: "Zieleinheit",
+          fi: "Kohdeyksikkö",
+          fr: "Unité cible",
+          ar: "وحدة الهدف",
+          it: "Unità di destinazione",
+        },
+        result: {
+          en: "Result",
+          zh: "答案",
+          ja: "結果",
+          ko: "결과",
+          es: "Resultado",
+          de: "Ergebnis",
+          fi: "Tulos",
+          fr: "Résultat",
+          ar: "النتيجة",
+          it: "Risultato",
+        },
+        tipsTitle: {
+          en: "Conversion Tips",
+          zh: "轉換關係",
+          ja: "変換のヒント",
+          ko: "변환 팁",
+          es: "Consejos de conversión",
+          de: "Umrechnungstipps",
+          fi: "Muunnosvinkit",
+          fr: "Conseils de conversion",
+          ar: "نصائح التحويل",
+          it: "Suggerimenti per la conversione",
+        },
+        visualizer: {
+          en: "Visualizer (Approx)",
+          zh: "視覺化長度 (示意)",
+          ja: "可視化 (概算)",
+          ko: "시각화 (대략)",
+          es: "Visualizador (Aproximado)",
+          de: "Visualisierer (Ungefähr)",
+          fi: "Visualisoija (Noin)",
+          fr: "Visualiseur (Approximatif)",
+          ar: "المصور (تقريبي)",
+          it: "Visualizzatore (Approssimativo)",
+        },
+        scale: {
+          en: "Scale: 10m Full Width",
+          zh: "比例: 10米 全寬",
+          ja: "スケール: 10m 全幅",
+          ko: "비율: 10m 전체 너비",
+          es: "Escala: 10m Ancho completo",
+          de: "Maßstab: 10m Volle Breite",
+          fi: "Mittakaava: 10m Täysi leveys",
+          fr: "Échelle : 10m Pleine largeur",
+          ar: "توسيع: 10 م عرض كامل",
+          it: "Scala: 10m Larghezza intera",
+        },
+        mm: {
+          en: "Millimeter",
+          zh: "毫米",
+          ja: "ミリメートル",
+          ko: "밀리미터",
+          es: "Milímetro",
+          de: "Millimeter",
+          fi: "Millimetri",
+          fr: "Millimètre",
+          ar: "مليمتر",
+          it: "Millimetro",
+        },
+        cm: {
+          en: "Centimeter",
+          zh: "厘米",
+          ja: "センチメートル",
+          ko: "센티미터",
+          es: "Centímetro",
+          de: "Zentimeter",
+          fi: "Senttimetri",
+          fr: "Centimètre",
+          ar: "سنتيمتر",
+          it: "Centimetro",
+        },
+        m: {
+          en: "Meter",
+          zh: "米",
+          ja: "メートル",
+          ko: "미터",
+          es: "Metro",
+          de: "Meter",
+          fi: "Metri",
+          fr: "Mètre",
+          ar: "متر",
+          it: "Metro",
+        },
+        km: {
+          en: "Kilometer",
+          zh: "公里",
+          ja: "キロメートル",
+          ko: "킬로미터",
+          es: "Kilómetro",
+          de: "Kilometer",
+          fi: "Kilometri",
+          fr: "Kilomètre",
+          ar: "كيلومتر",
+          it: "Chilometro",
+        },
+        relationships: [
+          { val: "1 km = 1000 m" },
+          { val: "1 m = 100 cm" },
+          { val: "1 cm = 10 mm" },
+          { val: "1 m = 1000 mm" },
+        ],
+      };
 
       function App() {
+        const [lang, setLang] = useState("zh");
         const [value, setValue] = useState(100);
         const [fromUnit, setFromUnit] = useState("cm");
         const [toUnit, setToUnit] = useState("m");
 
         const units = {
-          mm: { name: "毫米", symbol: "mm", toMM: 1 },
-          cm: { name: "厘米", symbol: "cm", toMM: 10 },
-          m: { name: "米", symbol: "m", toMM: 1000 },
-          km: { name: "公里", symbol: "km", toMM: 1000000 },
+          mm: { name: t.mm, symbol: "mm", toMM: 1 },
+          cm: { name: t.cm, symbol: "cm", toMM: 10 },
+          m: { name: t.m, symbol: "m", toMM: 1000 },
+          km: { name: t.km, symbol: "km", toMM: 1000000 },
         };
 
         const convert = () => {
-          const inMM = value * units[fromUnit].toMM;
-          return (inMM / units[toUnit].toMM).toFixed(4);
+          // units depends on lang now, so let's simplify logic by keeping multiplier static
+          // re-define multipliers separately
+          const multipliers = { mm: 1, cm: 10, m: 1000, km: 1000000 };
+          const inMM = value * multipliers[fromUnit];
+          return (inMM / multipliers[toUnit]).toFixed(4);
         };
 
         const result = convert();
+        const multipliers = { mm: 1, cm: 10, m: 1000, km: 1000000 };
+        const inMM = value * multipliers[fromUnit];
+        const widthPercent = Math.min(100, Math.max(1, (inMM / 10000) * 100)); // 10m = 100%
 
-        // Visual scale: map 0-1000mm to 0-100% width roughly, capped
-        const inMM = value * units[fromUnit].toMM;
-        // Let's say 10 meters (10000mm) is full width?
-        // Or adaptive.
-        const widthPercent = Math.min(100, Math.max(1, (inMM / 1000) * 10)); // 1m = 10% width
-        // This is just a toy visualizer
+        const getUnitName = (key) => {
+          return units[key].name[lang] || units[key].name["en"];
+        };
 
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-6xl font-black text-green-900 mb-8">
-              長度單位轉換
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-6xl font-black text-green-900 mb-8 mt-8 text-center">
+              {t.title[lang] || t.title["en"]}
             </h1>
 
             <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full">
-              <div className="grid grid-cols-2 gap-6 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 <div>
                   <label className="block text-lg font-bold text-green-800 mb-2">
-                    數值
+                    {t.value[lang] || t.value["en"]}
                   </label>
                   <input
                     type="number"
@@ -75,7 +247,7 @@
 
                 <div>
                   <label className="block text-lg font-bold text-green-800 mb-2">
-                    單位
+                    {t.unit[lang] || t.unit["en"]}
                   </label>
                   <select
                     value={fromUnit}
@@ -84,20 +256,20 @@
                   >
                     {Object.entries(units).map(([key, unit]) => (
                       <option key={key} value={key}>
-                        {unit.name} ({unit.symbol})
+                        {getUnitName(key)} ({unit.symbol})
                       </option>
                     ))}
                   </select>
                 </div>
               </div>
 
-              <div className="text-center text-5xl font-black text-green-600 mb-8">
-                ↓ 轉換成 ↓
+              <div className="text-center text-4xl md:text-5xl font-black text-green-600 mb-8">
+                ↓ {t.convertTo[lang] || t.convertTo["en"]} ↓
               </div>
 
               <div>
                 <label className="block text-lg font-bold text-green-800 mb-2">
-                  目標單位
+                  {t.targetUnit[lang] || t.targetUnit["en"]}
                 </label>
                 <select
                   value={toUnit}
@@ -106,7 +278,7 @@
                 >
                   {Object.entries(units).map(([key, unit]) => (
                     <option key={key} value={key}>
-                      {unit.name} ({unit.symbol})
+                      {getUnitName(key)} ({unit.symbol})
                     </option>
                   ))}
                 </select>
@@ -114,9 +286,9 @@
 
               <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-8 text-center border-4 border-green-400">
                 <div className="text-2xl font-bold text-green-700 mb-2">
-                  答案
+                  {t.result[lang] || t.result["en"]}
                 </div>
-                <div className="text-7xl font-black text-green-600">
+                <div className="text-6xl md:text-7xl font-black text-green-600 break-all">
                   {result}
                 </div>
                 <div className="text-3xl font-bold text-green-700 mt-2">
@@ -126,40 +298,32 @@
 
               <div className="mt-8 bg-blue-50 rounded-2xl p-6">
                 <h3 className="text-xl font-black text-blue-800 mb-4">
-                  💡 轉換關係
+                  💡 {t.tipsTitle[lang] || t.tipsTitle["en"]}
                 </h3>
-                <div className="grid grid-cols-2 gap-4 text-sm font-bold text-blue-700">
-                  <div className="bg-white p-3 rounded-lg">
-                    1 公里 = 1000 米
-                  </div>
-                  <div className="bg-white p-3 rounded-lg">1 米 = 100 厘米</div>
-                  <div className="bg-white p-3 rounded-lg">
-                    1 厘米 = 10 毫米
-                  </div>
-                  <div className="bg-white p-3 rounded-lg">
-                    1 米 = 1000 毫米
-                  </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm font-bold text-blue-700">
+                  {t.relationships.map((r, i) => (
+                    <div key={i} className="bg-white p-3 rounded-lg">
+                      {r.val}
+                    </div>
+                  ))}
                 </div>
               </div>
 
               {/* Visualizer - simple bar */}
               <div className="mt-8 bg-slate-100 rounded-2xl p-6 overflow-hidden">
                 <div className="text-center font-bold text-slate-700 mb-4">
-                  視覺化長度 (示意)
+                  {t.visualizer[lang] || t.visualizer["en"]}
                 </div>
                 <div className="w-full bg-slate-200 rounded-full h-8">
                   <div
                     className="h-full bg-gradient-to-r from-green-400 to-emerald-500 rounded-full bar-transition shadow-lg"
                     style={{
-                      width: `${Math.min(
-                        100,
-                        (value * units[fromUnit].toMM) / 100
-                      )}%`,
+                      width: `${widthPercent}%`,
                     }}
                   ></div>
                 </div>
                 <div className="text-center text-xs text-slate-400 mt-2">
-                  比例: 10cm 全寬
+                  {t.scale[lang] || t.scale["en"]}
                 </div>
               </div>
             </div>
@@ -170,20 +334,5 @@
       const root = ReactDOM.createRoot(document.getElementById("root"));
       root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

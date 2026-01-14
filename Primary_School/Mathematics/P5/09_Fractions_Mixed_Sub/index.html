@@ -8,25 +8,35 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.min.js"></script>
-    <script src="../../common/i18n.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #fef3c7 0%, #fcd34d 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
-      const { LanguageSelector, get } = window.MathI18n;
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
 
       const t = {
         title: {
@@ -42,199 +52,277 @@
           it: "Sottrazione di numeri misti",
         },
         step1: {
-          en: "Step 1: Improper Fractions:",
-          zh: "步驟1：化假分數：",
-          ja: "ステップ 1: 仮分数にする:",
-          ko: "단계 1: 가분수로 변환:",
-          es: "Paso 1: Fracciones impropias:",
-          de: "Schritt 1: Unechte Brüche:",
-          fi: "Vaihe 1: Murtoluvuiksi:",
-          fr: "Étape 1 : Fractions impropres :",
-          ar: "الخطوة 1: كسور غير حقيقية:",
-          it: "Passo 1: Frazioni improprie:",
+          en: "To Improper",
+          zh: "化假分數",
+          ja: "仮分数へ",
+          ko: "가분수로",
+          es: "A Impropia",
+          de: "In unechten Bruch",
+          fi: "Murtoluvuksi",
+          fr: "En fraction impropre",
+          ar: "إلى كسر غير حقيقي",
+          it: "In Impropria",
         },
         step2: {
-          en: "Step 2: Common Denominator:",
-          zh: "步驟2：通分：",
-          ja: "ステップ 2: 通分:",
-          ko: "단계 2: 통분:",
-          es: "Paso 2: Denominador común:",
-          de: "Schritt 2: Gemeinsamer Nenner:",
-          fi: "Vaihe 2: Yhteinen nimittäjä:",
-          fr: "Étape 2 : Dénominateur commun :",
-          ar: "الخطوة 2: توحيد المقامات:",
-          it: "Passo 2: Denominatore comune:",
+          en: "Find LCD",
+          zh: "通 分",
+          ja: "通分",
+          ko: "통분",
+          es: "MCD",
+          de: "kgV",
+          fi: "LCD",
+          fr: "PPCM",
+          ar: "LCD",
+          it: "m.c.m.",
         },
         step3: {
-          en: "Step 3: Subtract:",
-          zh: "步驟3：相減：",
-          ja: "ステップ 3: 引く:",
-          ko: "단계 3: 빼기:",
-          es: "Paso 3: Restar:",
-          de: "Schritt 3: Subtrahieren:",
-          fi: "Vaihe 3: Vähennä:",
-          fr: "Étape 3 : Soustraire :",
-          ar: "الخطوة 3: الطرح:",
-          it: "Passo 3: Sottrai:",
+          en: "Subtract",
+          zh: "相 減",
+          ja: "引く",
+          ko: "빼기",
+          es: "Restar",
+          de: "Subtrahieren",
+          fi: "Vähennä",
+          fr: "Soustraire",
+          ar: "طرح",
+          it: "Sottrai",
         },
-        answer: {
-          en: "Answer",
-          zh: "答案",
-          ja: "答え",
-          ko: "답",
-          es: "Respuesta",
-          de: "Antwort",
-          fi: "Vastaus",
-          fr: "Réponse",
-          ar: "إجابة",
-          it: "Risposta",
+        result: {
+          en: "Result",
+          zh: "結 果",
+          ja: "結果",
+          ko: "결과",
+          es: "Resultado",
+          de: "Ergebnis",
+          fi: "Tulos",
+          fr: "Résultat",
+          ar: "النتيجة",
+          it: "Risultato",
+        },
+        simplify: {
+          en: "Simplify",
+          zh: "約 簡",
+          ja: "約分",
+          ko: "약분",
+          es: "Simplificar",
+          de: "Vereinfachen",
+          fi: "Supista",
+          fr: "Simplifier",
+          ar: "تبسيط",
+          it: "Semplifica",
         },
       };
 
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
       function App() {
         const [lang, setLang] = useState("zh");
-        const getText = (key) => t[key][lang] || t[key]["en"];
-
         const [w1, setW1] = useState(3);
         const [n1, setN1] = useState(1);
-        const [d1, setD1] = useState(2);
+        const [d1, setD1] = useState(4);
         const [w2, setW2] = useState(1);
-        const [n2, setN2] = useState(2);
-        const [d2, setD2] = useState(3);
+        const [n2, setN2] = useState(1);
+        const [d2, setD2] = useState(2);
 
         const gcd = (a, b) => (b === 0 ? a : gcd(b, a % b));
         const lcm = (a, b) => (a * b) / gcd(a, b);
-        const imp1 = w1 * d1 + n1;
-        const imp2 = w2 * d2 + n2;
-        const commonDenom = lcm(d1, d2);
-        const newN1 = imp1 * (commonDenom / d1);
-        const newN2 = imp2 * (commonDenom / d2);
-        const diffN = newN1 - newN2;
-        const absDiffN = Math.abs(diffN);
-        const resultWhole = Math.floor(absDiffN / commonDenom);
-        const resultFrac = absDiffN % commonDenom;
-        const resultGcd = resultFrac > 0 ? gcd(resultFrac, commonDenom) : 1;
-        const simplifiedFrac = resultFrac / resultGcd;
-        const simplifiedDenom = commonDenom / resultGcd;
+
+        const impN1 = w1 * d1 + n1;
+        const impN2 = w2 * d2 + n2;
+
+        const commonD = lcm(d1, d2);
+        const convN1 = impN1 * (commonD / d1);
+        const convN2 = impN2 * (commonD / d2);
+
+        const diffN = convN1 - convN2;
+        const absDiff = Math.abs(diffN);
+        const isNeg = diffN < 0;
+
+        const resWhole = Math.floor(absDiff / commonD);
+        const resRem = absDiff % commonD;
+
+        const resGcd = gcd(resRem, commonD);
+        const simpN = resRem / resGcd;
+        const simpD = commonD / resGcd;
 
         return (
-          <div className="min-h-screen p-4 md:p-8 flex flex-col items-center">
-            <LanguageSelector lang={lang} setLang={setLang} />
-            <h1 className="text-4xl md:text-5xl font-black text-amber-900 mb-2 mt-4 text-center">
-              ➖ {getText("title")}
-            </h1>
+          <div className="min-h-screen flex flex-col items-center p-4 font-sans bg-slate-900 text-white">
+            <div className="w-full max-w-5xl flex justify-between items-center mb-10">
+              <h1 className="text-4xl font-black text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]">
+                ➖ {getText("title", lang)}
+              </h1>
+              <div className="flex bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-amber-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-3xl w-full mt-6">
-              <div className="flex items-center justify-center gap-4 mb-8 flex-wrap">
-                <div className="bg-orange-50 p-4 rounded-xl border-2 border-orange-200 flex items-center gap-2">
-                  <input
-                    type="number"
-                    min="0"
-                    value={w1}
-                    onChange={(e) => setW1(parseInt(e.target.value) || 0)}
-                    className="w-12 text-2xl font-black text-center border-2 border-orange-300 rounded outline-none"
-                  />
-                  <div className="flex flex-col items-center">
-                    <input
-                      type="number"
-                      min="0"
-                      value={n1}
-                      onChange={(e) => setN1(parseInt(e.target.value) || 0)}
-                      className="w-10 text-xl font-black text-center border-b-2 border-orange-400 bg-transparent outline-none"
-                    />
-                    <input
-                      type="number"
-                      min="1"
-                      value={d1}
-                      onChange={(e) =>
-                        setD1(Math.max(1, parseInt(e.target.value) || 1))
-                      }
-                      className="w-10 text-xl font-black text-center bg-transparent outline-none"
-                    />
+            <div className="w-full max-w-4xl flex flex-col gap-6">
+              {/* Inputs */}
+              <div className="glass-panel p-8 rounded-3xl flex justify-center items-center gap-8 md:gap-16 flex-wrap">
+                <MixedInput
+                  w={w1}
+                  n={n1}
+                  d={d1}
+                  setW={setW1}
+                  setN={setN1}
+                  setD={setD1}
+                  color="text-amber-400"
+                />
+                <div className="text-5xl font-black text-slate-500">-</div>
+                <MixedInput
+                  w={w2}
+                  n={n2}
+                  d={d2}
+                  setW={setW2}
+                  setN={setN2}
+                  setD={setD2}
+                  color="text-rose-400"
+                />
+              </div>
+
+              {/* Steps Visualizer */}
+              <div className="grid md:grid-cols-3 gap-6">
+                {/* Step 1: Improper */}
+                <div className="glass-panel p-6 rounded-2xl flex flex-col items-center">
+                  <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">
+                    {getText("step1", lang)}
+                  </div>
+                  <div className="flex gap-6 items-center">
+                    <div className="text-2xl font-mono font-bold text-amber-400">
+                      {impN1}/{d1}
+                    </div>
+                    <div className="text-slate-600 font-bold">-</div>
+                    <div className="text-2xl font-mono font-bold text-rose-400">
+                      {impN2}/{d2}
+                    </div>
                   </div>
                 </div>
-                <span className="text-4xl font-black text-amber-400">−</span>
-                <div className="bg-red-50 p-4 rounded-xl border-2 border-red-200 flex items-center gap-2">
-                  <input
-                    type="number"
-                    min="0"
-                    value={w2}
-                    onChange={(e) => setW2(parseInt(e.target.value) || 0)}
-                    className="w-12 text-2xl font-black text-center border-2 border-red-300 rounded outline-none"
-                  />
-                  <div className="flex flex-col items-center">
-                    <input
-                      type="number"
-                      min="0"
-                      value={n2}
-                      onChange={(e) => setN2(parseInt(e.target.value) || 0)}
-                      className="w-10 text-xl font-black text-center border-b-2 border-red-400 bg-transparent outline-none"
-                    />
-                    <input
-                      type="number"
-                      min="1"
-                      value={d2}
-                      onChange={(e) =>
-                        setD2(Math.max(1, parseInt(e.target.value) || 1))
-                      }
-                      className="w-10 text-xl font-black text-center bg-transparent outline-none"
-                    />
+
+                {/* Step 2: LCD */}
+                <div className="glass-panel p-6 rounded-2xl flex flex-col items-center">
+                  <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">
+                    {getText("step2", lang)} (LCD: {commonD})
+                  </div>
+                  <div className="flex gap-6 items-center">
+                    <div className="text-2xl font-mono font-bold text-amber-300">
+                      {convN1}/{commonD}
+                    </div>
+                    <div className="text-slate-600 font-bold">-</div>
+                    <div className="text-2xl font-mono font-bold text-rose-300">
+                      {convN2}/{commonD}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Step 3: Subtract */}
+                <div className="glass-panel p-6 rounded-2xl flex flex-col items-center bg-orange-500/10 border-orange-500/30">
+                  <div className="text-xs font-bold text-orange-400 uppercase tracking-widest mb-4">
+                    {getText("step3", lang)}
+                  </div>
+                  <div className="text-3xl font-black text-white px-4 py-2 bg-orange-500/20 rounded-xl">
+                    {isNeg && "-"} {absDiff}/{commonD}
                   </div>
                 </div>
               </div>
-              <div className="bg-slate-50 rounded-2xl p-6 space-y-2 text-center mb-6 text-lg">
-                <p>
-                  <b>{getText("step1")}</b> {imp1}/{d1} − {imp2}/{d2}
-                </p>
-                <p>
-                  <b>{getText("step2")}</b> {newN1}/{commonDenom} − {newN2}/
-                  {commonDenom}
-                </p>
-                <p>
-                  <b>{getText("step3")}</b> = {diffN}/{commonDenom}
-                </p>
-              </div>
-              <div
-                className={`rounded-2xl p-6 text-center border-4 ${
-                  diffN < 0
-                    ? "bg-red-100 border-red-300"
-                    : "bg-emerald-100 border-emerald-300"
-                }`}
-              >
-                <div className="font-bold mb-2">{getText("answer")}</div>
-                <div className="text-5xl font-black flex items-center justify-center gap-2">
-                  {diffN < 0 && <span>−</span>}
-                  {resultWhole > 0 && <span>{resultWhole}</span>}
-                  {simplifiedFrac > 0 && (
-                    <span className="text-3xl flex flex-col items-center">
-                      <span>{simplifiedFrac}</span>
-                      <span className="w-full h-0.5 bg-black"></span>
-                      <span>{simplifiedDenom}</span>
-                    </span>
+
+              {/* Final Result */}
+              <div className="glass-panel p-8 rounded-3xl flex flex-col items-center bg-emerald-500/10 border-emerald-500/30">
+                <div className="text-emerald-400 font-bold uppercase tracking-widest text-sm mb-6 border-b border-emerald-500/20 pb-2 w-full text-center">
+                  {getText("result", lang)}
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <div className="text-6xl md:text-8xl font-black text-white">
+                    {isNeg && <span className="mr-2 opacity-50">-</span>}
+                    {resWhole > 0 ? resWhole : resRem === 0 ? "0" : ""}
+                  </div>
+                  {resRem > 0 && (
+                    <div className="flex flex-col items-center text-4xl md:text-5xl font-bold text-emerald-200">
+                      <span>{resRem}</span>
+                      <div className="w-full h-1 bg-white/30 my-2"></div>
+                      <span>{commonD}</span>
+                    </div>
                   )}
-                  {resultWhole === 0 && simplifiedFrac === 0 && <span>0</span>}
                 </div>
+
+                {/* Simplified if needed */}
+                {simpN !== resRem && resRem !== 0 && (
+                  <div className="mt-8 pt-6 border-t border-emerald-500/20 w-full text-center">
+                    <div className="text-xs font-bold text-emerald-500 uppercase mb-2">
+                      {getText("simplify", lang)}
+                    </div>
+                    <div className="flex items-center justify-center gap-3">
+                      <div className="text-4xl font-black text-emerald-300 flex items-center">
+                        {isNeg && <span className="mr-2">-</span>}
+                        {resWhole > 0 ? resWhole : ""}
+                      </div>
+                      <div className="flex flex-col items-center text-2xl font-bold text-emerald-300">
+                        <span>{simpN}</span>
+                        <div className="w-full h-0.5 bg-current my-1"></div>
+                        <span>{simpD}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const MixedInput = ({ w, n, d, setW, setN, setD, color }) => (
+        <div className={`flex items-center gap-2 ${color}`}>
+          <input
+            type="number"
+            min="0"
+            value={w}
+            onChange={(e) => setW(Math.max(0, parseInt(e.target.value) || 0))}
+            className="w-16 bg-transparent text-center text-6xl font-black outline-none border border-slate-700/50 rounded-lg focus:border-white transition-colors py-2"
+          />
+          <div className="flex flex-col items-center gap-1">
+            <input
+              type="number"
+              min="0"
+              value={n}
+              onChange={(e) => setN(Math.max(0, parseInt(e.target.value) || 0))}
+              className="w-16 bg-transparent text-center text-4xl font-bold outline-none border-b-2 border-slate-500 focus:border-white transition-colors"
+            />
+            <input
+              type="number"
+              min="1"
+              value={d}
+              onChange={(e) => setD(Math.max(1, parseInt(e.target.value) || 1))}
+              className="w-16 bg-transparent text-center text-4xl font-bold outline-none"
+            />
+          </div>
+        </div>
+      );
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

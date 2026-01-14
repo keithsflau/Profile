@@ -8,23 +8,35 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #e0e7ff 0%, #6366f1 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(79, 70, 229, 0.15); /* Indigo 600 alpha */
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(129, 140, 248, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
-      const { LanguageSelector, get } = window.MathI18n;
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
 
       const t = {
         title: {
@@ -100,16 +112,16 @@
           it: "< 5, Arrotonda per difetto",
         },
         afterRounding: {
-          en: "After Rounding",
+          en: "Result",
           zh: "四捨五入後",
           ja: "四捨五入後",
           ko: "반올림 후",
-          es: "Después de Redondear",
-          de: "Nach dem Runden",
-          fi: "Pyöristyksen jälkeen",
-          fr: "Après l'arrondi",
-          ar: "بعد التقريب",
-          it: "Dopo l'arrotondamento",
+          es: "Resultado",
+          de: "Ergebnis",
+          fi: "Tulos",
+          fr: "Résultat",
+          ar: "النتيجة",
+          it: "Risultato",
         },
         ruleTitle: {
           en: "Rounding Rule:",
@@ -124,125 +136,175 @@
           it: "Regola di arrotondamento:",
         },
         ruleText: {
-          en: "Look at the next digit after the place you are keeping: 0-4 Round Down, 5-9 Round Up.",
+          en: "Look at the next digit: 0-4 Round Down, 5-9 Round Up.",
           zh: "看保留位數的下一位：0-4 捨去，5-9 進位。",
-          ja: "残す位の次の数字を見ます：0-4 は切り捨て、5-9 は切り上げ。",
-          ko: "유지하려는 자리의 다음 숫자를 보세요: 0-4는 내림, 5-9는 올림.",
-          es: "Mira el siguiente dígito después del lugar que estás conservando: 0-4 Redondeo abajo, 5-9 Redondeo arriba.",
-          de: "Schaue auf die Ziffer nach der Stelle, die du behältst: 0-4 Abrunden, 5-9 Aufrunden.",
-          fi: "Katso seuraavaa numeroa säilytettävän paikan jälkeen: 0-4 pyöristä alaspäin, 5-9 pyöristä ylöspäin.",
-          fr: "Regardez le chiffre suivant après la place que vous gardez : 0-4 Arrondir à l'inférieur, 5-9 Arrondir au supérieur.",
-          ar: "انظر إلى الرقم التالي بعد المنزلة التي تحتفظ بها: 0-4 تقريب للأسفل، 5-9 تقريب للأعلى.",
-          it: "Guarda la cifra successiva alla posizione che stai mantenendo: 0-4 Arrotonda per difetto, 5-9 Arrotonda per eccesso.",
+          ja: "次の数字を見る：0-4 は切り捨て、5-9 は切り上げ。",
+          ko: "다음 숫자 확인: 0-4 내림, 5-9 올림.",
+          es: "Mira el siguiente dígito: 0-4 Abajo, 5-9 Arriba.",
+          de: "Schaue auf die nächste Ziffer: 0-4 Abrunden, 5-9 Aufrunden.",
+          fi: "Katso seuraavaa numeroa: 0-4 alas, 5-9 ylös.",
+          fr: "Regardez le chiffre suivant : 0-4 vers le bas, 5-9 vers le haut.",
+          ar: "انظر للرقم التالي: 0-4 للأسفل، 5-9 للأعلى.",
+          it: "Guarda la cifra successiva: 0-4 Giù, 5-9 Su.",
         },
       };
 
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
       function App() {
         const [lang, setLang] = useState("zh");
-        const getText = (key) => t[key][lang] || t[key]["en"];
-
         const [num, setNum] = useState(3.4567);
         const [places, setPlaces] = useState(2);
 
         const rounded = parseFloat(num.toFixed(places));
         const digitToCheck = num.toString().split(".")[1]?.[places] || "0";
-        const action = parseInt(digitToCheck) >= 5 ? "入" : "捨";
+        const isRoundUp = parseInt(digitToCheck) >= 5;
 
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <LanguageSelector lang={lang} setLang={setLang} />
-            <h1 className="text-5xl font-black text-indigo-100 mb-2 mt-8">
-              🔢 {getText("title")}
-            </h1>
-
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-2xl w-full mt-8">
-              <div className="flex items-center justify-center gap-4 mb-8 flex-wrap">
-                <input
-                  type="number"
-                  step="0.0001"
-                  value={num}
-                  onChange={(e) => setNum(parseFloat(e.target.value) || 0)}
-                  className="w-32 text-3xl font-mono font-black text-center border-4 border-indigo-300 rounded-xl p-2"
-                />
-              </div>
-
-              <div className="flex justify-center gap-4 mb-6">
-                {[0, 1, 2, 3].map((p) => (
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <div className="w-full max-w-4xl flex justify-between items-center mb-10">
+              <h1 className="text-4xl font-black text-indigo-400 drop-shadow-[0_0_15px_rgba(129,140,248,0.5)]">
+                🔢 {getText("title", lang)}
+              </h1>
+              <div className="bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
                   <button
-                    key={p}
-                    onClick={() => setPlaces(p)}
-                    className={`px-4 py-2 rounded-xl font-bold ${
-                      places === p ? "bg-indigo-500 text-white" : "bg-slate-100"
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-indigo-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
                     }`}
                   >
-                    {getText("decimalPlaces").replace("{p}", p)}
+                    {l}
                   </button>
                 ))}
               </div>
+            </div>
 
-              <div className="bg-slate-50 rounded-2xl p-6 text-center mb-6">
+            <div className="w-full max-w-3xl flex flex-col gap-6">
+              {/* Input Section */}
+              <div className="glass-panel p-8 rounded-3xl flex flex-col  items-center justify-center gap-6 border-indigo-500/30">
+                <div className="flex flex-col items-center w-full gap-4">
+                  <input
+                    type="number"
+                    step="0.0001"
+                    value={num}
+                    onChange={(e) => setNum(parseFloat(e.target.value) || 0)}
+                    className="bg-slate-900/50 border-b-2 border-indigo-400 text-4xl font-mono font-black text-center w-64 p-3 outline-none focus:border-indigo-300 text-white"
+                  />
+
+                  <div className="flex gap-2">
+                    {[0, 1, 2, 3].map((p) => (
+                      <button
+                        key={p}
+                        onClick={() => setPlaces(p)}
+                        className={`px-4 py-2 rounded-xl font-bold transition-all ${
+                          places === p
+                            ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/50"
+                            : "bg-slate-800/50 text-indigo-200 hover:bg-slate-700"
+                        }`}
+                      >
+                        {getText("decimalPlaces", lang).replace("{p}", p)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Analysis */}
+              <div className="glass-panel p-6 rounded-2xl flex flex-col gap-4 text-center">
                 <p
-                  className="text-lg"
+                  className="text-xl text-indigo-100"
                   dangerouslySetInnerHTML={{
-                    __html: getText("correctTo").replace("{places}", places),
+                    __html: getText("correctTo", lang).replace(
+                      "{places}",
+                      `<span class="text-indigo-300 font-bold text-2xl mx-1">${places}</span>`
+                    ),
                   }}
-                ></p>
-                <p className="text-lg mt-2">
+                />
+
+                <div className="flex flex-col md:flex-row items-center justify-center gap-4 bg-black/20 p-4 rounded-xl">
                   <span
+                    className="text-slate-300"
                     dangerouslySetInnerHTML={{
-                      __html: getText("checkDigit").replace("{n}", places + 1),
+                      __html: getText("checkDigit", lang).replace(
+                        "{n}",
+                        places + 1
+                      ),
                     }}
-                  ></span>{" "}
-                  <span
-                    className={`text-2xl font-black ${
-                      parseInt(digitToCheck) >= 5
-                        ? "text-red-500"
-                        : "text-blue-500"
-                    }`}
+                  />
+                  <motion.div
+                    key={digitToCheck}
+                    initial={{ scale: 0.5 }}
+                    animate={{ scale: 1 }}
+                    className={`w-12 h-12 flex items-center justify-center rounded-full text-2xl font-black border-2
+                                ${
+                                  isRoundUp
+                                    ? "bg-red-500/20 border-red-500 text-red-400"
+                                    : "bg-blue-500/20 border-blue-500 text-blue-400"
+                                }
+                            `}
                   >
                     {digitToCheck}
+                  </motion.div>
+                  <span
+                    className={`font-bold ${
+                      isRoundUp ? "text-red-400" : "text-blue-400"
+                    }`}
+                  >
+                    ➜{" "}
+                    {isRoundUp
+                      ? getText("roundUp", lang)
+                      : getText("roundDown", lang)}
                   </span>
-                </p>
-                <p className="text-xl mt-2">
-                  {parseInt(digitToCheck) >= 5
-                    ? getText("roundUp")
-                    : getText("roundDown")}
-                </p>
+                </div>
               </div>
 
-              <div className="bg-emerald-100 rounded-2xl p-6 text-center border-4 border-emerald-300">
-                <div className="text-emerald-600 font-bold">
-                  {getText("afterRounding")}
+              {/* Result */}
+              <motion.div
+                key={rounded}
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="bg-gradient-to-r from-indigo-900/40 to-blue-900/40 border border-indigo-500/30 p-8 rounded-3xl text-center flex flex-col items-center"
+              >
+                <div className="text-indigo-300 font-bold uppercase tracking-widest text-sm mb-2">
+                  {getText("afterRounding", lang)}
                 </div>
-                <div className="text-5xl font-black text-emerald-800">
+                <div className="text-6xl font-black text-white font-mono drop-shadow-[0_0_20px_rgba(79,70,229,0.6)]">
                   {rounded}
                 </div>
-              </div>
+              </motion.div>
 
-              <div className="mt-6 bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
-                <p className="font-bold">💡 {getText("ruleTitle")}</p>
-                <p className="text-sm">{getText("ruleText")}</p>
+              {/* Tip */}
+              <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-xl flex gap-3 text-amber-200 text-sm justify-center items-center">
+                <span className="text-2xl">💡</span>
+                <div>
+                  <span className="font-bold mr-2 uppercase">
+                    {getText("ruleTitle", lang)}
+                  </span>
+                  {getText("ruleText", lang)}
+                </div>
               </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

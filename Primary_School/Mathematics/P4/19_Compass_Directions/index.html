@@ -3,12 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小四數學：方向指南針</title>
+    <title>小四數學：方向指南針 | Compass Directions</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -25,37 +26,167 @@
     <script type="text/babel">
       const { useState } = React;
       const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Compass Directions",
+          zh: "方向指南針",
+          ja: "羅針盤の方向",
+          ko: "나침반 방향",
+          es: "Direcciones de la Brújula",
+          de: "Kompassrichtungen",
+          fi: "Kompassisuunnat",
+          fr: "Directions de la boussole",
+          ar: "اتجاهات البوصلة",
+          it: "Direzioni della bussola",
+        },
+        currentDirection: {
+          en: "Current Direction",
+          zh: "目前方向",
+          ja: "現在の方向",
+          ko: "현재 방향",
+          es: "Dirección Actual",
+          de: "Aktuelle Richtung",
+          fi: "Nykyinen suunta",
+          fr: "Direction actuelle",
+          ar: "الاتجاه الحالي",
+          it: "Direzione attuale",
+        },
+        N: {
+          en: "North (N)",
+          zh: "北方 (N)",
+          ja: "北 (N)",
+          ko: "북쪽 (N)",
+          es: "Norte (N)",
+          de: "Norden (N)",
+          fi: "Pohjoinen (N)",
+          fr: "Nord (N)",
+          ar: "الشمال (N)",
+          it: "Nord (N)",
+        },
+        NE: {
+          en: "Northeast (NE)",
+          zh: "東北 (NE)",
+          ja: "北東 (NE)",
+          ko: "북동 (NE)",
+          es: "Noreste (NE)",
+          de: "Nordosten (NE)",
+          fi: "Koillinen (NE)",
+          fr: "Nord-Est (NE)",
+          ar: "شمال شرق (NE)",
+          it: "Nord-Est (NE)",
+        },
+        E: {
+          en: "East (E)",
+          zh: "東方 (E)",
+          ja: "東 (E)",
+          ko: "동쪽 (E)",
+          es: "Este (E)",
+          de: "Osten (E)",
+          fi: "Itä (E)",
+          fr: "Est (E)",
+          ar: "الشرق (E)",
+          it: "Est (E)",
+        },
+        SE: {
+          en: "Southeast (SE)",
+          zh: "東南 (SE)",
+          ja: "南東 (SE)",
+          ko: "남동 (SE)",
+          es: "Sureste (SE)",
+          de: "Südosten (SE)",
+          fi: "Kaakko (SE)",
+          fr: "Sud-Est (SE)",
+          ar: "جنوب شرق (SE)",
+          it: "Sud-Est (SE)",
+        },
+        S: {
+          en: "South (S)",
+          zh: "南方 (S)",
+          ja: "南 (S)",
+          ko: "남쪽 (S)",
+          es: "Sur (S)",
+          de: "Süden (S)",
+          fi: "Etelä (S)",
+          fr: "Sud (S)",
+          ar: "الجنوب (S)",
+          it: "Sud (S)",
+        },
+        SW: {
+          en: "Southwest (SW)",
+          zh: "西南 (SW)",
+          ja: "南西 (SW)",
+          ko: "남서 (SW)",
+          es: "Suroeste (SW)",
+          de: "Südwesten (SW)",
+          fi: "Lounas (SW)",
+          fr: "Sud-Ouest (SW)",
+          ar: "جنوب غرب (SW)",
+          it: "Sud-Ovest (SW)",
+        },
+        W: {
+          en: "West (W)",
+          zh: "西方 (W)",
+          ja: "西 (W)",
+          ko: "서쪽 (W)",
+          es: "Oeste (W)",
+          de: "Westen (W)",
+          fi: "Länsi (W)",
+          fr: "Ouest (W)",
+          ar: "الغرب (W)",
+          it: "Ovest (W)",
+        },
+        NW: {
+          en: "Northwest (NW)",
+          zh: "西北 (NW)",
+          ja: "北西 (NW)",
+          ko: "북서 (NW)",
+          es: "Noroeste (NW)",
+          de: "Nordwesten (NW)",
+          fi: "Luode (NW)",
+          fr: "Nord-Ouest (NW)",
+          ar: "شمال غرب (NW)",
+          it: "Nord-Ovest (NW)",
+        },
+      };
 
       function App() {
+        const [lang, setLang] = useState("zh");
         const [direction, setDirection] = useState("N");
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
         const dirs = [
-          { id: "N", angle: 0, name: "北方 (N)" },
-          { id: "NE", angle: 45, name: "東北 (NE)" },
-          { id: "E", angle: 90, name: "東方 (E)" },
-          { id: "SE", angle: 135, name: "東南 (SE)" },
-          { id: "S", angle: 180, name: "南方 (S)" },
-          { id: "SW", angle: 225, name: "西南 (SW)" },
-          { id: "W", angle: 270, name: "西方 (W)" },
-          { id: "NW", angle: 315, name: "西北 (NW)" },
+          { id: "N", angle: 0, nameKey: "N" },
+          { id: "NE", angle: 45, nameKey: "NE" },
+          { id: "E", angle: 90, nameKey: "E" },
+          { id: "SE", angle: 135, nameKey: "SE" },
+          { id: "S", angle: 180, nameKey: "S" },
+          { id: "SW", angle: 225, nameKey: "SW" },
+          { id: "W", angle: 270, nameKey: "W" },
+          { id: "NW", angle: 315, nameKey: "NW" },
         ];
 
         const current = dirs.find((d) => d.id === direction);
+        const currentName = getText(current.nameKey);
 
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-cyan-900 mb-8">
-              🧭 方向指南針
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-cyan-900 mb-8 mt-8">
+              🧭 {getText("title")}
             </h1>
 
             <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full flex flex-col md:flex-row items-center gap-12">
-              <div className="relative w-[400px] h-[400px] bg-slate-100 rounded-full border-8 border-slate-300 shadow-inner flex items-center justify-center">
+              <div className="relative w-[300px] h-[300px] md:w-[400px] md:h-[400px] bg-slate-100 rounded-full border-8 border-slate-300 shadow-inner flex items-center justify-center shrink-0">
                 {/* Markings */}
                 {dirs.map((d) => (
                   <div
                     key={d.id}
                     className="absolute font-black text-slate-400"
                     style={{
-                      transform: `rotate(${d.angle}deg) translate(0, -160px) rotate(-${d.angle}deg)`,
+                      transform: `rotate(${d.angle}deg) translate(0, -140px) rotate(-${d.angle}deg)`,
                     }}
                   >
                     {d.id}
@@ -66,7 +197,7 @@
                 <motion.div
                   animate={{ rotate: current.angle }}
                   transition={{ type: "spring", stiffness: 100, damping: 15 }}
-                  className="w-16 h-48 bg-transparent absolute"
+                  className="w-16 h-36 md:h-48 bg-transparent absolute"
                   style={{ transformOrigin: "center bottom", bottom: "50%" }}
                 >
                   {/* North needle half - red */}
@@ -75,7 +206,7 @@
                 <motion.div
                   animate={{ rotate: current.angle + 180 }}
                   transition={{ type: "spring", stiffness: 100, damping: 15 }}
-                  className="w-16 h-48 bg-transparent absolute"
+                  className="w-16 h-36 md:h-48 bg-transparent absolute"
                   style={{ transformOrigin: "center bottom", bottom: "50%" }}
                 >
                   {/* South needle half - white */}
@@ -87,9 +218,11 @@
 
               <div className="flex flex-col gap-4 w-full max-w-xs">
                 <div className="text-center mb-4">
-                  <div className="text-slate-500 font-bold mb-1">目前方向</div>
-                  <div className="text-4xl font-black text-cyan-600">
-                    {current.name}
+                  <div className="text-slate-500 font-bold mb-1">
+                    {getText("currentDirection")}
+                  </div>
+                  <div className="text-3xl font-black text-cyan-600">
+                    {currentName}
                   </div>
                 </div>
 
@@ -153,20 +286,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

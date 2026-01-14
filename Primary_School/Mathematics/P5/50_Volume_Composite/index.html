@@ -3,26 +3,38 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小五數學：複合圖形體積</title>
+    <title>小五數學：複合圖形體積 | Composite Volume</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.min.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <style>
       body {
-        font-family: "Fredoka", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
       }
+      .glass-panel {
+        background: rgba(245, 158, 11, 0.15); /* Amber 500 alpha */
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(251, 191, 36, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+
       .scene {
         perspective: 1200px;
         transform-style: preserve-3d;
       }
-      .shape-container {
+      .cuboid-container {
         position: relative;
         transform-style: preserve-3d;
         transform: rotateX(-30deg) rotateY(45deg);
@@ -39,26 +51,24 @@
         position: absolute;
         width: 40px;
         height: 40px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        background: inherit;
-        opacity: 0.95;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        opacity: 0.9;
       }
-      /* Cube Face Transforms */
       .front {
         transform: rotateY(0deg) translateZ(20px);
         filter: brightness(1);
       }
       .right {
         transform: rotateY(90deg) translateZ(20px);
-        filter: brightness(0.9);
+        filter: brightness(0.85);
       }
       .left {
         transform: rotateY(-90deg) translateZ(20px);
-        filter: brightness(0.9);
+        filter: brightness(0.85);
       }
       .back {
         transform: rotateY(180deg) translateZ(20px);
-        filter: brightness(0.8);
+        filter: brightness(0.7);
       }
       .top {
         transform: rotateX(90deg) translateZ(20px);
@@ -66,332 +76,370 @@
       }
       .bottom {
         transform: rotateX(-90deg) translateZ(20px);
-        filter: brightness(0.7);
+        filter: brightness(0.6);
       }
+
+      /* Custom colors/glows handled inline */
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { Layers, Scissors, Box, CheckCircle } = window.LucideReact;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
 
-      const Split = () => (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M16 3h5v5" />
-          <path d="M8 3H3v5" />
-          <path d="M12 22v-8.3a4 4 0 0 0-1.172-2.872L3 3" />
-          <path d="m15 9 6-6" />
-        </svg>
-      );
-      const Scissors = (props) => (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width={props.size || 24}
-          height={props.size || 24}
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          {...props}
-        >
-          <circle cx="6" cy="6" r="3" />
-          <circle cx="6" cy="18" r="3" />
-          <line x1="20" x2="8.12" y1="4" y2="15.88" />
-          <line x1="14.47" x2="20" y1="14.48" y2="20" />
-          <line x1="8.12" x2="12" y1="8.12" y2="12" />
-        </svg>
-      );
-      const Layers = (props) => (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width={props.size || 24}
-          height={props.size || 24}
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          {...props}
-        >
-          <path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z" />
-          <path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65" />
-          <path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65" />
-        </svg>
-      );
-      const RefreshCw = () => (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M3 12a9 9 0 0 1 9-9 9.97 9.97 0 0 1 5.9 2" />
-          <path d="M21 12a9 9 0 0 1-9 9 9.97 9.97 0 0 1-5.9-2" />
-          <path d="M2.5 12h5" />
-          <path d="M16.5 12h5" />
-          <path d="M21 21v-4.5" />
-          <path d="M3 7.5V3" />
-        </svg>
-      );
+      const t = {
+        title: {
+          en: "Composite Volume",
+          zh: "複合圖形體積",
+          ja: "複合図形の体積",
+          ko: "복합 도형의 부피",
+          es: "Volumen Compuesto",
+          de: "Zusammengesetztes Volumen",
+          fi: "Yhdistelmäkappaleen tilavuus",
+          fr: "Volume composite",
+          ar: "حجم الأشكال المركبة",
+          it: "Volume composto",
+        },
+        original: {
+          en: "Original",
+          zh: "原圖",
+          ja: "元の図",
+          ko: "원본",
+          es: "Original",
+          de: "Original",
+          fi: "Alkuperäinen",
+          fr: "Original",
+          ar: "الأصل",
+          it: "Originale",
+        },
+        method1: {
+          en: "Vertical Split",
+          zh: "垂直切割",
+          ja: "垂直分割",
+          ko: "수직 분할",
+          es: "División Vertical",
+          de: "Vertikale Teilung",
+          fi: "Pystyleikkaus",
+          fr: "Coupe verticale",
+          ar: "القطع الرأسي",
+          it: "Taglio verticale",
+        },
+        method2: {
+          en: "Horizontal Split",
+          zh: "水平切割",
+          ja: "水平分割",
+          ko: "수평 분할",
+          es: "División Horizontal",
+          de: "Horizontale Teilung",
+          fi: "Vaakaleikkaus",
+          fr: "Coupe horizontale",
+          ar: "القطع الأفقي",
+          it: "Taglio orizzontale",
+        },
+        totalVolume: {
+          en: "Total Volume",
+          zh: "總體積",
+          ja: "総体積",
+          ko: "총 부피",
+          es: "Volumen Total",
+          de: "Gesamtvolumen",
+          fi: "Kokonaistilavuus",
+          fr: "Volume total",
+          ar: "الحجم الإجمالي",
+          it: "Volume totale",
+        },
+        partA: {
+          en: "Part A",
+          zh: "部分 A",
+          ja: "パート A",
+          ko: "파트 A",
+          es: "Parte A",
+          de: "Teil A",
+          fi: "Osa A",
+          fr: "Partie A",
+          ar: "الجزء A",
+          it: "Parte A",
+        },
+        partB: {
+          en: "Part B",
+          zh: "部分 B",
+          ja: "パート B",
+          ko: "파트 B",
+          es: "Parte B",
+          de: "Teil B",
+          fi: "Osa B",
+          fr: "Partie B",
+          ar: "الجزء B",
+          it: "Parte B",
+        },
+      };
+
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
 
       function App() {
+        const [lang, setLang] = useState("zh");
         const [method, setMethod] = useState("none"); // none, v-split, h-split
 
-        // Shape Definition: L-Shape
-        // Bottom Slab: 4x2x2 (LxWxH) at y=0,1; x=0..3; z=0..1
-        // Top Tower: 2x2x3 at x=0..1; z=0..1; y=2..4
-        // Dimensions:
-        // Slab: 4L, 2W, 2H
-        // Tower: 2L, 2W, 3H on top of Slab(0,0)
-
-        // Let's parameterize the shape
+        // Shape Params
         const shape = {
-          slab: { l: 4, w: 2, h: 2, color: "#f59e0b" },
-          tower: { l: 2, w: 2, h: 3, x: 0, z: 0, color: "#ec4899" },
+          slab: { l: 4, w: 2, h: 2 },
+          tower: { l: 2, w: 2, h: 3, x: 2, z: 0 }, // Placed at x=2 (right side) top of slab
+          // Wait, previous file had tower at x=0? Let's check visually.
+          // Tower width=2. My slab length=4. If I want L shape...
+          // Let's make it simple.
+          // Slab: 4x2x2. Tower on top of right side (x=2..3).
         };
 
         const cubes = [];
-
-        // Generate Slab Cubes
-        for (let x = 0; x < shape.slab.l; x++) {
-          for (let y = 0; y < shape.slab.h; y++) {
-            for (let z = 0; z < shape.slab.w; z++) {
+        // Generate Slab
+        for (let x = 0; x < 4; x++) {
+          for (let y = 0; y < 2; y++) {
+            for (let z = 0; z < 2; z++) {
               let group = "slab";
-              // Logic for coloring based on method
-              let color = "bg-orange-500"; // Default slab color usually
-
               if (method === "v-split") {
-                // Split vertical line at x=2
-                if (x < 2) group = "A";
-                else group = "B";
+                // Cut at x=2. Left side (x<2) is A. Right side (x>=2) + Tower is B?
+                // Vertical split separates the 'tall' part from the 'short' part.
+                group = x < 2 ? "A" : "B";
               }
               if (method === "h-split") {
-                // Split horizontal line between slab and tower?
-                // Slab is always group A in h-split if the tower is on top
+                // Cut horizontally between slab and tower.
+                // Slab is A. Tower is B.
                 group = "A";
               }
-
-              cubes.push({ x, y, z, group, baseColor: "#f59e0b" });
+              cubes.push({ x, y, z, group });
             }
           }
         }
-        // Generate Tower Cubes
-        // Tower starts at y = shape.slab.h
-        for (let x = 0; x < shape.tower.l; x++) {
-          for (let y = 0; y < shape.tower.h; y++) {
-            for (let z = 0; z < shape.tower.w; z++) {
-              const actualY = y + shape.slab.h;
+        // Generate Tower (Right side, on top)
+        for (let x = 2; x < 4; x++) {
+          for (let y = 2; y < 5; y++) {
+            // h=3, so 2,3,4
+            for (let z = 0; z < 2; z++) {
               let group = "tower";
-
               if (method === "v-split") {
-                if (x < 2) group = "A";
-                else group = "B";
+                // Part of the tall stack B
+                group = "B";
               }
               if (method === "h-split") {
                 group = "B";
               }
-
-              cubes.push({ x, y: actualY, z, group, baseColor: "#ec4899" });
+              cubes.push({ x, y, z, group });
             }
           }
         }
 
         const size = 40;
-
-        // Center offsets need calculation
         const cx = (4 * 40) / 2;
         const cy = (5 * 40) / 2;
         const cz = (2 * 40) / 2;
 
         const getGroupColor = (g) => {
-          if (method === "none") {
-            return g === "slab" || (g === "A" && method === "h-split")
-              ? "rgb(245, 158, 11)"
-              : "rgb(236, 72, 153)";
-          }
-          if (g === "A") return "rgb(59, 130, 246)"; // Blue
-          if (g === "B") return "rgb(34, 197, 94)"; // Green
-
-          // Fallbacks for initial generation mapping
-          if (g === "slab") return "rgb(245, 158, 11)";
-          if (g === "tower") return "rgb(236, 72, 153)";
+          if (method === "none") return "rgba(245, 158, 11, 0.9)"; // Amber
+          if (g === "A") return "rgba(236, 72, 153, 0.9)"; // Pink
+          if (g === "B") return "rgba(34, 197, 94, 0.9)"; // Green
+          return "white";
         };
 
         return (
-          <div className="min-h-screen flex flex-col md:flex-row items-center justify-center p-8 overflow-hidden gap-12">
-            {/* Left Panel: Calculator */}
-            <div className="bg-white/95 backdrop-blur-xl p-8 rounded-[2rem] shadow-2xl w-full max-w-lg border-4 border-white z-10 flex flex-col gap-6">
-              <h1 className="text-3xl font-black text-slate-800 flex items-center gap-3 mb-4">
-                <Layers className="text-orange-500" />
-                複合圖形體積
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <div className="w-full max-w-6xl flex justify-between items-center mb-6">
+              <h1 className="text-3xl md:text-5xl font-black text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]">
+                🏗️ {getText("title", lang)}
               </h1>
-
-              <div className="flex gap-4">
-                <button
-                  onClick={() => setMethod("none")}
-                  className={`flex-1 py-4 rounded-xl font-bold transition-all ${
-                    method === "none"
-                      ? "bg-slate-800 text-white shadow-lg"
-                      : "bg-slate-100 text-slate-500 hover:bg-slate-200"
-                  }`}
-                >
-                  原圖
-                </button>
-                <button
-                  onClick={() => setMethod("v-split")}
-                  className={`flex-1 py-4 rounded-xl font-bold transition-all flex flex-col items-center gap-1 ${
-                    method === "v-split"
-                      ? "bg-blue-500 text-white shadow-lg"
-                      : "bg-blue-50 text-blue-400 hover:bg-blue-100"
-                  }`}
-                >
-                  <Scissors size={20} className="rotate-90" /> 切割方法 (一)
-                </button>
-                <button
-                  onClick={() => setMethod("h-split")}
-                  className={`flex-1 py-4 rounded-xl font-bold transition-all flex flex-col items-center gap-1 ${
-                    method === "h-split"
-                      ? "bg-green-500 text-white shadow-lg"
-                      : "bg-green-50 text-green-400 hover:bg-green-100"
-                  }`}
-                >
-                  <Scissors size={20} /> 切割方法 (二)
-                </button>
-              </div>
-
-              <div className="bg-slate-50 rounded-2xl p-6 border-2 border-slate-100 min-h-[200px] flex items-center justify-center">
-                {method === "none" && (
-                  <div className="text-center text-slate-400 font-bold">
-                    請選擇切割方法以計算體積
-                    <br />
-                    Select a method to calculate volume
-                  </div>
-                )}
-                {method === "v-split" && (
-                  <div className="w-full space-y-4">
-                    <div className="flex items-center gap-4 bg-blue-100 p-4 rounded-xl text-blue-800 font-bold">
-                      <div className="w-6 h-6 bg-blue-500 rounded border border-blue-600"></div>
-                      <span>長方體 A: 2 × 2 × 5 = 20</span>
-                    </div>
-                    <div className="flex items-center gap-4 bg-green-100 p-4 rounded-xl text-green-800 font-bold">
-                      <div className="w-6 h-6 bg-green-500 rounded border border-green-600"></div>
-                      <span>長方體 B: 2 × 2 × 2 = 8</span>
-                    </div>
-                    <div className="border-t-2 border-slate-200 pt-4 text-right text-3xl font-black text-slate-700">
-                      總體積 = 28
-                    </div>
-                  </div>
-                )}
-                {method === "h-split" && (
-                  <div className="w-full space-y-4">
-                    <div className="flex items-center gap-4 bg-blue-100 p-4 rounded-xl text-blue-800 font-bold">
-                      <div className="w-6 h-6 bg-blue-500 rounded border border-blue-600"></div>
-                      <span>下層 A: 4 × 2 × 2 = 16</span>
-                    </div>
-                    <div className="flex items-center gap-4 bg-green-100 p-4 rounded-xl text-green-800 font-bold">
-                      <div className="w-6 h-6 bg-green-500 rounded border border-green-600"></div>
-                      <span>上層 B: 2 × 2 × 3 = 12</span>
-                    </div>
-                    <div className="border-t-2 border-slate-200 pt-4 text-right text-3xl font-black text-slate-700">
-                      總體積 = 28
-                    </div>
-                  </div>
-                )}
+              <div className="bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex flex-wrap justify-end gap-1">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-amber-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Right Panel: 3D Visualization */}
-            <div className="w-full md:w-[600px] h-[500px] relative flex items-center justify-center scene">
-              <div className="shape-container">
-                {cubes.map((c, i) => {
-                  // Calculate offset based on split interaction
-                  let offsetX = 0;
-                  let offsetY = 0;
-
-                  if (method === "v-split") {
-                    if (c.group === "B") offsetX = 40; // separate B slightly to right
-                  }
-                  if (method === "h-split") {
-                    if (c.group === "B") offsetY = 40; // lift B slightly up
-                  }
-
-                  return (
-                    <div
-                      key={i}
-                      className="cube"
-                      style={{
-                        transform: `translate3d(${
-                          c.x * size - cx + offsetX
-                        }px, ${-c.y * size + cy - offsetY}px, ${
-                          c.z * size - cz
-                        }px)`,
-                        backgroundColor: getGroupColor(c.group), // fallback for faces
-                      }}
+            <main className="w-full max-w-6xl grid lg:grid-cols-3 gap-8">
+              {/* Control Panel */}
+              <div className="flex flex-col gap-6">
+                <div className="glass-panel p-2 rounded-2xl flex flex-col gap-2">
+                  {[
+                    {
+                      id: "none",
+                      label: "original",
+                      icon: <Layers size={20} />,
+                    },
+                    {
+                      id: "v-split",
+                      label: "method1",
+                      icon: <Scissors size={20} className="-rotate-90" />,
+                    },
+                    {
+                      id: "h-split",
+                      label: "method2",
+                      icon: <Scissors size={20} />,
+                    },
+                  ].map((m) => (
+                    <button
+                      key={m.id}
+                      onClick={() => setMethod(m.id)}
+                      className={`w-full py-4 px-6 rounded-xl font-bold flex items-center gap-3 transition-all ${
+                        method === m.id
+                          ? "bg-amber-500 text-white shadow-lg"
+                          : "hover:bg-white/5 text-amber-200"
+                      }`}
                     >
-                      {["front", "back", "right", "left", "top", "bottom"].map(
-                        (face) => (
-                          <div
-                            key={face}
-                            className={`face ${face}`}
-                            style={{ backgroundColor: getGroupColor(c.group) }}
-                          ></div>
-                        )
+                      {m.icon}
+                      <span>{getText(m.label, lang)}</span>
+                      {method === m.id && (
+                        <CheckCircle className="ml-auto" size={18} />
                       )}
-                    </div>
-                  );
-                })}
-              </div>
-              {/* Floor Shadow */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-black/10 rounded-full blur-2xl -z-10 transform rotateX(60deg) translateZ(-250px) scale-150"></div>
-            </div>
+                    </button>
+                  ))}
+                </div>
 
-            <div className="fixed bottom-4 left-4">
-              <a
-                href="../index.html"
-                className="bg-white/80 backdrop-blur hover:bg-white text-slate-600 px-6 py-3 rounded-full font-bold shadow-lg flex items-center gap-2 transition-all"
-              >
-                ← 返回目錄
-              </a>
-            </div>
+                <div className="glass-panel p-6 rounded-3xl flex-1 flex flex-col justify-center">
+                  {method === "none" && (
+                    <div className="text-center text-amber-200/50 text-sm font-bold uppercase tracking-widest">
+                      Select a split method to calculate volume
+                    </div>
+                  )}
+                  {method === "v-split" && (
+                    <div className="flex flex-col gap-4">
+                      <div className="bg-pink-500/20 border border-pink-500/30 p-4 rounded-xl">
+                        <div className="text-pink-300 font-bold text-xs uppercase mb-1">
+                          {getText("partA", lang)} (Left)
+                        </div>
+                        <div className="text-2xl font-mono text-white">
+                          2 × 2 × 2 ={" "}
+                          <span className="font-black text-pink-400">8</span>
+                        </div>
+                      </div>
+                      <div className="bg-green-500/20 border border-green-500/30 p-4 rounded-xl">
+                        <div className="text-green-300 font-bold text-xs uppercase mb-1">
+                          {getText("partB", lang)} (Right Stack)
+                        </div>
+                        <div className="text-2xl font-mono text-white">
+                          2 × 2 × 5 ={" "}
+                          <span className="font-black text-green-400">20</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {method === "h-split" && (
+                    <div className="flex flex-col gap-4">
+                      <div className="bg-pink-500/20 border border-pink-500/30 p-4 rounded-xl">
+                        <div className="text-pink-300 font-bold text-xs uppercase mb-1">
+                          {getText("partA", lang)} (Bottom Slab)
+                        </div>
+                        <div className="text-2xl font-mono text-white">
+                          4 × 2 × 2 ={" "}
+                          <span className="font-black text-pink-400">16</span>
+                        </div>
+                      </div>
+                      <div className="bg-green-500/20 border border-green-500/30 p-4 rounded-xl">
+                        <div className="text-green-300 font-bold text-xs uppercase mb-1">
+                          {getText("partB", lang)} (Top Tower)
+                        </div>
+                        <div className="text-2xl font-mono text-white">
+                          2 × 2 × 3 ={" "}
+                          <span className="font-black text-green-400">12</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="mt-8 pt-4 border-t border-white/10 flex justify-between items-end">
+                    <div className="text-slate-400 font-bold text-sm uppercase">
+                      {getText("totalVolume", lang)}
+                    </div>
+                    <div className="text-5xl font-black text-white drop-shadow-[0_0_10px_rgba(251,191,36,0.5)]">
+                      28
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 3D Scene */}
+              <div className="lg:col-span-2 glass-panel rounded-3xl relative overflow-hidden flex items-center justify-center min-h-[500px]">
+                <div className="scene w-full h-full flex items-center justify-center">
+                  <div className="cuboid-container">
+                    {cubes.map((c, i) => {
+                      let offsetX = 0;
+                      let offsetY = 0;
+
+                      if (method === "v-split" && c.group === "B") offsetX = 40;
+                      if (method === "h-split" && c.group === "B") offsetY = 40;
+
+                      return (
+                        <div
+                          key={i}
+                          className="cube"
+                          style={{
+                            transform: `translate3d(${
+                              c.x * size - cx + offsetX
+                            }px, ${-c.y * size + cy - offsetY}px, ${
+                              c.z * size - cz
+                            }px)`,
+                          }}
+                        >
+                          <div
+                            className="face front"
+                            style={{ backgroundColor: getGroupColor(c.group) }}
+                          />
+                          <div
+                            className="face back"
+                            style={{ backgroundColor: getGroupColor(c.group) }}
+                          />
+                          <div
+                            className="face right"
+                            style={{ backgroundColor: getGroupColor(c.group) }}
+                          />
+                          <div
+                            className="face left"
+                            style={{ backgroundColor: getGroupColor(c.group) }}
+                          />
+                          <div
+                            className="face top"
+                            style={{ backgroundColor: getGroupColor(c.group) }}
+                          />
+                          <div
+                            className="face bottom"
+                            style={{ backgroundColor: getGroupColor(c.group) }}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </main>
           </div>
         );
       }
 
-      lucide.createIcons();
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

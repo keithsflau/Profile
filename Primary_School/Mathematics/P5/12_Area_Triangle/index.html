@@ -3,29 +3,40 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小五數學：三角形面積 | Triangle Area</title>
+    <title>小五數學：三角形面積 | Area of Triangle</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <script src="../../common/i18n.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #ecfeff 0%, #22d3ee 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
-      const { LanguageSelector, get } = window.MathI18n;
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
 
       const t = {
         title: {
@@ -36,7 +47,7 @@
           es: "Área del Triángulo",
           de: "Fläche des Dreiecks",
           fi: "Kolmion pinta-ala",
-          fr: "Aire du Triangle",
+          fr: "Aire du triangle",
           ar: "مساحة المثلث",
           it: "Area del Triangolo",
         },
@@ -64,29 +75,17 @@
           ar: "الارتفاع",
           it: "Altezza",
         },
-        formulaTitle: {
-          en: "Formula:",
-          zh: "公式:",
-          ja: "公式:",
-          ko: "공식:",
-          es: "Fórmula:",
-          de: "Formel:",
-          fi: "Kaava:",
-          fr: "Formule :",
-          ar: "الصيغة:",
-          it: "Formula:",
-        },
-        formula: {
-          en: "Area = Base × Height ÷ 2",
-          zh: "面積 = 底 × 高 ÷ 2",
-          ja: "面積 = 底辺 × 高さ ÷ 2",
-          ko: "넓이 = 밑변 × 높이 ÷ 2",
-          es: "Área = Base × Altura ÷ 2",
-          de: "Fläche = Basis × Höhe ÷ 2",
-          fi: "Pinta-ala = Kanta × Korkeus ÷ 2",
-          fr: "Aire = Base × Hauteur ÷ 2",
-          ar: "المساحة = القاعدة × الارتفاع ÷ 2",
-          it: "Area = Base × Altezza ÷ 2",
+        skew: {
+          en: "Skew",
+          zh: "傾斜",
+          ja: "スキュー",
+          ko: "기울기",
+          es: "Inclinación",
+          de: "Neigung",
+          fi: "Vino",
+          fr: "Inclinaison",
+          ar: "انحراف",
+          it: "Inclinazione",
         },
         area: {
           en: "Area",
@@ -100,180 +99,316 @@
           ar: "المساحة",
           it: "Area",
         },
-        why: {
-          en: "Why divide by 2?",
-          zh: "為什麼除以 2？",
-          ja: "なぜ2で割るのですか？",
-          ko: "왜 2로 나누나요?",
-          es: "¿Por qué dividir entre 2?",
-          de: "Warum durch 2 teilen?",
-          fi: "Miksi jaetaan 2:lla?",
-          fr: "Pourquoi diviser par 2 ?",
-          ar: "لماذا نقسم على 2؟",
-          it: "Perché dividere per 2?",
+        proof: {
+          en: "Proof: Form Parallelogram",
+          zh: "證明：形成平行四邊形",
+          ja: "証明：平行四辺形を作る",
+          ko: "증명: 평행사변형 형성",
+          es: "Prueba: Formar Paralelogramo",
+          de: "Beweis: Parallelogramm bilden",
+          fi: "Todistus: Muodosta suunnikas",
+          fr: "Preuve : Former un parallélogramme",
+          ar: "برهان: تكوين متوازي أضلاع",
+          it: "Prova: Forma Parallelogramma",
         },
-        reason: {
-          en: "A triangle is half of a rectangle with the same base and height!",
-          zh: "三角形面積是同底同高長方形面積的一半！",
-          ja: "三角形は、同じ底辺と高さを持つ長方形の半分です！",
-          ko: "삼각형은 밑변과 높이가 같은 직사각형의 절반입니다!",
-          es: "¡Un triángulo es la mitad de un rectángulo con la misma base y altura!",
-          de: "Ein Dreieck ist die Hälfte eines Rechtecks mit derselben Basis und Höhe!",
-          fi: "Kolmio on puolet suorakulmiosta, jolla on sama kanta ja korkeus!",
-          fr: "Un triangle est la moitié d'un rectangle avec la même base et la même hauteur !",
-          ar: "المثلث هو نصف مستطيل له نفس القاعدة والارتفاع!",
-          it: "Un triangolo è la metà di un rettangolo con la stessa base e altezza!",
+        formula: {
+          en: "Area = (Base × Height) ÷ 2",
+          zh: "面積 = (底 × 高) ÷ 2",
+          ja: "面積 = (底辺 × 高さ) ÷ 2",
+          ko: "넓이 = (밑변 × 높이) ÷ 2",
+          es: "Área = (Base × Altura) ÷ 2",
+          de: "Fläche = (Basis × Höhe) ÷ 2",
+          fi: "Pinta-ala = (Kanta × Korkeus) ÷ 2",
+          fr: "Aire = (Base × Hauteur) ÷ 2",
+          ar: "المساحة = (القاعدة × الارتفاع) ÷ 2",
+          it: "Area = (Base × Altezza) ÷ 2",
         },
       };
 
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
       function App() {
         const [lang, setLang] = useState("zh");
-        const getText = (key) => t[key][lang] || t[key]["en"];
+        const [base, setBase] = useState(6);
+        const [height, setHeight] = useState(5);
+        const [skew, setSkew] = useState(2);
+        const [showProof, setShowProof] = useState(false);
 
-        const [base, setBase] = useState(8);
-        const [height, setHeight] = useState(6);
         const area = (base * height) / 2;
+        const U = 40;
+        const CX = 400;
+        const CY = 300;
+
+        // Triangle Coordinates
+        // Bottom-Left (local to shape center base)
+        const p1 = { x: 0, y: height * U };
+        const p2 = { x: base * U, y: height * U };
+        const p3 = { x: skew * U, y: 0 };
+
+        const pointsStr = `${p1.x},${p1.y} ${p2.x},${p2.y} ${p3.x},${p3.y}`;
 
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <LanguageSelector lang={lang} setLang={setLang} />
-            <h1 className="text-5xl font-black text-cyan-900 mb-2 mt-8">
-              📐 {getText("title")}
-            </h1>
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-4xl w-full mt-8">
-              <div className="flex flex-col md:flex-row gap-8 items-center">
-                <div className="flex-1">
-                  <svg
-                    viewBox="0 0 300 250"
-                    className="w-full max-w-sm mx-auto"
+          <div className="min-h-screen flex flex-col items-center p-4 font-sans bg-slate-900 text-white">
+            <div className="w-full max-w-5xl flex justify-between items-center mb-10">
+              <h1 className="text-4xl font-black text-cyan-400 drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]">
+                img {getText("title", lang)}
+              </h1>
+              <div className="flex bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-cyan-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
                   >
-                    {/* Rectangle outline to show half */}
-                    <rect
-                      x="50"
-                      y="50"
-                      width={base * 20}
-                      height={height * 20}
-                      fill="none"
-                      stroke="#94a3b8"
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="w-full max-w-6xl flex flex-col lg:flex-row gap-8 items-start">
+              {/* Visualization */}
+              <div className="flex-1 w-full glass-panel rounded-3xl overflow-hidden relative min-h-[400px] flex items-center justify-center border-4 border-slate-700/50">
+                {/* Grid */}
+                <div
+                  className="absolute inset-0 opacity-20 pointer-events-none"
+                  style={{
+                    backgroundImage:
+                      "linear-gradient(#475569 1px, transparent 1px), linear-gradient(90deg, #475569 1px, transparent 1px)",
+                    backgroundSize: `${U}px ${U}px`,
+                  }}
+                ></div>
+
+                <svg
+                  width="100%"
+                  height="500"
+                  viewBox="0 0 800 600"
+                  className="overflow-visible"
+                >
+                  <defs>
+                    <linearGradient id="triGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.6" />
+                      <stop
+                        offset="100%"
+                        stopColor="#0891b2"
+                        stopOpacity="0.8"
+                      />
+                    </linearGradient>
+                    <filter id="glow">
+                      <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                      <feMerge>
+                        <feMergeNode in="coloredBlur" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+                  </defs>
+
+                  <g
+                    transform={`translate(${CX - (base * U) / 2}, ${
+                      CY - (height * U) / 2
+                    })`}
+                  >
+                    {/* Main Triangle */}
+                    <motion.polygon
+                      points={pointsStr}
+                      fill="url(#triGrad)"
+                      stroke="#cffafe"
+                      strokeWidth="3"
+                      filter="url(#glow)"
+                    />
+
+                    {/* Height Line */}
+                    <line
+                      x1={p3.x}
+                      y1={p3.y}
+                      x2={p3.x}
+                      y2={p1.y}
+                      stroke="#fb7185"
                       strokeWidth="2"
                       strokeDasharray="5,5"
                     />
-                    {/* Triangle */}
-                    <polygon
-                      points={`50,${50 + height * 20} ${50 + base * 20},${
-                        50 + height * 20
-                      } ${50 + base * 10},50`}
-                      fill="#06b6d4"
-                      stroke="#0891b2"
-                      strokeWidth="3"
-                    />
-                    {/* Labels */}
                     <text
-                      x={50 + base * 10}
-                      y={50 + height * 20 + 25}
-                      textAnchor="middle"
-                      className="text-lg font-bold fill-cyan-800"
+                      x={p3.x + 10}
+                      y={p3.y + (height * U) / 2}
+                      fill="#fb7185"
+                      fontWeight="bold"
+                      fontSize="16"
                     >
-                      {getText("base")} = {base} cm
+                      {height}
                     </text>
-                    <text
-                      x={50 + base * 20 + 15}
-                      y={50 + height * 10}
-                      textAnchor="start"
-                      className="text-lg font-bold fill-cyan-800"
-                    >
-                      {getText("height")} = {height} cm
-                    </text>
-                    {/* Height line */}
+
+                    {/* Base Line */}
                     <line
-                      x1={50 + base * 10}
-                      y1="50"
-                      x2={50 + base * 10}
-                      y2={50 + height * 20}
-                      stroke="#ef4444"
+                      x1={p1.x}
+                      y1={p1.y + 15}
+                      x2={p2.x}
+                      y2={p2.y + 15}
+                      stroke="white"
                       strokeWidth="2"
-                      strokeDasharray="4,4"
+                      markerStart="url(#tick)"
+                      markerEnd="url(#tick)"
                     />
-                  </svg>
-                </div>
-                <div className="flex-1 space-y-6">
-                  <div>
-                    <label className="block font-bold text-cyan-800 mb-2">
-                      {getText("base")} (cm)
-                    </label>
-                    <input
-                      type="range"
-                      min="2"
-                      max="12"
-                      value={base}
-                      onChange={(e) => setBase(parseInt(e.target.value))}
-                      className="w-full accent-cyan-500"
-                    />
-                    <div className="text-center text-2xl font-black text-cyan-600">
-                      {base} cm
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block font-bold text-cyan-800 mb-2">
-                      {getText("height")} (cm)
-                    </label>
-                    <input
-                      type="range"
-                      min="2"
-                      max="10"
-                      value={height}
-                      onChange={(e) => setHeight(parseInt(e.target.value))}
-                      className="w-full accent-cyan-500"
-                    />
-                    <div className="text-center text-2xl font-black text-cyan-600">
-                      {height} cm
-                    </div>
-                  </div>
-                  <div className="bg-cyan-50 rounded-2xl p-4 border-2 border-cyan-200">
-                    <p className="text-lg font-bold text-center">
-                      {getText("formulaTitle")}
-                    </p>
-                    <p className="text-2xl font-mono text-center mt-2">
-                      {getText("formula")}
-                    </p>
-                  </div>
-                  <div className="bg-emerald-100 rounded-2xl p-6 text-center border-4 border-emerald-300">
-                    <div className="text-emerald-600 font-bold mb-1">
-                      {getText("area")}
-                    </div>
-                    <div className="text-4xl font-black text-emerald-800">
-                      {area} cm²
-                    </div>
-                    <div className="text-sm text-emerald-600 mt-2">
-                      {base} × {height} ÷ 2 = {area}
-                    </div>
-                  </div>
-                </div>
+                    <text
+                      x={(p1.x + p2.x) / 2}
+                      y={p1.y + 40}
+                      textAnchor="middle"
+                      fill="white"
+                      fontWeight="bold"
+                      fontSize="16"
+                    >
+                      {base}
+                    </text>
+
+                    {/* Duplicate Triangle for Proof (Rotated) */}
+                    <AnimatePresence>
+                      {showProof && (
+                        <motion.polygon
+                          initial={{
+                            opacity: 0,
+                            rotate: 0,
+                            originX: 0.5,
+                            originY: 0.5,
+                          }} // Simplified animation
+                          animate={{
+                            opacity: 1,
+                            rotate: 180,
+                            // Manual Offset calculation for perfect alignment
+                            // Rotated 180 around midpoint of p2-p3?
+                            // Midpoint of right side edge: M = ((p2.x+p3.x)/2, (p2.y+p3.y)/2)
+                            // SVG rotate(180, Mx, My)
+                          }}
+                          exit={{ opacity: 0, rotate: 0 }}
+                          transition={{ duration: 1.5, type: "spring" }}
+                          points={pointsStr}
+                          fill="transparent"
+                          stroke="#fbbf24"
+                          strokeWidth="2"
+                          strokeDasharray="5,5"
+                          style={{
+                            transformOrigin: `${(p2.x + p3.x) / 2}px ${
+                              (p2.y + p3.y) / 2
+                            }px`,
+                          }}
+                        />
+                      )}
+                    </AnimatePresence>
+                  </g>
+
+                  {showProof && (
+                    <motion.text
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 1 }}
+                      x="400"
+                      y="550"
+                      textAnchor="middle"
+                      fill="#fbbf24"
+                      fontSize="18"
+                      fontWeight="bold"
+                    >
+                      {getText("base", lang)} × {getText("height", lang)} ={" "}
+                      {base * height} (Parallelogram)
+                    </motion.text>
+                  )}
+                </svg>
               </div>
-              <div className="mt-6 bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
-                <p className="font-bold">💡 {getText("why")}</p>
-                <p className="text-sm">{getText("reason")}</p>
+
+              {/* Controls */}
+              <div className="w-full lg:w-80 flex flex-col gap-6">
+                <div className="glass-panel p-6 rounded-3xl flex flex-col gap-6">
+                  <ControlSlider
+                    label={getText("base", lang)}
+                    val={base}
+                    set={setBase}
+                    min={2}
+                    max={12}
+                    color="accent-cyan-400"
+                    text="text-cyan-300"
+                  />
+                  <ControlSlider
+                    label={getText("height", lang)}
+                    val={height}
+                    set={setHeight}
+                    min={2}
+                    max={8}
+                    color="accent-pink-400"
+                    text="text-pink-300"
+                  />
+                  <ControlSlider
+                    label={getText("skew", lang)}
+                    val={skew}
+                    set={setSkew}
+                    min={-4}
+                    max={12}
+                    color="accent-amber-400"
+                    text="text-amber-300"
+                  />
+
+                  <div className="h-px bg-white/10 my-2"></div>
+
+                  <button
+                    onClick={() => setShowProof(!showProof)}
+                    className={`py-3 rounded-xl font-bold text-lg transition-all border border-white/10 ${
+                      showProof
+                        ? "bg-amber-500/80 text-white shadow-[0_0_20px_rgba(245,158,11,0.3)]"
+                        : "bg-slate-700/50 text-slate-300 hover:bg-slate-600/50"
+                    }`}
+                  >
+                    {getText("proof", lang)}
+                  </button>
+
+                  <div className="bg-slate-950/50 p-4 rounded-xl border border-white/5 text-center">
+                    <div className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">
+                      {getText("formula", lang)}
+                    </div>
+                    <div className="text-4xl font-black text-white">{area}</div>
+                    {showProof && (
+                      <div className="text-xs text-amber-400 mt-1 font-mono">
+                        1/2 of {base * height}
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const ControlSlider = ({ label, val, set, min, max, color, text }) => (
+        <div className="flex flex-col gap-2">
+          <div className={`flex justify-between font-bold ${text}`}>
+            <label>{label}</label>
+            <span>{val}</span>
+          </div>
+          <input
+            type="range"
+            min={min}
+            max={max}
+            value={val}
+            onChange={(e) => set(Number(e.target.value))}
+            className={`w-full ${color}`}
+          />
+        </div>
+      );
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

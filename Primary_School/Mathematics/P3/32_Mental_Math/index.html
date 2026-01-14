@@ -3,13 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小三數學：心算特訓班</title>
+    <title>小三數學：心算特訓班 | Mental Math</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -26,8 +26,195 @@
     <script type="text/babel">
       const { useState, useEffect, useRef } = React;
       const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Mental Math Training",
+          zh: "心算特訓",
+          ja: "暗算トレーニング",
+          ko: "암산 훈련",
+          es: "Entrenamiento de cálculo mental",
+          de: "Kopfrechentraining",
+          fi: "Päässälasku",
+          fr: "Calcul mental",
+          ar: "تدريب الحساب الذهني",
+          it: "Calcolo mentale",
+        },
+        challenge: {
+          en: "Challenge your speed!",
+          zh: "挑戰你的運算速度！",
+          ja: "スピードに挑戦！",
+          ko: "속도에 도전하세요!",
+          es: "¡Desafía tu velocidad!",
+          de: "Fordere deine Geschwindigkeit heraus!",
+          fi: "Haasta nopeutesi!",
+          fr: "Défiez votre vitesse !",
+          ar: "تحدى سرعتك!",
+          it: "Sfida la tua velocità!",
+        },
+        start: {
+          en: "Start Challenge",
+          zh: "開始挑戰",
+          ja: "挑戦開始",
+          ko: "도전 시작",
+          es: "Iniciar desafío",
+          de: "Herausforderung starten",
+          fi: "Aloita haaste",
+          fr: "Commencer le défi",
+          ar: "ابدأ التحدي",
+          it: "Inizia sfida",
+        },
+        score: {
+          en: "Score",
+          zh: "得分",
+          ja: "スコア",
+          ko: "점수",
+          es: "Puntuación",
+          de: "Punktzahl",
+          fi: "Pisteet",
+          fr: "Score",
+          ar: "النتيجة",
+          it: "Punteggio",
+        },
+        combo: {
+          en: "Combo!",
+          zh: "連擊!",
+          ja: "コンボ!",
+          ko: "콤보!",
+          es: "¡Combo!",
+          de: "Combo!",
+          fi: "Kombo!",
+          fr: "Combo !",
+          ar: "كومبو!",
+          it: "Combo!",
+        },
+        timeUp: {
+          en: "Time's Up!",
+          zh: "時間到！",
+          ja: "時間切れ！",
+          ko: "시간 종료!",
+          es: "¡Se acabó el tiempo!",
+          de: "Zeit abgelaufen!",
+          fi: "Aika loppui!",
+          fr: "Temps écoulé !",
+          ar: "انتهى الوقت!",
+          it: "Tempo scaduto!",
+        },
+        finalScore: {
+          en: "Final Score",
+          zh: "最終得分",
+          ja: "最終スコア",
+          ko: "최종 점수",
+          es: "Puntuación final",
+          de: "Endpunktzahl",
+          fi: "Loppupisteet",
+          fr: "Score final",
+          ar: "النتيجة النهائية",
+          it: "Punteggio finale",
+        },
+        maxCombo: {
+          en: "Max Combo",
+          zh: "最高連擊",
+          ja: "最大コンボ",
+          ko: "최대 콤보",
+          es: "Combo máx",
+          de: "Max. Combo",
+          fi: "Max kombo",
+          fr: "Combo max",
+          ar: "أقصى كومبو",
+          it: "Combo max",
+        },
+        rank: {
+          en: "Rank",
+          zh: "評級",
+          ja: "ランク",
+          ko: "등급",
+          es: "Rango",
+          de: "Rang",
+          fi: "Sijoitus",
+          fr: "Rang",
+          ar: "الرتبة",
+          it: "Rango",
+        },
+        ranks: {
+          godlike: {
+            en: "Math God! 👑",
+            zh: "神算! 👑",
+            ja: "計算の神! 👑",
+            ko: "수학의 신! 👑",
+            es: "¡Dios de las mates! 👑",
+            de: "Mathe-Gott! 👑",
+            fi: "Matikkajumala! 👑",
+            fr: "Dieu des maths ! 👑",
+            ar: "إله الرياضيات! 👑",
+            it: "Dio della matematica! 👑",
+          },
+          master: {
+            en: "Master! 🌟",
+            zh: "高手! 🌟",
+            ja: "達人! 🌟",
+            ko: "고수! 🌟",
+            es: "¡Maestro! 🌟",
+            de: "Meister! 🌟",
+            fi: "Mestari! 🌟",
+            fr: "Maître ! 🌟",
+            ar: "أستاذ! 🌟",
+            it: "Maestro! 🌟",
+          },
+          good: {
+            en: "Good! 👍",
+            zh: "不錯! 👍",
+            ja: "いいね! 👍",
+            ko: "좋아요! 👍",
+            es: "¡Bien! 👍",
+            de: "Gut! 👍",
+            fi: "Hyvä! 👍",
+            fr: "Bien ! 👍",
+            ar: "جيد! 👍",
+            it: "Bene! 👍",
+          },
+          keepUp: {
+            en: "Keep it up! 💪",
+            zh: "加油! 💪",
+            ja: "頑張れ! 💪",
+            ko: "힘내세요! 💪",
+            es: "¡Sigue así! 💪",
+            de: "Weiter so! 💪",
+            fi: "Jaksaa jaksaa! 💪",
+            fr: "Continuez ! 💪",
+            ar: "استمر! 💪",
+            it: "Continua così! 💪",
+          },
+        },
+        playAgain: {
+          en: "Play Again",
+          zh: "再玩一次",
+          ja: "もう一度プレイ",
+          ko: "다시 하기",
+          es: "Jugar de nuevo",
+          de: "Nochmal spielen",
+          fi: "Pelaa uudelleen",
+          fr: "Rejouer",
+          ar: "العب مرة أخرى",
+          it: "Gioca ancora",
+        },
+        home: {
+          en: "Return Home",
+          zh: "返回主頁",
+          ja: "ホームに戻る",
+          ko: "홈으로",
+          es: "Volver al inicio",
+          de: "Zurück",
+          fi: "Etusivulle",
+          fr: "Accueil",
+          ar: "العودة للرئيسية",
+          it: "Home",
+        },
+      };
 
       function App() {
+        const [lang, setLang] = useState("zh");
         const [gameState, setGameState] = useState("menu"); // menu, playing, gameover
         const [question, setQuestion] = useState({ q: "", a: 0 });
         const [input, setInput] = useState("");
@@ -85,22 +272,33 @@
           }
         };
 
+        const getRankText = () => {
+          if (score > 500)
+            return t.ranks.godlike[lang] || t.ranks.godlike["en"];
+          if (score > 300) return t.ranks.master[lang] || t.ranks.master["en"];
+          if (score > 100) return t.ranks.good[lang] || t.ranks.good["en"];
+          return t.ranks.keepUp[lang] || t.ranks.keepUp["en"];
+        };
+
         return (
-          <div className="min-h-screen flex items-center justify-center p-4">
+          <div className="min-h-screen flex flex-col items-center justify-center p-4">
+            <div className="absolute top-4 right-4 z-50">
+              <LanguageSelector lang={lang} setLang={setLang} />
+            </div>
             <div className="bg-white/95 backdrop-blur-xl rounded-3xl p-8 shadow-2xl w-full max-w-lg text-center relative overflow-hidden">
               {gameState === "menu" && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                  <h1 className="text-5xl font-black text-green-700 mb-2">
-                    ⚡ 心算特訓
+                  <h1 className="text-4xl md:text-5xl font-black text-green-700 mb-2">
+                    ⚡ {t.title[lang] || t.title["en"]}
                   </h1>
                   <p className="text-xl text-green-600 mb-8 font-bold">
-                    挑戰你的運算速度！
+                    {t.challenge[lang] || t.challenge["en"]}
                   </p>
                   <button
                     onClick={() => setGameState("playing")}
-                    className="px-12 py-6 bg-green-500 hover:bg-green-600 text-white text-3xl font-black rounded-2xl shadow-lg hover:scale-105 transition-all w-full"
+                    className="px-8 py-6 bg-green-500 hover:bg-green-600 text-white text-2xl md:text-3xl font-black rounded-2xl shadow-lg hover:scale-105 transition-all w-full"
                   >
-                    開始挑戰
+                    {t.start[lang] || t.start["en"]}
                   </button>
                 </motion.div>
               )}
@@ -121,7 +319,7 @@
                       </span>
                     </div>
                     <div className="text-2xl font-black text-green-600">
-                      得分: {score}
+                      {t.score[lang] || t.score["en"]}: {score}
                     </div>
                   </div>
 
@@ -129,9 +327,9 @@
                     key={question.q}
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="bg-slate-100 rounded-2xl p-12 mb-8"
+                    className="bg-slate-100 rounded-2xl p-8 md:p-12 mb-8"
                   >
-                    <div className="text-6xl font-black text-slate-800">
+                    <div className="text-5xl md:text-6xl font-black text-slate-800">
                       {question.q}
                     </div>
                   </motion.div>
@@ -159,9 +357,9 @@
                     <motion.div
                       initial={{ y: 20, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
-                      className="absolute top-4 right-4 bg-yellow-400 text-yellow-900 font-black px-3 py-1 rounded-full transform rotate-12"
+                      className="absolute top-4 right-4 bg-yellow-400 text-yellow-900 font-black px-3 py-1 rounded-full transform rotate-12 shadow-lg"
                     >
-                      {combo} 連擊! 🔥
+                      {combo} {t.combo[lang] || t.combo["en"]} 🔥
                     </motion.div>
                   )}
                 </div>
@@ -171,10 +369,10 @@
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                   <div className="text-6xl mb-4">🏆</div>
                   <h2 className="text-4xl font-black text-slate-800 mb-2">
-                    時間到！
+                    {t.timeUp[lang] || t.timeUp["en"]}
                   </h2>
                   <div className="text-2xl text-slate-500 mb-8 font-bold">
-                    最終得分
+                    {t.finalScore[lang] || t.finalScore["en"]}
                   </div>
                   <div className="text-8xl font-black text-green-600 mb-8">
                     {score}
@@ -182,7 +380,7 @@
                   <div className="grid grid-cols-2 gap-4">
                     <div className="bg-green-50 p-4 rounded-xl">
                       <div className="text-sm text-green-700 font-bold mb-1">
-                        最高連擊
+                        {t.maxCombo[lang] || t.maxCombo["en"]}
                       </div>
                       <div className="text-3xl font-black text-green-800">
                         {combo}
@@ -190,16 +388,10 @@
                     </div>
                     <div className="bg-yellow-50 p-4 rounded-xl">
                       <div className="text-sm text-yellow-700 font-bold mb-1">
-                        評級
+                        {t.rank[lang] || t.rank["en"]}
                       </div>
-                      <div className="text-3xl font-black text-yellow-800">
-                        {score > 500
-                          ? "神算! 👑"
-                          : score > 300
-                          ? "高手! 🌟"
-                          : score > 100
-                          ? "不錯! 👍"
-                          : "加油! 💪"}
+                      <div className="text-2xl md:text-3xl font-black text-yellow-800">
+                        {getRankText()}
                       </div>
                     </div>
                   </div>
@@ -207,13 +399,13 @@
                     onClick={() => setGameState("playing")}
                     className="mt-8 px-8 py-4 bg-green-500 hover:bg-green-600 text-white text-xl font-black rounded-xl shadow-lg w-full"
                   >
-                    再玩一次
+                    {t.playAgain[lang] || t.playAgain["en"]}
                   </button>
                   <button
                     onClick={() => setGameState("menu")}
                     className="mt-4 px-8 py-4 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xl font-bold rounded-xl w-full"
                   >
-                    返回主頁
+                    {t.home[lang] || t.home["en"]}
                   </button>
                 </motion.div>
               )}
@@ -225,20 +417,5 @@
       const root = ReactDOM.createRoot(document.getElementById("root"));
       root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

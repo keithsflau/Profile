@@ -33,30 +33,141 @@
           en: "Transport Sounds",
           zh: "交通工具聲音",
           ja: "乗り物の音",
+          ko: "교통 수단 소리",
+          es: "Sonidos de transporte",
+          de: "Verkehrsgeräusche",
+          fi: "Liikenteen äänet",
+          fr: "Bruits de transport",
+          ar: "أصوات النقل",
+          it: "Suoni dei trasporti",
         },
         instruction: {
           en: "What makes this sound?",
           zh: "這是什麼發出的聲音？",
           ja: "これは何の音ですか？",
+          ko: "이것은 무엇이 내는 소리입니까?",
+          es: "¿Qué hace este sonido?",
+          de: "Was macht dieses Geräusch?",
+          fi: "Mikä pitää tätä ääntä?",
+          fr: "Qu'est-ce qui fait ce bruit ?",
+          ar: "ما الذي يصدر هذا الصوت؟",
+          it: "Cosa fa questo suono?",
         },
-        start: { en: "Start Listening", zh: "開始聆聽" },
-        correct: { en: "Correct!", zh: "答對了！" },
-        wrong: { en: "Try Again", zh: "再試一次" },
-        next: { en: "Next Sound", zh: "下一個聲音" },
-        finished: { en: "Great Ears!", zh: "你的耳朵真靈！" },
-        restart: { en: "Play Again", zh: "再玩一次" },
-
+        start: {
+          en: "Start Listening",
+          zh: "開始聆聽",
+          es: "Empezar a escuchar",
+          de: "Zuhören starten",
+          fi: "Aloita kuuntelu",
+          fr: "Commencer à écouter",
+          ar: "بدء الاستماع",
+          it: "Inizia ad ascoltare",
+        },
+        correct: {
+          en: "Correct!",
+          zh: "答對了！",
+          es: "¡Correcto!",
+          de: "Richtig!",
+          fi: "Oikein!",
+          fr: "Correct !",
+          ar: "صحيح!",
+          it: "Corretto!",
+        },
+        wrong: {
+          en: "Try Again",
+          zh: "再試一次",
+          es: "Inténtalo de nuevo",
+          de: "Versuch es noch einmal",
+          fi: "Yritä uudelleen",
+          fr: "Réessayez",
+          ar: "حاول مرة أخرى",
+          it: "Riprova",
+        },
+        next: {
+          en: "Next Sound",
+          zh: "下一個聲音",
+          es: "Siguiente sonido",
+          de: "Nächstes Geräusch",
+          fi: "Seuraava ääni",
+          fr: "Son suivant",
+          ar: "الصوت التالي",
+          it: "Suono successivo",
+        },
+        finished: {
+          en: "Great Ears!",
+          zh: "你的耳朵真靈！",
+          es: "¡Grandes oídos!",
+          de: "Tolle Ohren!",
+          fi: "Hienot korvat!",
+          fr: "Grandes oreilles !",
+          ar: "آذان رائعة!",
+          it: "Grandi orecchie!",
+        },
+        restart: {
+          en: "Play Again",
+          zh: "再玩一次",
+          es: "Jugar de nuevo",
+          de: "Nochmal spielen",
+          fi: "Pelaa uudelleen",
+          fr: "Rejouer",
+          ar: "العب مرة أخرى",
+          it: "Gioca di nuovo",
+        },
         sound1: { en: "Beep Beep!", zh: "嗶嗶！" },
         sound2: { en: "Choo Choo!", zh: "嗚嗚——！" },
-        sound3: { en: "Wee Woo Wee Woo!", zh: "咿—嗚—咿—嗚！" }, // Fire/Police
-        sound4: { en: "Vroom Vroom!", zh: "轟轟！" }, // Car/Bike
-        sound5: { en: "Ding Ding!", zh: "叮叮！" }, // Tram
-
-        car: { en: "Car", zh: "汽車" },
-        train: { en: "Train", zh: "火車" },
-        ambulance: { en: "Ambulance", zh: "救護車" },
-        tram: { en: "Tram", zh: "電車" },
-        bike: { en: "Motorcycle", zh: "電單車" },
+        sound3: { en: "Wee Woo Wee Woo!", zh: "咿—嗚—咿—嗚！" },
+        sound4: { en: "Vroom Vroom!", zh: "轟轟！" },
+        sound5: { en: "Ding Ding!", zh: "叮叮！" },
+        car: {
+          en: "Car",
+          zh: "汽車",
+          es: "Coche",
+          de: "Auto",
+          fi: "Auto",
+          fr: "Voiture",
+          ar: "سيارة",
+          it: "Auto",
+        },
+        train: {
+          en: "Train",
+          zh: "火車",
+          es: "Tren",
+          de: "Zug",
+          fi: "Juna",
+          fr: "Train",
+          ar: "قطار",
+          it: "Treno",
+        },
+        ambulance: {
+          en: "Ambulance",
+          zh: "救護車",
+          es: "Ambulancia",
+          de: "Krankenwagen",
+          fi: "Ambulanssi",
+          fr: "Ambulance",
+          ar: "سيارة إسعاف",
+          it: "Ambulanza",
+        },
+        tram: {
+          en: "Tram",
+          zh: "電車",
+          es: "Tranvía",
+          de: "Straßenbahn",
+          fi: "Raitiovaunu",
+          fr: "Tramway",
+          ar: "ترام",
+          it: "Tram",
+        },
+        bike: {
+          en: "Motorcycle",
+          zh: "電單車",
+          es: "Motocicleta",
+          de: "Motorrad",
+          fi: "Moottoripyörä",
+          fr: "Moto",
+          ar: "دراجة نارية",
+          it: "Motocicletta",
+        },
       };
 
       const questions = [
@@ -202,20 +313,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

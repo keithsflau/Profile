@@ -2,11 +2,12 @@
 <html lang="zh-HK">
   <head>
     <meta charset="UTF-8" />
-    <title>小三數學：十萬以內的數</title>
+    <title>小三數學：十萬以內的數 | Numbers up to 100,000</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@900&family=Fredoka:wght@600&display=swap"
       rel="stylesheet"
@@ -22,14 +23,121 @@
     <div id="root"></div>
     <script type="text/babel">
       const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Numbers up to 100,000",
+          zh: "十萬以內的數",
+          ja: "10万までの数",
+          ko: "10만까지의 수",
+          es: "Números hasta 100,000",
+          de: "Zahlen bis 100.000",
+          fi: "Luvut 100 000 asti",
+          fr: "Nombres jusqu'à 100 000",
+          ar: "الأرقام حتى 100,000",
+          it: "Numeri fino a 100.000",
+        },
+        reading: {
+          en: "Number Format",
+          zh: "中文讀法",
+          ja: "数値形式",
+          ko: "숫자 형식",
+          es: "Formato de número",
+          de: "Zahlenformat",
+          fi: "Numeromuoto",
+          fr: "Format de nombre",
+          ar: "تنسيق الأرقام",
+          it: "Formato numerico",
+        },
+        tenThousands: {
+          en: "Ten Thousands",
+          zh: "萬位",
+          ja: "万の位",
+          ko: "만의 자리",
+          es: "Diezmilésimas",
+          de: "Zehntausender",
+          fi: "Kymmenet tuhannet",
+          fr: "Dizaines de milliers",
+          ar: "عشرة آلاف",
+          it: "Decine di migliaia",
+        },
+        thousands: {
+          en: "Thousands",
+          zh: "千位",
+          ja: "千の位",
+          ko: "천의 자리",
+          es: "Milésimas",
+          de: "Tausender",
+          fi: "Tuhannet",
+          fr: "Milliers",
+          ar: "آلاف",
+          it: "Migliaia",
+        },
+        hundreds: {
+          en: "Hundreds",
+          zh: "百位",
+          ja: "百の位",
+          ko: "백의 자리",
+          es: "Centenas",
+          de: "Hunderter",
+          fi: "Sadat",
+          fr: "Centaines",
+          ar: "مئات",
+          it: "Centinaia",
+        },
+        tens: {
+          en: "Tens",
+          zh: "十位",
+          ja: "十の位",
+          ko: "십의 자리",
+          es: "Decenas",
+          de: "Zehner",
+          fi: "Kymmenet",
+          fr: "Dizaines",
+          ar: "عشرات",
+          it: "Decine",
+        },
+        ones: {
+          en: "Ones",
+          zh: "個位",
+          ja: "一の位",
+          ko: "일의 자리",
+          es: "Unidades",
+          de: "Einer",
+          fi: "Ykköset",
+          fr: "Unités",
+          ar: "آحاد",
+          it: "Unità",
+        },
+      };
+
       function App() {
+        const [lang, setLang] = useState("zh");
         const [num, setNum] = useState(56789);
-        const places = ["萬", "千", "百", "十", "個"];
+        const placeKeys = [
+          "tenThousands",
+          "thousands",
+          "hundreds",
+          "tens",
+          "ones",
+        ];
         const digits = num.toString().padStart(5, "0").split("");
+
+        const getPlaceName = (key) => t[key][lang] || t[key]["en"];
+
+        // For Chinese, we might want to keep "中文讀法" if the user selected Chinese
+        // For other languages, just showing the locale string is standard enough as "Number Format"
+        const getFormattedNumber = () => {
+          // Basic toLocaleString usually adds commas, which is good enough here
+          return num.toLocaleString(lang === "zh" ? "zh-HK" : "en-US");
+        };
+
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-6xl font-black text-white mb-8">
-              🔢 十萬以內的數
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-6xl font-black text-white mb-8 mt-8 text-center">
+              🔢 {t.title[lang] || t.title["en"]}
             </h1>
             <div className="bg-white/90 rounded-3xl p-8 shadow-2xl max-w-5xl w-full">
               <input
@@ -48,17 +156,21 @@
                     key={i}
                     className="bg-gradient-to-br from-blue-100 to-cyan-100 rounded-2xl p-6 text-center border-4 border-blue-300"
                   >
-                    <div className="text-xl font-bold text-blue-800 mb-2">
-                      {places[i]}位
+                    <div className="text-sm md:text-xl font-bold text-blue-800 mb-2 truncate">
+                      {getPlaceName(placeKeys[i])}
                     </div>
-                    <div className="text-7xl font-black text-blue-600">{d}</div>
+                    <div className="text-4xl md:text-7xl font-black text-blue-600">
+                      {d}
+                    </div>
                   </div>
                 ))}
               </div>
               <div className="mt-8 bg-blue-50 p-6 rounded-xl text-center">
-                <div className="text-3xl font-bold text-blue-800">中文讀法</div>
+                <div className="text-3xl font-bold text-blue-800">
+                  {t.reading[lang] || t.reading["en"]}
+                </div>
                 <div className="text-4xl font-black text-blue-600 mt-4">
-                  {num.toLocaleString("zh-HK")}
+                  {getFormattedNumber()}
                 </div>
               </div>
             </div>
@@ -67,20 +179,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

@@ -33,37 +33,185 @@
           en: "Emotion Traffic Light",
           zh: "情緒紅綠燈",
           ja: "感情の信号機",
+          ko: "감정 신호등",
+          es: "Semáforo de Emociones",
+          de: "Gefühlsampel",
+          fi: "Tunne liikennevalot",
+          fr: "Feu de Circulation des Émotions",
+          ar: "إشارة المرور العاطفية",
+          it: "Semaforo delle Emozioni",
         },
         instruction: {
           en: "How to handle this feeling?",
           zh: "如何處理這種情緒？",
           ja: "この感情をどう処理しますか？",
+          ko: "이 감정을 어떻게 처리해야 할까요?",
+          es: "¿Cómo manejar este sentimiento?",
+          de: "Wie gehe ich mit diesem Gefühl um?",
+          fi: "Kuinka käsitellä tätä tunnetta?",
+          fr: "Comment gérer ce sentiment ?",
+          ar: "كيف تتعامل مع هذا الشعور؟",
+          it: "Come gestire questa sensazione?",
         },
-        red: { en: "Stop (Calm Down)", zh: "停 (冷靜)" },
-        yellow: { en: "Think (What to do?)", zh: "想 (怎麼辦？)" },
-        green: { en: "Go (Act)", zh: "行 (行動)" },
+        red: {
+          en: "Stop (Calm Down)",
+          zh: "停 (冷靜)",
+          ja: "止まれ (落ち着く)",
+          ko: "멈춤 (진정하기)",
+          es: "Parar (Calmarse)",
+          de: "Stopp (Beruhigen)",
+          fi: "Seis (Rauhoitu)",
+          fr: "Arrêt (Se calmer)",
+          ar: "توقف (هدئ أعصابك)",
+          it: "Stop (Calmati)",
+        },
+        yellow: {
+          en: "Think (What to do?)",
+          zh: "想 (怎麼辦？)",
+          ja: "考える (どうする？)",
+          ko: "생각 (어떻게 할까?)",
+          es: "Pensar (¿Qué hacer?)",
+          de: "Denken (Was tun?)",
+          fi: "Mieti (Mitä tehdä?)",
+          fr: "Penser (Que faire ?)",
+          ar: "فكر (ماذا تفعل؟)",
+          it: "Pensa (Cosa fare?)",
+        },
+        green: {
+          en: "Go (Act)",
+          zh: "行 (行動)",
+          ja: "進む (行動)",
+          ko: "진행 (행동)",
+          es: "Ir (Actuar)",
+          de: "Los (Handeln)",
+          fi: "Mene (Toimi)",
+          fr: "Allez (Agir)",
+          ar: "اذهب (تصرف)",
+          it: "Vai (Agisci)",
+        },
 
-        angry: { en: "Very Angry! Want to hit!", zh: "很生氣！想打人！" },
-        nervous: { en: "Nervous about exam...", zh: "考試前很緊張..." },
-        sad: { en: "Sad because friend left.", zh: "朋友走了很傷心。" },
-        excited: { en: "Too excited running around!", zh: "太興奮亂跑！" },
+        angry: {
+          en: "Very Angry! Want to hit!",
+          zh: "很生氣！想打人！",
+          ja: "とても怒っている！殴りたい！",
+          ko: "화가 나요! 때리고 싶어요!",
+          es: "¡Muy enojado! ¡Quiero golpear!",
+          de: "Sehr wütend! Will schlagen!",
+          fi: "Olen vihainen! Tekee mieli lyödä!",
+          fr: "Très en colère ! Envie de frapper !",
+          ar: "غاضب جدا! تريد أن تضرب!",
+          it: "Molto Arrabbiato! Voglio colpire!",
+        },
+        nervous: {
+          en: "Nervous about exam...",
+          zh: "考試前很緊張...",
+          ja: "試験で緊張している...",
+          ko: "시험 때문에 긴장돼요...",
+          es: "Nervioso por el examen...",
+          de: "Nervös wegen Prüfung...",
+          fi: "Jännittää koetta...",
+          fr: "Nerveux pour l'examen...",
+          ar: "متوتر بشأن الامتحان ...",
+          it: "Nervoso per l'esame...",
+        },
+        sad: {
+          en: "Sad because friend left.",
+          zh: "朋友走了很傷心。",
+          ja: "友達が行ってしまって悲しい。",
+          ko: "친구가 떠나서 슬퍼요.",
+          es: "Triste porque mi amigo se fue.",
+          de: "Traurig, weil Freund weg ist.",
+          fi: "Surullinen koska ystävä lähti.",
+          fr: "Triste parce que l'ami est parti.",
+          ar: "حزين لأن صديقي غادر.",
+          it: "Triste perché l'amico se n'è andato.",
+        },
+        excited: {
+          en: "Too excited running around!",
+          zh: "太興奮亂跑！",
+          ja: "興奮して走り回ってる！",
+          ko: "너무 신나서 뛰어다녀요!",
+          es: "¡Demasiado emocionado corriendo!",
+          de: "Zu aufgeregt, renne herum!",
+          fi: "Liian innoissaan juoksemassa ympäriinsä!",
+          fr: "Trop excité à courir partout !",
+          ar: "متحمس جدا للجري!",
+          it: "Troppo eccitato correndo in giro!",
+        },
 
         redAction: {
           en: "Take deep breaths. 1...2...3...",
           zh: "深呼吸... 1... 2... 3...",
+          ja: "深呼吸して。1...2...3...",
+          ko: "심호흡을 하세요. 1...2...3...",
+          es: "Respira hondo. 1...2...3...",
+          de: "Tief durchatmen. 1...2...3...",
+          fi: "Hengitä syvään. 1...2...3...",
+          fr: "Respirez profondément. 1...2...3...",
+          ar: "خذ أنفاسا عميقة. 1... 2... 3...",
+          it: "Fai respiri profondi. 1...2...3...",
         },
         yellowAction: {
           en: "Think: Hitting hurts others.",
           zh: "想：打人會令別人受傷。",
+          ja: "考える：殴ると相手が痛い。",
+          ko: "생각: 때리면 다른 사람이 다쳐요.",
+          es: "Piensa: Golpear lastima a otros.",
+          de: "Denke: Schlagen tut anderen weh.",
+          fi: "Mieti: Lyöminen sattuu toisiin.",
+          fr: "Pensez : Frapper fait mal aux autres.",
+          ar: "فكر: الضرب يؤذي الآخرين.",
+          it: "Pensa: Colpire fa male agli altri.",
         },
         greenAction: {
           en: "Tell teacher or draw a picture.",
           zh: "告訴老師或畫畫發洩。",
+          ja: "先生に言うか、絵を描く。",
+          ko: "선생님께 말하거나 그림을 그리세요.",
+          es: "Dile al maestro o dibuja un dibujo.",
+          de: "Sag es dem Lehrer oder male ein Bild.",
+          fi: "Kerro opettajalle tai piirrä kuva.",
+          fr: "Dites-le au professeur ou dessinez une image.",
+          ar: "أخبر المعلم أو ارسم صورة.",
+          it: "Dillo all'insegnante o disegna un'immagine.",
         },
 
-        next: { en: "Next Step", zh: "下一步" },
-        restart: { en: "Try Another", zh: "試試其他" },
-        great: { en: "Great job managing emotions!", zh: "處理情緒做得好！" },
+        next: {
+          en: "Next Step",
+          zh: "下一步",
+          ja: "次のステップ",
+          ko: "다음 단계",
+          es: "Siguiente Paso",
+          de: "Nächster Schritt",
+          fi: "Seuraava vaihe",
+          fr: "Étape Suivante",
+          ar: "الخطوة التالية",
+          it: "Passo Successivo",
+        },
+        restart: {
+          en: "Try Another",
+          zh: "試試其他",
+          ja: "他を試す",
+          ko: "다른 것 시도",
+          es: "Probar Otro",
+          de: "Ein anderes versuchen",
+          fi: "Kokeile toista",
+          fr: "Essayer un autre",
+          ar: "جرب آخر",
+          it: "Prova un Altro",
+        },
+        great: {
+          en: "Great job managing emotions!",
+          zh: "處理情緒做得好！",
+          ja: "感情のコントロールが上手ですね！",
+          ko: "감정 조절을 잘했어요!",
+          es: "¡Gran trabajo manejando emociones!",
+          de: "Super, wie du mit Gefühlen umgehst!",
+          fi: "Hienoa työtä tunteiden hallinnassa!",
+          fr: "Bravo pour la gestion des émotions !",
+          ar: "عمل عظيم في إدارة العواطف!",
+          it: "Ottimo lavoro nella gestione delle emozioni!",
+        },
       };
 
       const scenarios = [
@@ -235,20 +383,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

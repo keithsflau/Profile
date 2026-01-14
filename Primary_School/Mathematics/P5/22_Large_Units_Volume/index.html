@@ -8,23 +8,35 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #fef9c3 0%, #eab308 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
-      const { LanguageSelector, get } = window.MathI18n;
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
 
       const t = {
         title: {
@@ -40,16 +52,16 @@
           it: "Conversione unità di volume",
         },
         relations: {
-          en: "Conversion Relations:",
-          zh: "換算關係:",
-          ja: "変換関係:",
-          ko: "변환 관계:",
-          es: "Relaciones de Conversión:",
-          de: "Umrechnungsverhältnisse:",
-          fi: "Muunnossuhteet:",
-          fr: "Relations de conversion :",
-          ar: "علاقات التحويل:",
-          it: "Relazioni di conversione:",
+          en: "Conversion Relations",
+          zh: "換算關係",
+          ja: "変換関係",
+          ko: "변환 관계",
+          es: "Relaciones de Conversión",
+          de: "Umrechnungsverhältnisse",
+          fi: "Muunnossuhteet",
+          fr: "Relations de conversion",
+          ar: "علاقات التحويل",
+          it: "Relazioni di conversione",
         },
         m3Option: {
           en: "m³ (Cubic Meter)",
@@ -88,48 +100,48 @@
           it: "L (Litro)",
         },
         cm3Header: {
-          en: "Cubic Centimeter cm³",
-          zh: "立方厘米 cm³",
-          ja: "立方センチメートル cm³",
-          ko: "세제곱센티미터 cm³",
-          es: "Centímetro Cúbico cm³",
-          de: "Kubikzentimeter cm³",
-          fi: "Kuutiosenttimetri cm³",
-          fr: "Centimètre cube cm³",
-          ar: "سنتيمتر مكعب cm³",
-          it: "Centimetro cubo cm³",
+          en: "Cubic Centimeter",
+          zh: "立方厘米",
+          ja: "立方センチメートル",
+          ko: "세제곱센티미터",
+          es: "Centímetro Cúbico",
+          de: "Kubikzentimeter",
+          fi: "Kuutiosenttimetri",
+          fr: "Centimètre cube",
+          ar: "سنتيمتر مكعب",
+          it: "Centimetro cubo",
         },
         mlHeader: {
-          en: "Milliliter mL",
-          zh: "毫升 mL",
-          ja: "ミリリットル mL",
-          ko: "밀리리터 mL",
-          es: "Mililitro mL",
-          de: "Milliliter mL",
-          fi: "Millilitra mL",
-          fr: "Millilitre mL",
-          ar: "ملليلتر mL",
-          it: "Millilitro mL",
+          en: "Milliliter",
+          zh: "毫升",
+          ja: "ミリリットル",
+          ko: "밀리리터",
+          es: "Mililitro",
+          de: "Milliliter",
+          fi: "Millilitra",
+          fr: "Millilitre",
+          ar: "ملليلتر",
+          it: "Millilitro",
         },
         lHeader: {
-          en: "Liter L",
-          zh: "公升 L",
-          ja: "リットル L",
-          ko: "리터 L",
-          es: "Litro L",
-          de: "Liter L",
-          fi: "Litra L",
-          fr: "Litre L",
-          ar: "لتر L",
-          it: "Litro L",
+          en: "Liter",
+          zh: "公升",
+          ja: "リットル",
+          ko: "리터",
+          es: "Litro",
+          de: "Liter",
+          fi: "Litra",
+          fr: "Litre",
+          ar: "لتر",
+          it: "Litro",
         },
       };
 
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
       function App() {
         const [lang, setLang] = useState("zh");
-        const getText = (key) => t[key][lang] || t[key]["en"];
-
-        const [value, setValue] = useState(2.5);
+        const [value, setValue] = useState(1);
         const [fromUnit, setFromUnit] = useState("m3");
 
         const conversions = {
@@ -143,89 +155,143 @@
         const ml = value * c.toMl;
         const liters = value * c.toL;
 
-        return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <LanguageSelector lang={lang} setLang={setLang} />
-            <h1 className="text-5xl font-black text-yellow-900 mb-2 mt-8">
-              📏 {getText("title")}
-            </h1>
+        const formatNumber = (num) => {
+          // Avoid tiny floating point errors
+          if (Math.abs(num) < 0.000001) return 0;
+          // Up to 6 decimal places, remove trailing zeros
+          return parseFloat(num.toFixed(6)).toLocaleString();
+        };
 
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-3xl w-full mt-8">
-              <div className="flex items-center justify-center gap-4 mb-8 flex-wrap">
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4 font-sans bg-slate-900 text-white">
+            <div className="w-full max-w-5xl flex justify-between items-center mb-10">
+              <h1 className="text-4xl font-black text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]">
+                📏 {getText("title", lang)}
+              </h1>
+              <div className="flex bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-amber-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="w-full max-w-4xl flex flex-col gap-8">
+              {/* Input Section */}
+              <div className="glass-panel p-8 rounded-3xl flex flex-col md:flex-row items-center gap-6 justify-center">
                 <input
                   type="number"
                   step="0.1"
                   value={value}
                   onChange={(e) => setValue(parseFloat(e.target.value) || 0)}
-                  className="w-32 text-3xl font-black text-center border-4 border-yellow-300 rounded-xl p-2"
+                  className="w-full md:w-48 bg-slate-950/50 border-2 border-slate-700 rounded-xl px-4 py-3 text-center text-3xl font-black text-amber-400 focus:border-amber-500 outline-none transition-colors"
                 />
                 <select
                   value={fromUnit}
                   onChange={(e) => setFromUnit(e.target.value)}
-                  className="text-2xl font-bold p-3 border-4 border-yellow-300 rounded-xl bg-white"
+                  className="w-full md:w-auto bg-slate-800 border-2 border-slate-700 rounded-xl px-4 py-3 text-xl font-bold focus:border-amber-500 outline-none cursor-pointer"
                 >
-                  <option value="m3">{getText("m3Option")}</option>
-                  <option value="cm3">{getText("cm3Option")}</option>
-                  <option value="L">{getText("lOption")}</option>
+                  <option value="m3">{getText("m3Option", lang)}</option>
+                  <option value="cm3">{getText("cm3Option", lang)}</option>
+                  <option value="L">{getText("lOption", lang)}</option>
                 </select>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div className="bg-yellow-50 rounded-xl p-4 text-center border-2 border-yellow-200">
-                  <div className="text-yellow-600 font-bold">
-                    {getText("cm3Header")}
-                  </div>
-                  <div className="text-3xl font-black text-yellow-800">
-                    {cm3.toLocaleString()}
-                  </div>
-                </div>
-                <div className="bg-blue-50 rounded-xl p-4 text-center border-2 border-blue-200">
-                  <div className="text-blue-600 font-bold">
-                    {getText("mlHeader")}
-                  </div>
-                  <div className="text-3xl font-black text-blue-800">
-                    {ml.toLocaleString()}
-                  </div>
-                </div>
-                <div className="bg-green-50 rounded-xl p-4 text-center border-2 border-green-200">
-                  <div className="text-green-600 font-bold">
-                    {getText("lHeader")}
-                  </div>
-                  <div className="text-3xl font-black text-green-800">
-                    {liters.toLocaleString()}
-                  </div>
-                </div>
+              {/* Results Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <ResultCard
+                  label={getText("cm3Header", lang)}
+                  unit="cm³"
+                  value={formatNumber(cm3)}
+                  color="bg-amber-500/20 border-amber-500/30 text-amber-300"
+                  delay={0}
+                />
+                <ResultCard
+                  label={getText("mlHeader", lang)}
+                  unit="mL"
+                  value={formatNumber(ml)}
+                  color="bg-blue-500/20 border-blue-500/30 text-blue-300"
+                  delay={0.1}
+                />
+                <ResultCard
+                  label={getText("lHeader", lang)}
+                  unit="L"
+                  value={formatNumber(liters)}
+                  color="bg-green-500/20 border-green-500/30 text-green-300"
+                  delay={0.2}
+                />
               </div>
 
-              <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
-                <p className="font-bold mb-2">📖 {getText("relations")}</p>
-                <ul className="list-disc list-inside text-sm space-y-1">
-                  <li>1 m³ = 1,000,000 cm³</li>
-                  <li>1 cm³ = 1 mL</li>
-                  <li>1 L = 1,000 mL = 1,000 cm³</li>
-                  <li>1 m³ = 1,000 L</li>
+              {/* Reference Table */}
+              <div className="glass-panel p-6 rounded-2xl">
+                <div className="text-slate-400 font-bold uppercase tracking-widest text-xs mb-4">
+                  📖 {getText("relations", lang)}
+                </div>
+                <ul className="space-y-2 font-mono text-sm md:text-base text-slate-300">
+                  <li className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-amber-500"></span>{" "}
+                    1 m³ = 1,000,000 cm³
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-blue-500"></span> 1
+                    cm³ = 1 mL
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-green-500"></span>{" "}
+                    1 L = 1,000 mL = 1,000 cm³
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-white"></span> 1 m³
+                    = 1,000 L
+                  </li>
                 </ul>
               </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const ResultCard = ({ label, unit, value, color, delay }) => (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay }}
+          className={`glass-panel p-6 rounded-2xl flex flex-col items-center justify-center gap-2 border ${
+            color.replace("bg-", "border-").split(" ")[1]
+          }`}
+        >
+          <div className="text-sm font-bold uppercase tracking-wider opacity-80">
+            {label}
+          </div>
+          <div className={`text-3xl font-black ${color.split(" ").pop()}`}>
+            {value}
+          </div>
+          <div className="text-xs font-mono opacity-60">{unit}</div>
+        </motion.div>
+      );
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

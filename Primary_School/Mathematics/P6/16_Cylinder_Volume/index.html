@@ -8,191 +8,367 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #fce7f3 0%, #be185d 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
+
+      const t = {
+        title: {
+          en: "Cylinder Volume",
+          zh: "圓柱體積",
+          ja: "円柱の体積",
+          ko: "원기둥의 부피",
+          es: "Volumen del Cilindro",
+          de: "Zylindervolumen",
+          fi: "Sylinterin tilavuus",
+          fr: "Volume du cylindre",
+          ar: "حجم الأسطوانة",
+          it: "Volume Cilindro",
+        },
+        radius: {
+          en: "Radius (r)",
+          zh: "半徑 (r)",
+          ja: "半径 (r)",
+          ko: "반지름 (r)",
+          es: "Radio (r)",
+          de: "Radius (r)",
+          fi: "Säde (r)",
+          fr: "Rayon (r)",
+          ar: "نصف القطر (r)",
+          it: "Raggio (r)",
+        },
+        height: {
+          en: "Height (h)",
+          zh: "高度 (h)",
+          ja: "高さ (h)",
+          ko: "높이 (h)",
+          es: "Altura (h)",
+          de: "Höhe (h)",
+          fi: "Korkeus (h)",
+          fr: "Hauteur (h)",
+          ar: "الارتفاع (h)",
+          it: "Altezza (h)",
+        },
+        baseArea: {
+          en: "Base Area",
+          zh: "底面積",
+          ja: "底面積",
+          ko: "밑넓이",
+          es: "Área Base",
+          de: "Grundfläche",
+          fi: "Pohjapinta-ala",
+          fr: "Surface de base",
+          ar: "مساحة القاعدة",
+          it: "Area Base",
+        },
+        volume: {
+          en: "Volume",
+          zh: "體積",
+          ja: "体積",
+          ko: "부피",
+          es: "Volumen",
+          de: "Volumen",
+          fi: "Tilavuus",
+          fr: "Volume",
+          ar: "الحجم",
+          it: "Volume",
+        },
+        formula: {
+          en: "V = π × r² × h",
+          zh: "V = π × r² × h",
+          ja: "V = π × r² × h",
+          ko: "V = π × r² × h",
+          es: "V = π × r² × h",
+          de: "V = π × r² × h",
+          fi: "V = π × r² × h",
+          fr: "V = π × r² × h",
+          ar: "V = π × r² × h",
+          it: "V = π × r² × h",
+        },
+      };
+
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
       function App() {
+        const [lang, setLang] = useState("zh");
         const [r, setR] = useState(5);
-        const [h, setH] = useState(10);
-        const pi = 3.14;
-        const baseArea = r * r * pi;
+        const [h, setH] = useState(8);
+        const PI = 3.14159;
+
+        const baseArea = PI * r * r;
         const volume = baseArea * h;
 
+        // Scaling for SVG
+        // Map r (1-10) to px width
+        // Map h (1-20) to px height
+        const scale = 15;
+        const widthPx = r * 2 * scale;
+        const heightPx = h * scale;
+
+        // Center cylinder in 300x400 view
+        const centerX = 200;
+        const bottomY = 350;
+        const topY = bottomY - heightPx;
+
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-pink-900 mb-2">
-              🛢️ 圓柱體積
-            </h1>
-            <p className="text-xl text-pink-700 font-bold mb-8">
-              Volume of Cylinder
-            </p>
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-4xl w-full">
-              <div className="flex flex-col md:flex-row gap-8 items-center">
-                <div className="flex-1 flex justify-center">
-                  <svg viewBox="0 0 200 300" className="w-64 h-80">
-                    {/* Perspective Cylinder */}
-                    <defs>
-                      <linearGradient
-                        id="grad1"
-                        x1="0%"
-                        y1="0%"
-                        x2="100%"
-                        y2="0%"
-                      >
-                        <stop
-                          offset="0%"
-                          style={{ stopColor: "#f472b6", stopOpacity: 1 }}
-                        />
-                        <stop
-                          offset="50%"
-                          style={{ stopColor: "#ec4899", stopOpacity: 1 }}
-                        />
-                        <stop
-                          offset="100%"
-                          style={{ stopColor: "#db2777", stopOpacity: 1 }}
-                        />
-                      </linearGradient>
-                    </defs>
-                    <ellipse
-                      cx="100"
-                      cy="40"
-                      rx="80"
-                      ry="20"
-                      fill="#fbcfe8"
-                      stroke="#be185d"
-                      strokeWidth="2"
-                    />
-                    <rect
-                      x="20"
-                      y="40"
-                      width="160"
-                      height="220"
-                      fill="url(#grad1)"
-                      stroke="none"
-                    />
-                    <line
-                      x1="20"
-                      y1="40"
-                      x2="20"
-                      y2="260"
-                      stroke="#be185d"
-                      strokeWidth="2"
-                    />
-                    <line
-                      x1="180"
-                      y1="40"
-                      x2="180"
-                      y2="260"
-                      stroke="#be185d"
-                      strokeWidth="2"
-                    />
-                    <path
-                      d="M 20 260 A 80 20 0 0 0 180 260"
-                      fill="#db2777"
-                      stroke="#be185d"
-                      strokeWidth="2"
-                    />
-                    <path
-                      d="M 20 260 A 80 20 0 0 1 180 260"
-                      fill="none"
-                      stroke="#be185d"
-                      strokeWidth="2"
-                      strokeDasharray="5,5"
-                    />
+          <div className="min-h-screen flex flex-col items-center p-4 font-sans bg-slate-900 text-white">
+            <div className="w-full max-w-5xl flex justify-between items-center mb-8">
+              <h1 className="text-4xl font-black text-cyan-400 drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]">
+                🛢️ {getText("title", lang)}
+              </h1>
+              <div className="flex bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-cyan-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-                    {/* Labels */}
-                    <line
-                      x1="100"
-                      y1="40"
-                      x2="180"
-                      y2="40"
-                      stroke="#be185d"
-                      strokeWidth="2"
-                    />
-                    <text
-                      x="140"
-                      y="35"
-                      className="font-bold fill-pink-900 text-sm"
+            <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Visual Stage */}
+              <div className="glass-panel rounded-3xl p-4 flex items-center justify-center relative min-h-[400px]">
+                <div className="absolute inset-0 bg-cyan-900/10 -z-10 rounded-3xl"></div>
+
+                <svg
+                  width="400"
+                  height="400"
+                  viewBox="0 0 400 400"
+                  className="overflow-visible"
+                >
+                  <defs>
+                    <linearGradient
+                      id="cylGrad"
+                      x1="0%"
+                      y1="0%"
+                      x2="100%"
+                      y2="0%"
                     >
-                      r = {r}
-                    </text>
+                      <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.4" />
+                      <stop
+                        offset="50%"
+                        stopColor="#22d3ee"
+                        stopOpacity="0.8"
+                      />
+                      <stop
+                        offset="100%"
+                        stopColor="#22d3ee"
+                        stopOpacity="0.4"
+                      />
+                    </linearGradient>
+                  </defs>
 
-                    <line
-                      x1="190"
-                      y1="40"
-                      x2="190"
-                      y2="260"
-                      stroke="#be185d"
-                      strokeWidth="2"
-                      markerEnd="url(#arrow)"
-                      markerStart="url(#arrow)"
-                    />
-                    <text
-                      x="200"
-                      y="150"
-                      className="font-bold fill-pink-900 text-sm"
-                    >
-                      h = {h}
-                    </text>
-                  </svg>
-                </div>
+                  {/* Back Half of Bottom Ellipse (dashed) */}
+                  <ellipse
+                    cx={centerX}
+                    cy={bottomY}
+                    rx={widthPx / 2}
+                    ry={widthPx / 6}
+                    fill="none"
+                    stroke="#67e8f9"
+                    strokeWidth="2"
+                    strokeDasharray="5,5"
+                  />
 
-                <div className="flex-1 w-full space-y-6">
+                  {/* Cylinder Body */}
+                  <path
+                    d={`
+                             M ${centerX - widthPx / 2} ${topY} 
+                             L ${centerX - widthPx / 2} ${bottomY} 
+                             A ${widthPx / 2} ${widthPx / 6} 0 0 0 ${
+                      centerX + widthPx / 2
+                    } ${bottomY}
+                             L ${centerX + widthPx / 2} ${topY} 
+                           `}
+                    fill="url(#cylGrad)"
+                    stroke="none"
+                  />
+
+                  {/* Edges */}
+                  <line
+                    x1={centerX - widthPx / 2}
+                    y1={topY}
+                    x2={centerX - widthPx / 2}
+                    y2={bottomY}
+                    stroke="#0891b2"
+                    strokeWidth="2"
+                  />
+                  <line
+                    x1={centerX + widthPx / 2}
+                    y1={topY}
+                    x2={centerX + widthPx / 2}
+                    y2={bottomY}
+                    stroke="#0891b2"
+                    strokeWidth="2"
+                  />
+
+                  {/* Front Half of Bottom Ellipse */}
+                  <path
+                    d={`M ${centerX - widthPx / 2} ${bottomY} A ${
+                      widthPx / 2
+                    } ${widthPx / 6} 0 0 0 ${centerX + widthPx / 2} ${bottomY}`}
+                    fill="none"
+                    stroke="#0891b2"
+                    strokeWidth="2"
+                  />
+
+                  {/* Top Ellipse (Full) */}
+                  <ellipse
+                    cx={centerX}
+                    cy={topY}
+                    rx={widthPx / 2}
+                    ry={widthPx / 6}
+                    fill="#06b6d4"
+                    stroke="#0891b2"
+                    strokeWidth="2"
+                  />
+
+                  {/* Measurements */}
+                  {/* Radius */}
+                  <line
+                    x1={centerX}
+                    y1={topY}
+                    x2={centerX + widthPx / 2}
+                    y2={topY}
+                    stroke="white"
+                    strokeWidth="2"
+                  />
+                  <text
+                    x={centerX + widthPx / 4}
+                    y={topY - 10}
+                    textAnchor="middle"
+                    fill="white"
+                    fontWeight="bold"
+                    fontSize="14"
+                  >
+                    r={r}
+                  </text>
+
+                  {/* Height */}
+                  <line
+                    x1={centerX + widthPx / 2 + 20}
+                    y1={topY}
+                    x2={centerX + widthPx / 2 + 20}
+                    y2={bottomY}
+                    stroke="white"
+                    strokeWidth="2"
+                    markerStart="url(#arrow)"
+                    markerEnd="url(#arrow)"
+                  />
+                  <text
+                    x={centerX + widthPx / 2 + 35}
+                    y={(topY + bottomY) / 2}
+                    textAnchor="start"
+                    fill="white"
+                    fontWeight="bold"
+                    fontSize="14"
+                  >
+                    h={h}
+                  </text>
+                </svg>
+              </div>
+
+              {/* Controls & Stats */}
+              <div className="flex flex-col justify-center gap-6">
+                <div className="glass-panel p-8 rounded-3xl space-y-6">
                   <div>
-                    <label className="block font-bold text-pink-800 mb-1">
-                      底半徑 Radius (cm): {r}
-                    </label>
+                    <div className="flex justify-between font-bold text-cyan-200 mb-2">
+                      <label>{getText("radius", lang)}</label>
+                      <span>{r} cm</span>
+                    </div>
                     <input
                       type="range"
                       min="1"
                       max="10"
+                      step="0.5"
                       value={r}
-                      onChange={(e) => setR(parseInt(e.target.value))}
-                      className="w-full accent-pink-600"
+                      onChange={(e) => setR(Number(e.target.value))}
+                      className="w-full h-3 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-400"
                     />
                   </div>
+
                   <div>
-                    <label className="block font-bold text-pink-800 mb-1">
-                      高度 Height (cm): {h}
-                    </label>
+                    <div className="flex justify-between font-bold text-cyan-200 mb-2">
+                      <label>{getText("height", lang)}</label>
+                      <span>{h} cm</span>
+                    </div>
                     <input
                       type="range"
                       min="1"
                       max="20"
+                      step="1"
                       value={h}
-                      onChange={(e) => setH(parseInt(e.target.value))}
-                      className="w-full accent-pink-600"
+                      onChange={(e) => setH(Number(e.target.value))}
+                      className="w-full h-3 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-400"
                     />
                   </div>
+                </div>
 
-                  <div className="bg-pink-50 rounded-2xl p-4 border-2 border-pink-200">
-                    <p className="font-bold text-center">
-                      底面積 Base Area: πr²
-                    </p>
-                    <p className="text-center font-mono">
-                      3.14 × {r}² = {baseArea.toFixed(2)} cm²
-                    </p>
+                <div className="glass-panel p-8 rounded-3xl space-y-4">
+                  <div className="flex justify-between items-center text-sm text-slate-400 font-bold uppercase">
+                    <span>{getText("baseArea", lang)}</span>
+                    <span>πr²</span>
+                  </div>
+                  <div className="text-xl font-mono text-cyan-200 border-b border-white/10 pb-4">
+                    3.1416 × {r}² ≈ {baseArea.toFixed(2)} cm²
                   </div>
 
-                  <div className="bg-emerald-100 rounded-2xl p-6 text-center border-4 border-emerald-300">
-                    <div className="text-emerald-600 font-bold mb-1">
-                      體積 Volume (底面積 × 高)
-                    </div>
-                    <div className="text-4xl font-black text-emerald-800">
-                      {volume.toFixed(2)} cm³
-                    </div>
+                  <div className="flex justify-between items-center text-sm text-emerald-400 font-bold uppercase mt-4">
+                    <span>{getText("volume", lang)}</span>
+                    <span>{getText("baseArea", lang)} × h</span>
+                  </div>
+                  <div className="text-4xl font-mono font-black text-white">
+                    {volume.toFixed(2)}{" "}
+                    <span className="text-lg text-slate-500">cm³</span>
+                  </div>
+
+                  <div className="bg-slate-800 p-4 rounded-xl text-center text-cyan-100 font-mono text-sm mt-4 border border-white/5">
+                    {getText("formula", lang)}
                   </div>
                 </div>
               </div>
@@ -200,22 +376,9 @@
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

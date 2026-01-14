@@ -3,18 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小三數學：重量天秤</title>
+    <title>小三數學：重量天秤 | Weight Balance</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script
-      src="https://unpkg.com/react@18/umd/react.development.js"
-      crossorigin
-    ></script>
-    <script
-      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
-      crossorigin
-    ></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -31,33 +26,142 @@
     <script type="text/babel">
       const { useState } = React;
       const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Weight Balance",
+          zh: "重量天秤",
+          ja: "重さのバランス",
+          ko: "무게 균형",
+          es: "Balanza de peso",
+          de: "Waage",
+          fi: "Painovaaka",
+          fr: "Balance de poids",
+          ar: "ميزان الوزن",
+          it: "Bilancia del peso",
+        },
+        subtitle: {
+          en: "Learn grams (g) and kilograms (kg)",
+          zh: "認識克(g)與千克(kg)",
+          ja: "グラム(g)とキログラム(kg)を学ぶ",
+          ko: "그램(g)과 킬로그램(kg) 배우기",
+          es: "Aprenda gramos (g) y kilogramos (kg)",
+          de: "Lernen Sie Gramm (g) und Kilogramm (kg)",
+          fi: "Opi grammat (g) ja kilogrammat (kg)",
+          fr: "Apprendre les grammes (g) et les kilogrammes (kg)",
+          ar: "تعلم الجرام (g) والكيلوجرام (kg)",
+          it: "Impara grammi (g) e chilogrammi (kg)",
+        },
+        balanced: {
+          en: "Balanced!",
+          zh: "平衡！",
+          ja: "バランス!",
+          ko: "균형!",
+          es: "¡Equilibrado!",
+          de: "Ausgeglichen!",
+          fi: "Tasapainossa!",
+          fr: "Équilibré !",
+          ar: "متوازن!",
+          it: "Bilanciato!",
+        },
+        leftHeavy: {
+          en: "Left is heavier",
+          zh: "左邊較重",
+          ja: "左が重い",
+          ko: "왼쪽이 더 무거움",
+          es: "La izquierda es más pesada",
+          de: "Links ist schwerer",
+          fi: "Vasen on painavampi",
+          fr: "La gauche est plus lourde",
+          ar: "اليسار أثقل",
+          it: "Sinistra più pesante",
+        },
+        rightHeavy: {
+          en: "Right is heavier",
+          zh: "右邊較重",
+          ja: "右が重い",
+          ko: "오른쪽이 더 무거움",
+          es: "La derecha es más pesada",
+          de: "Rechts ist schwerer",
+          fi: "Oikea on painavampi",
+          fr: "La droite est plus lourde",
+          ar: "اليمين أثقل",
+          it: "Destra più pesante",
+        },
+        leftWeight: {
+          en: "Left Weight",
+          zh: "左邊重量",
+          ja: "左の重さ",
+          ko: "왼쪽 무게",
+          es: "Peso izquierdo",
+          de: "Linkes Gewicht",
+          fi: "Vasen paino",
+          fr: "Poids gauche",
+          ar: "الوزن الأيسر",
+          it: "Peso sinistro",
+        },
+        rightWeight: {
+          en: "Right Weight",
+          zh: "右邊重量",
+          ja: "右の重さ",
+          ko: "오른쪽 무게",
+          es: "Peso derecho",
+          de: "Rechtes Gewicht",
+          fi: "Oikea paino",
+          fr: "Poids droit",
+          ar: "الوزن الأيمن",
+          it: "Peso destro",
+        },
+        units: {
+          en: "Weight Units",
+          zh: "重量單位",
+          ja: "重量単位",
+          ko: "무게 단위",
+          es: "Unidades de peso",
+          de: "Gewichtseinheiten",
+          fi: "Painoyksiköt",
+          fr: "Unités de poids",
+          ar: "وحدات الوزن",
+          it: "Unità di peso",
+        },
+        items: [
+          { name: { zh: "蘋果", en: "Apple" }, emoji: "🍎", weight: 200 },
+          { name: { zh: "橙", en: "Orange" }, emoji: "🍊", weight: 150 },
+          { name: { zh: "西瓜", en: "Watermelon" }, emoji: "🍉", weight: 2000 },
+          { name: { zh: "書本", en: "Book" }, emoji: "📚", weight: 500 },
+          { name: { zh: "水樽", en: "Bottle" }, emoji: "💧", weight: 250 },
+        ],
+      };
+
       function App() {
+        const [lang, setLang] = useState("zh");
         const [leftWeight, setLeftWeight] = useState(500);
         const [rightWeight, setRightWeight] = useState(500);
         const diff = leftWeight - rightWeight;
 
-        // Calculate tilt with minimum threshold for visibility
-        let calculatedTilt = -diff / 5; // Higher sensitivity
+        let calculatedTilt = -diff / 5;
         if (diff !== 0 && Math.abs(calculatedTilt) < 5) {
-          calculatedTilt = diff < 0 ? 5 : -5; // Min tilt for small diffs
+          calculatedTilt = diff < 0 ? 5 : -5;
         }
         const tilt = Math.max(-30, Math.min(30, calculatedTilt));
 
-        const items = [
-          { name: "蘋果", emoji: "🍎", weight: 200 },
-          { name: "橙", emoji: "🍊", weight: 150 },
-          { name: "西瓜", emoji: "🍉", weight: 2000 },
-          { name: "書本", emoji: "📚", weight: 500 },
-          { name: "水樽", emoji: "💧", weight: 250 },
-        ];
+        const getStatusText = () => {
+          if (diff === 0) return "⚖️ " + (t.balanced[lang] || t.balanced["en"]);
+          if (diff > 0) return "⬅️ " + (t.leftHeavy[lang] || t.leftHeavy["en"]);
+          return "➡️ " + (t.rightHeavy[lang] || t.rightHeavy["en"]);
+        };
+
+        const getItemName = (item) => item.name[lang] || item.name["en"];
 
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-6xl font-black text-orange-900 mb-4">
-              ⚖️ 重量天秤
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-6xl font-black text-orange-900 mb-4 mt-8 text-center">
+              ⚖️ {t.title[lang] || t.title["en"]}
             </h1>
-            <p className="text-xl text-orange-700 font-bold mb-8">
-              認識克(g)與千克(kg)
+            <p className="text-xl text-orange-700 font-bold mb-8 text-center">
+              {t.subtitle[lang] || t.subtitle["en"]}
             </p>
 
             <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-5xl w-full">
@@ -84,21 +188,17 @@
               </div>
 
               <div
-                className={`text-center text-2xl font-black mb-8 ${
+                className={`text-center text-xl md:text-2xl font-black mb-8 ${
                   diff === 0 ? "text-green-600" : "text-red-600"
                 }`}
               >
-                {diff === 0
-                  ? "⚖️ 平衡！"
-                  : diff > 0
-                  ? "⬅️ 左邊較重"
-                  : "➡️ 右邊較重"}
+                {getStatusText()}
               </div>
 
-              <div className="grid grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                   <h3 className="text-2xl font-black text-orange-800 mb-4">
-                    左邊重量
+                    {t.leftWeight[lang] || t.leftWeight["en"]}
                   </h3>
                   <input
                     type="range"
@@ -119,7 +219,7 @@
                 </div>
                 <div>
                   <h3 className="text-2xl font-black text-orange-800 mb-4">
-                    右邊重量
+                    {t.rightWeight[lang] || t.rightWeight["en"]}
                   </h3>
                   <input
                     type="range"
@@ -140,8 +240,8 @@
                 </div>
               </div>
 
-              <div className="mt-8 grid grid-cols-5 gap-3">
-                {items.map((item, i) => (
+              <div className="mt-8 grid grid-cols-3 md:grid-cols-5 gap-3">
+                {t.items.map((item, i) => (
                   <button
                     key={i}
                     onClick={() => {
@@ -151,7 +251,7 @@
                     className="py-4 bg-gradient-to-r from-yellow-100 to-orange-100 hover:from-yellow-200 hover:to-orange-200 rounded-xl transition-all"
                   >
                     <div className="text-4xl mb-2">{item.emoji}</div>
-                    <div className="text-sm font-bold">{item.name}</div>
+                    <div className="text-sm font-bold">{getItemName(item)}</div>
                     <div className="text-xs text-orange-600">
                       {item.weight}g
                     </div>
@@ -160,14 +260,12 @@
               </div>
 
               <div className="mt-8 bg-blue-50 p-4 rounded-xl">
-                <div className="font-bold text-blue-800 mb-2">💡 重量單位</div>
-                <div className="grid grid-cols-2 gap-3 text-sm text-blue-700">
-                  <div className="bg-white p-2 rounded">
-                    1 千克 (kg) = 1000 克 (g)
-                  </div>
-                  <div className="bg-white p-2 rounded">
-                    1000 克 (g) = 1 千克 (kg)
-                  </div>
+                <div className="font-bold text-blue-800 mb-2">
+                  💡 {t.units[lang] || t.units["en"]}
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-blue-700">
+                  <div className="bg-white p-2 rounded">1 kg = 1000 g</div>
+                  <div className="bg-white p-2 rounded">1000 g = 1 kg</div>
                 </div>
               </div>
             </div>
@@ -176,20 +274,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

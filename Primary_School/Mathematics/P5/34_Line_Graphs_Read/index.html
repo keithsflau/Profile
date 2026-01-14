@@ -8,23 +8,35 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #dbeafe 0%, #3b82f6 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 58, 138, 0.3); /* Blue 900 */
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(96, 165, 250, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
-      const { LanguageSelector, get } = window.MathI18n;
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
 
       const t = {
         title: {
@@ -40,44 +52,44 @@
           it: "Lettura grafici a linee",
         },
         graphTitle: {
-          en: "Monthly Average Temperature",
+          en: "Monthly Avg. Temp.",
           zh: "香港月平均氣溫",
           ja: "月平均気温",
           ko: "월별 평균 기온",
-          es: "Temperatura Promedio Mensual",
-          de: "Monatliche Durchschnittstemperatur",
+          es: "Temp. Promedio Mensual",
+          de: "Monatliche Durchschnittstemp.",
           fi: "Kuukausittainen keskilämpötila",
-          fr: "Température moyenne mensuelle",
+          fr: "Temp. moy. mensuelle",
           ar: "متوسط درجة الحرارة الشهرية",
-          it: "Temperatura media mensile",
+          it: "Temp. media mensile",
         },
         selectedInfo: {
-          en: "Average temperature of {month} is",
-          zh: "{month} 的平均氣溫是",
-          ja: "{month} の平均気温は",
-          ko: "{month}의 평균 기온은",
-          es: "La temperatura promedio de {month} es",
-          de: "Die Durchschnittstemperatur von {month} ist",
-          fi: "{month}n keskilämpötila on",
-          fr: "La température moyenne de {month} est",
-          ar: "متوسط درجة الحرارة لـ {month} هو",
-          it: "La temperatura media di {month} è",
+          en: "Avg Temp of {month}",
+          zh: "{month} 的平均氣溫",
+          ja: "{month} の平均気温",
+          ko: "{month}의 평균 기온",
+          es: "Temp. prom. de {month}",
+          de: "Durchschnittstemp. von {month}",
+          fi: "{month}n keskilämpötila",
+          fr: "Temp. moy. de {month}",
+          ar: "متوسط حرارة {month}",
+          it: "Temp. media di {month}",
         },
         tip: {
-          en: "Click on points to see the data values!",
-          zh: "點擊圖上的點來查看數據！",
-          ja: "ポイントをクリックしてデータ値を確認してください！",
-          ko: "데이터 값을 보려면 점을 클릭하세요!",
-          es: "¡Haz clic en los puntos para ver los valores de los datos!",
-          de: "Klicke auf die Punkte, um die Datenwerte zu sehen!",
-          fi: "Klikkaa pisteitä nähdäksesi data-arvot!",
-          fr: "Cliquez sur les points pour voir les valeurs des données !",
-          ar: "انقر على النقاط لرؤية قيم البيانات!",
-          it: "Clicca sui punti per vedere i valori dei dati!",
+          en: "Click on points to see values",
+          zh: "點擊圖上的點來查看數據",
+          ja: "ポイントをクリックして値を確認",
+          ko: "값을 보려면 점을 클릭하세요",
+          es: "Clic en puntos para ver valores",
+          de: "Klicke auf Punkte für Werte",
+          fi: "Klikkaa pisteitä nähdäksesi arvot",
+          fr: "Cliquez sur les points pour voir les valeurs",
+          ar: "انقر على النقاط لرؤية القيم",
+          it: "Clicca sui punti per vedere i valori",
         },
         jan: {
           en: "Jan",
-          zh: "一月",
+          zh: "1月",
           ja: "1月",
           ko: "1월",
           es: "Ene",
@@ -89,7 +101,7 @@
         },
         feb: {
           en: "Feb",
-          zh: "二月",
+          zh: "2月",
           ja: "2月",
           ko: "2월",
           es: "Feb",
@@ -101,7 +113,7 @@
         },
         mar: {
           en: "Mar",
-          zh: "三月",
+          zh: "3月",
           ja: "3月",
           ko: "3월",
           es: "Mar",
@@ -113,7 +125,7 @@
         },
         apr: {
           en: "Apr",
-          zh: "四月",
+          zh: "4月",
           ja: "4月",
           ko: "4월",
           es: "Abr",
@@ -125,7 +137,7 @@
         },
         may: {
           en: "May",
-          zh: "五月",
+          zh: "5月",
           ja: "5月",
           ko: "5월",
           es: "May",
@@ -137,7 +149,7 @@
         },
         jun: {
           en: "Jun",
-          zh: "六月",
+          zh: "6月",
           ja: "6月",
           ko: "6월",
           es: "Jun",
@@ -149,9 +161,11 @@
         },
       };
 
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
       function App() {
         const [lang, setLang] = useState("zh");
-        const getText = (key) => t[key][lang] || t[key]["en"];
+        const [selected, setSelected] = useState(null);
 
         const data = [
           { month: "jan", temp: 15 },
@@ -161,140 +175,197 @@
           { month: "may", temp: 30 },
           { month: "jun", temp: 32 },
         ];
-        const [selected, setSelected] = useState(null);
         const maxTemp = 35;
         const minTemp = 10;
         const range = maxTemp - minTemp;
 
+        // SVG Dimensions
+        const width = 350;
+        const height = 220;
+        const padding = { top: 30, bottom: 30, left: 40, right: 20 };
+        const chartW = width - padding.left - padding.right;
+        const chartH = height - padding.top - padding.bottom; // 160
+
         const points = data.map((d, i) => ({
-          x: 50 + i * 50,
-          y: 180 - ((d.temp - minTemp) / range) * 160,
+          x: padding.left + i * (chartW / (data.length - 1)),
+          y: height - padding.bottom - ((d.temp - minTemp) / range) * chartH,
           ...d,
         }));
 
+        const pointString = points.map((p) => `${p.x},${p.y}`).join(" ");
+
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <LanguageSelector lang={lang} setLang={setLang} />
-            <h1 className="text-5xl font-black text-blue-100 mb-2 mt-8">
-              📈 {getText("title")}
-            </h1>
-
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-3xl w-full mt-8">
-              <h3 className="text-xl font-bold text-center text-slate-700 mb-4">
-                {getText("graphTitle")}
-              </h3>
-
-              <svg
-                viewBox="0 0 350 220"
-                className="w-full max-w-lg mx-auto bg-slate-50 rounded-xl"
-              >
-                {/* Y-axis */}
-                <line
-                  x1="40"
-                  y1="20"
-                  x2="40"
-                  y2="180"
-                  stroke="#94a3b8"
-                  strokeWidth="2"
-                />
-                {/* X-axis */}
-                <line
-                  x1="40"
-                  y1="180"
-                  x2="320"
-                  y2="180"
-                  stroke="#94a3b8"
-                  strokeWidth="2"
-                />
-                {/* Y-labels */}
-                {[35, 30, 25, 20, 15, 10].map((v, i) => (
-                  <text
-                    key={v}
-                    x="35"
-                    y={20 + i * 32}
-                    textAnchor="end"
-                    className="text-xs fill-slate-500"
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <div className="w-full max-w-4xl flex justify-between items-center mb-10">
+              <h1 className="text-4xl font-black text-blue-400 drop-shadow-[0_0_15px_rgba(96,165,250,0.5)]">
+                📈 {getText("title", lang)}
+              </h1>
+              <div className="bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-blue-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
                   >
-                    {v}°
-                  </text>
+                    {l}
+                  </button>
                 ))}
-                {/* Line */}
-                <polyline
-                  fill="none"
-                  stroke="#3b82f6"
-                  strokeWidth="3"
-                  strokeLinejoin="round"
-                  points={points.map((p) => `${p.x},${p.y}`).join(" ")}
-                />
-                {/* Points */}
-                {points.map((p, i) => (
-                  <g
-                    key={i}
-                    onClick={() => setSelected(i)}
-                    className="cursor-pointer"
+              </div>
+            </div>
+
+            <div className="w-full max-w-3xl flex flex-col gap-6">
+              {/* Graph Panel */}
+              <div className="glass-panel p-6 md:p-8 rounded-3xl flex flex-col items-center">
+                <h3 className="text-xl font-bold text-blue-200 mb-6 tracking-wide uppercase">
+                  {getText("graphTitle", lang)}
+                </h3>
+
+                <div className="w-full max-w-lg relative">
+                  <svg
+                    viewBox={`0 0 ${width} ${height}`}
+                    className="w-full h-auto overflow-visible"
                   >
-                    <circle
-                      cx={p.x}
-                      cy={p.y}
-                      r={selected === i ? 10 : 6}
-                      fill={selected === i ? "#ef4444" : "#3b82f6"}
-                      stroke="white"
-                      strokeWidth="2"
+                    {/* Grid Lines */}
+                    {[0, 0.2, 0.4, 0.6, 0.8, 1].map((p) => {
+                      const val = minTemp + range * p;
+                      const y = height - padding.bottom - p * chartH;
+                      return (
+                        <g key={p}>
+                          <line
+                            x1={padding.left}
+                            y1={y}
+                            x2={width - padding.right}
+                            y2={y}
+                            stroke="rgba(255,255,255,0.1)"
+                            strokeDasharray="4 4"
+                          />
+                          <text
+                            x={padding.left - 5}
+                            y={y + 4}
+                            textAnchor="end"
+                            className="text-[10px] fill-slate-400 font-mono"
+                          >
+                            {Math.round(val)}°
+                          </text>
+                        </g>
+                      );
+                    })}
+
+                    {/* X Axis Labels */}
+                    {points.map((p, i) => (
+                      <text
+                        key={i}
+                        x={p.x}
+                        y={height - 10}
+                        textAnchor="middle"
+                        className="text-[10px] fill-slate-300 font-bold uppercase tracking-wider"
+                      >
+                        {getText(p.month, lang)}
+                      </text>
+                    ))}
+
+                    {/* Area under curve (optional visual flair) */}
+                    <path
+                      d={`${points[0].x},${
+                        height - padding.bottom
+                      } L${pointString} L${points[points.length - 1].x},${
+                        height - padding.bottom
+                      } Z`}
+                      fill="rgba(59, 130, 246, 0.1)"
                     />
-                    <text
-                      x={p.x}
-                      y="195"
-                      textAnchor="middle"
-                      className="text-xs fill-slate-600 font-bold"
-                    >
-                      {getText(p.month)}
-                    </text>
-                  </g>
-                ))}
-              </svg>
 
-              {selected !== null && (
-                <div className="mt-4 bg-blue-100 rounded-xl p-4 text-center border-2 border-blue-300">
-                  <p className="text-lg">
-                    {getText("selectedInfo")
-                      .replace(
-                        "{month}",
-                        `<b>${getText(data[selected].month)}</b>`
-                      )
-                      .split("<b>")
-                      .map((part, i) =>
-                        i % 2 === 1 ? <b key={i}>{part}</b> : part
-                      )}
-                  </p>
-                  <p className="text-4xl font-black text-blue-600">
-                    {data[selected].temp}°C
-                  </p>
+                    {/* Line */}
+                    <path
+                      d={`M${pointString}`}
+                      fill="none"
+                      stroke="#60a5fa"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+
+                    {/* Points */}
+                    {points.map((p, i) => (
+                      <motion.g
+                        key={i}
+                        whileHover={{ scale: 1.5 }}
+                        onClick={() => setSelected(i)}
+                        className="cursor-pointer"
+                      >
+                        <circle
+                          cx={p.x}
+                          cy={p.y}
+                          r={selected === i ? 6 : 4}
+                          fill="#1e3a8a"
+                          stroke={selected === i ? "#fff" : "#60a5fa"}
+                          strokeWidth="2"
+                        />
+                        {/* Invisible hit area */}
+                        <circle cx={p.x} cy={p.y} r="15" fill="transparent" />
+                      </motion.g>
+                    ))}
+                  </svg>
                 </div>
-              )}
+              </div>
 
-              <div className="mt-6 bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
-                <p className="font-bold">💡 {getText("tip")}</p>
+              {/* Info Panel */}
+              <div className="h-32">
+                <AnimatePresence mode="wait">
+                  {selected !== null ? (
+                    <motion.div
+                      key="info"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="glass-panel p-6 rounded-2xl flex items-center justify-between border-l-4 border-l-blue-400 bg-blue-900/20"
+                    >
+                      <div className="text-lg text-blue-200">
+                        {getText("selectedInfo", lang, {
+                          month: getText(data[selected].month, lang),
+                        })}
+                      </div>
+                      <div className="text-5xl font-black text-white drop-shadow-[0_0_10px_rgba(96,165,250,0.8)]">
+                        {data[selected].temp}°C
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="tip"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="bg-amber-500/10 border border-amber-500/20 p-6 rounded-2xl flex items-center gap-4 text-amber-200 justify-center h-full"
+                    >
+                      <span className="text-3xl">💡</span>
+                      <span className="font-bold text-lg">
+                        {getText("tip", lang)}
+                      </span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小三數學：棒形圖製作</title>
+    <title>小三數學：棒形圖製作 | Bar Chart Maker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -26,16 +27,119 @@
     <div id="root"></div>
     <script type="text/babel">
       const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Bar Chart Maker",
+          zh: "棒形圖製作",
+          ja: "棒グラフ作成",
+          ko: "막대 그래프 만들기",
+          es: "Creador de gráficos de barras",
+          de: "Balkendiagramm-Ersteller",
+          fi: "Pylväskaavion luoja",
+          fr: "Créateur de diagrammes à barres",
+          ar: "صانع المخططات الشريطية",
+          it: "Creatore di grafici a barre",
+        },
+        adjust: {
+          en: "Adjust Data",
+          zh: "調整數據",
+          ja: "データを調整",
+          ko: "데이터 조정",
+          es: "Ajustar datos",
+          de: "Daten anpassen",
+          fi: "Säädä tietoja",
+          fr: "Ajuster les données",
+          ar: "تعديل البيانات",
+          it: "Regola i dati",
+        },
+        chartTitle: {
+          en: "Favorite Fruits",
+          zh: "最喜愛的水果",
+          ja: "好きな果物",
+          ko: "좋아하는 과일",
+          es: "Frutas favoritas",
+          de: "Lieblingsfrüchte",
+          fi: "Lempi hedelmät",
+          fr: "Fruits préférés",
+          ar: "الفواكه المفضلة",
+          it: "Frutta preferita",
+        },
+        tip: {
+          en: "Drag sliders or enter numbers to change bar height!",
+          zh: "拖動滑桿或輸入數字來改變棒的高度！",
+          ja: "スライダーをドラッグするか数字を入力して棒の高さを変更してください！",
+          ko: "슬라이더를 드래그하거나 숫자를 입력하여 막대 높이를 변경하세요!",
+          es: "¡Arrastra los controles deslizantes o ingresa números para cambiar la altura de la barra!",
+          de: "Ziehen Sie die Schieberegler oder geben Sie Zahlen ein, um die Balkenhöhe zu ändern!",
+          fi: "Vedä liukusäätimiä tai syötä numeroita muuttaaksesi pylvään korkeutta!",
+          fr: "Faites glisser les curseurs ou entrez des nombres pour changer la hauteur de la barre !",
+          ar: "اسحب أشرطة التمرير أو أدخل أرقامًا لتغيير ارتفاع الشريط!",
+          it: "Trascina i cursori o inserisci numeri per cambiare l'altezza della barra!",
+        },
+        fruits: {
+          apple: {
+            en: "Apple",
+            zh: "蘋果",
+            ja: "リンゴ",
+            ko: "사과",
+            es: "Manzana",
+            de: "Apfel",
+            fi: "Omena",
+            fr: "Pomme",
+            ar: "تفاحة",
+            it: "Mela",
+          },
+          orange: {
+            en: "Orange",
+            zh: "橙",
+            ja: "オレンジ",
+            ko: "오렌지",
+            es: "Naranja",
+            de: "Orange",
+            fi: "Appelsiini",
+            fr: "Orange",
+            ar: "برتقال",
+            it: "Arancia",
+          },
+          banana: {
+            en: "Banana",
+            zh: "香蕉",
+            ja: "バナナ",
+            ko: "바나나",
+            es: "Plátano",
+            de: "Banane",
+            fi: "Banaani",
+            fr: "Banane",
+            ar: "موز",
+            it: "Banana",
+          },
+          grape: {
+            en: "Grape",
+            zh: "葡萄",
+            ja: "ブドウ",
+            ko: "포도",
+            es: "Uva",
+            de: "Traube",
+            fi: "Rypäle",
+            fr: "Raisin",
+            ar: "عنب",
+            it: "Uva",
+          },
+        },
+      };
 
       function App() {
+        const [lang, setLang] = useState("zh");
         const [data, setData] = useState([
-          { name: "蘋果", value: 5, color: "#ef4444" },
-          { name: "橙", value: 8, color: "#f97316" },
-          { name: "香蕉", value: 3, color: "#eab308" },
-          { name: "葡萄", value: 6, color: "#8b5cf6" },
+          { nameKey: "apple", value: 5, color: "#ef4444" },
+          { nameKey: "orange", value: 8, color: "#f97316" },
+          { nameKey: "banana", value: 3, color: "#eab308" },
+          { nameKey: "grape", value: 6, color: "#8b5cf6" },
         ]);
 
-        const maxScale = 15; // Fixed scale for better visualization
+        const maxScale = 15;
 
         const updateValue = (idx, val) => {
           const newData = [...data];
@@ -43,20 +147,25 @@
           setData(newData);
         };
 
+        const getName = (key) => t.fruits[key][lang] || t.fruits[key]["en"];
+
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-6xl font-black text-indigo-900 mb-8">
-              📊 棒形圖製作
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-6xl font-black text-indigo-900 mb-8 mt-8 text-center">
+              📊 {t.title[lang] || t.title["en"]}
             </h1>
             <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-6xl w-full">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div>
                   <h3 className="text-2xl font-black text-indigo-800 mb-6">
-                    調整數據
+                    {t.adjust[lang] || t.adjust["en"]}
                   </h3>
                   {data.map((d, i) => (
                     <div key={i} className="mb-4 flex items-center gap-4">
-                      <div className="w-24 text-xl font-bold">{d.name}</div>
+                      <div className="w-24 text-xl font-bold">
+                        {getName(d.nameKey)}
+                      </div>
                       <input
                         type="range"
                         min="0"
@@ -74,13 +183,13 @@
                     </div>
                   ))}
                   <div className="mt-8 bg-indigo-50 p-4 rounded-xl text-indigo-800 text-lg">
-                    <p>👉 拖動滑桿或輸入數字來改變棒的高度！</p>
+                    <p>👉 {t.tip[lang] || t.tip["en"]}</p>
                   </div>
                 </div>
 
                 <div className="bg-indigo-50 rounded-2xl p-6 relative">
                   <h3 className="text-2xl font-black text-indigo-800 mb-6 text-center">
-                    最喜愛的水果
+                    {t.chartTitle[lang] || t.chartTitle["en"]}
                   </h3>
                   <div className="flex items-end justify-around h-80 bg-white rounded-xl p-4 border-2 border-indigo-100 relative">
                     {/* Grid lines */}
@@ -115,8 +224,8 @@
                             }}
                           />
                         </div>
-                        <div className="text-lg font-bold mt-2 text-slate-600">
-                          {d.name}
+                        <div className="text-sm md:text-lg font-bold mt-2 text-slate-600 truncate w-full text-center">
+                          {getName(d.nameKey)}
                         </div>
                       </div>
                     ))}
@@ -129,20 +238,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

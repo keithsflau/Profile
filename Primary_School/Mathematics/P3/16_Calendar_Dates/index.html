@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>小三數學：月曆日期</title>
+    <title>小三數學：月曆日期 | Calendar</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -23,7 +24,281 @@
     <div id="root"></div>
     <script type="text/babel">
       const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Calendar",
+          zh: "月曆日期",
+          ja: "カレンダー",
+          ko: "달력",
+          es: "Calendario",
+          de: "Kalender",
+          fi: "Kalenteri",
+          fr: "Calendrier",
+          ar: "التقويم",
+          it: "Calendario",
+        },
+        daysInMonth: {
+          en: "This month has {n} days",
+          zh: "本月有 {n} 天",
+          ja: "今月は{n}日あります",
+          ko: "이번 달은 {n}일입니다",
+          es: "Este mes tiene {n} días",
+          de: "Dieser Monat hat {n} Tage",
+          fi: "Tässä kuussa on {n} päivää",
+          fr: "Ce mois a {n} jours",
+          ar: "هذا الشهر به {n} يومًا",
+          it: "Questo mese ha {n} giorni",
+        },
+        months: [
+          {
+            en: "January",
+            zh: "一月",
+            ja: "1月",
+            ko: "1월",
+            es: "Enero",
+            de: "Januar",
+            fi: "Tammikuu",
+            fr: "Janvier",
+            ar: "يناير",
+            it: "Gennaio",
+          },
+          {
+            en: "February",
+            zh: "二月",
+            ja: "2月",
+            ko: "2월",
+            es: "Febrero",
+            de: "Februar",
+            fi: "Helmikuu",
+            fr: "Février",
+            ar: "فبراير",
+            it: "Febbraio",
+          },
+          {
+            en: "March",
+            zh: "三月",
+            ja: "3月",
+            ko: "3월",
+            es: "Marzo",
+            de: "März",
+            fi: "Maaliskuu",
+            fr: "Mars",
+            ar: "مارس",
+            it: "Marzo",
+          },
+          {
+            en: "April",
+            zh: "四月",
+            ja: "4月",
+            ko: "4월",
+            es: "Abril",
+            de: "April",
+            fi: "Huhtikuu",
+            fr: "Avril",
+            ar: "أبريل",
+            it: "Aprile",
+          },
+          {
+            en: "May",
+            zh: "五月",
+            ja: "5月",
+            ko: "5월",
+            es: "Mayo",
+            de: "Mai",
+            fi: "Toukokuu",
+            fr: "Mai",
+            ar: "مايو",
+            it: "Maggio",
+          },
+          {
+            en: "June",
+            zh: "六月",
+            ja: "6月",
+            ko: "6월",
+            es: "Junio",
+            de: "Juni",
+            fi: "Kesäkuu",
+            fr: "Juin",
+            ar: "يونيو",
+            it: "Giugno",
+          },
+          {
+            en: "July",
+            zh: "七月",
+            ja: "7月",
+            ko: "7월",
+            es: "Julio",
+            de: "Juli",
+            fi: "Heinäkuu",
+            fr: "Juillet",
+            ar: "يوليو",
+            it: "Luglio",
+          },
+          {
+            en: "August",
+            zh: "八月",
+            ja: "8月",
+            ko: "8월",
+            es: "Agosto",
+            de: "August",
+            fi: "Elokuu",
+            fr: "Août",
+            ar: "أغسطس",
+            it: "Agosto",
+          },
+          {
+            en: "September",
+            zh: "九月",
+            ja: "9月",
+            ko: "9월",
+            es: "Septiembre",
+            de: "September",
+            fi: "Syyskuu",
+            fr: "Septembre",
+            ar: "سبتمبر",
+            it: "Settembre",
+          },
+          {
+            en: "October",
+            zh: "十月",
+            ja: "10月",
+            ko: "10월",
+            es: "Octubre",
+            de: "Oktober",
+            fi: "Lokakuu",
+            fr: "Octobre",
+            ar: "أكتوبر",
+            it: "Ottobre",
+          },
+          {
+            en: "November",
+            zh: "十一月",
+            ja: "11月",
+            ko: "11월",
+            es: "Noviembre",
+            de: "November",
+            fi: "Marraskuu",
+            fr: "Novembre",
+            ar: "نوفمبر",
+            it: "Novembre",
+          },
+          {
+            en: "December",
+            zh: "十二月",
+            ja: "12月",
+            ko: "12월",
+            es: "Diciembre",
+            de: "Dezember",
+            fi: "Joulukuu",
+            fr: "Décembre",
+            ar: "ديسمبر",
+            it: "Dicembre",
+          },
+        ],
+        weekdays: [
+          {
+            en: "Sun",
+            zh: "日",
+            ja: "日",
+            ko: "일",
+            es: "Dom",
+            de: "So",
+            fi: "Su",
+            fr: "Dim",
+            ar: "أحد",
+            it: "Dom",
+          },
+          {
+            en: "Mon",
+            zh: "一",
+            ja: "月",
+            ko: "월",
+            es: "Lun",
+            de: "Mo",
+            fi: "Ma",
+            fr: "Lun",
+            ar: "اثنين",
+            it: "Lun",
+          },
+          {
+            en: "Tue",
+            zh: "二",
+            ja: "火",
+            ko: "화",
+            es: "Mar",
+            de: "Di",
+            fi: "Ti",
+            fr: "Mar",
+            ar: "ثلاثاء",
+            it: "Mar",
+          },
+          {
+            en: "Wed",
+            zh: "三",
+            ja: "水",
+            ko: "수",
+            es: "Mié",
+            de: "Mi",
+            fi: "Ke",
+            fr: "Mer",
+            ar: "أربعاء",
+            it: "Mer",
+          },
+          {
+            en: "Thu",
+            zh: "四",
+            ja: "木",
+            ko: "목",
+            es: "Jue",
+            de: "Do",
+            fi: "To",
+            fr: "Jeu",
+            ar: "خميس",
+            it: "Gio",
+          },
+          {
+            en: "Fri",
+            zh: "五",
+            ja: "金",
+            ko: "금",
+            es: "Vie",
+            de: "Fr",
+            fi: "Pe",
+            fr: "Ven",
+            ar: "جمعة",
+            it: "Ven",
+          },
+          {
+            en: "Sat",
+            zh: "六",
+            ja: "土",
+            ko: "토",
+            es: "Sáb",
+            de: "Sa",
+            fi: "La",
+            fr: "Sam",
+            ar: "سبت",
+            it: "Sab",
+          },
+        ],
+        year: {
+          en: "",
+          zh: "年",
+          ja: "年",
+          ko: "년",
+          es: "",
+          de: "",
+          fi: "",
+          fr: "",
+          ar: "",
+          it: "",
+        }, // Year suffix mostly for Asian langs
+      };
+
       function App() {
+        const [lang, setLang] = useState("zh");
         const [month, setMonth] = useState(1);
         const [year, setYear] = useState(2025);
         const daysInMonth = new Date(year, month, 0).getDate();
@@ -34,24 +309,21 @@
             .fill(0)
             .map((_, i) => i + 1),
         ];
-        const months = [
-          "一月",
-          "二月",
-          "三月",
-          "四月",
-          "五月",
-          "六月",
-          "七月",
-          "八月",
-          "九月",
-          "十月",
-          "十一月",
-          "十二月",
-        ];
+
+        const getMonthName = (m) =>
+          t.months[m - 1][lang] || t.months[m - 1]["en"];
+        const getWeekday = (i) => t.weekdays[i][lang] || t.weekdays[i]["en"];
+        const getDaysInMonthText = () =>
+          (t.daysInMonth[lang] || t.daysInMonth["en"]).replace(
+            "{n}",
+            daysInMonth
+          );
+
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-6xl font-black text-red-900 mb-8">
-              📅 月曆日期
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-6xl font-black text-red-900 mb-8 mt-8 text-center">
+              📅 {t.title[lang] || t.title["en"]}
             </h1>
             <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full">
               <div className="flex justify-center gap-4 mb-8">
@@ -62,7 +334,8 @@
                   ←
                 </button>
                 <div className="px-8 py-3 bg-gradient-to-r from-red-100 to-pink-100 rounded-xl text-2xl font-black">
-                  {year}年 {months[month - 1]}
+                  {year}
+                  {t.year[lang]} {getMonthName(month)}
                 </div>
                 <button
                   onClick={() => setMonth((m) => (m < 12 ? m + 1 : 1))}
@@ -72,9 +345,9 @@
                 </button>
               </div>
               <div className="grid grid-cols-7 gap-2 mb-4 text-center font-bold text-red-800">
-                {["日", "一", "二", "三", "四", "五", "六"].map((d, i) => (
+                {[0, 1, 2, 3, 4, 5, 6].map((i) => (
                   <div key={i} className="py-2">
-                    {d}
+                    {getWeekday(i)}
                   </div>
                 ))}
               </div>
@@ -83,7 +356,7 @@
                   day ? (
                     <div
                       key={i}
-                      className="aspect-square bg-gradient-to-br from-red-100 to-pink-100 rounded-xl flex items-center justify-center text-2xl font-black hover:scale-110 transition-all cursor-pointer"
+                      className="aspect-square bg-gradient-to-br from-red-100 to-pink-100 rounded-xl flex items-center justify-center text-xl md:text-2xl font-black hover:scale-110 transition-all cursor-pointer"
                     >
                       {day}
                     </div>
@@ -94,7 +367,7 @@
               </div>
               <div className="mt-8 bg-red-50 p-4 rounded-xl text-center">
                 <div className="text-lg font-bold text-red-800">
-                  本月有 {daysInMonth} 天
+                  {getDaysInMonthText()}
                 </div>
               </div>
             </div>
@@ -103,20 +376,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

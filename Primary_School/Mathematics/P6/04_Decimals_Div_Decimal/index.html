@@ -8,111 +8,249 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #dbeafe 0%, #3b82f6 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
+
+      const t = {
+        title: {
+          en: "Decimal ÷ Decimal",
+          zh: "小數除以小數",
+          ja: "小数 ÷ 小数",
+          ko: "소수 ÷ 소수",
+          es: "Decimal ÷ Decimal",
+          de: "Dezimal ÷ Dezimal",
+          fi: "Desimaali ÷ Desimaali",
+          fr: "Décimal ÷ Décimal",
+          ar: "كسر عشري ÷ كسر عشري",
+          it: "Decimale ÷ Decimale",
+        },
+        step1: {
+          en: "Remove Decimal",
+          zh: "移除除數小數點",
+          ja: "除数の小数点を消す",
+          ko: "제수의 소수점 제거",
+          es: "Eliminar decimal del divisor",
+          de: "Dezimalpunkt beim Teiler entfernen",
+          fi: "Poista desimaali jakajasta",
+          fr: "Supprimer la virgule du diviseur",
+          ar: "إزالة العلامة العشرية من المقسوم عليه",
+          it: "Rimuovi Decimale dal Divisore",
+        },
+        step2: {
+          en: "Shift Both",
+          zh: "雙方移位",
+          ja: "両方をシフト",
+          ko: "양쪽 이동",
+          es: "Desplazar Ambos",
+          de: "Beide verschieben",
+          fi: "Siirrä molempia",
+          fr: "Décaler les deux",
+          ar: "إزاحة كلاهما",
+          it: "Sposta Entrambi",
+        },
+        result: {
+          en: "Calculation",
+          zh: "計算",
+          ja: "計算",
+          ko: "계산",
+          es: "Cálculo",
+          de: "Berechnung",
+          fi: "Laskutoimitus",
+          fr: "Calcul",
+          ar: "حساب",
+          it: "Calcolo",
+        },
+        answer: {
+          en: "Answer",
+          zh: "答案",
+          ja: "答え",
+          ko: "정답",
+          es: "Respuesta",
+          de: "Antwort",
+          fi: "Vastaus",
+          fr: "Réponse",
+          ar: "إجابة",
+          it: "Risposta",
+        },
+      };
+
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
       function App() {
+        const [lang, setLang] = useState("zh");
         const [dividend, setDividend] = useState(7.2);
         const [divisor, setDivisor] = useState(0.4);
 
-        const countDec = (n) => {
-          const s = n.toString();
-          return s.includes(".") ? s.split(".")[1].length : 0;
+        // Count initial decimal places in divisor
+        const getDecimals = (n) => {
+          const parts = n.toString().split(".");
+          return parts.length > 1 ? parts[1].length : 0;
         };
-        const divisorDecs = countDec(divisor);
-        const multiplier = Math.pow(10, divisorDecs);
-        const newDividend = dividend * multiplier;
-        const newDivisor = divisor * multiplier;
+        const shift = getDecimals(divisor);
+        const multiplier = Math.pow(10, shift);
+
+        const newDividend = Math.round(dividend * multiplier * 1000) / 1000; // avoid float errors
+        const newDivisor = Math.round(divisor * multiplier * 1000) / 1000;
+
         const result = dividend / divisor;
 
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-blue-100 mb-2">
-              ➗ 小數除以小數
-            </h1>
-            <p className="text-xl text-blue-200 font-bold mb-8">
-              Decimal ÷ Decimal
-            </p>
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-2xl w-full">
-              <div className="flex items-center justify-center gap-4 mb-8">
+          <div className="min-h-screen flex flex-col items-center p-4 font-sans bg-slate-900 text-white">
+            <div className="w-full max-w-5xl flex justify-between items-center mb-10">
+              <h1 className="text-4xl font-black text-cyan-400 drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]">
+                ➗ {getText("title", lang)}
+              </h1>
+              <div className="flex bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-cyan-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="w-full max-w-4xl flex flex-col gap-12">
+              {/* Input Section */}
+              <div className="glass-panel p-8 rounded-3xl flex flex-wrap items-center justify-center gap-8">
                 <input
                   type="number"
                   step="0.1"
                   value={dividend}
                   onChange={(e) => setDividend(parseFloat(e.target.value) || 0)}
-                  className="w-24 text-3xl font-mono font-black text-center border-4 border-blue-300 rounded-xl p-2"
+                  className="w-40 text-4xl font-black text-center bg-slate-800 border-b-4 border-blue-500 rounded-xl py-2 outline-none"
                 />
-                <span className="text-3xl font-black text-blue-400">÷</span>
+                <div className="text-4xl font-black text-cyan-400">÷</div>
                 <input
                   type="number"
                   step="0.1"
                   value={divisor}
-                  onChange={(e) =>
-                    setDivisor(parseFloat(e.target.value) || 0.1)
-                  }
-                  className="w-24 text-3xl font-mono font-black text-center border-4 border-blue-300 rounded-xl p-2"
+                  onChange={(e) => setDivisor(parseFloat(e.target.value) || 1)}
+                  className="w-40 text-4xl font-black text-center bg-slate-800 border-b-4 border-cyan-500 rounded-xl py-2 outline-none"
                 />
               </div>
 
-              <div className="bg-slate-50 rounded-2xl p-6 mb-6">
-                <p className="font-bold text-slate-700 mb-2">
-                  步驟: 把除數變成整數
-                </p>
-                <p className="font-mono">
-                  除數有 {divisorDecs} 位小數，兩邊 × {multiplier}
-                </p>
-                <p className="font-mono text-lg mt-2">
-                  {dividend} ÷ {divisor} = {newDividend} ÷ {newDivisor}
-                </p>
-                <p className="font-mono text-lg">
-                  = {result.toFixed(4).replace(/\.?0+$/, "")}
-                </p>
-              </div>
+              {/* Process Visualization */}
+              <div className="glass-panel p-12 rounded-3xl min-h-[300px] flex flex-col items-center justify-center relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+                {/* Step Description */}
+                <div className="absolute top-4 left-4 bg-cyan-500/20 text-cyan-300 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest border border-cyan-500/50">
+                  {getText("step2", lang)}: × {multiplier}
+                </div>
 
-              <div className="bg-emerald-100 rounded-2xl p-6 text-center border-4 border-emerald-300">
-                <div className="text-emerald-600 font-bold">答案 Answer</div>
-                <div className="text-5xl font-black text-emerald-800">
-                  {result.toFixed(4).replace(/\.?0+$/, "")}
+                <div className="flex items-center gap-12 text-3xl md:text-5xl font-mono font-bold">
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="text-slate-500 text-sm font-sans mb-1">
+                      Old
+                    </div>
+                    <motion.div layout className="opacity-50 blur-[1px]">
+                      {dividend} ÷ {divisor}
+                    </motion.div>
+                  </div>
+
+                  <motion.div
+                    animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }}
+                    transition={{ duration: 0.5, delay: 0.5 }}
+                    className="text-cyan-400 text-2xl"
+                  >
+                    ⇩
+                  </motion.div>
+
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="text-cyan-400 text-sm font-sans mb-1 font-bold">
+                      New (Integer Divisor)
+                    </div>
+                    <motion.div
+                      layout
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.6 }}
+                      className="bg-cyan-900/40 px-6 py-4 rounded-xl border border-cyan-500/30 text-white shadow-[0_0_30px_rgba(34,211,238,0.2)]"
+                    >
+                      {newDividend} ÷ {newDivisor}
+                    </motion.div>
+                  </div>
                 </div>
               </div>
 
-              <div className="mt-6 bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
-                <p className="font-bold">
-                  💡 技巧: 先把除數變成整數，被除數也要乘以相同倍數！
-                </p>
+              {/* Final Result */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="glass-panel p-8 rounded-3xl border-l-4 border-blue-500 bg-blue-900/10 flex flex-col items-center justify-center">
+                  <h3 className="text-blue-400 font-bold uppercase mb-4">
+                    {getText("answer", lang)}
+                  </h3>
+                  <div className="text-6xl font-black text-white">
+                    {parseFloat(result.toFixed(5))}
+                  </div>
+                </div>
+
+                <div className="glass-panel p-8 rounded-3xl border-l-4 border-slate-500 bg-slate-800/50 text-sm text-slate-300 leading-relaxed font-mono">
+                  <p className="mb-2 text-cyan-400 font-bold">
+                    {getText("step1", lang)}:
+                  </p>
+                  <p>1. Count divisor decimals: {shift}</p>
+                  <p>
+                    2. Multiply both by 10^{shift} = {multiplier}
+                  </p>
+                  <p>
+                    3. {dividend} × {multiplier} = {newDividend}
+                  </p>
+                  <p>
+                    4. {divisor} × {multiplier} = {newDivisor}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

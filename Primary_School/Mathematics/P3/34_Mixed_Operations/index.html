@@ -3,12 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小三數學：這是一個好玩的混合運算</title>
+    <title>小三數學：這是一個好玩的混合運算 | Mixed Operations</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -25,13 +26,136 @@
     <script type="text/babel">
       const { useState } = React;
       const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Mixed Operations",
+          zh: "四則混合運算",
+          ja: "四則演算",
+          ko: "혼합 연산",
+          es: "Operaciones mixtas",
+          de: "Gemischte Operationen",
+          fi: "Sekalaskut",
+          fr: "Opérations mixtes",
+          ar: "العمليات المختلطة",
+          it: "Operazioni miste",
+        },
+        step1: {
+          en: "Step 1",
+          zh: "步驟一",
+          ja: "ステップ 1",
+          ko: "단계 1",
+          es: "Paso 1",
+          de: "Schritt 1",
+          fi: "Vaihe 1",
+          fr: "Étape 1",
+          ar: "الخطوة 1",
+          it: "Passo 1",
+        },
+        finalAnswer: {
+          en: "Final Answer",
+          zh: "最終答案",
+          ja: "最終答え",
+          ko: "최종 정답",
+          es: "Respuesta final",
+          de: "Endergebnis",
+          fi: "Lopullinen vastaus",
+          fr: "Réponse finale",
+          ar: "الجواب النهائي",
+          it: "Risposta finale",
+        },
+        remaining: {
+          en: "Remaining: ",
+          zh: "剩餘算式：",
+          ja: "残り: ",
+          ko: "남은 식: ",
+          es: "Restante: ",
+          de: "Verbleibend: ",
+          fi: "Jäljellä: ",
+          fr: "Restant : ",
+          ar: "المتبقي: ",
+          it: "Rimanente: ",
+        },
+        nextStep: {
+          en: "Next Step",
+          zh: "下一步",
+          ja: "次へ",
+          ko: "다음 단계",
+          es: "Siguiente",
+          de: "Weiter",
+          fi: "Seuraava",
+          fr: "Suivant",
+          ar: "التالي",
+          it: "Avanti",
+        },
+        newQuestion: {
+          en: "New Question",
+          zh: "新題目",
+          ja: "新しい問題",
+          ko: "새 문제",
+          es: "Nueva pregunta",
+          de: "Neue Frage",
+          fi: "Uusi kysymys",
+          fr: "Nouvelle question",
+          ar: "سؤال جديد",
+          it: "Nuova domanda",
+        },
+        tip: {
+          en: "💡 Tip: BODMAS Rule - Brackets first, then Multiply/Divide, then Add/Subtract!",
+          zh: "💡 記得口訣：先乘除，後加減，有括號先算括號！",
+          ja: "💡 ヒント: 括弧が先、次に掛け算/割り算、最後に足し算/引き算！",
+          ko: "💡 팁: 괄호 먼저, 그 다음 곱하기/나누기, 마지막으로 더하기/빼기!",
+          es: "💡 Consejo: ¡Paréntesis primero, luego multiplica/divide, después suma/resta!",
+          de: "💡 Tipp: Klammern zuerst, dann Punkt- vor Strichrechnung!",
+          fi: "💡 Vinkki: Sulut ensin, sitten kerto/jako, lopuksi yhteen/vähennys!",
+          fr: "💡 Astuce : Parenthèses d'abord, puis Mult/Div, enfin Add/Soust !",
+          ar: "💡 تلميح: الأقواس أولاً، ثم الضرب/القسمة، ثم الجمع/الطرح!",
+          it: "💡 Suggerimento: Prima le parentesi, poi Moltiplica/Dividi, infine Aggiungi/Sottrai!",
+        },
+        explanations: {
+          bracket: {
+            en: "Calculate brackets first: {exp}",
+            zh: "先計算括號內的：{exp}",
+            ja: "括弧内を先に計算: {exp}",
+            ko: "괄호 안을 먼저 계산: {exp}",
+            es: "Calcular paréntesis primero: {exp}",
+            de: "Klammern zuerst berechnen: {exp}",
+            fi: "Laske sulut ensin: {exp}",
+            fr: "Calculer les parenthèses d'abord : {exp}",
+            ar: "حساب الأقواس أولاً: {exp}",
+            it: "Calcola prima le parentesi: {exp}",
+          },
+          md: {
+            en: "Multiply/Divide before Add/Subtract: {exp}",
+            zh: "先乘除後加減：{exp}",
+            ja: "足し算/引き算の前に掛け算/割り算: {exp}",
+            ko: "더하기/빼기 전에 곱하기/나누기: {exp}",
+            es: "Mult/Div antes de Sumar/Restar: {exp}",
+            de: "Punkt vor Strich: {exp}",
+            fi: "Kerto/Jako ennen Yhteen/Vähennystä: {exp}",
+            fr: "Mult/Div avant Add/Soust : {exp}",
+            ar: "الضرب/القسمة قبل الجمع/الطرح: {exp}",
+            it: "Molt/Div prima di Agg/Sott: {exp}",
+          },
+          lr: {
+            en: "Calculate from Left to Right: {exp}",
+            zh: "由左至右計算：{exp}",
+            ja: "左から右へ計算: {exp}",
+            ko: "왼쪽에서 오른쪽으로 계산: {exp}",
+            es: "Calcular de izquierda a derecha: {exp}",
+            de: "Von links nach rechts berechnen: {exp}",
+            fi: "Laske vasemmalta oikealle: {exp}",
+            fr: "Calculer de gauche à droite : {exp}",
+            ar: "حساب من اليسار إلى اليمين: {exp}",
+            it: "Calcola da sinistra a destra: {exp}",
+          },
+        },
+      };
 
       function App() {
-        // Generates question of type: A [op1] B [op2] C
-        // Logic: P3 mixed operations usually involve +/- mixed, or x/÷ with +/- (BODMAS simple)
-        // Let's stick to simple: (A + B) x C or A + B x C
-
-        const [step, setStep] = useState(0); // 0: input, 1: showing step 1, 2: showing final
+        const [lang, setLang] = useState("zh");
+        const [step, setStep] = useState(0);
         const [q, setQ] = useState({
           n1: 5,
           n2: 3,
@@ -48,56 +172,56 @@
           const n1 = Math.floor(Math.random() * 10) + 2;
           const n2 = Math.floor(Math.random() * 10) + 2;
           const n3 = Math.floor(Math.random() * 5) + 2;
-          // Add brackets randomly 30%
           const bracket = Math.random() > 0.7;
           setQ({ n1, n2, n3, op1: o1, op2: o2, hasBracket: bracket });
           setStep(0);
         };
 
-        // Simple parser logic for display
-        // Case 1: Bracket first. (n1 op1 n2) op2 n3
-        // Case 2: BODMAS. Multiply/Divide first.
-        let step1Val, finalVal, explanation;
+        let step1Val, finalVal, explanationKey, expStr;
 
         if (q.hasBracket) {
-          // Assuming format (n1 op1 n2) op2 n3
-          // First calc inside bracket
           const inside = eval(`${q.n1} ${q.op1.replace("×", "*")} ${q.n2}`);
           step1Val = inside;
           finalVal = eval(`${inside} ${q.op2.replace("×", "*")} ${q.n3}`);
-          explanation = `先計算括號內的：${q.n1} ${q.op1} ${q.n2} = ${inside}`;
+          explanationKey = "bracket";
+          expStr = `${q.n1} ${q.op1} ${q.n2} = ${inside}`;
         } else {
-          // n1 op1 n2 op2 n3
-          // Check priorities
           const p1 = q.op1 === "×";
           const p2 = q.op2 === "×";
 
           if (p1 && !p2) {
-            // x then +/-
             step1Val = q.n1 * q.n2;
             finalVal = eval(`${step1Val} ${q.op2.replace("×", "*")} ${q.n3}`);
-            explanation = `先乘除後加減：${q.n1} × ${q.n2} = ${step1Val}`;
+            explanationKey = "md";
+            expStr = `${q.n1} × ${q.n2} = ${step1Val}`;
           } else if (!p1 && p2) {
-            // +/- then x
             step1Val = q.n2 * q.n3;
             finalVal = eval(`${q.n1} ${q.op1.replace("×", "*")} ${step1Val}`);
-            explanation = `先乘除後加減：${q.n2} × ${q.n3} = ${step1Val}`;
+            explanationKey = "md";
+            expStr = `${q.n2} × ${q.n3} = ${step1Val}`;
           } else {
-            // Same priority, left to right
             step1Val = eval(`${q.n1} ${q.op1.replace("×", "*")} ${q.n2}`);
             finalVal = eval(`${step1Val} ${q.op2.replace("×", "*")} ${q.n3}`);
-            explanation = `由左至右計算：${q.n1} ${q.op1} ${q.n2} = ${step1Val}`;
+            explanationKey = "lr";
+            expStr = `${q.n1} ${q.op1} ${q.n2} = ${step1Val}`;
           }
         }
 
+        const getExplanation = () =>
+          (
+            t.explanations[explanationKey][lang] ||
+            t.explanations[explanationKey]["en"]
+          ).replace("{exp}", expStr);
+
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-6xl font-black text-white mb-8 drop-shadow-lg">
-              🔢 四則混合運算
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-6xl font-black text-white mb-8 mt-8 drop-shadow-lg text-center">
+              🔢 {t.title[lang] || t.title["en"]}
             </h1>
 
             <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full text-center">
-              <div className="flex justify-center items-center gap-4 text-5xl font-black text-slate-800 mb-12 h-32">
+              <div className="flex justify-center items-center gap-2 md:gap-4 text-3xl md:text-5xl font-black text-slate-800 mb-12 h-32 flex-wrap">
                 {q.hasBracket && <span className="text-pink-500">(</span>}
                 <span>{q.n1}</span>
                 <span className="text-pink-600">{q.op1}</span>
@@ -118,13 +242,13 @@
                       className="bg-yellow-100 p-6 rounded-2xl border-l-8 border-yellow-400 text-left"
                     >
                       <div className="text-lg font-bold text-yellow-800 mb-2">
-                        步驟一
+                        {t.step1[lang] || t.step1["en"]}
                       </div>
-                      <div className="text-2xl font-bold text-slate-800">
-                        {explanation}
+                      <div className="text-xl md:text-2xl font-bold text-slate-800">
+                        {getExplanation()}
                       </div>
                       <div className="mt-2 text-slate-500">
-                        剩餘算式：
+                        {t.remaining[lang] || t.remaining["en"]}
                         {q.hasBracket ||
                         (q.op1 === "×" && q.op2 !== "×") ||
                         (q.op1 !== "×" && q.op2 !== "×")
@@ -141,7 +265,7 @@
                       className="bg-green-100 p-6 rounded-2xl border-l-8 border-green-500 text-left"
                     >
                       <div className="text-lg font-bold text-green-800 mb-2">
-                        最終答案
+                        {t.finalAnswer[lang] || t.finalAnswer["en"]}
                       </div>
                       <div className="text-4xl font-black text-green-600">
                         {finalVal}
@@ -161,18 +285,18 @@
                       : "bg-pink-500 text-white hover:bg-pink-600 shadow-lg hover:scale-105"
                   }`}
                 >
-                  下一步 expl step
+                  {t.nextStep[lang] || t.nextStep["en"]}
                 </button>
                 <button
                   onClick={generate}
                   className="px-8 py-4 bg-slate-800 text-white rounded-xl font-black text-xl hover:bg-slate-700 shadow-lg transition-all"
                 >
-                  新題目
+                  {t.newQuestion[lang] || t.newQuestion["en"]}
                 </button>
               </div>
 
-              <div className="mt-6 text-slate-500 font-bold text-sm">
-                💡 記得口訣：先乘除，後加減，有括號先算括號！
+              <div className="mt-6 text-slate-500 font-bold text-sm md:text-base">
+                {t.tip[lang] || t.tip["en"]}
               </div>
             </div>
           </div>
@@ -182,20 +306,5 @@
       const root = ReactDOM.createRoot(document.getElementById("root"));
       root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

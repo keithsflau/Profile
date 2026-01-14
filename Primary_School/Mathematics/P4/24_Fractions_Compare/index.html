@@ -3,12 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小四數學：分數比較</title>
+    <title>小四數學：分數比較 | Comparing Fractions</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -25,13 +26,44 @@
     <script type="text/babel">
       const { useState } = React;
       const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Comparing Fractions",
+          zh: "分數比較",
+          ja: "分数の比較",
+          ko: "분수 비교",
+          es: "Comparación de Fracciones",
+          de: "Brüche vergleichen",
+          fi: "Murtolukujen vertailu",
+          fr: "Comparaison de fractions",
+          ar: "مقارنة الكسور",
+          it: "Confronto frazioni",
+        },
+        tip: {
+          en: "Common Denominator Tip: Make denominators the same ({lcd}), then compare numerators!\n{n1} × {d2} = {v1}  vs  {n2} × {d1} = {v2}",
+          zh: "通分母提示：把分母變一樣 ({lcd})，比較分子！\n{n1} × {d2} = {v1}  vs  {n2} × {d1} = {v2}",
+          ja: "共通分母のヒント：分母を同じにして ({lcd})、分子を比較してください！\n{n1} × {d2} = {v1}  vs  {n2} × {d1} = {v2}",
+          ko: "공통 분모 팁: 분모를 같게 만들고 ({lcd}), 분자를 비교하세요!\n{n1} × {d2} = {v1}  vs  {n2} × {d1} = {v2}",
+          es: "Consejo de Denominador Común: ¡Haz que los denominadores sean iguales ({lcd}), luego compara los numeradores!\n{n1} × {d2} = {v1}  vs  {n2} × {d1} = {v2}",
+          de: "Tipp zum gemeinsamen Nenner: Machen Sie die Nenner gleich ({lcd}) und vergleichen Sie dann die Zähler!\n{n1} × {d2} = {v1}  vs  {n2} × {d1} = {v2}",
+          fi: "Yhteisen nimittäjän vinkki: Tee nimittäjistä samat ({lcd}) ja vertaa sitten osoittajia!\n{n1} × {d2} = {v1}  vs  {n2} × {d1} = {v2}",
+          fr: "Astuce du dénominateur commun : Rendez les dénominateurs identiques ({lcd}), puis comparez les numérateurs !\n{n1} × {d2} = {v1}  vs  {n2} × {d1} = {v2}",
+          ar: "نصيحة القاسم المشترك: اجعل القواسم متساوية ({lcd})، ثم قارن البسط!\n{n1} × {d2} = {v1}  vs  {n2} × {d1} = {v2}",
+          it: "Suggerimento denominatore comune: rendi i denominatori uguali ({lcd}), poi confronta i numeratori!\n{n1} × {d2} = {v1}  vs  {n2} × {d1} = {v2}",
+        },
+      };
 
       function App() {
+        const [lang, setLang] = useState("zh");
         const [n1, setN1] = useState(2);
         const [d1, setD1] = useState(3);
 
         const [n2, setN2] = useState(3);
         const [d2, setD2] = useState(4);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
 
         const val1 = n1 / d1;
         const val2 = n2 / d2;
@@ -66,8 +98,9 @@
 
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-orange-900 mb-8">
-              ⚖️ 分數比較
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-orange-900 mb-8 mt-8">
+              ⚖️ {getText("title")}
             </h1>
 
             <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full">
@@ -98,7 +131,7 @@
                   key={sign}
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="w-24 h-24 bg-orange-500 rounded-full flex items-center justify-center text-6xl font-black text-white shadow-lg"
+                  className="w-24 h-24 bg-orange-500 rounded-full flex items-center justify-center text-6xl font-black text-white shadow-lg mx-auto"
                 >
                   {sign}
                 </motion.div>
@@ -131,10 +164,15 @@
                 <Bar n={n2} d={d2} color="bg-blue-500" />
               </div>
 
-              <div className="mt-8 text-center bg-yellow-50 p-4 rounded-xl text-yellow-800 font-bold">
-                通分母提示：把分母變一樣 ({d1 * d2})，比較分子！
-                <br />
-                {n1} × {d2} = {n1 * d2} &nbsp; vs &nbsp; {n2} × {d1} = {n2 * d1}
+              <div className="mt-8 text-center bg-yellow-50 p-4 rounded-xl text-yellow-800 font-bold whitespace-pre-line">
+                {getText("tip")
+                  .replace("{lcd}", d1 * d2)
+                  .replace("{n1}", n1)
+                  .replace("{d2}", d2)
+                  .replace("{v1}", n1 * d2)
+                  .replace("{n2}", n2)
+                  .replace("{d1}", d1)
+                  .replace("{v2}", n2 * d1)}
               </div>
             </div>
           </div>
@@ -142,20 +180,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

@@ -3,18 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小三數學：除法基礎訓練</title>
+    <title>小三數學：除法基礎訓練 | Division Basic Training</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script
-      src="https://unpkg.com/react@18/umd/react.development.js"
-      crossorigin
-    ></script>
-    <script
-      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
-      crossorigin
-    ></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -35,7 +30,121 @@
     <script type="text/babel">
       const { useState, useEffect } = React;
       const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Division Training",
+          zh: "除法基礎訓練",
+          ja: "割り算の練習",
+          ko: "나눗셈 훈련",
+          es: "Entrenamiento de división",
+          de: "Divisionstraining",
+          fi: "Jakolaskuharjoitus",
+          fr: "Entraînement à la division",
+          ar: "تدريب القسمة",
+          it: "Allenamento alla divisione",
+        },
+        quotient: {
+          en: "Quotient",
+          zh: "商數",
+          ja: "商",
+          ko: "몫",
+          es: "Cociente",
+          de: "Quotient",
+          fi: "Osamäärä",
+          fr: "Quotient",
+          ar: "ناتج القسمة",
+          it: "Quoziente",
+        },
+        remainder: {
+          en: "Remainder",
+          zh: "餘數",
+          ja: "余り",
+          ko: "나머지",
+          es: "Resto",
+          de: "Rest",
+          fi: "Jäännös",
+          fr: "Reste",
+          ar: "الباقي",
+          it: "Resto",
+        },
+        check: {
+          en: "Check Answer",
+          zh: "確認答案",
+          ja: "答え合わせ",
+          ko: "정답 확인",
+          es: "Comprobar respuesta",
+          de: "Antwort prüfen",
+          fi: "Tarkista vastaus",
+          fr: "Vérifier la réponse",
+          ar: "تحقق من الإجابة",
+          it: "Controlla la risposta",
+        },
+        next: {
+          en: "Next",
+          zh: "下一題",
+          ja: "次へ",
+          ko: "다음",
+          es: "Siguiente",
+          de: "Weiter",
+          fi: "Seuraava",
+          fr: "Suivant",
+          ar: "التالي",
+          it: "Avanti",
+        },
+        correct: {
+          en: "Correct! Score:",
+          zh: "答對了！得分：",
+          ja: "正解！スコア：",
+          ko: "정답! 점수:",
+          es: "¡Correcto! Puntuación:",
+          de: "Richtig! Punktsatnd:",
+          fi: "Oikein! Pisteet:",
+          fr: "Correct ! Score :",
+          ar: "صحيح! النتيجة:",
+          it: "Corretto! Punteggio:",
+        },
+        incorrect: {
+          en: "Try again! Answer:",
+          zh: "再現試試！正確答案：",
+          ja: "もう一度！正解：",
+          ko: "다시 시도하세요! 정답:",
+          es: "¡Inténtalo de nuevo! Respuesta:",
+          de: "Versuch es nochmal! Antwort:",
+          fi: "Yritä uudelleen! Vastaus:",
+          fr: "Réessayez ! Réponse :",
+          ar: "حاول مرة أخرى! الإجابة:",
+          it: "Riprova! Risposta:",
+        },
+        rem: {
+          en: "R",
+          zh: "餘",
+          ja: "余り",
+          ko: "나머지",
+          es: "R",
+          de: "R",
+          fi: "jäännös",
+          fr: "R",
+          ar: "الباقي",
+          it: "R",
+        },
+        formula: {
+          en: "Formula: Dividend ÷ Divisor = Quotient ... Remainder",
+          zh: "公式：被除數 ÷ 除數 = 商數 ... 餘數",
+          ja: "公式：被除数 ÷ 除数 = 商 ... 余り",
+          ko: "공식: 피제수 ÷ 제수 = 몫 ... 나머지",
+          es: "Fórmula: Dividendo ÷ Divisor = Cociente ... Resto",
+          de: "Formel: Dividend ÷ Divisor = Quotient ... Rest",
+          fi: "Kaava: Jaettava ÷ Jakaja = Osamäärä ... Jäännös",
+          fr: "Formule : Dividende ÷ Diviseur = Quotient ... Reste",
+          ar: "الصيغة: المقسوم ÷ المقسوم عليه = الناتج ... الباقي",
+          it: "Formula: Dividendo ÷ Divisore = Quoziente ... Resto",
+        },
+      };
+
       function App() {
+        const [lang, setLang] = useState("zh");
         const [dividend, setDividend] = useState(12);
         const [divisor, setDivisor] = useState(3);
         const [userQuotient, setUserQuotient] = useState("");
@@ -68,8 +177,9 @@
 
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-6xl font-black text-purple-900 mb-8">
-              ➗ 除法基礎訓練
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-6xl font-black text-purple-900 mb-8 mt-8 text-center">
+              ➗ {t.title[lang] || t.title["en"]}
             </h1>
             <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full">
               <div className="text-center mb-8">
@@ -88,7 +198,7 @@
               <div className="grid grid-cols-2 gap-6 mb-6">
                 <div>
                   <label className="block text-lg font-bold text-purple-800 mb-2">
-                    商數
+                    {t.quotient[lang] || t.quotient["en"]}
                   </label>
                   <input
                     type="number"
@@ -101,7 +211,7 @@
                 </div>
                 <div>
                   <label className="block text-lg font-bold text-purple-800 mb-2">
-                    餘數
+                    {t.remainder[lang] || t.remainder["en"]}
                   </label>
                   <input
                     type="number"
@@ -118,32 +228,34 @@
                 onClick={checkAnswer}
                 className="w-full py-4 bg-purple-600 hover:bg-purple-700 text-white text-xl font-bold rounded-2xl shadow-lg mb-4"
               >
-                確認答案
+                {t.check[lang] || t.check["en"]}
               </button>
 
               {feedback === "correct" && (
                 <div className="bg-green-100 text-green-700 p-4 rounded-xl text-center font-bold text-xl mb-4">
-                  ✓ 答對了！得分: {score}
+                  ✓ {t.correct[lang] || t.correct["en"]} {score}
                   <button
                     onClick={generateNew}
                     className="ml-4 px-6 py-2 bg-green-600 text-white rounded-lg"
                   >
-                    下一題
+                    {t.next[lang] || t.next["en"]}
                   </button>
                 </div>
               )}
               {feedback === "incorrect" && (
                 <div className="bg-red-100 text-red-700 p-4 rounded-xl text-center font-bold text-xl">
-                  ✗ 再試試！正確答案：{quotient} 餘 {remainder}
+                  ✗ {t.incorrect[lang] || t.incorrect["en"]} {quotient}{" "}
+                  {t.rem[lang] || t.rem["en"]} {remainder}
                 </div>
               )}
 
               <div className="mt-6 bg-blue-50 p-4 rounded-xl">
                 <div className="font-bold text-blue-800 mb-2">
-                  💡 公式：被除數 ÷ 除數 = 商數 ... 餘數
+                  💡 {t.formula[lang] || t.formula["en"]}
                 </div>
                 <div className="text-blue-700">
-                  {dividend} ÷ {divisor} = {quotient} 餘 {remainder}
+                  {dividend} ÷ {divisor} = {quotient}{" "}
+                  {t.rem[lang] || t.rem["en"]} {remainder}
                 </div>
               </div>
             </div>
@@ -152,20 +264,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

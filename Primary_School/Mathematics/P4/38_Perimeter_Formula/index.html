@@ -3,12 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小四數學：周界公式</title>
+    <title>小四數學：周界公式 | Perimeter Formula</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -25,8 +26,63 @@
     <script type="text/babel">
       const { useState } = React;
       const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Perimeter Formula",
+          zh: "周界公式",
+          ja: "周囲の公式",
+          ko: "둘레 공식",
+          es: "Fórmula del Perímetro",
+          de: "Umfangsformel",
+          fi: "Piirin kaava",
+          fr: "Formule du périmètre",
+          ar: "صيغة المحيط",
+          it: "Formula del perimetro",
+        },
+        length: {
+          en: "Length",
+          zh: "長",
+          ja: "長さ",
+          ko: "길이",
+          es: "Largo",
+          de: "Länge",
+          fi: "Pituus",
+          fr: "Longueur",
+          ar: "الطول",
+          it: "Lunghezza",
+        },
+        width: {
+          en: "Width",
+          zh: "闊",
+          ja: "幅",
+          ko: "너비",
+          es: "Ancho",
+          de: "Breite",
+          fi: "Leveys",
+          fr: "Largeur",
+          ar: "العرض",
+          it: "Larghezza",
+        },
+        formula: {
+          en: "Formula: (Length + Width) × 2",
+          zh: "公式：(長 + 闊) × 2",
+          ja: "公式：(長さ + 幅) × 2",
+          ko: "공식: (길이 + 너비) × 2",
+          es: "Fórmula: (Largo + Ancho) × 2",
+          de: "Formel: (Länge + Breite) × 2",
+          fi: "Kaava: (Pituus + Leveys) × 2",
+          fr: "Formule : (Longueur + Largeur) × 2",
+          ar: "الصيغة: (الطول + والعرض) × 2",
+          it: "Formula: (Lunghezza + Larghezza) × 2",
+        },
+      };
 
       function App() {
+        const [lang, setLang] = useState("zh");
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
         const [w, setW] = useState(5);
         const [h, setH] = useState(3);
 
@@ -36,15 +92,16 @@
 
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-sky-900 mb-8">
-              📏 周界公式
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-sky-900 mb-8 mt-8">
+              📏 {getText("title")}
             </h1>
 
             <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full flex flex-col md:flex-row gap-12 items-center">
               <div className="flex flex-col gap-6 w-72">
                 <div className="flex items-center gap-4">
-                  <label className="font-bold text-sky-800 text-xl w-16">
-                    長
+                  <label className="font-bold text-sky-800 text-xl w-24">
+                    {getText("length")}
                   </label>
                   <input
                     type="range"
@@ -57,8 +114,8 @@
                   <span className="text-2xl font-black text-sky-700">{w}</span>
                 </div>
                 <div className="flex items-center gap-4">
-                  <label className="font-bold text-sky-800 text-xl w-16">
-                    闊
+                  <label className="font-bold text-sky-800 text-xl w-24">
+                    {getText("width")}
                   </label>
                   <input
                     type="range"
@@ -73,7 +130,7 @@
 
                 <div className="bg-sky-50 p-6 rounded-2xl border-2 border-sky-200">
                   <h3 className="font-bold text-sky-800 mb-2">
-                    公式：(長 + 闊) × 2
+                    {getText("formula")}
                   </h3>
                   <div className="text-2xl font-bold text-sky-900 mb-2">
                     ({w} + {h}) × 2
@@ -118,7 +175,7 @@
                     textAnchor="middle"
                     className="font-bold fill-sky-700"
                   >
-                    長 ({w})
+                    {getText("length")} ({w})
                   </text>
                   <text
                     x={w * scale + 10}
@@ -126,7 +183,7 @@
                     textAnchor="start"
                     className="font-bold fill-sky-700"
                   >
-                    闊 ({h})
+                    {getText("width")} ({h})
                   </text>
                   <text
                     x={(w * scale) / 2}
@@ -134,7 +191,7 @@
                     textAnchor="middle"
                     className="font-bold fill-sky-700"
                   >
-                    長 ({w})
+                    {getText("length")} ({w})
                   </text>
                   <text
                     x="-10"
@@ -142,7 +199,7 @@
                     textAnchor="end"
                     className="font-bold fill-sky-700"
                   >
-                    闊 ({h})
+                    {getText("width")} ({h})
                   </text>
                 </svg>
               </div>
@@ -152,20 +209,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

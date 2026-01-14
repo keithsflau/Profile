@@ -3,201 +3,274 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小五數學：小數乘法 (×10/100) | Decimals ×10/100</title>
+    <title>小五數學：小數乘法視像化 | Decimal Multiplication Visualizer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #fef9c3 0%, #eab308 100%);
+        background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      }
+      .digit-box {
+        font-family: "JetBrains Mono", monospace;
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
-      const { LanguageSelector, get } = window.MathI18n;
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
 
       const t = {
         title: {
-          en: "Decimals × 10/100/1000",
-          zh: "小數乘 10/100/1000",
-          ja: "小数 × 10/100/1000",
-          ko: "소수 × 10/100/1000",
-          es: "Decimales × 10/100/1000",
-          de: "Dezimalzahlen × 10/100/1000",
-          fi: "Desimaalit × 10/100/1000",
-          fr: "Décimales × 10/100/1000",
-          ar: "الكسور العشرية × 10/100/1000",
-          it: "Decimali × 10/100/1000",
+          en: "Decimal Jump",
+          zh: "小數跳跳變",
+          ja: "小数ジャンプ",
+          ko: "소수 점프",
+          es: "Salto Decimal",
+          de: "Dezimalsprung",
+          fi: "Desimaaliloukkaus",
+          fr: "Saut Décimal",
+          ar: "قفزة عشرية",
+          it: "Salto Decimale",
+        },
+        instruction: {
+          en: "Observe how x10, x100 moves the decimal point!",
+          zh: "觀察 x10, x100 如何移動小數點！",
+          ja: "x10、x100で小数点がどう動くか観察しよう！",
+          ko: "x10, x100이 소수점을 어떻게 이동시키는지 관찰하세요!",
+          es: "¡Observa cómo x10, x100 mueven el punto decimal!",
+          de: "Beobachte, wie x10, x100 das Dezimalkomma verschiebt!",
+          fi: "Katso miten x10, x100 siirtää desimaalipilkkua!",
+          fr: "Observez comment x10, x100 déplacent le point décimal !",
+          ar: "لاحظ كيف يحرك x10, x100 العلامة العشرية!",
+          it: "Osserva come x10, x100 spostano il punto decimale!",
+        },
+        multiply: {
+          en: "Multiply by",
+          zh: "乘以",
+          ja: "掛ける",
+          ko: "곱하기",
+          es: "Multiplicar por",
+          de: "Multiplizieren mit",
+          fi: "Kerro",
+          fr: "Multiplier par",
+          ar: "ضرب في",
+          it: "Moltiplica per",
+        },
+        reset: {
+          en: "Reset",
+          zh: "重置",
+          ja: "リセット",
+          ko: "초기화",
+          es: "Reiniciar",
+          de: "Zurücksetzen",
+          fi: "Nollaa",
+          fr: "Réinitialiser",
+          ar: "إعادة ضبط",
+          it: "Reimposta",
+        },
+        result: {
+          en: "Result",
+          zh: "結果",
+          ja: "結果",
+          ko: "결과",
+          es: "Resultado",
+          de: "Ergebnis",
+          fi: "Tulos",
+          fr: "Résultat",
+          ar: "النتيجة",
+          it: "Risultato",
         },
         moveRight: {
           en: "Decimal point moves {n} place(s) right",
           zh: "小數點向右移 {n} 位",
-          ja: "小数点を右に {n} 桁移動",
-          ko: "소수점을 오른쪽으로 {n} 칸 이동",
+          ja: "小数点が右に {n} 桁移動",
+          ko: "소수점이 오른쪽으로 {n} 자리 이동",
           es: "El punto decimal se mueve {n} lugar(es) a la derecha",
-          de: "Dezimalpunkt verschiebt sich um {n} Stelle(n) nach rechts",
-          fi: "Desimaalipilkku siirtyy {n} paikkaa oikealle",
-          fr: "La virgule décimale se déplace de {n} rang(s) vers la droite",
-          ar: "تتحرك العلامة العشرية {n} خانة/خانات لليمين",
-          it: "Il punto decimale si sposta di {n} posto/i a destra",
+          de: "Dezimalkomma verschiebt sich um {n} Stelle(n) nach rechts",
+          fi: "Desimaalipilkku siirtyy {n} askel(ta) oikealle",
+          fr: "Le point décimal se déplace de {n} rang(s) vers la droite",
+          ar: "تتحرك العلامة العشرية {n} منزلة (منازل) لليمين",
+          it: "Il punto decimale si sposta di {n} posto(i) a destra",
         },
-        answer: {
-          en: "Answer",
-          zh: "答案",
-          ja: "答え",
-          ko: "정답",
-          es: "Respuesta",
-          de: "Antwort",
-          fi: "Vastaus",
-          fr: "Réponse",
-          ar: "إجابة",
-          it: "Risposta",
+        original: {
+          en: "Original",
+          zh: "原本",
+          ja: "元",
+          ko: "원래",
+          es: "Original",
+          de: "Original",
+          fi: "Alkuperäinen",
+          fr: "Original",
+          ar: "أصلي",
+          it: "Originale",
         },
-        patternTitle: {
-          en: "Pattern:",
-          zh: "規律:",
-          ja: "パターン:",
-          ko: "패턴:",
-          es: "Patrón:",
-          de: "Muster:",
-          fi: "Kaava:",
-          fr: "Modèle :",
-          ar: "نمط:",
-          it: "Modello:",
-        },
-        pattern10: {
-          en: "× 10: Decimal point moves 1 place right",
-          zh: "× 10: 小數點向右移 1 位",
-          ja: "× 10: 小数点を右に 1 桁移動",
-          ko: "× 10: 소수점을 오른쪽으로 1 칸 이동",
-          es: "× 10: El punto decimal se mueve 1 lugar a la derecha",
-          de: "× 10: Dezimalpunkt verschiebt sich um 1 Stelle nach rechts",
-          fi: "× 10: Desimaalipilkku siirtyy 1 paikan oikealle",
-          fr: "× 10 : La virgule décimale se déplace de 1 rang vers la droite",
-          ar: "× 10: تتحرك العلامة العشرية خانة واحدة لليمين",
-          it: "× 10: Il punto decimale si sposta di 1 posto a destra",
-        },
-        pattern100: {
-          en: "× 100: Decimal point moves 2 places right",
-          zh: "× 100: 小數點向右移 2 位",
-          ja: "× 100: 小数点を右に 2 桁移動",
-          ko: "× 100: 소수점을 오른쪽으로 2 칸 이동",
-          es: "× 100: El punto decimal se mueve 2 lugares a la derecha",
-          de: "× 100: Dezimalpunkt verschiebt sich um 2 Stellen nach rechts",
-          fi: "× 100: Desimaalipilkku siirtyy 2 paikkaa oikealle",
-          fr: "× 100 : La virgule décimale se déplace de 2 rangs vers la droite",
-          ar: "× 100: تتحرك العلامة العشرية خانتين لليمين",
-          it: "× 100: Il punto decimale si sposta di 2 posti a destra",
-        },
-        pattern1000: {
-          en: "× 1000: Decimal point moves 3 places right",
-          zh: "× 1000: 小數點向右移 3 位",
-          ja: "× 1000: 小数点を右に 3 桁移動",
-          ko: "× 1000: 소수점을 오른쪽으로 3 칸 이동",
-          es: "× 1000: El punto decimal se mueve 3 lugares a la derecha",
-          de: "× 1000: Dezimalpunkt verschiebt sich um 3 Stellen nach rechts",
-          fi: "× 1000: Desimaalipilkku siirtyy 3 paikkaa oikealle",
-          fr: "× 1000 : La virgule décimale se déplace de 3 rangs vers la droite",
-          ar: "× 1000: تتحرك العلامة العشرية 3 خانات لليمين",
-          it: "× 1000: Il punto decimale si sposta di 3 posti a destra",
-        },
+      };
+
+      const getText = (key, lang, params = {}) => {
+        let text = t[key]?.[lang] || t[key]?.["en"] || key;
+        for (const param in params) {
+          text = text.replace(`{${param}}`, params[param]);
+        }
+        return text;
       };
 
       function App() {
         const [lang, setLang] = useState("zh");
-        const getText = (key) => t[key][lang] || t[key]["en"];
+        const [baseNumber, setBaseNumber] = useState("12.345");
+        const [multiplier, setMultiplier] = useState(1);
 
-        const [num, setNum] = useState(3.456);
-        const [multiplier, setMultiplier] = useState(10);
-
-        const result = num * multiplier;
-        const decimalPlaces = num.toString().split(".")[1]?.length || 0;
-        const shift = multiplier === 10 ? 1 : multiplier === 100 ? 2 : 3;
+        const jumps = Math.log10(multiplier);
 
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <LanguageSelector lang={lang} setLang={setLang} />
-            <h1 className="text-5xl font-black text-yellow-900 mb-2 mt-8">
-              ✖️ {getText("title")}
-            </h1>
+          <div className="min-h-screen p-4 md:p-8 flex flex-col items-center justify-center">
+            <div className="w-full max-w-4xl flex justify-between items-center mb-12">
+              <h1 className="text-4xl md:text-5xl font-black bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 to-orange-400">
+                {getText("title", lang)}
+              </h1>
+              <div className="bg-slate-800/80 p-1.5 rounded-xl flex flex-wrap justify-center gap-1 backdrop-blur-md border border-white/10 max-w-[40%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-yellow-500 text-black shadow-lg scale-105"
+                        : "text-white/60 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-2xl w-full mt-8">
-              <div className="flex items-center justify-center gap-4 mb-8 flex-wrap">
+            <div className="w-full max-w-5xl glass-panel rounded-3xl p-8 md:p-16 flex flex-col items-center gap-12 relative overflow-hidden">
+              {/* Decoration */}
+              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-yellow-500 to-orange-600"></div>
+
+              {/* Input Area */}
+              <div className="flex flex-col items-center gap-4 z-10 w-full">
                 <input
                   type="number"
-                  step="0.001"
-                  value={num}
-                  onChange={(e) => setNum(parseFloat(e.target.value) || 0)}
-                  className="w-32 text-3xl font-mono font-black text-center border-4 border-yellow-300 rounded-xl p-2"
+                  value={baseNumber}
+                  onChange={(e) => {
+                    if (e.target.value.length < 12)
+                      setBaseNumber(e.target.value);
+                  }}
+                  className="bg-transparent border-b-4 border-yellow-500/50 text-center text-5xl font-black text-white outline-none focus:border-yellow-400 w-full max-w-md pb-2 font-mono"
                 />
-                <span className="text-3xl font-black text-yellow-400">×</span>
-                <select
-                  value={multiplier}
-                  onChange={(e) => setMultiplier(parseInt(e.target.value))}
-                  className="text-2xl font-bold p-3 border-4 border-yellow-300 rounded-xl"
-                >
-                  <option value="10">10</option>
-                  <option value="100">100</option>
-                  <option value="1000">1000</option>
-                </select>
               </div>
 
-              <div className="bg-slate-50 rounded-2xl p-6 text-center mb-6">
-                <p className="text-lg text-slate-600 mb-2">
-                  {getText("moveRight").replace("{n}", shift)}
-                </p>
-                <div className="mt-4 text-4xl font-mono font-black text-yellow-600">
-                  {num} → {result}
-                </div>
+              {/* Visualization Stage */}
+              <div className="flex items-center justify-center gap-2 font-mono text-6xl md:text-8xl font-bold bg-black/30 p-8 rounded-2xl shadow-inner relative w-full overflow-x-auto min-h-[160px]">
+                {/* We render the digits split by dot */}
+                {(() => {
+                  const parts = baseNumber.split(".");
+                  const integer = parts[0] || "0";
+                  const fraction = parts[1] || "";
+                  const fullStr = integer + fraction + "000"; // Pad zeros for jumps
+
+                  // Where is the dot initially? After integer.length digits.
+                  const initialDotPos = integer.length;
+                  const currentDotPos = initialDotPos + jumps;
+
+                  // Render digits
+                  return (
+                    <div className="flex items-end gap-1 relative">
+                      {fullStr.split("").map((d, i) => {
+                        return (
+                          <div
+                            key={i}
+                            className={`flex items-end transition-all duration-500 ${
+                              i >= integer.length + fraction.length + jumps
+                                ? "opacity-0 w-0"
+                                : "opacity-100 w-auto"
+                            }`}
+                          >
+                            <span className="digit-box px-1 relative">{d}</span>
+                            {i === currentDotPos - 1 && (
+                              <motion.div
+                                layoutId="decimal-dot"
+                                className="w-4 h-4 rounded-full bg-yellow-400 mb-4 mx-1 shadow-[0_0_20px_#facc15]"
+                                transition={{
+                                  type: "spring",
+                                  stiffness: 300,
+                                  damping: 20,
+                                }}
+                              />
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
               </div>
 
-              <div className="bg-emerald-100 rounded-2xl p-6 text-center border-4 border-emerald-300">
-                <div className="text-emerald-600 font-bold">
-                  {getText("answer")}
-                </div>
-                <div className="text-5xl font-black text-emerald-800">
-                  {result}
-                </div>
+              {/* Controls */}
+              <div className="grid grid-cols-4 gap-4 w-full max-w-2xl z-10">
+                {[1, 10, 100, 1000].map((m) => (
+                  <button
+                    key={m}
+                    onClick={() => setMultiplier(m)}
+                    className={`py-4 rounded-xl font-black text-xl transition-all border-2
+                            ${
+                              multiplier === m
+                                ? "bg-yellow-500 text-black border-yellow-400 shadow-[0_0_20px_rgba(234,179,8,0.5)] transform scale-105"
+                                : "bg-white/5 border-white/10 hover:bg-white/10 text-slate-400"
+                            }`}
+                  >
+                    {m === 1 ? getText("original", lang) : `× ${m}`}
+                  </button>
+                ))}
               </div>
 
-              <div className="mt-6 bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
-                <p className="font-bold">💡 {getText("patternTitle")}</p>
-                <ul className="list-disc list-inside text-sm space-y-1">
-                  <li>{getText("pattern10")}</li>
-                  <li>{getText("pattern100")}</li>
-                  <li>{getText("pattern1000")}</li>
-                </ul>
+              {/* Legend */}
+              <div className="text-slate-400 text-sm font-bold bg-black/20 px-6 py-3 rounded-full border border-white/5">
+                {jumps === 0
+                  ? getText("instruction", lang)
+                  : getText("moveRight", lang, { n: jumps })}
               </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

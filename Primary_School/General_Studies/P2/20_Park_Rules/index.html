@@ -33,22 +33,124 @@
           en: "Park Rules",
           zh: "公園守規則",
           ja: "公園のルール",
+          ko: "공원 규칙",
+          es: "Reglas del Parque",
+          de: "Parkregeln",
+          fi: "Puiston säännöt",
+          fr: "Règles du Parc",
+          ar: "قواعد الحديقة",
+          it: "Regole del Parco",
         },
         instruction: {
           en: "Tap BAD behaviors to stop them!",
           zh: "點擊錯誤行為來糾正！",
           ja: "悪い行動をタップして止めよう！",
+          ko: "나쁜 행동을 탭하여 멈추세요!",
+          es: "¡Toca los malos comportamientos para detenerlos!",
+          de: "Tippe auf SCHLECHTES Verhalten, um es zu stoppen!",
+          fi: "Napauta HUONOA käytöstä lopettaaksesi sen!",
+          fr: "Appuyez sur les MAUVAIS comportements pour les arrêter !",
+          ar: "اضغط على السلوكيات السيئة لوقفها!",
+          it: "Tocca i CATTIVI comportamenti per fermarli!",
         },
 
-        found: { en: "Stopped!", zh: "已糾正！" },
-        clean: { en: "Everyone is behaving well!", zh: "大家都守規則了！" },
-        reset: { en: "Play Again", zh: "再玩一次" },
+        found: {
+          en: "Stopped!",
+          zh: "已糾正！",
+          ja: "止めた！",
+          ko: "멈췄습니다!",
+          es: "¡Detenido!",
+          de: "Gestoppt!",
+          fi: "Pysäytetty!",
+          fr: "Arrêté !",
+          ar: "توقف!",
+          it: "Fermato!",
+        },
+        clean: {
+          en: "Everyone is behaving well!",
+          zh: "大家都守規則了！",
+          ja: "みんな良い子ですね！",
+          ko: "모두가 잘 행동하고 있어요!",
+          es: "¡Todos se comportan bien!",
+          de: "Alle benehmen sich gut!",
+          fi: "Kaikki käyttäytyvät hyvin!",
+          fr: "Tout le monde se comporte bien !",
+          ar: "الجميع يتصرف بشكل جيد!",
+          it: "Tutti si comportano bene!",
+        },
+        reset: {
+          en: "Play Again",
+          zh: "再玩一次",
+          ja: "もう一度プレイ",
+          ko: "다시 하기",
+          es: "Jugar de Nuevo",
+          de: "Nochmal spielen",
+          fi: "Pelaa uudelleen",
+          fr: "Rejouer",
+          ar: "العب مرة أخرى",
+          it: "Gioca di Nuovo",
+        },
 
-        climb: { en: "No Climbing!", zh: "不可攀爬！" },
-        pick: { en: "No Picking Flowers!", zh: "不可採摘花朵！" },
-        litter: { en: "No Littering!", zh: "不可亂拋垃圾！" },
-        bike: { en: "No Cycling Here!", zh: "此處禁止踏單車！" }, // Assuming pedestrian zone
-        dog: { en: "Leash your dog!", zh: "請牽好狗隻！" },
+        climb: {
+          en: "No Climbing!",
+          zh: "不可攀爬！",
+          ja: "登らないで！",
+          ko: "등반 금지!",
+          es: "¡No escalar!",
+          de: "Nicht klettern!",
+          fi: "Ei kiipeilyä!",
+          fr: "Défense de grimper !",
+          ar: "لا تسلق!",
+          it: "Vietato Arrampicarsi!",
+        },
+        pick: {
+          en: "No Picking Flowers!",
+          zh: "不可採摘花朵！",
+          ja: "花を摘まないで！",
+          ko: "꽃을 꺾지 마세요!",
+          es: "¡No recoger flores!",
+          de: "Keine Blumen pflücken!",
+          fi: "Ei kukkien poimimista!",
+          fr: "Défense de cueillir des fleurs !",
+          ar: "لا قطف الزهور!",
+          it: "Vietato Cogliere Fiori!",
+        },
+        litter: {
+          en: "No Littering!",
+          zh: "不可亂拋垃圾！",
+          ja: "ポイ捨て禁止！",
+          ko: "쓰레기 투기 금지!",
+          es: "¡No tirar basura!",
+          de: "Nicht wegwerfen!",
+          fi: "Ei roskia!",
+          fr: "Défense de jeter des ordures !",
+          ar: "ممنوع رمي القمامة!",
+          it: "Vietato gettare rifiuti!",
+        },
+        bike: {
+          en: "No Cycling Here!",
+          zh: "此處禁止踏單車！",
+          ja: "ここでは自転車禁止！",
+          ko: "여기서는 자전거 금지!",
+          es: "¡No andar en bicicleta aquí!",
+          de: "Hier kein Radfahren!",
+          fi: "Ei pyöräilyä täällä!",
+          fr: "Cyclisme interdit ici !",
+          ar: "لا ركوب الدراجات هنا!",
+          it: "Vietato andare in bicicletta qui!",
+        }, // Assuming pedestrian zone
+        dog: {
+          en: "Leash your dog!",
+          zh: "請牽好狗隻！",
+          ja: "犬をリードにつないで！",
+          ko: "개를 목줄에 매세요!",
+          es: "¡Ata a tu perro!",
+          de: "Leine deinen Hund an!",
+          fi: "Pidä koira kytkettynä!",
+          fr: "Tenez votre chien en laisse !",
+          ar: "أربط كلبك!",
+          it: "Tieni il cane al guinzaglio!",
+        },
       };
 
       const itemsDef = [
@@ -220,20 +322,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

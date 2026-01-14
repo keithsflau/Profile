@@ -3,12 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小三數學：羅馬數字探險</title>
+    <title>小三數學：羅馬數字探險 | Roman Numerals</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -25,12 +26,124 @@
     <script type="text/babel">
       const { useState } = React;
       const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Roman Numeral Adventure",
+          zh: "羅馬數字探險",
+          ja: "ローマ数字の冒険",
+          ko: "로마 숫자 모험",
+          es: "Aventura de números romanos",
+          de: "Abenteuer römische Zahlen",
+          fi: "Roomalaiset numerot",
+          fr: "Aventure chiffres romains",
+          ar: "مغامرة الأرقام الرومانية",
+          it: "Avventura numeri romani",
+        },
+        converter: {
+          en: "Number Converter",
+          zh: "數字轉換器",
+          ja: "数値変換",
+          ko: "숫자 변환기",
+          es: "Convertidor de números",
+          de: "Zahlenkonverter",
+          fi: "Numeromuunnin",
+          fr: "Convertisseur de nombres",
+          ar: "محول الأرقام",
+          it: "Convertitore di numeri",
+        },
+        chart: {
+          en: "Symbol Chart",
+          zh: "符號對照表",
+          ja: "記号チャート",
+          ko: "기호 차트",
+          es: "Tabla de símbolos",
+          de: "Symboltabelle",
+          fi: "Symbolitaulukko",
+          fr: "Tableau des symboles",
+          ar: "جدول الرموز",
+          it: "Tabella dei simboli",
+        },
+        romanNum: {
+          en: "Roman Numeral",
+          zh: "羅馬數字",
+          ja: "ローマ数字",
+          ko: "로마 숫자",
+          es: "Número romano",
+          de: "Römische Zahl",
+          fi: "Roomalainen numero",
+          fr: "Chiffre romain",
+          ar: "رقم روماني",
+          it: "Numero romano",
+        },
+        tipsTitle: {
+          en: "Rules & Tips",
+          zh: "規則小貼士",
+          ja: "ルールとヒント",
+          ko: "규칙 및 팁",
+          es: "Reglas y consejos",
+          de: "Regeln & Tipps",
+          fi: "Säännöt ja vinkit",
+          fr: "Règles et astuces",
+          ar: "القواعد والنصائح",
+          it: "Regole e suggerimenti",
+        },
+        tips: [
+          {
+            en: "Max 3 consecutive same symbols (e.g., III = 3)",
+            zh: "最多連續出現3次 (例如: III = 3)",
+            ja: "同じ記号は最大3回連続（例：III = 3）",
+            ko: "같은 기호는 최대 3번 연속 (예: III = 3)",
+            es: "Máx 3 símbolos consecutivos iguales (ej. III = 3)",
+            de: "Max. 3 gleiche Symbole hintereinander (z.B. III = 3)",
+            fi: "Enintään 3 samaa symbolia peräkkäin (esim. III = 3)",
+            fr: "Max 3 symboles identiques consécutifs (ex. III = 3)",
+            ar: "بحد أقصى 3 رموز متتالية (مثال: III = 3)",
+            it: "Max 3 simboli consecutivi uguali (es. III = 3)",
+          },
+          {
+            en: "Left subtract, Right add (e.g., IV = 5-1 = 4)",
+            zh: "左減右加 (例如: IV = 5-1 = 4)",
+            ja: "左は引き算、右は足し算（例：IV = 5-1 = 4）",
+            ko: "왼쪽은 빼고, 오른쪽은 더함 (예: IV = 5-1 = 4)",
+            es: "Izquierda resta, Derecha suma (ej. IV = 5-1 = 4)",
+            de: "Links subtrahieren, Rechts addieren (z.B. IV = 5-1 = 4)",
+            fi: "Vasen vähentää, Oikea lisää (esim. IV = 5-1 = 4)",
+            fr: "Gauche soustrait, Droite ajoute (ex. IV = 5-1 = 4)",
+            ar: "اليسار يطرح، اليمين يضيف (مثال: IV = 5-1 = 4)",
+            it: "Sinistra sottrae, Destra aggiunge (es. IV = 5-1 = 4)",
+          },
+          {
+            en: "V, L, D cannot be repeated",
+            zh: "V, L, D 不能重複",
+            ja: "V, L, D は繰り返せません",
+            ko: "V, L, D 는 반복될 수 없습니다",
+            es: "V, L, D no se pueden repetir",
+            de: "V, L, D dürfen nicht wiederholt werden",
+            fi: "V, L, D ei voi toistaa",
+            fr: "V, L, D ne peuvent pas être répétés",
+            ar: "لا يمكن تكرار V, L, D",
+            it: "V, L, D non possono essere ripetuti",
+          },
+        ],
+        desc: {
+          1: { en: "One", zh: "一" },
+          5: { en: "Five", zh: "五" },
+          10: { en: "Ten", zh: "十" },
+          50: { en: "Fifty", zh: "五十" },
+          100: { en: "Hundred", zh: "一百" },
+          500: { en: "Five Hundred", zh: "五百" },
+          1000: { en: "Thousand", zh: "一千" },
+        },
+      };
 
       function App() {
+        const [lang, setLang] = useState("zh");
         const [num, setNum] = useState(1);
 
         const toRoman = (n) => {
-          if (n <= 0 || n > 3999) return "超出範圍";
+          if (n <= 0 || n > 3999) return "N/A";
           const val = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1];
           const syms = [
             "M",
@@ -59,26 +172,29 @@
         };
 
         const symbols = [
-          { r: "I", v: 1, desc: "一" },
-          { r: "V", v: 5, desc: "五" },
-          { r: "X", v: 10, desc: "十" },
-          { r: "L", v: 50, desc: "五十" },
-          { r: "C", v: 100, desc: "一百" },
-          { r: "D", v: 500, desc: "五百" },
-          { r: "M", v: 1000, desc: "一千" },
+          { r: "I", v: 1 },
+          { r: "V", v: 5 },
+          { r: "X", v: 10 },
+          { r: "L", v: 50 },
+          { r: "C", v: 100 },
+          { r: "D", v: 500 },
+          { r: "M", v: 1000 },
         ];
+
+        const getDesc = (val) => t.desc[val][lang] || t.desc[val]["en"];
 
         return (
           <div className="min-h-screen p-8 flex flex-col items-center text-white">
-            <h1 className="text-6xl font-black text-amber-500 mb-8 drop-shadow-lg">
-              🏛️ 羅馬數字探險
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-6xl font-black text-amber-500 mb-8 mt-8 drop-shadow-lg text-center">
+              🏛️ {t.title[lang] || t.title["en"]}
             </h1>
 
             <div className="flex flex-col lg:flex-row gap-8 w-full max-w-6xl">
               {/* Control & Display */}
               <div className="flex-1 bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 shadow-2xl">
                 <h2 className="text-3xl font-bold mb-6 text-amber-300">
-                  數字轉換器
+                  {t.converter[lang] || t.converter["en"]}
                 </h2>
 
                 <div className="mb-8">
@@ -132,9 +248,9 @@
                   className="bg-gradient-to-br from-amber-600 to-amber-800 rounded-3xl p-12 text-center border-4 border-amber-400 shadow-[0_0_30px_rgba(245,158,11,0.3)]"
                 >
                   <div className="text-sm font-bold text-amber-200 mb-2">
-                    羅馬數字
+                    {t.romanNum[lang] || t.romanNum["en"]}
                   </div>
-                  <div className="text-7xl font-serif font-black text-white tracking-widest">
+                  <div className="text-6xl md:text-7xl font-serif font-black text-white tracking-widest break-words">
                     {toRoman(num)}
                   </div>
                 </motion.div>
@@ -143,14 +259,14 @@
               {/* Reference Chart */}
               <div className="flex-1 bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 shadow-2xl">
                 <h2 className="text-3xl font-bold mb-6 text-amber-300">
-                  符號對照表
+                  {t.chart[lang] || t.chart["en"]}
                 </h2>
                 <div className="grid gap-3">
                   {symbols.map((s) => (
                     <div
                       key={s.r}
                       className={`flex items-center justify-between p-4 rounded-xl ${
-                        toRoman(num).includes(s.r)
+                        toRoman(num).includes(s.r) && num < 4000 // Simple highlighting
                           ? "bg-amber-500/20 border border-amber-500/50"
                           : "bg-slate-800/50"
                       }`}
@@ -159,7 +275,9 @@
                         <span className="text-3xl font-serif font-black text-amber-400 w-12 text-center">
                           {s.r}
                         </span>
-                        <span className="text-lg text-slate-300">{s.desc}</span>
+                        <span className="text-lg text-slate-300">
+                          {getDesc(s.v)}
+                        </span>
                       </div>
                       <span className="text-2xl font-black font-mono">
                         {s.v}
@@ -170,12 +288,12 @@
 
                 <div className="mt-8 bg-slate-800/50 p-6 rounded-2xl border border-slate-700">
                   <h3 className="text-xl font-bold text-amber-300 mb-3">
-                    💡 規則小貼士
+                    💡 {t.tipsTitle[lang] || t.tipsTitle["en"]}
                   </h3>
                   <ul className="space-y-2 text-slate-300 list-disc list-inside">
-                    <li>最多連續出現3次 (例如: III = 3)</li>
-                    <li>左減右加 (例如: IV = 5-1 = 4)</li>
-                    <li>V, L, D 不能重複</li>
+                    {t.tips.map((tip, i) => (
+                      <li key={i}>{tip[lang] || tip["en"]}</li>
+                    ))}
                   </ul>
                 </div>
               </div>
@@ -185,20 +303,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

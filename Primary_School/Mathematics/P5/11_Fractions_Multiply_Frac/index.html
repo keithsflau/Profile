@@ -8,24 +8,35 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <script src="../../common/i18n.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #fdf4ff 0%, #e879f9 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
-      const { LanguageSelector, get } = window.MathI18n;
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
 
       const t = {
         title: {
@@ -40,142 +51,101 @@
           ar: "كسر × كسر",
           it: "Frazione × Frazione",
         },
-        formulaTitle: {
-          en: "Formula:",
-          zh: "公式:",
-          ja: "公式:",
-          ko: "공식:",
-          es: "Fórmula:",
-          de: "Formel:",
-          fi: "Kaava:",
-          fr: "Formule :",
-          ar: "الصيغة:",
-          it: "Formula:",
+        rule: {
+          en: "Rule: Top × Top, Bottom × Bottom",
+          zh: "口訣：分子乘分子，分母乘分母",
+          ja: "ルール: 上×上、下×下",
+          ko: "규칙: 위 × 위, 아래 × 아래",
+          es: "Regla: Arriba × Arriba, Abajo × Abajo",
+          de: "Regel: Oben × Oben, Unten × Unten",
+          fi: "Sääntö: Ylhäältä × Ylhäältä, Alhaalta × Alhaalta",
+          fr: "Règle : Haut × Haut, Bas × Bas",
+          ar: "القاعدة: أعلى × أعلى، أسفل × أسفل",
+          it: "Regola: Sopra × Sopra, Sotto × Sotto",
         },
-        formula: {
-          en: "Numerator × Numerator / Denominator × Denominator",
-          zh: "分子 × 分子 / 分母 × 分母",
-          ja: "分子 × 分子 / 分母 × 分母",
-          ko: "분자 × 분자 / 분모 × 분모",
-          es: "Numerador × Numerador / Denominador × Denominador",
-          de: "Zähler × Zähler / Nenner × Nenner",
-          fi: "Osoittaja × Osoittaja / Nimittäjä × Nimittäjä",
-          fr: "Numérateur × Numérateur / Dénominateur × Dénominateur",
-          ar: "البسط × البسط / المقام × المقام",
-          it: "Numeratore × Numeratore / Denominatore × Denominatore",
-        },
-        numerator: {
-          en: "(Numerator)",
-          zh: "(分子)",
-          ja: "(分子)",
-          ko: "(분자)",
-          es: "(Numerador)",
-          de: "(Zähler)",
-          fi: "(Osoittaja)",
-          fr: "(Numérateur)",
-          ar: "(البسط)",
-          it: "(Numeratore)",
-        },
-        denominator: {
-          en: "(Denominator)",
-          zh: "(分母)",
-          ja: "(分母)",
-          ko: "(분모)",
-          es: "(Denominador)",
-          de: "(Nenner)",
-          fi: "(Nimittäjä)",
-          fr: "(Dénominateur)",
-          ar: "(المقام)",
-          it: "(Denominatore)",
+        result: {
+          en: "Result",
+          zh: "結 果",
+          ja: "結果",
+          ko: "결과",
+          es: "Resultado",
+          de: "Ergebnis",
+          fi: "Tulos",
+          fr: "Résultat",
+          ar: "النتيجة",
+          it: "Risultato",
         },
         simplify: {
-          en: "Simplify ÷",
-          zh: "約簡 ÷",
-          ja: "約分 ÷",
-          ko: "약분 ÷",
-          es: "Simplificar ÷",
-          de: "Vereinfachen ÷",
-          fi: "Supista ÷",
-          fr: "Simplifier ÷",
-          ar: "تبسيط ÷",
-          it: "Semplifica ÷",
-        },
-        answer: {
-          en: "Answer",
-          zh: "答案",
-          ja: "答え",
-          ko: "답",
-          es: "Respuesta",
-          de: "Antwort",
-          fi: "Vastaus",
-          fr: "Réponse",
-          ar: "إجابة",
-          it: "Risposta",
-        },
-        visualization: {
-          en: "Visualization: {f1} of {f2}",
-          zh: "視覺化: {f1} 的 {f2}",
-          ja: "視覚化: {f2} の {f1}",
-          ko: "시각화: {f2} 의 {f1}",
-          es: "Visualización: {f1} de {f2}",
-          de: "Visualisierung: {f1} von {f2}",
-          fi: "Visualisointi: {f1} - {f2}",
-          fr: "Visualisation : {f1} de {f2}",
-          ar: "التصور: {f1} من {f2}",
-          it: "Visualizzazione: {f1} di {f2}",
-        },
-        purpleCells: {
-          en: "Purple Cells",
-          zh: "紫色格",
-          ja: "紫色のセル",
-          ko: "보라색 칸",
-          es: "Celdas Moradas",
-          de: "Lila Zellen",
-          fi: "Violetit solut",
-          fr: "Cellules violettes",
-          ar: "خلايا أرجوانية",
-          it: "Celle viola",
-        },
-        totalCells: {
-          en: "Total Cells",
-          zh: "總格數",
-          ja: "総セル数",
-          ko: "총 칸 수",
-          es: "Celdas Totales",
-          de: "Gesamtzellen",
-          fi: "Soluja yhteensä",
-          fr: "Total des cellules",
-          ar: "إجمالي الخلايا",
-          it: "Celle totali",
+          en: "Simplify",
+          zh: "約 簡",
+          ja: "約分",
+          ko: "약분",
+          es: "Simplificar",
+          de: "Vereinfachen",
+          fi: "Supista",
+          fr: "Simplifier",
+          ar: "تبسيط",
+          it: "Semplifica",
         },
       };
 
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
       function App() {
         const [lang, setLang] = useState("zh");
-        const getText = (key) => t[key][lang] || t[key]["en"];
-
         const [n1, setN1] = useState(2);
         const [d1, setD1] = useState(3);
         const [n2, setN2] = useState(3);
         const [d2, setD2] = useState(4);
 
         const gcd = (a, b) => (b === 0 ? a : gcd(b, a % b));
+
         const prodN = n1 * n2;
         const prodD = d1 * d2;
+
         const g = gcd(prodN, prodD);
         const simN = prodN / g;
         const simD = prodD / g;
 
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <LanguageSelector lang={lang} setLang={setLang} />
-            <h1 className="text-5xl font-black text-fuchsia-900 mb-2 mt-8">
-              ✖️ {getText("title")}
-            </h1>
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-3xl w-full mt-8">
-              <div className="flex items-center justify-center gap-6 mb-8 flex-wrap">
-                <div className="bg-pink-50 p-4 rounded-xl border-2 border-pink-200">
-                  <div className="flex flex-col items-center">
+          <div className="min-h-screen flex flex-col items-center p-4 font-sans bg-slate-900 text-white">
+            <div className="w-full max-w-5xl flex justify-between items-center mb-10">
+              <h1 className="text-4xl font-black text-fuchsia-400 drop-shadow-[0_0_15px_rgba(232,121,249,0.5)]">
+                ✖️ {getText("title", lang)}
+              </h1>
+              <div className="flex bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-fuchsia-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="w-full max-w-6xl flex flex-col lg:flex-row gap-8 items-start">
+              <div className="flex-1 flex flex-col gap-6 w-full">
+                {/* Inputs */}
+                <div className="glass-panel p-8 rounded-3xl flex justify-center items-center gap-6 md:gap-12 flex-wrap min-h-[200px]">
+                  <div className="flex flex-col items-center gap-2">
                     <input
                       type="number"
                       min="1"
@@ -183,9 +153,8 @@
                       onChange={(e) =>
                         setN1(Math.max(1, parseInt(e.target.value) || 1))
                       }
-                      className="w-14 text-3xl font-black text-center border-b-4 border-pink-400 bg-transparent outline-none"
+                      className="w-20 bg-transparent text-center text-5xl font-black outline-none border-b-4 border-pink-500 focus:border-white transition-colors text-pink-400"
                     />
-                    <div className="w-14 h-1 bg-pink-800 my-1"></div>
                     <input
                       type="number"
                       min="1"
@@ -193,13 +162,11 @@
                       onChange={(e) =>
                         setD1(Math.max(1, parseInt(e.target.value) || 1))
                       }
-                      className="w-14 text-3xl font-black text-center bg-transparent outline-none"
+                      className="w-20 bg-transparent text-center text-5xl font-black outline-none text-slate-400"
                     />
                   </div>
-                </div>
-                <span className="text-4xl font-black text-fuchsia-400">×</span>
-                <div className="bg-purple-50 p-4 rounded-xl border-2 border-purple-200">
-                  <div className="flex flex-col items-center">
+                  <span className="text-4xl font-black text-slate-500">×</span>
+                  <div className="flex flex-col items-center gap-2">
                     <input
                       type="number"
                       min="1"
@@ -207,9 +174,8 @@
                       onChange={(e) =>
                         setN2(Math.max(1, parseInt(e.target.value) || 1))
                       }
-                      className="w-14 text-3xl font-black text-center border-b-4 border-purple-400 bg-transparent outline-none"
+                      className="w-20 bg-transparent text-center text-5xl font-black outline-none border-b-4 border-indigo-500 focus:border-white transition-colors text-indigo-400"
                     />
-                    <div className="w-14 h-1 bg-purple-800 my-1"></div>
                     <input
                       type="number"
                       min="1"
@@ -217,95 +183,129 @@
                       onChange={(e) =>
                         setD2(Math.max(1, parseInt(e.target.value) || 1))
                       }
-                      className="w-14 text-3xl font-black text-center bg-transparent outline-none"
+                      className="w-20 bg-transparent text-center text-5xl font-black outline-none text-slate-400"
                     />
                   </div>
-                </div>
-              </div>
+                  <span className="text-4xl font-black text-slate-500">=</span>
 
-              <div className="bg-slate-50 rounded-2xl p-6 text-center mb-6">
-                <p className="text-xl mb-2">
-                  <b>{getText("formulaTitle")}</b> {getText("formula")}
-                </p>
-                <p className="text-2xl font-mono">
-                  {n1} × {n2} = {prodN} {getText("numerator")}
-                </p>
-                <p className="text-2xl font-mono">
-                  {d1} × {d2} = {prodD} {getText("denominator")}
-                </p>
-                <p className="text-2xl font-mono mt-2">
-                  = {prodN}/{prodD}
-                </p>
+                  {/* Result Raw */}
+                  <div className="flex flex-col items-center gap-2 opacity-80">
+                    <div className="text-5xl font-black text-fuchsia-400 flex items-center gap-2">
+                      {prodN}
+                    </div>
+                    <div className="w-full h-1 bg-slate-600 rounded-full"></div>
+                    <div className="text-5xl font-black text-slate-400">
+                      {prodD}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Rule */}
+                <div className="text-center font-bold text-fuchsia-400 uppercase tracking-widest text-sm animate-pulse">
+                  {getText("rule", lang)}
+                </div>
+
+                {/* Final Result Panel */}
                 {g > 1 && (
-                  <p className="text-lg text-slate-500 mt-2">
-                    {getText("simplify")} {g} = {simN}/{simD}
-                  </p>
+                  <div className="glass-panel p-6 rounded-3xl bg-fuchsia-500/10 border-fuchsia-500/30 flex flex-col items-center">
+                    <div className="text-fuchsia-400 font-bold uppercase tracking-widest text-sm mb-4 border-b border-fuchsia-500/20 pb-2 w-full text-center">
+                      {getText("simplify", lang)} (÷{g})
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <span className="text-6xl font-black text-white">
+                        {simN}
+                      </span>
+                      <div className="w-16 h-1 bg-white/30 my-2"></div>
+                      <span className="text-6xl font-black text-white">
+                        {simD}
+                      </span>
+                    </div>
+                  </div>
                 )}
               </div>
 
-              <div className="bg-fuchsia-100 rounded-2xl p-6 text-center border-4 border-fuchsia-300">
-                <div className="text-fuchsia-600 font-bold mb-2">
-                  {getText("answer")}
-                </div>
-                <div className="text-5xl font-black text-fuchsia-800">
-                  {simN}/{simD}
-                </div>
-              </div>
+              {/* Grid Visualizer */}
+              <div className="w-full lg:w-auto flex flex-col items-center">
+                <div className="glass-panel p-6 rounded-3xl flex flex-col items-center gap-4">
+                  <div className="text-sm font-bold text-slate-400 uppercase tracking-widest">
+                    Area Model
+                  </div>
 
-              {/* Visual grid */}
-              <div className="mt-6 bg-slate-100 rounded-2xl p-4">
-                <p className="text-center text-sm text-slate-600 mb-4">
-                  {getText("visualization")
-                    .replace("{f1}", `${n1}/${d1}`)
-                    .replace("{f2}", `${n2}/${d2}`)}
-                </p>
-                <div
-                  className="grid gap-1 mx-auto w-fit"
-                  style={{ gridTemplateColumns: `repeat(${d2}, 1fr)` }}
-                >
-                  {[...Array(d1 * d2)].map((_, i) => {
-                    const row = Math.floor(i / d2);
-                    const col = i % d2;
-                    const filled = row < n1 && col < n2;
-                    return (
-                      <div
-                        key={i}
-                        className={`w-8 h-8 border border-slate-300 ${
-                          filled
-                            ? "bg-fuchsia-400"
-                            : row < n1
-                            ? "bg-pink-200"
-                            : "bg-white"
-                        }`}
-                      ></div>
-                    );
-                  })}
+                  {/* 
+                             The grid represents 1 unit square.
+                             Width is divided into d2 parts (denom 2).
+                             Height is divided into d1 parts (denom 1).
+                             
+                             We highlight width n2.
+                             We highlight height n1.
+                             The intersection is the product.
+                          */}
+
+                  <div
+                    className="relative border-2 border-slate-500 bg-slate-800 shadow-2xl overflow-hidden"
+                    style={{
+                      width: "300px",
+                      height: "300px",
+                      display: "grid",
+                      gridTemplateColumns: `repeat(${d2}, 1fr)`,
+                      gridTemplateRows: `repeat(${d1}, 1fr)`,
+                    }}
+                  >
+                    {Array.from({ length: d1 * d2 }).map((_, i) => {
+                      const row = Math.floor(i / d2); // 0 to d1-1
+                      const col = i % d2; // 0 to d2-1
+
+                      // Logic:
+                      // Fraction 1 (n1/d1) is vertical (rows) selection
+                      // Fraction 2 (n2/d2) is horizontal (cols) selection
+
+                      const isRowSelected = row < n1;
+                      const isColSelected = col < n2;
+                      const isIntersection = isRowSelected && isColSelected;
+
+                      return (
+                        <div
+                          key={i}
+                          className={`border border-slate-700/30 relative overflow-hidden transition-all duration-500 ${
+                            isIntersection
+                              ? "bg-fuchsia-500"
+                              : isRowSelected
+                              ? "bg-pink-500/20"
+                              : isColSelected
+                              ? "bg-indigo-500/20"
+                              : ""
+                          }`}
+                        >
+                          {isIntersection && (
+                            <motion.div
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              className="w-full h-full bg-white/10 animate-pulse"
+                            />
+                          )}
+                        </div>
+                      );
+                    })}
+
+                    {/* Labels */}
+                  </div>
+
+                  <div className="flex justify-between w-[300px] text-xs font-mono text-slate-500 mt-2">
+                    <span>← {d2} cols →</span>
+                    <span>Count: {prodD}</span>
+                  </div>
+                  <div className="text-xs font-mono text-fuchsia-400">
+                    Intersection: {n1} × {n2} = {prodN}
+                  </div>
                 </div>
-                <p className="text-center text-sm text-slate-500 mt-2">
-                  {getText("purpleCells")} = {n1 * n2} / {getText("totalCells")}{" "}
-                  = {d1 * d2}
-                </p>
               </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

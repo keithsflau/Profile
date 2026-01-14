@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小四數學：質數與合成數</title>
+    <title>小四數學：質數與合成數 | Prime & Composite</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -23,7 +24,75 @@
     <div id="root"></div>
     <script type="text/babel">
       const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Prime & Composite Numbers",
+          zh: "質數與合成數",
+          ja: "素数と合成数",
+          ko: "소수와 합성수",
+          es: "Números Primos y Compuestos",
+          de: "Primzahlen und zusammengesetzte Zahlen",
+          fi: "Alkuluvut ja yhdistetyt luvut",
+          fr: "Nombres premiers et composés",
+          ar: "الأعداد الأولية والمركبة",
+          it: "Numeri primi e composti",
+        },
+        prime: {
+          en: "Prime (Only 2 factors)",
+          zh: "質數 (只有 1 和自己兩個因數)",
+          ja: "素数 (因数は2つだけ)",
+          ko: "소수 (약수가 2개뿐)",
+          es: "Primo (Solo 2 factores)",
+          de: "Primzahl (Nur 2 Faktoren)",
+          fi: "Alkuluku (Vain 2 tekijää)",
+          fr: "Premier (Seulement 2 facteurs)",
+          ar: "أولي (فقط 2 عوامل)",
+          it: "Primo (Solo 2 fattori)",
+        },
+        composite: {
+          en: "Composite (>2 factors)",
+          zh: "合成數 (多於兩個因數)",
+          ja: "合成数 (因数が2つ以上)",
+          ko: "합성수 (약수가 2개 초과)",
+          es: "Compuesto (>2 factores)",
+          de: "Zusammengesetzt (>2 Faktoren)",
+          fi: "Yhdistetty (>2 tekijää)",
+          fr: "Composé (>2 facteurs)",
+          ar: "مركب (> 2 عوامل)",
+          it: "Composto (>2 fattori)",
+        },
+        sieve: {
+          en: "Auto Sieve",
+          zh: "一鍵篩選",
+          ja: "自動ふるい",
+          ko: "자동 체",
+          es: "Criba Automática",
+          de: "Automatisches Sieb",
+          fi: "Automaattinen seula",
+          fr: "Crible automatique",
+          ar: "غربال تلقائي",
+          it: "Setaccio automatico",
+        },
+        tip: {
+          en: "Tip: Click numbers to check! Note: 1 is neither prime nor composite.",
+          zh: "提示：點擊數字查看它是質數還是合成數！<br />注意：1 既不是質數也不是合成數。",
+          ja: "ヒント：数字をクリックして確認！注意：1は素数でも合成数でもありません。",
+          ko: "팁: 숫자를 클릭하여 확인하세요! 주의: 1은 소수도 합성수도 아닙니다.",
+          es: "Consejo: ¡Haz clic en los números para comprobarlo! Nota: 1 no es ni primo ni compuesto.",
+          de: "Tipp: Klicken Sie auf die Zahlen, um es zu überprüfen! Hinweis: 1 ist weder Primzahl noch zusammengesetzt.",
+          fi: "Vinkki: Napsauta numeroita tarkistaaksesi! Huomaa: 1 ei ole alkuluku eikä yhdistetty luku.",
+          fr: "Astuce : Cliquez sur les nombres pour vérifier ! Remarque : 1 n'est ni premier ni composé.",
+          ar: "تلميح: انقر فوق الأرقام للتحقق! ملاحظة: 1 ليس أوليًا ولا مركبًا.",
+          it: "Suggerimento: Clicca sui numeri per controllare! Nota: 1 non è né primo né composto.",
+        },
+      };
+
       function App() {
+        const [lang, setLang] = useState("zh");
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
         // Eratosthenes Sieve simplified
         const [nums, setNums] = useState(
           Array(51)
@@ -67,22 +136,23 @@
 
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-purple-900 mb-8">
-              🔢 質數與合成數 (Prime & Composite)
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-purple-900 mb-8 mt-8">
+              🔢 {getText("title")}
             </h1>
 
             <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-5xl w-full">
-              <div className="flex gap-4 justify-center mb-8">
+              <div className="flex gap-4 justify-center mb-8 flex-wrap">
                 <div className="flex items-center gap-2">
                   <div className="w-6 h-6 rounded bg-green-500"></div>
                   <span className="font-bold text-slate-700">
-                    質數 (只有 1 和自己兩個因數)
+                    {getText("prime")}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-6 h-6 rounded bg-red-400"></div>
                   <span className="font-bold text-slate-700">
-                    合成數 (多於兩個因數)
+                    {getText("composite")}
                   </span>
                 </div>
               </div>
@@ -92,11 +162,11 @@
                   onClick={autoSieve}
                   className="bg-purple-600 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-purple-700 transition-all"
                 >
-                  一鍵篩選 (Eratosthenes Sieve)
+                  {getText("sieve")}
                 </button>
               </div>
 
-              <div className="grid grid-cols-10 gap-3">
+              <div className="grid grid-cols-5 md:grid-cols-10 gap-3">
                 {nums.map((item, i) => {
                   if (i === 0) return null; // Skip 0
                   let bg = "bg-slate-100 hover:bg-slate-200";
@@ -118,10 +188,8 @@
                 })}
               </div>
 
-              <div className="mt-8 text-center text-slate-500">
-                提示：點擊數字查看它是質數還是合成數！
-                <br />
-                注意：1 既不是質數也不是合成數。
+              <div className="mt-8 text-center text-slate-500 font-bold">
+                <span dangerouslySetInnerHTML={{ __html: getText("tip") }} />
               </div>
             </div>
           </div>
@@ -129,20 +197,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

@@ -17,6 +17,7 @@
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.min.js"></script>
+    <script src="../../common/i18n.js"></script>
 
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
@@ -42,10 +43,299 @@
       const { useState, useEffect, useRef } = React;
       const { motion } = window.Motion;
       const { Circle, Ruler, RotateCw } = window.LucideReact;
+      const { LanguageSelector, get } = window.MathI18n;
 
       const PI = Math.PI;
 
+      const t = {
+        title: {
+          en: "Circle Explorer",
+          zh: "圓形探索家",
+          ja: "サークルエクスプローラー",
+          ko: "원 탐험가",
+          es: "Explorador de Círculos",
+          de: "Kreis-Entdecker",
+          fi: "Ympyrätutkija",
+          fr: "Explorateur de cercles",
+          ar: "مستكشف الدوائر",
+          it: "Esploratore di Cerchi",
+        },
+        header_grade: {
+          en: "P6 Math",
+          zh: "小六數學",
+          ja: "小6算数",
+          ko: "초6 수학",
+          es: "Matemáticas P6",
+          de: "Mathe 6. Klasse",
+          fi: "6. luokan matematiikka",
+          fr: "Maths P6",
+          ar: "الرياضيات للصف السادس",
+          it: "Matematica 6a elementare",
+        },
+        subtitle: {
+          en: "Circumference, Diameter, Radius, Area",
+          zh: "圓周、直徑、半徑、面積",
+          ja: "円周、直径、半径、面積",
+          ko: "원둘레, 지름, 반지름, 넓이",
+          es: "Circunferencia, Diámetro, Radio, Área",
+          de: "Umfang, Durchmesser, Radius, Fläche",
+          fi: "Kehä, Halkaisija, Säde, Pinta-ala",
+          fr: "Circonférence, Diamètre, Rayon, Aire",
+          ar: "المحيط، القطر، نصف القطر، المساحة",
+          it: "Circonferenza, Diametro, Raggio, Area",
+        },
+        show_diameter: {
+          en: "Display Diameter",
+          zh: "顯示直徑",
+          ja: "直径を表示",
+          ko: "지름 표시",
+          es: "Mostrar Diámetro",
+          de: "Durchmesser anzeigen",
+          fi: "Näytä halkaisija",
+          fr: "Afficher le diamètre",
+          ar: "عرض القطر",
+          it: "Mostra Diametro",
+        },
+        show_circumference: {
+          en: "Display Circumference",
+          zh: "顯示圓周",
+          ja: "円周を表示",
+          ko: "원둘레 표시",
+          es: "Mostrar Circunferencia",
+          de: "Umfang anzeigen",
+          fi: "Näytä kehä",
+          fr: "Afficher la circonférence",
+          ar: "عرض المحيط",
+          it: "Mostra Circonferenza",
+        },
+
+        radius: {
+          en: "Radius (r)",
+          zh: "半徑 (r)",
+          ja: "半径 (r)",
+          ko: "반지름 (r)",
+          es: "Radio (r)",
+          de: "Radius (r)",
+          fi: "Säde (r)",
+          fr: "Rayon (r)",
+          ar: "نصف القطر (r)",
+          it: "Raggio (r)",
+        },
+        diameter: {
+          en: "Diameter (d)",
+          zh: "直徑 (d)",
+          ja: "直径 (d)",
+          ko: "지름 (d)",
+          es: "Diámetro (d)",
+          de: "Durchmesser (d)",
+          fi: "Halkaisija (d)",
+          fr: "Diamètre (d)",
+          ar: "القطر (d)",
+          it: "Diametro (d)",
+        },
+        circumference: {
+          en: "Circumference (C)",
+          zh: "圓周 (C)",
+          ja: "円周 (C)",
+          ko: "원둘레 (C)",
+          es: "Circunferencia (C)",
+          de: "Umfang (C)",
+          fi: "Kehä (C)",
+          fr: "Circonférence (C)",
+          ar: "المحيط (C)",
+          it: "Circonferenza (C)",
+        },
+        area: {
+          en: "Area (A)",
+          zh: "面積 (A)",
+          ja: "面積 (A)",
+          ko: "넓이 (A)",
+          es: "Área (A)",
+          de: "Fläche (A)",
+          fi: "Pinta-ala (A)",
+          fr: "Aire (A)",
+          ar: "المساحة (A)",
+          it: "Area (A)",
+        },
+
+        formulas_title: {
+          en: "Important Formulas",
+          zh: "重要公式",
+          ja: "重要な公式",
+          ko: "중요 공식",
+          es: "Fórmulas Importantes",
+          de: "Wichtige Formeln",
+          fi: "Tärkeitä kaavoja",
+          fr: "Formules importantes",
+          ar: "صيغ مهمة",
+          it: "Formule Importanti",
+        },
+        formula_c: {
+          en: "Circumference:",
+          zh: "圓周公式：",
+          ja: "円周の公式：",
+          ko: "원둘레 공식:",
+          es: "Fórmula de Circunferencia:",
+          de: "Umfangsformel:",
+          fi: "Kehän kaava:",
+          fr: "Formule de circonférence :",
+          ar: "صيغة المحيط:",
+          it: "Formula Circonferenza:",
+        },
+        formula_or: {
+          en: "Or:",
+          zh: "或：",
+          ja: "または：",
+          ko: "또는:",
+          es: "O:",
+          de: "Oder:",
+          fi: "Tai:",
+          fr: "Ou :",
+          ar: "أو:",
+          it: "O:",
+        },
+        formula_a: {
+          en: "Area:",
+          zh: "面積公式：",
+          ja: "面積の公式：",
+          ko: "넓이 공식:",
+          es: "Formula de Área:",
+          de: "Flächenformel:",
+          fi: "Pinta-alan kaava:",
+          fr: "Formule d'aire :",
+          ar: "صيغة المساحة:",
+          it: "Formula Area:",
+        },
+
+        pi_desc: {
+          en: "Pi (π):",
+          zh: "圓周率 π (Pi):",
+          ja: "円周率 π (Pi):",
+          ko: "원주율 π (Pi):",
+          es: "Pi (π):",
+          de: "Pi (π):",
+          fi: "Pi (π):",
+          fr: "Pi (π) :",
+          ar: "باي (π):",
+          it: "Pi (π):",
+        },
+        pi_note: {
+          en: "Usually use 3.14 or 22/7",
+          zh: "一般計算時用 3.14 或 22/7",
+          ja: "通常、3.14 または 22/7 を使用",
+          ko: "보통 3.14 또는 22/7 사용",
+          es: "Usualmente usa 3.14 o 22/7",
+          de: "Verwende normalerweise 3.14 oder 22/7",
+          fi: "Käytä yleensä 3.14 tai 22/7",
+          fr: "Utilisez généralement 3.14 ou 22/7",
+          ar: "تستخدم عادة 3.14 أو 22/7",
+          it: "Di solito usa 3.14 o 22/7",
+        },
+
+        adjust_radius: {
+          en: "Adjust Radius",
+          zh: "調整半徑",
+          ja: "半径を調整",
+          ko: "반지름 조정",
+          es: "Ajustar Radio",
+          de: "Radius anpassen",
+          fi: "Säädä sädettä",
+          fr: "Ajuster le rayon",
+          ar: "ضبط نصف القطر",
+          it: "Regola Raggio",
+        },
+        drag_hint: {
+          en: "Drag slider to change radius",
+          zh: "拖動滑桿改變半徑",
+          ja: "スライダーをドラッグして半径を変更",
+          ko: "슬라이더를 드래그하여 반지름 변경",
+          es: "Arrastra el control deslizante para cambiar el radio",
+          de: "Schieberegler ziehen, um Radius zu ändern",
+          fi: "Vedä liukusäädintä muuttaaksesi sädettä",
+          fr: "Faites glisser le curseur pour changer le rayon",
+          ar: "اسحب شريط التمرير لتغيير نصف القطر",
+          it: "Trascina il cursore per cambiare raggio",
+        },
+        knowledge_title: {
+          en: "Circle Knowledge",
+          zh: "圓形知識",
+          ja: "円の知識",
+          ko: "원 지식",
+          es: "Conocimiento del Círculo",
+          de: "Kreiswissen",
+          fi: "Ympyrätieto",
+          fr: "Connaissance du cercle",
+          ar: "معرفة الدائرة",
+          it: "Conoscenza del Cerchio",
+        },
+
+        know_r: {
+          en: "Radius: Distance from center to edge",
+          zh: "半徑 (Radius)：圓心到圓周上任何一點的距離",
+          ja: "半径：中心から端までの距離",
+          ko: "반지름: 중심에서 가장자리까지의 거리",
+          es: "Radio: Distancia del centro al borde",
+          de: "Radius: Abstand vom Zentrum zum Rand",
+          fi: "Säde: Etäisyys keskustasta reunaan",
+          fr: "Rayon : Distance du centre au bord",
+          ar: "نصف القطر: المسافة من المركز إلى الحافة",
+          it: "Raggio: Distanza dal centro al bordo",
+        },
+        know_d: {
+          en: "Diameter: Through center, 2x radius",
+          zh: "直徑 (Diameter)：通過圓心的最長線段，等於2倍半徑",
+          ja: "直径：中心を通る、半径の2倍",
+          ko: "지름: 중심을 통과하는 가장 긴 선분, 반지름의 2배",
+          es: "Diámetro: A través del centro, 2x radio",
+          de: "Durchmesser: Durch das Zentrum, 2x Radius",
+          fi: "Halkaisija: Keskustan kautta, 2x säde",
+          fr: "Diamètre : À travers le centre, 2x rayon",
+          ar: "القطر: يمر عبر المركز، 2 × نصف القطر",
+          it: "Diametro: Attraverso il centro, 2x raggio",
+        },
+        know_c: {
+          en: "Circumference: Length of boundary",
+          zh: "圓周 (Circumference)：圓形邊界的長度",
+          ja: "円周：境界の長さ",
+          ko: "원둘레: 경계의 길이",
+          es: "Circunferencia: Longitud del borde",
+          de: "Umfang: Länge der Grenze",
+          fi: "Kehä: Reunan pituus",
+          fr: "Circonférence : Longueur de la limite",
+          ar: "المحيط: طول الحدود",
+          it: "Circonferenza: Lunghezza del bordo",
+        },
+        know_a: {
+          en: "Area: Space inside",
+          zh: "面積 (Area)：圓形內部的空間大小",
+          ja: "面積：内部の空間",
+          ko: "넓이: 내부 공간의 크기",
+          es: "Área: Espacio interior",
+          de: "Fläche: Raum im Inneren",
+          fi: "Pinta-ala: Sisätila",
+          fr: "Aire : Espace à l'intérieur",
+          ar: "المساحة: الحيز الداخلي",
+          it: "Area: Spazio all'interno",
+        },
+
+        relations_title: {
+          en: "Relationships",
+          zh: "關係式",
+          ja: "関係式",
+          ko: "관계식",
+          es: "Relaciones",
+          de: "Beziehungen",
+          fi: "Suhteet",
+          fr: "Relations",
+          ar: "العلاقات",
+          it: "Relazioni",
+        },
+      };
+
       function App() {
+        const [lang, setLang] = useState("zh");
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
         const [radius, setRadius] = useState(5);
         const [showDiameter, setShowDiameter] = useState(true);
         const [showCircumference, setShowCircumference] = useState(false);
@@ -128,16 +418,19 @@
 
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <header className="text-center mb-8">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <header className="text-center mb-8 mt-8">
               <div className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-md px-6 py-3 rounded-full mb-4">
                 <Circle className="text-white" size={24} />
-                <span className="text-white font-bold text-lg">小六數學</span>
+                <span className="text-white font-bold text-lg">
+                  {getText("header_grade")}
+                </span>
               </div>
               <h1 className="text-5xl md:text-6xl font-black text-white mb-2 tracking-tight">
-                圓形探索家
+                {getText("title")}
               </h1>
               <p className="text-xl text-white/80 font-medium">
-                圓周、直徑、半徑、面積
+                {getText("subtitle")}
               </p>
             </header>
 
@@ -162,7 +455,7 @@
                         : "bg-slate-100 text-slate-600"
                     }`}
                   >
-                    {showDiameter ? "✓" : ""} 顯示直徑
+                    {showDiameter ? "✓" : ""} {getText("show_diameter")}
                   </button>
                   <button
                     onClick={() => setShowCircumference(!showCircumference)}
@@ -172,7 +465,8 @@
                         : "bg-slate-100 text-slate-600"
                     }`}
                   >
-                    {showCircumference ? "✓" : ""} 顯示圓周
+                    {showCircumference ? "✓" : ""}{" "}
+                    {getText("show_circumference")}
                   </button>
                 </div>
 
@@ -180,7 +474,7 @@
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="bg-green-50 rounded-2xl p-4 text-center border-2 border-green-200">
                     <div className="text-sm font-bold text-slate-600 mb-1">
-                      半徑 (r)
+                      {getText("radius")}
                     </div>
                     <div className="text-3xl font-black text-green-600">
                       {radius}
@@ -189,7 +483,7 @@
                   </div>
                   <div className="bg-orange-50 rounded-2xl p-4 text-center border-2 border-orange-200">
                     <div className="text-sm font-bold text-slate-600 mb-1">
-                      直徑 (d)
+                      {getText("diameter")}
                     </div>
                     <div className="text-3xl font-black text-orange-600">
                       {diameter}
@@ -198,7 +492,7 @@
                   </div>
                   <div className="bg-purple-50 rounded-2xl p-4 text-center border-2 border-purple-200">
                     <div className="text-sm font-bold text-slate-600 mb-1">
-                      圓周 (C)
+                      {getText("circumference")}
                     </div>
                     <div className="text-2xl font-black text-purple-600">
                       {circumference.toFixed(2)}
@@ -207,7 +501,7 @@
                   </div>
                   <div className="bg-blue-50 rounded-2xl p-4 text-center border-2 border-blue-200">
                     <div className="text-sm font-bold text-slate-600 mb-1">
-                      面積 (A)
+                      {getText("area")}
                     </div>
                     <div className="text-2xl font-black text-blue-600">
                       {area.toFixed(2)}
@@ -219,13 +513,13 @@
                 {/* Formulas */}
                 <div className="mt-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6">
                   <h3 className="text-lg font-black text-purple-600 mb-4">
-                    📐 重要公式
+                    📐 {getText("formulas_title")}
                   </h3>
 
                   <div className="space-y-4">
                     <div className="bg-white p-4 rounded-lg">
                       <div className="font-bold text-slate-700 mb-2">
-                        圓周公式：
+                        {getText("formula_c")}
                       </div>
                       <div className="text-xl font-mono">
                         C = 2<span className="pi-highlight">π</span>r = 2 ×{" "}
@@ -233,7 +527,8 @@
                         {circumference.toFixed(2)} cm
                       </div>
                       <div className="text-sm text-slate-500 mt-2">
-                        或：C = <span className="pi-highlight">π</span>d ={" "}
+                        {getText("formula_or")} C ={" "}
+                        <span className="pi-highlight">π</span>d ={" "}
                         <span className="pi-highlight">π</span> × {diameter} ≈{" "}
                         {circumference.toFixed(2)} cm
                       </div>
@@ -241,7 +536,7 @@
 
                     <div className="bg-white p-4 rounded-lg">
                       <div className="font-bold text-slate-700 mb-2">
-                        面積公式：
+                        {getText("formula_a")}
                       </div>
                       <div className="text-xl font-mono">
                         A = <span className="pi-highlight">π</span>r² ={" "}
@@ -252,14 +547,13 @@
 
                     <div className="bg-yellow-50 p-4 rounded-lg border-2 border-yellow-200">
                       <div className="font-black text-yellow-800">
-                        圓周率 π (Pi):
+                        {getText("pi_desc")}
                       </div>
                       <div className="text-2xl font-mono text-yellow-900 mt-2">
                         <span className="pi-highlight">π</span> ≈ 3.14159...
                       </div>
                       <div className="text-sm text-yellow-700 mt-2">
-                        一般計算時用 <span className="font-black">3.14</span> 或{" "}
-                        <span className="font-black">22/7</span>
+                        {getText("pi_note")}
                       </div>
                     </div>
                   </div>
@@ -270,7 +564,7 @@
               <div className="lg:col-span-4 flex flex-col gap-6">
                 <div className="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-lg">
                   <h3 className="text-xl font-black text-purple-600 mb-4 flex items-center gap-2">
-                    <Ruler size={24} /> 調整半徑
+                    <Ruler size={24} /> {getText("adjust_radius")}
                   </h3>
 
                   <div className="mb-6">
@@ -287,7 +581,7 @@
                         {radius} cm
                       </div>
                       <div className="text-sm text-slate-500">
-                        拖動滑桿改變半徑
+                        {getText("drag_hint")}
                       </div>
                     </div>
                   </div>
@@ -334,37 +628,39 @@
 
                 <div className="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-lg">
                   <h3 className="text-lg font-black text-slate-800 mb-3">
-                    💡 圓形知識
+                    💡 {getText("knowledge_title")}
                   </h3>
                   <div className="text-sm text-slate-600 leading-relaxed space-y-2">
                     <p>
                       <strong className="text-green-600">
-                        半徑 (Radius)：
+                        {getText("know_r").split(":")[0]}:
                       </strong>
-                      圓心到圓周上任何一點的距離
+                      {getText("know_r").split(":")[1]}
                     </p>
                     <p>
                       <strong className="text-orange-600">
-                        直徑 (Diameter)：
+                        {getText("know_d").split(":")[0]}:
                       </strong>
-                      通過圓心的最長線段，等於2倍半徑
+                      {getText("know_d").split(":")[1]}
                     </p>
                     <p>
                       <strong className="text-purple-600">
-                        圓周 (Circumference)：
+                        {getText("know_c").split(":")[0]}:
                       </strong>
-                      圓形邊界的長度
+                      {getText("know_c").split(":")[1]}
                     </p>
                     <p>
-                      <strong className="text-blue-600">面積 (Area)：</strong>
-                      圓形內部的空間大小
+                      <strong className="text-blue-600">
+                        {getText("know_a").split(":")[0]}:
+                      </strong>
+                      {getText("know_a").split(":")[1]}
                     </p>
                   </div>
                 </div>
 
                 <div className="bg-gradient-to-br from-red-100 to-pink-100 rounded-3xl p-6 shadow-lg">
                   <h3 className="text-lg font-black text-red-700 mb-3">
-                    🎯 關係式
+                    🎯 {getText("relations_title")}
                   </h3>
                   <div className="text-sm space-y-2">
                     <div className="bg-white p-2 rounded-lg">d = 2r</div>
@@ -386,20 +682,5 @@
       const root = ReactDOM.createRoot(document.getElementById("root"));
       root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

@@ -8,35 +8,209 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #dbeafe 0%, #3b82f6 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+      .perspective-1000 {
+        perspective: 1000px;
+      }
+      .preserve-3d {
+        transform-style: preserve-3d;
+      }
+      .backface-hidden {
+        backface-visibility: hidden;
+      }
+      .rotate-y-180 {
+        transform: rotateY(180deg);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
-      function App() {
-        // Simple quiz for translating phrases to expressions
-        const problems = [
-          { q: "x 加上 5 (x plus 5)", ans: "x + 5" },
-          { q: "y 減去 3 (y minus 3)", ans: "y - 3" },
-          { q: "k 的 4 倍 (4 times k)", ans: "4k" },
-          { q: "m 除以 2 (m divided by 2)", ans: "m / 2" },
-          { q: "10 減去 z (10 minus z)", ans: "10 - z" },
-          { q: "n 的一半 (half of n)", ans: "n / 2" },
-        ];
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
 
-        const [flipped, setFlipped] = useState(
-          Array(problems.length).fill(false)
-        );
+      const t = {
+        title: {
+          en: "Algebraic Expressions",
+          zh: "代數式",
+          ja: "代数式",
+          ko: "대수식",
+          es: "Expresiones Algebraicas",
+          de: "Algebraische Ausdrücke",
+          fi: "Algebralliset lausekkeet",
+          fr: "Expressions algébriques",
+          ar: "تعبيرات جبرية",
+          it: "Espressioni Algebriche",
+        },
+        instruction: {
+          en: "Click cards to reveal the expression",
+          zh: "點擊卡片查看代數式",
+          ja: "カードをクリックして式を表示",
+          ko: "카드를 클릭하여 식 확인",
+          es: "Haz clic en las tarjetas para revelar la expresión",
+          de: "Klicken Sie auf die Karten, um den Ausdruck anzuzeigen",
+          fi: "Napsauta kortteja nähdäksesi lausekkeen",
+          fr: "Cliquez sur les cartes pour révéler l'expression",
+          ar: "انقر على البطاقات للكشف عن التعبير",
+          it: "Clicca sulle carte per rivelare l'espressione",
+        },
+        rules: {
+          en: "Writing Rules",
+          zh: "書寫規則",
+          ja: "書き方のルール",
+          ko: "작성 규칙",
+          es: "Reglas de escritura",
+          de: "Schreibregeln",
+          fi: "Kirjoitussäännöt",
+          fr: "Règles d'écriture",
+          ar: "قواعد الكتابة",
+          it: "Regole di scrittura",
+        },
+        rule1: {
+          en: "Omit multiplication sign",
+          zh: "乘號通常省略",
+          ja: "乗算記号は省略",
+          ko: "곱셈 기호 생략",
+          es: "Omitir signo de multiplicación",
+          de: "Multiplikationszeichen weglassen",
+          fi: "Jätä kertomerkki pois",
+          fr: "Ommettre le signe de multiplication",
+          ar: "حذف علامة الضرب",
+          it: "Omettere segno di moltiplicazione",
+        },
+        rule2: {
+          en: "Use fraction for division",
+          zh: "除號寫成分數",
+          ja: "除算には分数を使用",
+          ko: "나눗셈은 분수로",
+          es: "Usar fracción para división",
+          de: "Bruch für Division verwenden",
+          fi: "Käytä murtolukua jakolaskuun",
+          fr: "Utiliser une fraction pour la division",
+          ar: "استخدم الكسر للقسمة",
+          it: "Usa frazione per divisione",
+        },
+        rule3: {
+          en: "Number before letter",
+          zh: "數字寫在字母前",
+          ja: "文字の前に数字",
+          ko: "문자 앞에 숫자",
+          es: "Número antes de letra",
+          de: "Zahl vor Buchstabe",
+          fi: "Numero ennen kirjainta",
+          fr: "Nombre avant lettre",
+          ar: "الرقم قبل الحرف",
+          it: "Numero prima della lettera",
+        },
+      };
+
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
+      const DATA = [
+        {
+          q: {
+            en: "x plus 5",
+            zh: "x 加上 5",
+            ja: "x たす 5",
+            ko: "x 더하기 5",
+            es: "x más 5",
+            de: "x plus 5",
+            fr: "x plus 5",
+            it: "x più 5",
+          },
+          ans: "x + 5",
+        },
+        {
+          q: {
+            en: "y minus 3",
+            zh: "y 減去 3",
+            ja: "y ひく 3",
+            ko: "y 빼기 3",
+            es: "y menos 3",
+            de: "y minus 3",
+            fr: "y moins 3",
+            it: "y meno 3",
+          },
+          ans: "y - 3",
+        },
+        {
+          q: {
+            en: "4 times k",
+            zh: "k 的 4 倍",
+            ja: "k の 4 倍",
+            ko: "k의 4배",
+            es: "4 veces k",
+            de: "4 mal k",
+            fr: "4 fois k",
+            it: "4 volte k",
+          },
+          ans: "4k",
+        },
+        {
+          q: {
+            en: "m divided by 2",
+            zh: "m 除以 2",
+            ja: "m わる 2",
+            ko: "m 나누기 2",
+            es: "m dividido por 2",
+            de: "m geteilt durch 2",
+            fr: "m divisé par 2",
+            it: "m diviso 2",
+          },
+          ans: "m / 2",
+        },
+        {
+          q: {
+            en: "10 minus z",
+            zh: "10 減去 z",
+            ja: "10 ひく z",
+            ko: "10 빼기 z",
+            es: "10 menos z",
+            de: "10 minus z",
+            fr: "10 moins z",
+            it: "10 meno z",
+          },
+          ans: "10 - z",
+        },
+        {
+          q: {
+            en: "half of n",
+            zh: "n 的一半",
+            ja: "n の半分",
+            ko: "n의 절반",
+            es: "mitad de n",
+            de: "Hälfte von n",
+            fr: "moitié de n",
+            it: "metà di n",
+          },
+          ans: "n / 2",
+        },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [flipped, setFlipped] = useState(Array(DATA.length).fill(false));
 
         const toggle = (i) => {
           const newFlipped = [...flipped];
@@ -44,74 +218,92 @@
           setFlipped(newFlipped);
         };
 
-        return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-blue-900 mb-2">
-              🔤 代數式
-            </h1>
-            <p className="text-xl text-blue-700 font-bold mb-8">
-              Algebraic Expressions
-            </p>
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-4xl w-full">
-              <p className="text-center text-lg mb-6 text-slate-600">
-                點擊卡片查看代數式 Click cards to reveal expressions
-              </p>
+        const getQ = (item) => item.q[lang] || item.q["en"];
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {problems.map((p, i) => (
+        return (
+          <div className="min-h-screen flex flex-col items-center p-4 font-sans bg-slate-900 text-white">
+            <div className="w-full max-w-5xl flex justify-between items-center mb-8">
+              <h1 className="text-4xl font-black text-indigo-400 drop-shadow-[0_0_15px_rgba(129,140,248,0.5)]">
+                🔤 {getText("title", lang)}
+              </h1>
+              <div className="flex bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-indigo-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="w-full max-w-5xl space-y-8">
+              <div className="text-center text-slate-400 font-bold tracking-widest uppercase text-sm">
+                {getText("instruction", lang)}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {DATA.map((item, i) => (
                   <div
                     key={i}
                     onClick={() => toggle(i)}
-                    className="aspect-video cursor-pointer perspective-1000 group"
+                    className="group perspective-1000 cursor-pointer h-48"
                   >
-                    <div
-                      className={`relative w-full h-full duration-500 preserve-3d transition-transform ${
-                        flipped[i] ? "rotate-y-180" : ""
-                      }`}
-                      style={{
-                        transformStyle: "preserve-3d",
-                        transform: flipped[i]
-                          ? "rotateY(180deg)"
-                          : "rotateY(0deg)",
-                      }}
+                    <motion.div
+                      className="relative w-full h-full preserve-3d transition duration-500"
+                      animate={{ rotateY: flipped[i] ? 180 : 0 }}
                     >
                       {/* Front */}
-                      <div
-                        className="absolute w-full h-full bg-blue-100 rounded-2xl border-4 border-blue-300 flex items-center justify-center p-4 backface-hidden shadow-lg hover:bg-blue-200"
-                        style={{ backfaceVisibility: "hidden" }}
-                      >
-                        <p className="font-bold text-center text-blue-900 text-lg">
-                          {p.q}
-                        </p>
+                      <div className="absolute inset-0 backface-hidden bg-slate-800 rounded-2xl border border-slate-600 flex items-center justify-center p-6 shadow-xl group-hover:border-indigo-400/50 group-hover:bg-slate-700 transition-colors">
+                        <div className="text-xl font-bold text-slate-200 text-center">
+                          {getQ(item)}
+                        </div>
                       </div>
+
                       {/* Back */}
-                      <div
-                        className="absolute w-full h-full bg-indigo-500 rounded-2xl border-4 border-indigo-600 flex items-center justify-center p-4 backface-hidden shadow-lg rotate-y-180"
-                        style={{
-                          backfaceVisibility: "hidden",
-                          transform: "rotateY(180deg)",
-                        }}
-                      >
-                        <p className="font-black text-center text-white text-3xl font-mono">
-                          {p.ans}
-                        </p>
+                      <div className="absolute inset-0 backface-hidden rotate-y-180 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl border border-indigo-400 flex items-center justify-center p-6 shadow-xl">
+                        <div className="text-4xl font-black font-mono text-white text-center drop-shadow-md">
+                          {item.ans}
+                        </div>
                       </div>
-                    </div>
+                    </motion.div>
                   </div>
                 ))}
               </div>
 
-              <div className="mt-8 bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
-                <p className="font-bold">📝 書寫規則:</p>
-                <ul className="list-disc list-inside text-sm mt-1 space-y-1">
-                  <li>
-                    乘號通常省略: 4 × k 寫成 <b>4k</b>
+              <div className="glass-panel p-6 rounded-2xl border-l-4 border-indigo-500">
+                <h3 className="text-lg font-bold text-indigo-300 mb-4">
+                  {getText("rules", lang)}
+                </h3>
+                <ul className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm font-medium text-slate-300">
+                  <li className="bg-slate-800/50 p-3 rounded-lg flex items-center gap-3">
+                    <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
+                    {getText("rule1", lang)} (4 × k → 4k)
                   </li>
-                  <li>
-                    除號寫成分數形式: m ÷ 2 寫成 <b>m/2</b>
+                  <li className="bg-slate-800/50 p-3 rounded-lg flex items-center gap-3">
+                    <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
+                    {getText("rule2", lang)} (m ÷ 2 → m/2)
                   </li>
-                  <li>
-                    數字通常寫在字母前面: k × 4 寫成 <b>4k</b>
+                  <li className="bg-slate-800/50 p-3 rounded-lg flex items-center gap-3">
+                    <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
+                    {getText("rule3", lang)} (k × 4 → 4k)
                   </li>
                 </ul>
               </div>
@@ -119,22 +311,9 @@
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

@@ -33,26 +33,126 @@
           en: "Filial Piety Matching",
           zh: "孝順行動卡",
           ja: "親孝行マッチング",
+          ko: "효도 행동 매칭",
+          es: "Emparejamiento de piedad filial",
+          de: "Kindliche Pietät Zuordnung",
+          fi: "Filiaalinen hurskaus paritus",
+          fr: "Appariement de la piété filiale",
+          ar: "مطابقة بر الوالدين",
+          it: "Abbinamento pietà filiale",
         },
         instruction: {
           en: "Match the situation with the correct action!",
           zh: "將情境與正確的行動配對！",
           ja: "状況と正しい行動を合わせてください！",
+          ko: "상황에 맞는 행동을 연결하세요!",
+          es: "¡Empareja la situación con la acción correcta!",
+          de: "Ordne die Situation der richtigen Handlung zu!",
+          fi: "Yhdistä tilanne oikeaan toimintaan!",
+          fr: "Associez la situation à la bonne action !",
+          ar: "طابق الموقف مع الإجراء الصحيح!",
+          it: "Abbina la situazione all'azione corretta!",
         },
-        restart: { en: "Play Again", zh: "再玩一次" },
-        completed: { en: "You are a good child!", zh: "你真是個好孩子！" },
-
-        s1: { en: "Mom is cooking", zh: "媽媽煮飯" },
-        r1: { en: "Help set the table", zh: "幫忙擺碗筷" },
-
-        s2: { en: "Dad is tired from work", zh: "爸爸工作累了" },
-        r2: { en: "Massage his shoulders", zh: "幫他在肩膀按摩" },
-
-        s3: { en: "Grandma is crossing street", zh: "嫲嫲過馬路" },
-        r3: { en: "Hold her hand", zh: "牽著她的手" },
-
-        s4: { en: "Parents give me a gift", zh: "父母送禮物給我" },
-        r4: { en: "Say 'Thank You'", zh: "說「謝謝」" },
+        restart: {
+          en: "Play Again",
+          zh: "再玩一次",
+          es: "Jugar de nuevo",
+          de: "Nochmal spielen",
+          fi: "Pelaa uudelleen",
+          fr: "Rejouer",
+          ar: "العب مرة أخرى",
+          it: "Gioca di nuovo",
+        },
+        completed: {
+          en: "You are a good child!",
+          zh: "你真是個好孩子！",
+          es: "¡Eres un buen niño!",
+          de: "Du bist ein gutes Kind!",
+          fi: "Olet hyvä lapsi!",
+          fr: "Tu es un bon enfant !",
+          ar: "أنت طفل صالح!",
+          it: "Sei un bravo bambino!",
+        },
+        s1: {
+          en: "Mom is cooking",
+          zh: "媽媽煮飯",
+          es: "Mamá está cocinando",
+          de: "Mama kocht",
+          fi: "Äiti tekee ruokaa",
+          fr: "Maman cuisine",
+          ar: "أمي تطبخ",
+          it: "Mamma sta cucinando",
+        },
+        r1: {
+          en: "Help set the table",
+          zh: "幫忙擺碗筷",
+          es: "Ayudar a poner la mesa",
+          de: "Hilf den Tisch zu decken",
+          fi: "Auta kattamaan pöytä",
+          fr: "Aider à mettre la table",
+          ar: "ساعد في تجهيز الطاولة",
+          it: "Aiuta ad apparecchiare la tavola",
+        },
+        s2: {
+          en: "Dad is tired from work",
+          zh: "爸爸工作累了",
+          es: "Papá está cansado del trabajo",
+          de: "Papa ist müde von der Arbeit",
+          fi: "Isä on väsynyt töistä",
+          fr: "Papa est fatigué du travail",
+          ar: "أبي متعب من العمل",
+          it: "Papà è stanco dal lavoro",
+        },
+        r2: {
+          en: "Massage his shoulders",
+          zh: "幫他在肩膀按摩",
+          es: "Masajear sus hombros",
+          de: "Massiere seine Schultern",
+          fi: "Hiero hänen hartioitaan",
+          fr: "Masser ses épaules",
+          ar: "دلك كتفيه",
+          it: "Massaggiagli le spalle",
+        },
+        s3: {
+          en: "Grandma is crossing street",
+          zh: "嫲嫲過馬路",
+          es: "La abuela está cruzando la calle",
+          de: "Oma überquert die Straße",
+          fi: "Isoäiti ylittää katua",
+          fr: "Grand-mère traverse la rue",
+          ar: "الجدة تعبر الشارع",
+          it: "La nonna sta attraversando la strada",
+        },
+        r3: {
+          en: "Hold her hand",
+          zh: "牽著她的手",
+          es: "Tomar su mano",
+          de: "Halte ihre Hand",
+          fi: "Pidä hänen kädestään",
+          fr: "Lui tenir la main",
+          ar: "امسك يدها",
+          it: "Tienile la mano",
+        },
+        s4: {
+          en: "Parents give me a gift",
+          zh: "父母送禮物給我",
+          es: "Los padres me dan un regalo",
+          de: "Eltern geben mir ein Geschenk",
+          fi: "Vanhemmat antavat minulle lahjan",
+          fr: "Les parents me donnent un cadeau",
+          ar: "يعطيني الوالدان هدية",
+          it: "I genitori mi fanno un regalo",
+        },
+        r4: {
+          en: "Say 'Thank You'",
+          zh: "說「謝謝」",
+          es: "Decir 'Gracias'",
+          de: "Sag 'Danke'",
+          fi: "Sano 'Kiitos'",
+          fr: "Dire 'Merci'",
+          ar: "قل 'شكراً'",
+          it: "Dì 'Grazie'",
+        },
       };
 
       const pairsData = [
@@ -217,20 +317,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

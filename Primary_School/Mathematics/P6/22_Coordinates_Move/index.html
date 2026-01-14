@@ -8,70 +8,237 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #dbeafe 0%, #2563eb 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
+
+      const t = {
+        title: {
+          en: "Translate Coordinates",
+          zh: "坐標平移",
+          ja: "座標移動",
+          ko: "좌표 이동",
+          es: "Trasladar Coordenadas",
+          de: "Koordinaten verschieben",
+          fi: "Siirrä koordinaatteja",
+          fr: "Translater les coordonnées",
+          ar: "نقل الإحداثيات",
+          it: "Trasla Coordinate",
+        },
+        startPoint: {
+          en: "Start Point (A)",
+          zh: "起點 (A)",
+          ja: "始点 (A)",
+          ko: "시작점 (A)",
+          es: "Punto de Inicio (A)",
+          de: "Startpunkt (A)",
+          fi: "Aloituspiste (A)",
+          fr: "Point de départ (A)",
+          ar: "نقطة البداية (A)",
+          it: "Punto di Inizio (A)",
+        },
+        endPoint: {
+          en: "End Point (B)",
+          zh: "終點 (B)",
+          ja: "終点 (B)",
+          ko: "끝점 (B)",
+          es: "Punto Final (B)",
+          de: "Endpunkt (B)",
+          fi: "Päätepiste (B)",
+          fr: "Point d'arrivée (B)",
+          ar: "نقطة النهاية (B)",
+          it: "Punto Finale (B)",
+        },
+        movement: {
+          en: "Movement",
+          zh: "移動",
+          ja: "移動",
+          ko: "이동",
+          es: "Movimiento",
+          de: "Bewegung",
+          fi: "Liike",
+          fr: "Mouvement",
+          ar: "حركة",
+          it: "Movimento",
+        },
+        horizontal: {
+          en: "Horizontal (x)",
+          zh: "水平 (x)",
+          ja: "水平 (x)",
+          ko: "수평 (x)",
+          es: "Horizontal (x)",
+          de: "Horizontal (x)",
+          fi: "Vaaka (x)",
+          fr: "Horizontal (x)",
+          ar: "أفقي (x)",
+          it: "Orizzontale (x)",
+        },
+        vertical: {
+          en: "Vertical (y)",
+          zh: "垂直 (y)",
+          ja: "垂直 (y)",
+          ko: "수직 (y)",
+          es: "Vertical (y)",
+          de: "Vertikal (y)",
+          fi: "Pysty (y)",
+          fr: "Vertical (y)",
+          ar: "عمودي (y)",
+          it: "Verticale (y)",
+        },
+        right: {
+          en: "Right",
+          zh: "向右",
+          ja: "右",
+          ko: "오른쪽",
+          es: "Derecha",
+          de: "Rechts",
+          fi: "Oikealle",
+          fr: "Droite",
+          ar: "يمين",
+          it: "Destra",
+        },
+        left: {
+          en: "Left",
+          zh: "向左",
+          ja: "左",
+          ko: "왼쪽",
+          es: "Izquierda",
+          de: "Links",
+          fi: "Vasemmalle",
+          fr: "Gauche",
+          ar: "يسار",
+          it: "Sinistra",
+        },
+        up: {
+          en: "Up",
+          zh: "向上",
+          ja: "上",
+          ko: "위",
+          es: "Arriba",
+          de: "Oben",
+          fi: "Ylös",
+          fr: "Haut",
+          ar: "أعلى",
+          it: "Su",
+        },
+        down: {
+          en: "Down",
+          zh: "向下",
+          ja: "下",
+          ko: "아래",
+          es: "Abajo",
+          de: "Unten",
+          fi: "Alas",
+          fr: "Bas",
+          ar: "أسفل",
+          it: "Giù",
+        },
+      };
+
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
       function App() {
-        // Start at (1,2)
-        const [start, setStart] = useState({ x: 1, y: 2 });
-        const [move, setMove] = useState({ dx: 2, dy: 3 }); // right 2, up 3
+        const [lang, setLang] = useState("zh");
+        const [start, setStart] = useState({ x: 2, y: 3 });
+        const [move, setMove] = useState({ dx: 4, dy: 2 });
 
         const end = { x: start.x + move.dx, y: start.y + move.dy };
 
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-blue-900 mb-2">
-              ↔️ 坐標平移
-            </h1>
-            <p className="text-xl text-blue-700 font-bold mb-8">
-              Coordinate Translation
-            </p>
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-5xl w-full flex flex-col md:flex-row gap-8">
-              <div
-                className="flex-1 bg-slate-50 border-4 border-blue-200 rounded-xl relative overflow-hidden"
-                style={{ height: "400px" }}
-              >
-                <svg viewBox="0 0 400 400" className="w-full h-full">
+          <div className="min-h-screen flex flex-col items-center p-4 font-sans bg-slate-900 text-white">
+            <div className="w-full max-w-6xl flex justify-between items-center mb-8">
+              <h1 className="text-4xl font-black text-cyan-400 drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]">
+                ↔️ {getText("title", lang)}
+              </h1>
+              <div className="flex bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-cyan-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Graph */}
+              <div className="glass-panel p-4 rounded-3xl aspect-square relative flex items-center justify-center">
+                <svg
+                  viewBox="0 0 400 400"
+                  className="w-full h-full bg-slate-800/50 rounded-2xl"
+                >
                   {/* Grid */}
-                  {Array.from({ length: 21 }, (_, i) => i).map((i) => (
+                  {Array.from({ length: 21 }).map((_, i) => (
                     <g key={i}>
                       <line
                         x1={i * 20}
                         y1="0"
                         x2={i * 20}
                         y2="400"
-                        stroke="#e2e8f0"
-                        strokeWidth="1"
+                        stroke="rgba(255,255,255,0.1)"
+                        strokeWidth={i === 10 ? 0 : 1}
                       />
                       <line
                         x1="0"
                         y1={i * 20}
                         x2="400"
                         y2={i * 20}
-                        stroke="#e2e8f0"
-                        strokeWidth="1"
+                        stroke="rgba(255,255,255,0.1)"
+                        strokeWidth={i === 10 ? 0 : 1}
                       />
                     </g>
                   ))}
-                  {/* Axes (Center is 200, 200) */}
+                  {/* Axes */}
                   <line
                     x1="200"
                     y1="0"
                     x2="200"
                     y2="400"
-                    stroke="#94a3b8"
+                    stroke="white"
                     strokeWidth="2"
                   />
                   <line
@@ -79,20 +246,11 @@
                     y1="200"
                     x2="400"
                     y2="200"
-                    stroke="#94a3b8"
+                    stroke="white"
                     strokeWidth="2"
                   />
 
-                  {/* Arrow Path */}
-                  <path
-                    d={`M ${200 + start.x * 20} ${200 - start.y * 20} L ${
-                      200 + end.x * 20
-                    } ${200 - end.y * 20}`}
-                    stroke="#f59e0b"
-                    strokeWidth="3"
-                    strokeDasharray="5,5"
-                    markerEnd="url(#arrow)"
-                  />
+                  {/* Path Arrow */}
                   <defs>
                     <marker
                       id="arrow"
@@ -103,53 +261,77 @@
                       orient="auto"
                       markerUnits="strokeWidth"
                     >
-                      <path d="M0,0 L0,6 L9,3 z" fill="#f59e0b" />
+                      <path d="M0,0 L0,6 L9,3 z" fill="#facc15" />
                     </marker>
                   </defs>
 
-                  {/* Points */}
-                  <circle
-                    cx={200 + start.x * 20}
-                    cy={200 - start.y * 20}
-                    r="6"
-                    fill="#3b82f6"
-                  />
-                  <circle
-                    cx={200 + end.x * 20}
-                    cy={200 - end.y * 20}
-                    r="6"
-                    fill="#ef4444"
+                  <motion.path
+                    d={`M ${200 + start.x * 20} ${200 - start.y * 20} L ${
+                      200 + end.x * 20
+                    } ${200 - end.y * 20}`}
+                    stroke="#facc15"
+                    strokeWidth="3"
+                    strokeDasharray="6 4"
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: 1 }}
+                    markerEnd="url(#arrow)"
                   />
 
+                  {/* Points */}
+                  <motion.circle
+                    animate={{ cx: 200 + start.x * 20, cy: 200 - start.y * 20 }}
+                    r="6"
+                    fill="#22d3ee"
+                    stroke="white"
+                    strokeWidth="2"
+                  />
                   <text
                     x={200 + start.x * 20}
                     y={200 - start.y * 20 - 15}
                     textAnchor="middle"
-                    className="font-bold fill-blue-700 text-sm"
+                    fill="#22d3ee"
+                    fontWeight="bold"
+                    fontSize="14"
                   >
-                    A ({start.x},{start.y})
+                    A
                   </text>
+
+                  <motion.circle
+                    animate={{ cx: 200 + end.x * 20, cy: 200 - end.y * 20 }}
+                    r="6"
+                    fill="#f472b6"
+                    stroke="white"
+                    strokeWidth="2"
+                  />
                   <text
                     x={200 + end.x * 20}
                     y={200 - end.y * 20 - 15}
                     textAnchor="middle"
-                    className="font-bold fill-red-700 text-sm"
+                    fill="#f472b6"
+                    fontWeight="bold"
+                    fontSize="14"
                   >
-                    B ({end.x},{end.y})
+                    B
                   </text>
                 </svg>
+                <div className="absolute top-4 left-4 font-mono text-xs text-slate-500 bg-slate-900/80 px-2 rounded border border-white/5">
+                  Grid: -10 to 10
+                </div>
               </div>
 
-              <div className="flex-1 space-y-6">
-                <div>
-                  <h3 className="text-xl font-bold text-blue-800 mb-2">
-                    1. 起點 Start Point (A)
-                  </h3>
+              {/* Controls */}
+              <div className="flex flex-col gap-6">
+                {/* Start Point */}
+                <div className="glass-panel p-6 rounded-3xl border-l-4 border-cyan-500">
+                  <div className="text-cyan-400 font-bold uppercase mb-4">
+                    {getText("startPoint", lang)}
+                  </div>
                   <div className="flex gap-4">
-                    <div className="flex flex-col">
-                      <label className="text-sm font-bold text-slate-500">
+                    <label className="flex-1">
+                      <span className="block text-xs font-bold text-slate-500 mb-1">
                         X
-                      </label>
+                      </span>
                       <input
                         type="number"
                         value={start.x}
@@ -159,13 +341,13 @@
                             x: parseInt(e.target.value) || 0,
                           })
                         }
-                        className="w-20 border-2 border-blue-300 rounded p-1 text-center font-bold"
+                        className="w-full bg-slate-800 border-2 border-slate-600 rounded-xl py-2 text-center text-xl font-bold"
                       />
-                    </div>
-                    <div className="flex flex-col">
-                      <label className="text-sm font-bold text-slate-500">
+                    </label>
+                    <label className="flex-1">
+                      <span className="block text-xs font-bold text-slate-500 mb-1">
                         Y
-                      </label>
+                      </span>
                       <input
                         type="number"
                         value={start.y}
@@ -175,76 +357,92 @@
                             y: parseInt(e.target.value) || 0,
                           })
                         }
-                        className="w-20 border-2 border-blue-300 rounded p-1 text-center font-bold"
+                        className="w-full bg-slate-800 border-2 border-slate-600 rounded-xl py-2 text-center text-xl font-bold"
                       />
-                    </div>
+                    </label>
                   </div>
                 </div>
 
-                <div>
-                  <h3 className="text-xl font-bold text-amber-700 mb-2">
-                    2. 移動 Movement
-                  </h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-bold text-slate-500">
-                        水平 Horizontal (dx)
-                      </label>
-                      <input
-                        type="range"
-                        min="-8"
-                        max="8"
-                        value={move.dx}
-                        onChange={(e) =>
-                          setMove({ ...move, dx: parseInt(e.target.value) })
-                        }
-                        className="w-full accent-amber-500"
-                      />
-                      <div className="text-center font-bold text-amber-600">
+                {/* Movement */}
+                <div className="glass-panel p-6 rounded-3xl border-l-4 border-yellow-500">
+                  <div className="text-yellow-400 font-bold uppercase mb-4">
+                    {getText("movement", lang)}
+                  </div>
+
+                  <div className="mb-4">
+                    <div className="flex justify-between text-sm font-bold mb-1">
+                      <span>{getText("horizontal", lang)}</span>
+                      <span className="text-yellow-400">
                         {move.dx > 0
-                          ? `向右 ${move.dx}`
+                          ? getText("right", lang) + " " + move.dx
                           : move.dx < 0
-                          ? `向左 ${Math.abs(move.dx)}`
-                          : "不變"}
-                      </div>
+                          ? getText("left", lang) + " " + Math.abs(move.dx)
+                          : "0"}
+                      </span>
                     </div>
-                    <div>
-                      <label className="block text-sm font-bold text-slate-500">
-                        垂直 Vertical (dy)
-                      </label>
-                      <input
-                        type="range"
-                        min="-8"
-                        max="8"
-                        value={move.dy}
-                        onChange={(e) =>
-                          setMove({ ...move, dy: parseInt(e.target.value) })
-                        }
-                        className="w-full accent-amber-500"
-                      />
-                      <div className="text-center font-bold text-amber-600">
+                    <input
+                      type="range"
+                      min="-8"
+                      max="8"
+                      value={move.dx}
+                      onChange={(e) =>
+                        setMove({ ...move, dx: parseInt(e.target.value) })
+                      }
+                      className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-yellow-400"
+                    />
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between text-sm font-bold mb-1">
+                      <span>{getText("vertical", lang)}</span>
+                      <span className="text-yellow-400">
                         {move.dy > 0
-                          ? `向上 ${move.dy}`
+                          ? getText("up", lang) + " " + move.dy
                           : move.dy < 0
-                          ? `向下 ${Math.abs(move.dy)}`
-                          : "不變"}
-                      </div>
+                          ? getText("down", lang) + " " + Math.abs(move.dy)
+                          : "0"}
+                      </span>
                     </div>
+                    <input
+                      type="range"
+                      min="-8"
+                      max="8"
+                      value={move.dy}
+                      onChange={(e) =>
+                        setMove({ ...move, dy: parseInt(e.target.value) })
+                      }
+                      className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-yellow-400"
+                    />
                   </div>
                 </div>
 
-                <div className="bg-red-50 p-6 rounded-2xl border-2 border-red-200">
-                  <h3 className="text-xl font-bold text-red-800 mb-2">
-                    3. 終點 End Point (B)
-                  </h3>
-                  <p className="font-mono text-lg text-slate-700">
-                    x: {start.x} + ({move.dx}) = {end.x}
-                  </p>
-                  <p className="font-mono text-lg text-slate-700">
-                    y: {start.y} + ({move.dy}) = {end.y}
-                  </p>
-                  <div className="mt-2 text-4xl font-black text-red-600 text-center">
-                    ({end.x}, {end.y})
+                {/* End Point */}
+                <div className="glass-panel p-6 rounded-3xl border-l-4 border-pink-500 bg-pink-500/10">
+                  <div className="text-pink-400 font-bold uppercase mb-2">
+                    {getText("endPoint", lang)}
+                  </div>
+                  <div className="flex items-center justify-center gap-6">
+                    <div className="text-center">
+                      <div className="text-xs text-pink-300 font-bold">X</div>
+                      <div className="text-3xl font-black font-mono">
+                        {start.x}{" "}
+                        <span className="text-yellow-400">
+                          {move.dx >= 0 ? "+" : "-"} {Math.abs(move.dx)}
+                        </span>{" "}
+                        = {end.x}
+                      </div>
+                    </div>
+                    <div className="w-px h-12 bg-pink-500/30"></div>
+                    <div className="text-center">
+                      <div className="text-xs text-pink-300 font-bold">Y</div>
+                      <div className="text-3xl font-black font-mono">
+                        {start.y}{" "}
+                        <span className="text-yellow-400">
+                          {move.dy >= 0 ? "+" : "-"} {Math.abs(move.dy)}
+                        </span>{" "}
+                        = {end.y}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -252,22 +450,9 @@
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

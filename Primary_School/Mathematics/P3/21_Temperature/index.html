@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>小三數學：溫度計</title>
+    <title>小三數學：溫度計 | Thermometer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -23,7 +24,99 @@
     <div id="root"></div>
     <script type="text/babel">
       const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Thermometer",
+          zh: "溫度計",
+          ja: "温度計",
+          ko: "온도계",
+          es: "Termómetro",
+          de: "Thermometer",
+          fi: "Lämpömittari",
+          fr: "Thermomètre",
+          ar: "مقياس الحرارة",
+          it: "Termometro",
+        },
+        unitTitle: {
+          en: "Temperature Unit",
+          zh: "溫度單位",
+          ja: "温度単位",
+          ko: "온도 단위",
+          es: "Unidad de temperatura",
+          de: "Temperatureinheit",
+          fi: "Lämpötilayksikkö",
+          fr: "Unité de température",
+          ar: "وحدة درجة الحرارة",
+          it: "Unità di temperatura",
+        },
+        unitText: {
+          en: "Celsius (°C)",
+          zh: "攝氏度（°C）",
+          ja: "摂氏 (°C)",
+          ko: "섭씨 (°C)",
+          es: "Celsius (°C)",
+          de: "Celsius (°C)",
+          fi: "Celsius (°C)",
+          fr: "Celsius (°C)",
+          ar: "درجة مئوية (°C)",
+          it: "Celsius (°C)",
+        },
+        scenarios: {
+          freezing: {
+            en: "Freezing",
+            zh: "冰點",
+            ja: "凝固点",
+            ko: "빙점",
+            es: "Congelación",
+            de: "Gefrierpunkt",
+            fi: "Jäätymispiste",
+            fr: "Point de congélation",
+            ar: "نقطة التجمد",
+            it: "Punto di congelamento",
+          },
+          room: {
+            en: "Room Temp",
+            zh: "室溫",
+            ja: "室温",
+            ko: "실온",
+            es: "Temp. ambiente",
+            de: "Zimmertemp.",
+            fi: "Huoneenlämpö",
+            fr: "Temp. ambiante",
+            ar: "درجة حرارة الغرفة",
+            it: "Temp. ambiente",
+          },
+          body: {
+            en: "Body Temp",
+            zh: "體溫",
+            ja: "体温",
+            ko: "체온",
+            es: "Temp. corporal",
+            de: "Körpertemp.",
+            fi: "Ruumiinlämpö",
+            fr: "Temp. corporelle",
+            ar: "درجة حرارة الجسم",
+            it: "Temp. corporea",
+          },
+          hot: {
+            en: "Hot Water",
+            zh: "熱水",
+            ja: "お湯",
+            ko: "뜨거운 물",
+            es: "Agua caliente",
+            de: "Heißes Wasser",
+            fi: "Kuuma vesi",
+            fr: "Eau chaude",
+            ar: "ماء ساخن",
+            it: "Acqua calda",
+          },
+        },
+      };
+
       function App() {
+        const [lang, setLang] = useState("zh");
         const [temp, setTemp] = useState(25);
         const color =
           temp < 0
@@ -34,14 +127,21 @@
             ? "#eab308"
             : "#ef4444";
         const scenarios = [
-          { name: "冰點", temp: 0 },
-          { name: "室溫", temp: 25 },
-          { name: "體溫", temp: 37 },
-          { name: "熱水", temp: 80 },
+          { key: "freezing", temp: 0 },
+          { key: "room", temp: 25 },
+          { key: "body", temp: 37 },
+          { key: "hot", temp: 80 },
         ];
+
+        const getScenarioName = (key) =>
+          t.scenarios[key][lang] || t.scenarios[key]["en"];
+
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-6xl font-black text-white mb-8">🌡️ 溫度計</h1>
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-6xl font-black text-white mb-8 mt-8 text-center">
+              🌡️ {t.title[lang] || t.title["en"]}
+            </h1>
             <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div>
@@ -122,16 +222,18 @@
                         onClick={() => setTemp(s.temp)}
                         className="py-3 bg-gradient-to-r from-red-100 to-orange-100 hover:from-red-200 hover:to-orange-200 rounded-xl font-bold"
                       >
-                        {s.name}
+                        {getScenarioName(s.key)}
                         <div className="text-2xl">{s.temp}°C</div>
                       </button>
                     ))}
                   </div>
                   <div className="mt-6 bg-blue-50 p-4 rounded-xl">
                     <div className="font-bold text-blue-800 mb-2">
-                      💡 溫度單位
+                      💡 {t.unitTitle[lang] || t.unitTitle["en"]}
                     </div>
-                    <div className="text-blue-700">攝氏度（°C）= Celsius</div>
+                    <div className="text-blue-700">
+                      {t.unitText[lang] || t.unitText["en"]}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -141,20 +243,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

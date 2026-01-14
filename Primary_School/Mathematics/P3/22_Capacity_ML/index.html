@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>小三數學：容量（毫升與升）</title>
+    <title>小三數學：容量（毫升與升） | Capacity (ml & L)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -23,16 +24,73 @@
     <div id="root"></div>
     <script type="text/babel">
       const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Capacity Units",
+          zh: "容量單位",
+          ja: "容量単位",
+          ko: "용량 단위",
+          es: "Unidades de capacidad",
+          de: "Kapazitätseinheiten",
+          fi: "Tilavuusyksiköt",
+          fr: "Unités de capacité",
+          ar: "وحدات السعة",
+          it: "Unità di capacità",
+        },
+        conversion: {
+          en: "Conversion",
+          zh: "轉換",
+          ja: "変換",
+          ko: "변환",
+          es: "Conversión",
+          de: "Umrechnung",
+          fi: "Muunnos",
+          fr: "Conversion",
+          ar: "تحويل",
+          it: "Conversione",
+        },
+        rule1: {
+          en: "1 Liter (L) = 1000 Milliliters (ml)",
+          zh: "1 升 (L) = 1000 毫升 (ml)",
+          ja: "1リットル (L) = 1000ミリリットル (ml)",
+          ko: "1 리터 (L) = 1000 밀리리터 (ml)",
+          es: "1 Litro (L) = 1000 Mililitros (ml)",
+          de: "1 Liter (L) = 1000 Milliliter (ml)",
+          fi: "1 litra (L) = 1000 millilitraa (ml)",
+          fr: "1 Litre (L) = 1000 Millilitres (ml)",
+          ar: "1 لتر (L) = 1000 ملليلتر (ml)",
+          it: "1 Litro (L) = 1000 Millilitri (ml)",
+        },
+        rule2: {
+          en: "1000 Milliliters (ml) = 1 Liter (L)",
+          zh: "1000 毫升 (ml) = 1 升 (L)",
+          ja: "1000ミリリットル (ml) = 1リットル (L)",
+          ko: "1000 밀리리터 (ml) = 1 리터 (L)",
+          es: "1000 Mililitros (ml) = 1 Litro (L)",
+          de: "1000 Milliliter (ml) = 1 Liter (L)",
+          fi: "1000 millilitraa (ml) = 1 litra (L)",
+          fr: "1000 Millilitres (ml) = 1 Litre (L)",
+          ar: "1000 ملليلتر (ml) = 1 لتر (L)",
+          it: "1000 Millilitri (ml) = 1 Litro (L)",
+        },
+      };
+
       function App() {
+        const [lang, setLang] = useState("zh");
         const [ml, setMl] = useState(500);
         const liters = ml / 1000;
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-6xl font-black text-white mb-8">🥤 容量單位</h1>
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-6xl font-black text-white mb-8 mt-8 text-center">
+              🥤 {t.title[lang] || t.title["en"]}
+            </h1>
             <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div>
-                  <svg width="300" height="400">
+                  <svg width="300" height="400" className="mx-auto">
                     <rect
                       x="100"
                       y="50"
@@ -71,7 +129,7 @@
                       onChange={(e) => setMl(parseInt(e.target.value))}
                       className="w-full mb-4"
                     />
-                    <div className="bg-gradient-to-r from-blue-100 to-cyan-100 rounded-2xl p-8 mb-6 border-4 border-blue-400">
+                    <div className="bg-gradient-to-r from-blue-100 to-cyan-100 rounded-2xl p-8 mb-6 border-4 border-blue-400 text-center">
                       <div className="text-5xl font-black text-blue-600 mb-4">
                         {ml} ml
                       </div>
@@ -82,11 +140,11 @@
                   </div>
                   <div className="bg-blue-50 p-6 rounded-xl">
                     <div className="font-bold text-blue-800 text-lg mb-3">
-                      💡 轉換
+                      💡 {t.conversion[lang] || t.conversion["en"]}
                     </div>
                     <div className="space-y-2 text-blue-700">
-                      <div>1 升 (L) = 1000 毫升 (ml)</div>
-                      <div>1000 毫升 (ml) = 1 升 (L)</div>
+                      <div>{t.rule1[lang] || t.rule1["en"]}</div>
+                      <div>{t.rule2[lang] || t.rule2["en"]}</div>
                     </div>
                   </div>
                 </div>
@@ -97,20 +155,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

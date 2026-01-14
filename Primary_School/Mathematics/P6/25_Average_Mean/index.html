@@ -8,29 +8,135 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #e0e7ff 0%, #4338ca 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
+
+      const t = {
+        title: {
+          en: "Average (Mean)",
+          zh: "平均數",
+          ja: "平均",
+          ko: "평균",
+          es: "Promedio (Media)",
+          de: "Durchschnitt",
+          fi: "Keskiarvo",
+          fr: "Moyenne",
+          ar: "متوسط",
+          it: "Media",
+        },
+        count: {
+          en: "Count",
+          zh: "數量",
+          ja: "個数",
+          ko: "개수",
+          es: "Cantidad",
+          de: "Anzahl",
+          fi: "Lukumäärä",
+          fr: "Nombre",
+          ar: "العدد",
+          it: "Conteggio",
+        },
+        sum: {
+          en: "Sum",
+          zh: "總和",
+          ja: "合計",
+          ko: "합계",
+          es: "Suma",
+          de: "Summe",
+          fi: "Summa",
+          fr: "Somme",
+          ar: "المجموع",
+          it: "Somma",
+        },
+        average: {
+          en: "Average",
+          zh: "平均數",
+          ja: "平均",
+          ko: "평균",
+          es: "Promedio",
+          de: "Durchschnitt",
+          fi: "Keskiarvo",
+          fr: "Moyenne",
+          ar: "متوسط",
+          it: "Media",
+        },
+        addData: {
+          en: "Add Data",
+          zh: "添加數據",
+          ja: "データを追加",
+          ko: "데이터 추가",
+          es: "Añadir Datos",
+          de: "Daten hinzufügen",
+          fi: "Lisää tietoja",
+          fr: "Ajouter données",
+          ar: "إضافة بيانات",
+          it: "Aggiungi Dati",
+        },
+        levelOut: {
+          en: "Level Out",
+          zh: "拉平線",
+          ja: "平準化",
+          ko: "수평 맞추기",
+          es: "Nivelar",
+          de: "Ausgleichen",
+          fi: "Tasoita",
+          fr: "Niveler",
+          ar: "تسوية",
+          it: "Livellare",
+        },
+        formula: {
+          en: "Sum ÷ Count = Average",
+          zh: "總和 ÷ 數量 = 平均數",
+          ja: "合計 ÷ 個数 = 平均",
+          ko: "합계 ÷ 개수 = 평균",
+          es: "Suma ÷ Cantidad = Promedio",
+          de: "Summe ÷ Anzahl = Durchschnitt",
+          fi: "Summa ÷ Lukumäärä = Keskiarvo",
+          fr: "Somme ÷ Nombre = Moyenne",
+          ar: "المجموع ÷ العدد = المتوسط",
+          it: "Somma ÷ Conteggio = Media",
+        },
+      };
+
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
       function App() {
-        // Dynamic list of numbers
-        const [nums, setNums] = useState([80, 85, 90, 75]);
+        const [lang, setLang] = useState("zh");
+        const [nums, setNums] = useState([40, 60, 80, 50, 70]);
         const sum = nums.reduce((a, b) => a + b, 0);
         const avg = sum / nums.length;
 
+        const [showAverageLine, setShowAverageLine] = useState(false);
+
         const addNum = () => {
-          if (nums.length < 8) setNums([...nums, 50]);
+          if (nums.length < 10) setNums([...nums, 50]);
         };
         const removeNum = (i) => {
           if (nums.length > 1) {
@@ -41,109 +147,193 @@
         };
         const updateNum = (i, val) => {
           const newNums = [...nums];
-          newNums[i] = parseInt(val) || 0;
+          newNums[i] = Math.max(0, Math.min(100, parseInt(val) || 0));
           setNums(newNums);
         };
 
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-indigo-100 mb-2">
-              📉 平均數
-            </h1>
-            <p className="text-xl text-indigo-200 font-bold mb-8">
-              Average (Mean)
-            </p>
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-3xl w-full">
-              <div className="flex flex-wrap gap-4 justify-center mb-8">
-                {nums.map((n, i) => (
-                  <div
-                    key={i}
-                    className="flex flex-col items-center bg-indigo-50 p-2 rounded-xl border-2 border-indigo-200 relative group"
+          <div className="min-h-screen flex flex-col items-center p-4 font-sans bg-slate-900 text-white">
+            <div className="w-full max-w-5xl flex justify-between items-center mb-8">
+              <h1 className="text-4xl font-black text-indigo-400 drop-shadow-[0_0_15px_rgba(129,140,248,0.5)]">
+                📊 {getText("title", lang)}
+              </h1>
+              <div className="flex bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-indigo-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
                   >
-                    <input
-                      type="number"
-                      value={n}
-                      onChange={(e) => updateNum(i, e.target.value)}
-                      className="w-16 h-16 text-3xl font-black text-center text-indigo-800 bg-transparent outline-none"
-                    />
-                    <button
-                      onClick={() => removeNum(i)}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      ×
-                    </button>
-
-                    {/* Visual Bar representation relative to 100 */}
-                    <div className="w-full bg-slate-200 h-1 mt-1 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-indigo-500"
-                        style={{ width: `${Math.min(n, 100)}%` }}
-                      ></div>
-                    </div>
-                  </div>
+                    {l}
+                  </button>
                 ))}
-                {nums.length < 8 && (
+              </div>
+            </div>
+
+            <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Controls / List */}
+              <div className="glass-panel p-6 rounded-3xl flex flex-col gap-4 max-h-[500px] overflow-hidden">
+                <div className="flex justify-between items-center mb-2">
+                  <h2 className="font-bold text-slate-300 uppercase">
+                    {getText("addData", lang)}
+                  </h2>
                   <button
                     onClick={addNum}
-                    className="w-16 h-16 rounded-xl border-2 border-dashed border-indigo-300 text-indigo-300 hover:text-indigo-500 hover:border-indigo-500 flex items-center justify-center text-3xl font-bold transition-colors"
+                    className="w-8 h-8 rounded-full bg-indigo-600 hover:bg-indigo-500 font-bold flex items-center justify-center transition-colors shadow-lg"
                   >
                     +
                   </button>
-                )}
+                </div>
+
+                <div className="flex-1 overflow-y-auto pr-2 space-y-3 custom-scrollbar">
+                  <AnimatePresence>
+                    {nums.map((n, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        className="flex items-center gap-3 bg-slate-800/50 p-2 rounded-xl border border-slate-700 relative group"
+                      >
+                        <div className="w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-300 flex items-center justify-center font-bold text-xs border border-indigo-500/30">
+                          {i + 1}
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          value={n}
+                          onChange={(e) => updateNum(i, e.target.value)}
+                          className="flex-1 h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+                        />
+                        <input
+                          type="number"
+                          value={n}
+                          onChange={(e) => updateNum(i, e.target.value)}
+                          className="w-12 bg-transparent text-right font-black text-lg outline-none"
+                        />
+                        <button
+                          onClick={() => removeNum(i)}
+                          className="w-6 h-6 rounded-full bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-all font-bold"
+                        >
+                          ×
+                        </button>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-                <div className="bg-slate-50 p-6 rounded-2xl">
-                  <div className="text-sm font-bold text-slate-500 uppercase">
-                    數量 Count
-                  </div>
-                  <div className="text-4xl font-black text-slate-800">
-                    {nums.length}
-                  </div>
-                </div>
-                <div className="bg-slate-50 p-6 rounded-2xl">
-                  <div className="text-sm font-bold text-slate-500 uppercase">
-                    總和 Sum
-                  </div>
-                  <div className="text-4xl font-black text-slate-800">
-                    {sum}
-                  </div>
-                </div>
-                <div className="bg-indigo-100 p-6 rounded-2xl border-4 border-indigo-400">
-                  <div className="text-sm font-bold text-indigo-600 uppercase">
-                    平均 Average
-                  </div>
-                  <div className="text-5xl font-black text-indigo-900">
-                    {avg.toFixed(1)}
-                  </div>
-                </div>
-              </div>
+              {/* Visualization */}
+              <div className="lg:col-span-2 flex flex-col gap-6">
+                <div className="glass-panel p-8 rounded-3xl flex-1 flex flex-col relative min-h-[300px]">
+                  <div className="flex justify-between items-end h-full gap-2 relative">
+                    {/* Average Line */}
+                    <motion.div
+                      className="absolute left-0 right-0 border-t-4 border-dashed border-emerald-400 z-10 flex items-center justify-end pr-2 pointer-events-none"
+                      animate={{
+                        bottom: `${avg}%`,
+                        opacity: showAverageLine ? 1 : 0.5,
+                      }}
+                      transition={{ type: "spring", stiffness: 50 }}
+                    >
+                      <span className="text-emerald-400 font-bold bg-slate-900/80 px-2 rounded -mt-8 text-sm">
+                        Mean: {avg.toFixed(1)}
+                      </span>
+                    </motion.div>
 
-              <div className="mt-8 bg-amber-50 p-6 rounded-2xl border border-amber-200 text-center">
-                <p className="text-lg font-mono text-amber-900">
-                  ({nums.join(" + ")}) ÷ {nums.length} = <b>{avg.toFixed(1)}</b>
-                </p>
+                    {/* Bars */}
+                    {nums.map((n, i) => (
+                      <div
+                        key={i}
+                        className="flex-1 flex flex-col justify-end h-full relative group"
+                      >
+                        <div className="text-center font-bold text-slate-500 text-xs mb-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          {n}
+                        </div>
+                        <motion.div
+                          className="w-full bg-indigo-500 rounded-t-lg relative overflow-hidden"
+                          animate={{
+                            height: showAverageLine ? `${avg}%` : `${n}%`,
+                          }}
+                          transition={{
+                            type: "spring",
+                            stiffness: 60,
+                            damping: 15,
+                          }} // "Levelling" effect
+                        >
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                        </motion.div>
+                        <div className="text-center text-xs text-slate-600 font-bold mt-2">
+                          {i + 1}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Stats Bar */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="glass-panel p-4 rounded-2xl flex flex-col items-center">
+                    <div className="text-xs text-slate-400 font-bold uppercase">
+                      {getText("count", lang)}
+                    </div>
+                    <div className="text-3xl font-black text-white">
+                      {nums.length}
+                    </div>
+                  </div>
+                  <div className="glass-panel p-4 rounded-2xl flex flex-col items-center">
+                    <div className="text-xs text-slate-400 font-bold uppercase">
+                      {getText("sum", lang)}
+                    </div>
+                    <div className="text-3xl font-black text-indigo-300">
+                      {sum}
+                    </div>
+                  </div>
+                  <motion.div
+                    className="glass-panel p-4 rounded-2xl flex flex-col items-center border-2 border-emerald-500/30 bg-emerald-500/5 cursor-pointer hover:bg-emerald-500/10 transition-colors"
+                    onClick={() => setShowAverageLine(!showAverageLine)}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <div className="text-xs text-emerald-400 font-bold uppercase flex items-center gap-2">
+                      {getText("average", lang)}
+                      <span className="text-[10px] bg-emerald-500/20 px-1.5 rounded">
+                        {showAverageLine ? "ON" : "OFF"}
+                      </span>
+                    </div>
+                    <div className="text-3xl font-black text-white">
+                      {avg.toFixed(1)}
+                    </div>
+                  </motion.div>
+                </div>
+
+                <div className="text-center text-slate-400 font-mono text-sm">
+                  {getText("formula", lang)}
+                </div>
               </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

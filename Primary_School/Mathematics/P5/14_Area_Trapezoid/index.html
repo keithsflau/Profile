@@ -3,65 +3,77 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小五數學：梯形面積 | Trapezoid Area</title>
+    <title>小五數學：梯形面積 | Area of Trapezoid</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #fce7f3 0%, #f472b6 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
-      const { LanguageSelector, get } = window.MathI18n;
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
 
       const t = {
         title: {
-          en: "Trapezoid Area",
+          en: "Area of Trapezoid",
           zh: "梯形面積",
           ja: "台形の面積",
           ko: "사다리꼴의 넓이",
           es: "Área del Trapecio",
           de: "Fläche des Trapezes",
           fi: "Puolisuunnikkaan pinta-ala",
-          fr: "Aire du Trapèze",
+          fr: "Aire du trapèze",
           ar: "مساحة شبه المنحرف",
           it: "Area del Trapezio",
         },
-        topBase: {
-          en: "Top Base",
+        top: {
+          en: "Top",
           zh: "上底",
           ja: "上底",
           ko: "윗변",
-          es: "Base Superior",
-          de: "Obere Basis",
-          fi: "Yläkanta",
-          fr: "Petite Base",
-          ar: "القاعدة العليا",
-          it: "Base Minore",
+          es: "Superior",
+          de: "Oben",
+          fi: "Ylä",
+          fr: "Haut",
+          ar: "أعلى",
+          it: "Superiore",
         },
-        bottomBase: {
-          en: "Bottom Base",
+        bottom: {
+          en: "Bottom",
           zh: "下底",
           ja: "下底",
           ko: "아랫변",
-          es: "Base Inferior",
-          de: "Untere Basis",
-          fi: "Alakanta",
-          fr: "Grande Base",
-          ar: "القاعدة السفلى",
-          it: "Base Maggiore",
+          es: "Inferior",
+          de: "Unten",
+          fi: "Ala",
+          fr: "Bas",
+          ar: "أسفل",
+          it: "Inferiore",
         },
         height: {
           en: "Height",
@@ -75,30 +87,6 @@
           ar: "الارتفاع",
           it: "Altezza",
         },
-        formulaTitle: {
-          en: "Formula:",
-          zh: "公式:",
-          ja: "公式:",
-          ko: "공식:",
-          es: "Fórmula:",
-          de: "Formel:",
-          fi: "Kaava:",
-          fr: "Formule :",
-          ar: "الصيغة:",
-          it: "Formula:",
-        },
-        formula: {
-          en: "(Top Base + Bottom Base) × Height ÷ 2",
-          zh: "(上底 + 下底) × 高 ÷ 2",
-          ja: "(上底 + 下底) × 高さ ÷ 2",
-          ko: "(윗변 + 아랫변) × 높이 ÷ 2",
-          es: "(Base Sup. + Base Inf.) × Altura ÷ 2",
-          de: "(Obere Basis + Untere Basis) × Höhe ÷ 2",
-          fi: "(Yläkanta + Alakanta) × Korkeus ÷ 2",
-          fr: "(Petite Base + Grande Base) × Hauteur ÷ 2",
-          ar: "(القاعدة العليا + القاعدة السفلى) × الارتفاع ÷ 2",
-          it: "(Base Minore + Base Maggiore) × Altezza ÷ 2",
-        },
         area: {
           en: "Area",
           zh: "面積",
@@ -111,195 +99,317 @@
           ar: "المساحة",
           it: "Area",
         },
-        why: {
-          en: "Why divide by 2?",
-          zh: "為什麼除以 2？",
-          ja: "なぜ2で割るのですか？",
-          ko: "왜 2로 나누나요?",
-          es: "¿Por qué dividir entre 2?",
-          de: "Warum durch 2 teilen?",
-          fi: "Miksi jaetaan 2:lla?",
-          fr: "Pourquoi diviser par 2 ?",
-          ar: "لماذا نقسم على 2؟",
-          it: "Perché dividere per 2?",
+        proof: {
+          en: "Proof: Duplicate & Rotate",
+          zh: "證明：複製並旋轉",
+          ja: "証明：複製して回転",
+          ko: "증명: 복제 및 회전",
+          es: "Prueba: Duplicar y Rotar",
+          de: "Beweis: Duplizieren & Drehen",
+          fi: "Todistus: Kopioi ja kierrä",
+          fr: "Preuve : Dupliquer et Pivoter",
+          ar: "برهان: نسخ وتدوير",
+          it: "Prova: Duplica e Ruota",
         },
-        reason: {
-          en: "Two identical trapezoids can form a parallelogram with base (top + bottom) and the same height.",
-          zh: "兩個相同的梯形可以拼成一個平行四邊形，其底為 (上底 + 下底)，高相同。",
-          ja: "2つの同じ台形は、底辺が（上底+下底）で高さが同じ平行四辺形を作ることができます。",
-          ko: "두 개의 동일한 사다리꼴은 (윗변 + 아랫변)을 밑변으로 하고 높이가 같은 평행사변형을 만들 수 있습니다.",
-          es: "Dos trapecios idénticos pueden formar un paralelogramo con base (superior + inferior) y la misma altura.",
-          de: "Zwei identische Trapeze können ein Parallelogramm mit der Basis (Oben + Unten) und derselben Höhe bilden.",
-          fi: "Kaksi samanlaista puolisuunnikasta voi muodostaa suunnikkaan, jonka kanta on (ylä + ala) ja korkeus sama.",
-          fr: "Deux trapèzes identiques peuvent former un parallélogramme avec une base (petite + grande) et la même hauteur.",
-          ar: "يمكن لشبه منحرفين متطابقين تكوين متوازي أضلاع بقاعدة (عليا + سفلى) ونفس الارتفاع.",
-          it: "Due trapezi identici possono formare un parallelogramma con base (minore + maggiore) e la stessa altezza.",
+        formula: {
+          en: "(Top + Bottom) × Height ÷ 2",
+          zh: "(上底 + 下底) × 高 ÷ 2",
+          ja: "(上底 + 下底) × 高さ ÷ 2",
+          ko: "(윗변 + 아랫변) × 높이 ÷ 2",
+          es: "(Sup + Inf) × Altura ÷ 2",
+          de: "(Oben + Unten) × Höhe ÷ 2",
+          fi: "(Ylä + Ala) × Korkeus ÷ 2",
+          fr: "(Haut + Bas) × H ÷ 2",
+          ar: "(أعلى + أسفل) × 2 ÷ الارتفاع",
+          it: "(Sup + Inf) × H ÷ 2",
+        },
+        paraText: {
+          en: "Forms a large Parallelogram!",
+          zh: "形成一個大平行四邊形！",
+          ja: "大きな平行四辺形になります！",
+          ko: "직사각형을 형성합니다!",
+          es: "¡Forma un gran paralelogramo!",
+          de: "Bildet ein großes Parallelogramm!",
+          fi: "Muodostaa suuren suunnikkaan!",
+          fr: "Forme un grand parallélogramme !",
+          ar: "يشكل متوازي أضلاع كبير!",
+          it: "Forma un grande parallelogramma!",
         },
       };
 
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
       function App() {
         const [lang, setLang] = useState("zh");
-        const getText = (key) => t[key][lang] || t[key]["en"];
-
-        const [topBase, setTopBase] = useState(6);
-        const [bottomBase, setBottomBase] = useState(10);
+        const [top, setTop] = useState(6);
+        const [bottom, setBottom] = useState(10);
         const [height, setHeight] = useState(5);
-        const area = ((topBase + bottomBase) * height) / 2;
+        const [showProof, setShowProof] = useState(false);
 
-        const cx = 160;
-        const scale = 12;
-        const topHalf = (topBase * scale) / 2;
-        const botHalf = (bottomBase * scale) / 2;
-        const h = height * 15;
+        const area = ((top + bottom) * height) / 2;
+        const U = 35;
+        const CX = 400;
+        const CY = 300;
+
+        // Shape Geometry (Isosceles Trapezoid centered)
+        const H_px = height * U;
+        const T_px = top * U;
+        const B_px = bottom * U;
+
+        // Vertices relative to center (0,0)
+        // TL: (-T/2, -H/2)
+        // TR: (T/2, -H/2)
+        // BR: (B/2, H/2)
+        // BL: (-B/2, H/2)
+
+        const pathStr = `M ${-T_px / 2} ${-H_px / 2} L ${T_px / 2} ${
+          -H_px / 2
+        } L ${B_px / 2} ${H_px / 2} L ${-B_px / 2} ${H_px / 2} Z`;
 
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <LanguageSelector lang={lang} setLang={setLang} />
-            <h1 className="text-5xl font-black text-pink-900 mb-2 mt-8">
-              ⏢ {getText("title")}
-            </h1>
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-4xl w-full mt-8">
-              <div className="flex flex-col md:flex-row gap-8 items-center">
-                <div className="flex-1">
-                  <svg
-                    viewBox="0 0 320 200"
-                    className="w-full max-w-sm mx-auto"
+          <div className="min-h-screen flex flex-col items-center p-4 font-sans bg-slate-900 text-white">
+            <div className="w-full max-w-5xl flex justify-between items-center mb-10">
+              <h1 className="text-4xl font-black text-pink-400 drop-shadow-[0_0_15px_rgba(244,114,182,0.5)]">
+                img {getText("title", lang)}
+              </h1>
+              <div className="flex bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-pink-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
                   >
-                    <polygon
-                      points={`${cx - topHalf},40 ${cx + topHalf},40 ${
-                        cx + botHalf
-                      },${40 + h} ${cx - botHalf},${40 + h}`}
-                      fill="#ec4899"
-                      stroke="#be185d"
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="w-full max-w-6xl flex flex-col lg:flex-row gap-8 items-start">
+              {/* Visual Stage */}
+              <div className="flex-1 w-full glass-panel rounded-3xl overflow-hidden relative min-h-[400px] flex items-center justify-center border-4 border-slate-700/50">
+                {/* Grid */}
+                <div
+                  className="absolute inset-0 opacity-20 pointer-events-none"
+                  style={{
+                    backgroundImage:
+                      "linear-gradient(#475569 1px, transparent 1px), linear-gradient(90deg, #475569 1px, transparent 1px)",
+                    backgroundSize: `${U}px ${U}px`,
+                  }}
+                ></div>
+
+                <svg
+                  width="100%"
+                  height="500"
+                  viewBox="0 0 800 600"
+                  className="overflow-visible"
+                >
+                  <defs>
+                    <linearGradient id="trapGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#ec4899" stopOpacity="0.6" />
+                      <stop
+                        offset="100%"
+                        stopColor="#be185d"
+                        stopOpacity="0.8"
+                      />
+                    </linearGradient>
+                    <linearGradient
+                      id="trapGradDuplicate"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.6" />
+                      <stop
+                        offset="100%"
+                        stopColor="#d97706"
+                        stopOpacity="0.8"
+                      />
+                    </linearGradient>
+                  </defs>
+
+                  <g transform={`translate(${CX}, ${CY})`}>
+                    {/* Original */}
+                    <path
+                      d={pathStr}
+                      fill="url(#trapGrad)"
+                      stroke="#fbcfe8"
                       strokeWidth="3"
                     />
-                    {/* Top base label */}
+
+                    {/* Text for Original */}
                     <text
-                      x={cx}
-                      y="30"
+                      x={0}
+                      y={-H_px / 2 - 10}
                       textAnchor="middle"
-                      className="text-sm font-bold fill-pink-800"
+                      fill="#fbcfe8"
+                      fontWeight="bold"
                     >
-                      {getText("topBase")} = {topBase} cm
+                      {top}
                     </text>
-                    {/* Bottom base label */}
                     <text
-                      x={cx}
-                      y={40 + h + 20}
+                      x={0}
+                      y={H_px / 2 + 25}
                       textAnchor="middle"
-                      className="text-sm font-bold fill-pink-800"
+                      fill="#fbcfe8"
+                      fontWeight="bold"
                     >
-                      {getText("bottomBase")} = {bottomBase} cm
+                      {bottom}
                     </text>
-                    {/* Height line */}
                     <line
-                      x1={cx}
-                      y1="40"
-                      x2={cx}
-                      y2={40 + h}
-                      stroke="#3b82f6"
-                      strokeWidth="2"
-                      strokeDasharray="4,4"
+                      x1={0}
+                      y1={-H_px / 2}
+                      x2={0}
+                      y2={H_px / 2}
+                      stroke="white"
+                      strokeDasharray="5,5"
                     />
-                    <text
-                      x={cx + 10}
-                      y={40 + h / 2}
-                      className="text-sm font-bold fill-blue-600"
-                    >
+                    <text x={5} y={0} fill="white" fontWeight="bold">
                       h={height}
                     </text>
-                  </svg>
-                </div>
-                <div className="flex-1 space-y-4">
-                  <div>
-                    <label className="block font-bold text-pink-800 mb-1">
-                      {getText("topBase")} (cm)
-                    </label>
-                    <input
-                      type="range"
-                      min="2"
-                      max="10"
-                      value={topBase}
-                      onChange={(e) => setTopBase(parseInt(e.target.value))}
-                      className="w-full accent-pink-500"
-                    />
-                    <div className="text-center text-xl font-black text-pink-600">
-                      {topBase} cm
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block font-bold text-pink-800 mb-1">
-                      {getText("bottomBase")} (cm)
-                    </label>
-                    <input
-                      type="range"
-                      min="4"
-                      max="14"
-                      value={bottomBase}
-                      onChange={(e) => setBottomBase(parseInt(e.target.value))}
-                      className="w-full accent-pink-500"
-                    />
-                    <div className="text-center text-xl font-black text-pink-600">
-                      {bottomBase} cm
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block font-bold text-pink-800 mb-1">
-                      {getText("height")} (cm)
-                    </label>
-                    <input
-                      type="range"
-                      min="2"
-                      max="8"
-                      value={height}
-                      onChange={(e) => setHeight(parseInt(e.target.value))}
-                      className="w-full accent-pink-500"
-                    />
-                    <div className="text-center text-xl font-black text-pink-600">
-                      {height} cm
-                    </div>
-                  </div>
-                  <div className="bg-pink-50 rounded-xl p-3 border-2 border-pink-200 text-center">
-                    <p className="font-bold">{getText("formulaTitle")}</p>
-                    <p className="font-mono">{getText("formula")}</p>
-                  </div>
-                  <div className="bg-emerald-100 rounded-2xl p-4 text-center border-4 border-emerald-300">
-                    <div className="text-emerald-600 font-bold">
-                      {getText("area")}
-                    </div>
-                    <div className="text-4xl font-black text-emerald-800">
-                      {area} cm²
-                    </div>
-                    <div className="text-sm text-emerald-600">
-                      ({topBase} + {bottomBase}) × {height} ÷ 2 = {area}
-                    </div>
-                  </div>
-                </div>
+
+                    {/* Duplicate for Proof */}
+                    <AnimatePresence>
+                      {showProof && (
+                        <motion.g
+                          initial={{ rotate: 0, x: 0, opacity: 0 }}
+                          animate={{
+                            rotate: 180,
+                            x: (T_px + B_px) / 2, // Translating to align side-by-side
+                            opacity: 1,
+                          }}
+                          exit={{ rotate: 0, x: 0, opacity: 0 }}
+                          transition={{
+                            duration: 1.5,
+                            type: "spring",
+                            bounce: 0.2,
+                          }}
+                        >
+                          <path
+                            d={pathStr}
+                            fill="url(#trapGradDuplicate)"
+                            stroke="#fcd34d"
+                            strokeWidth="3"
+                            strokeDasharray="5,5"
+                          />
+                        </motion.g>
+                      )}
+                    </AnimatePresence>
+                  </g>
+
+                  {showProof && (
+                    <motion.text
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 1 }}
+                      x="400"
+                      y="550"
+                      textAnchor="middle"
+                      fill="#fcd34d"
+                      fontSize="18"
+                      fontWeight="bold"
+                    >
+                      {getText("paraText", lang)} (Area ÷ 2)
+                    </motion.text>
+                  )}
+                </svg>
               </div>
-              <div className="mt-6 bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
-                <p className="font-bold">💡 {getText("why")}</p>
-                <p className="text-sm">{getText("reason")}</p>
+
+              {/* Controls */}
+              <div className="w-full lg:w-80 flex flex-col gap-6">
+                <div className="glass-panel p-6 rounded-3xl flex flex-col gap-6">
+                  <ControlSlider
+                    label={getText("top", lang)}
+                    val={top}
+                    set={setTop}
+                    min={2}
+                    max={10}
+                    color="accent-pink-400"
+                    text="text-pink-300"
+                  />
+                  <ControlSlider
+                    label={getText("bottom", lang)}
+                    val={bottom}
+                    set={setBottom}
+                    min={4}
+                    max={14}
+                    color="accent-fuchsia-400"
+                    text="text-fuchsia-300"
+                  />
+                  <ControlSlider
+                    label={getText("height", lang)}
+                    val={height}
+                    set={setHeight}
+                    min={2}
+                    max={10}
+                    color="accent-rose-400"
+                    text="text-rose-300"
+                  />
+
+                  <div className="h-px bg-white/10 my-2"></div>
+
+                  <button
+                    onClick={() => setShowProof(!showProof)}
+                    className={`py-3 rounded-xl font-bold text-lg transition-all border border-white/10 ${
+                      showProof
+                        ? "bg-amber-500/80 text-white shadow-[0_0_20px_rgba(245,158,11,0.3)]"
+                        : "bg-slate-700/50 text-slate-300 hover:bg-slate-600/50"
+                    }`}
+                  >
+                    {getText("proof", lang)}
+                  </button>
+
+                  <div className="bg-slate-950/50 p-4 rounded-xl border border-white/5 text-center">
+                    <div className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">
+                      {getText("formula", lang)}
+                    </div>
+                    <div className="text-4xl font-black text-white">{area}</div>
+                    <div className="text-xs text-slate-500 mt-1 font-mono">
+                      (({top}+{bottom})×{height})÷2
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const ControlSlider = ({ label, val, set, min, max, color, text }) => (
+        <div className="flex flex-col gap-2">
+          <div className={`flex justify-between font-bold ${text}`}>
+            <label>{label}</label>
+            <span>{val}</span>
+          </div>
+          <input
+            type="range"
+            min={min}
+            max={max}
+            value={val}
+            onChange={(e) => set(Number(e.target.value))}
+            className={`w-full ${color}`}
+          />
+        </div>
+      );
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

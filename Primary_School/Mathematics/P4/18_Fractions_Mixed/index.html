@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小四數學：帶分數</title>
+    <title>小四數學：帶分數 | Mixed Numbers</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -23,10 +24,42 @@
     <div id="root"></div>
     <script type="text/babel">
       const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Mixed Numbers",
+          zh: "帶分數",
+          ja: "帯分数",
+          ko: "대분수",
+          es: "Números Mixtos",
+          de: "Gemischte Zahlen",
+          fi: "Sekaluvut",
+          fr: "Nombres mixtes",
+          ar: "الأعداد الكسرية",
+          it: "Numeri misti",
+        },
+        explanation: {
+          en: "{whole} Integers plus {rem}/{den}",
+          zh: "{whole} 個整數 加上 {rem}/{den}",
+          ja: "{whole} 個の整数 足す {rem}/{den}",
+          ko: "{whole} 개의 정수 더하기 {rem}/{den}",
+          es: "{whole} Enteros más {rem}/{den}",
+          de: "{whole} Ganze plus {rem}/{den}",
+          fi: "{whole} kokonaista plus {rem}/{den}",
+          fr: "{whole} Entiers plus {rem}/{den}",
+          ar: "{whole} أعداد صحيحة زائد {rem}/{den}",
+          it: "{whole} Interi più {rem}/{den}",
+        },
+      };
+
       function App() {
+        const [lang, setLang] = useState("zh");
         const [whole, setWhole] = useState(2);
         const [rem, setRem] = useState(1);
         const [den, setDen] = useState(4);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
 
         // Mixed number: whole + rem/den
         // Improper: (whole*den + rem) / den
@@ -35,12 +68,13 @@
 
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-rose-900 mb-8">
-              🍰 帶分數
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-rose-900 mb-8 mt-8">
+              🍰 {getText("title")}
             </h1>
 
             <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full flex flex-col items-center">
-              <div className="flex gap-12 items-center mb-12">
+              <div className="flex gap-12 items-center mb-12 flex-wrap justify-center">
                 {/* Mixed Number Input */}
                 <div className="flex items-center gap-2">
                   <input
@@ -130,6 +164,21 @@
                           50 + 45 * Math.cos(Math.PI * 2 * (end / 360));
                         const y2 =
                           50 + 45 * Math.sin(Math.PI * 2 * (end / 360));
+
+                        if (den === 1) {
+                          return (
+                            <circle
+                              key={j}
+                              cx="50"
+                              cy="50"
+                              r="45"
+                              fill={j < toFill ? "#fb7185" : "transparent"}
+                              stroke="white"
+                              strokeWidth="1"
+                            />
+                          );
+                        }
+
                         return (
                           <path
                             key={j}
@@ -145,8 +194,11 @@
                 })}
               </div>
 
-              <div className="mt-8 text-slate-500 font-bold">
-                {whole} 個整數 加上 {rem}/{den}
+              <div className="mt-8 text-slate-500 font-bold text-center">
+                {getText("explanation")
+                  .replace("{whole}", whole)
+                  .replace("{rem}", rem)
+                  .replace("{den}", den)}
               </div>
             </div>
           </div>
@@ -154,20 +206,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

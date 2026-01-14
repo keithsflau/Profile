@@ -8,116 +8,324 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #fce7f3 0%, #ec4899 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
+
+      const t = {
+        title: {
+          en: "Percentage Change",
+          zh: "百分數變化",
+          ja: "変化率",
+          ko: "백분율 변화",
+          es: "Cambio Porcentual",
+          de: "Prozentuale Änderung",
+          fi: "Prosentuaalinen muutos",
+          fr: "Variation en pourcentage",
+          ar: "التغير المئوي",
+          it: "Variazione Percentuale",
+        },
+        original: {
+          en: "Original Value",
+          zh: "原本數值",
+          ja: "元の値",
+          ko: "원래 값",
+          es: "Valor Original",
+          de: "Ursprünglicher Wert",
+          fi: "Alkuperäinen arvo",
+          fr: "Valeur originale",
+          ar: "القيمة الأصلية",
+          it: "Valore Originale",
+        },
+        new: {
+          en: "New Value",
+          zh: "新數值",
+          ja: "新しい値",
+          ko: "새로운 값",
+          es: "Nuevo Valor",
+          de: "Neuer Wert",
+          fi: "Uusi arvo",
+          fr: "Nouvelle valeur",
+          ar: "القيمة الجديدة",
+          it: "Nuovo Valore",
+        },
+        increase: {
+          en: "Increase by",
+          zh: "增加",
+          ja: "増加",
+          ko: "증가",
+          es: "Aumento de",
+          de: "Anstieg um",
+          fi: "Kasvu",
+          fr: "Augmentation de",
+          ar: "زيادة بـ",
+          it: "Aumento di",
+        },
+        decrease: {
+          en: "Decrease by",
+          zh: "減少",
+          ja: "減少",
+          ko: "감소",
+          es: "Disminución de",
+          de: "Rückgang um",
+          fi: "Lasku",
+          fr: "Diminution de",
+          ar: "نقصان بـ",
+          it: "Diminuzione di",
+        },
+        diff: {
+          en: "Difference",
+          zh: "相差",
+          ja: "差",
+          ko: "차이",
+          es: "Diferencia",
+          de: "Differenz",
+          fi: "Erotus",
+          fr: "Différence",
+          ar: "الفرق",
+          it: "Differenza",
+        },
+        formula: {
+          en: "Formula",
+          zh: "公式",
+          ja: "公式",
+          ko: "공식",
+          es: "Fórmula",
+          de: "Formel",
+          fi: "Kaava",
+          fr: "Formule",
+          ar: "صيغة",
+          it: "Formula",
+        },
+      };
+
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
       function App() {
+        const [lang, setLang] = useState("zh");
         const [oldVal, setOldVal] = useState(50);
         const [newVal, setNewVal] = useState(60);
 
-        const change = newVal - oldVal;
-        const percentChange = (change / oldVal) * 100;
-        const isIncrease = change >= 0;
+        const diff = newVal - oldVal;
+        const percent = (diff / oldVal) * 100;
+        const isIncrease = diff >= 0;
+
+        // Visual scaling
+        const maxVal = Math.max(oldVal, newVal, 100) * 1.2;
 
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-pink-900 mb-2">
-              📊 百分數變化
-            </h1>
-            <p className="text-xl text-pink-700 font-bold mb-8">
-              Percentage Change
-            </p>
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-2xl w-full">
-              <div className="grid grid-cols-2 gap-6 mb-8">
-                <div className="text-center">
-                  <label className="block font-bold text-pink-700 mb-2">
-                    舊數值 Old Value
-                  </label>
-                  <input
-                    type="number"
-                    value={oldVal}
-                    onChange={(e) => setOldVal(parseFloat(e.target.value) || 1)}
-                    className="w-full text-3xl font-black text-center border-4 border-pink-300 rounded-xl p-2"
-                  />
-                </div>
-                <div className="text-center">
-                  <label className="block font-bold text-pink-700 mb-2">
-                    新數值 New Value
-                  </label>
-                  <input
-                    type="number"
-                    value={newVal}
-                    onChange={(e) => setNewVal(parseFloat(e.target.value) || 0)}
-                    className="w-full text-3xl font-black text-center border-4 border-pink-300 rounded-xl p-2"
-                  />
+          <div className="min-h-screen flex flex-col items-center p-4 font-sans bg-slate-900 text-white">
+            <div className="w-full max-w-5xl flex justify-between items-center mb-10">
+              <h1 className="text-4xl font-black text-pink-400 drop-shadow-[0_0_15px_rgba(244,114,182,0.5)]">
+                📊 {getText("title", lang)}
+              </h1>
+              <div className="flex bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-pink-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Controls */}
+              <div className="glass-panel p-8 rounded-3xl flex flex-col gap-6 md:col-span-2">
+                <div className="flex flex-wrap text-center gap-8 justify-center">
+                  <div className="flex flex-col items-center">
+                    <label className="text-slate-400 font-bold uppercase mb-2">
+                      {getText("original", lang)}
+                    </label>
+                    <input
+                      type="number"
+                      value={oldVal}
+                      onChange={(e) =>
+                        setOldVal(Math.max(1, parseFloat(e.target.value) || 1))
+                      }
+                      className="w-32 text-4xl font-black text-center bg-slate-800 border-b-4 border-slate-500 rounded-xl py-2 outline-none"
+                    />
+                  </div>
+
+                  <div className="flex items-center pt-8">
+                    <div className="text-4xl">➔</div>
+                  </div>
+
+                  <div className="flex flex-col items-center">
+                    <label className="text-pink-400 font-bold uppercase mb-2">
+                      {getText("new", lang)}
+                    </label>
+                    <input
+                      type="number"
+                      value={newVal}
+                      onChange={(e) =>
+                        setNewVal(Math.max(0, parseFloat(e.target.value) || 0))
+                      }
+                      className="w-32 text-4xl font-black text-center bg-slate-800 border-b-4 border-pink-500 rounded-xl py-2 outline-none"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="bg-slate-50 rounded-2xl p-6 mb-6 text-center">
-                <p className="text-lg mb-2">
-                  變化量 = {newVal} - {oldVal} = {change > 0 ? "+" : ""}
-                  {change}
-                </p>
-                <p className="text-lg">百分數變化 = (變化量 ÷ 舊數值) × 100%</p>
-                <p className="font-mono text-xl mt-2">
-                  ({change} ÷ {oldVal}) × 100%
-                </p>
+              {/* Bar Visualization */}
+              <div className="glass-panel p-8 rounded-3xl min-h-[300px] flex items-end justify-center gap-12 relative">
+                {/* Background Lines */}
+                <div className="absolute inset-0 p-8 flex flex-col justify-between pointer-events-none opacity-20">
+                  <div className="w-full h-px bg-white"></div>
+                  <div className="w-full h-px bg-white"></div>
+                  <div className="w-full h-px bg-white"></div>
+                  <div className="w-full h-px bg-white"></div>
+                  <div className="w-full h-px bg-white"></div>
+                </div>
+
+                {/* Old Bar */}
+                <div className="flex flex-col items-center relative z-10 w-24">
+                  <div className="text-2xl font-bold mb-2">{oldVal}</div>
+                  <motion.div
+                    initial={false}
+                    animate={{ height: `${(oldVal / maxVal) * 200}px` }}
+                    className="w-full bg-slate-500 rounded-t-xl opacity-80"
+                  />
+                  <div className="mt-2 text-xs font-bold uppercase text-slate-400">
+                    {getText("original", lang)}
+                  </div>
+                </div>
+
+                {/* New Bar */}
+                <div className="flex flex-col items-center relative z-10 w-24">
+                  <div className="text-2xl font-bold mb-2 text-pink-300">
+                    {newVal}
+                  </div>
+                  <div className="w-full relative flex flex-col-reverse">
+                    {/* Base part (min of old and new) */}
+                    <motion.div
+                      animate={{
+                        height: `${
+                          (Math.min(oldVal, newVal) / maxVal) * 200
+                        }px`,
+                      }}
+                      className="w-full bg-pink-600 rounded-t-xl opacity-80 absolute bottom-0"
+                    />
+
+                    {/* Diff part (only if new > old) */}
+                    {isIncrease && (
+                      <motion.div
+                        animate={{
+                          height: `${(diff / maxVal) * 200}px`,
+                          bottom: `${(oldVal / maxVal) * 200}px`,
+                        }}
+                        className="w-full bg-green-500 rounded-t-xl absolute"
+                      />
+                    )}
+
+                    {/* If decrease, show ghost of old? Or simple separate bar? simple separate bar is fine. */}
+                    {/* Actually simple bars are better. But let's keep it simple. */}
+                    <motion.div
+                      animate={{ height: `${(newVal / maxVal) * 200}px` }}
+                      className={`w-full rounded-t-xl ${
+                        isIncrease ? "bg-pink-500" : "bg-pink-500"
+                      }`}
+                    />
+                  </div>
+
+                  <div className="mt-2 text-xs font-bold uppercase text-pink-400">
+                    {getText("new", lang)}
+                  </div>
+                </div>
+
+                {/* Arrow connecting tops */}
+                {/* Too complex to SVG perfectly in React without measuring. Text-based logic below is sufficient. */}
               </div>
 
-              <div
-                className={`rounded-2xl p-6 text-center border-4 ${
-                  isIncrease
-                    ? "bg-green-100 border-green-300"
-                    : "bg-red-100 border-red-300"
-                }`}
-              >
-                <div
-                  className={`${
-                    isIncrease ? "text-green-600" : "text-red-600"
-                  } font-bold`}
-                >
-                  {isIncrease ? "增加 Increase" : "減少 Decrease"}
+              {/* Calculation & Result */}
+              <div className="glass-panel p-8 rounded-3xl flex flex-col justify-center">
+                <div className="mb-6">
+                  <div className="flex justify-between items-center text-sm font-bold uppercase text-slate-400 mb-2 border-b border-white/10 pb-2">
+                    <span>{getText("diff", lang)}</span>
+                    <span>
+                      {newVal} - {oldVal} = {diff}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm font-bold uppercase text-slate-400 mb-2 border-b border-white/10 pb-2">
+                    <span>{getText("formula", lang)}</span>
+                    <span>
+                      ({diff} ÷ {oldVal}) × 100%
+                    </span>
+                  </div>
                 </div>
+
                 <div
-                  className={`text-5xl font-black ${
-                    isIncrease ? "text-green-800" : "text-red-800"
+                  className={`text-center p-6 rounded-2xl border-4 ${
+                    isIncrease
+                      ? "bg-green-500/20 border-green-500"
+                      : "bg-red-500/20 border-red-500"
                   }`}
                 >
-                  {Math.abs(percentChange).toFixed(1)}%
+                  <div
+                    className={`text-xl font-bold uppercase mb-1 ${
+                      isIncrease ? "text-green-400" : "text-red-400"
+                    }`}
+                  >
+                    {isIncrease
+                      ? getText("increase", lang)
+                      : getText("decrease", lang)}
+                  </div>
+                  <div className="text-5xl font-black text-white">
+                    {Math.abs(percent).toFixed(1)}%
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

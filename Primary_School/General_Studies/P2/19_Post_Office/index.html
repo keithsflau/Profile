@@ -33,26 +33,161 @@
           en: "Post Office",
           zh: "郵局服務",
           ja: "郵便局",
+          ko: "우체국",
+          es: "Oficina de Correos",
+          de: "Postamt",
+          fi: "Posti",
+          fr: "Bureau de Poste",
+          ar: "مكتب البريد",
+          it: "Ufficio Postale",
         },
         instruction: {
           en: "Weigh the mail & stick stamps!",
           zh: "為郵件稱重並貼上郵票！",
           ja: "郵便物の重さを量り、切手を貼ってください！",
+          ko: "우편물의 무게를 재고 우표를 붙이세요!",
+          es: "¡Pesa el correo y pega sellos!",
+          de: "Wiege die Post & klebe Briefmarken!",
+          fi: "Punnitse posti ja liimaa postimerkit!",
+          fr: "Pesez le courrier et collez des timbres !",
+          ar: "وزن البريد والعصا الطوابع!",
+          it: "Pesa la posta e attacca i francobolli!",
         },
-        weight: { en: "Weight", zh: "重量" },
-        cost: { en: "Cost", zh: "郵費" },
-        stamps: { en: "Stamps", zh: "郵票" },
+        weight: {
+          en: "Weight",
+          zh: "重量",
+          ja: "重量",
+          ko: "무게",
+          es: "Peso",
+          de: "Gewicht",
+          fi: "Paino",
+          fr: "Poids",
+          ar: "وزن",
+          it: "Peso",
+        },
+        cost: {
+          en: "Cost",
+          zh: "郵費",
+          ja: "費用",
+          ko: "비용",
+          es: "Costo",
+          de: "Kosten",
+          fi: "Hinta",
+          fr: "Coût",
+          ar: "كلفة",
+          it: "Costo",
+        },
+        stamps: {
+          en: "Stamps",
+          zh: "郵票",
+          ja: "切手",
+          ko: "우표",
+          es: "Sellos",
+          de: "Briefmarken",
+          fi: "Postimerkit",
+          fr: "Timbres",
+          ar: "طوابع",
+          it: "Francobolli",
+        },
 
-        letter: { en: "Letter", zh: "信件" },
-        packet: { en: "Packet", zh: "小包裹" },
-        parcel: { en: "Parcel", zh: "大包裹" },
+        letter: {
+          en: "Letter",
+          zh: "信件",
+          ja: "手紙",
+          ko: "편지",
+          es: "Carta",
+          de: "Brief",
+          fi: "Kirje",
+          fr: "Lettre",
+          ar: "رسالة",
+          it: "Lettera",
+        },
+        packet: {
+          en: "Packet",
+          zh: "小包裹",
+          ja: "小包",
+          ko: "소포",
+          es: "Paquete",
+          de: "Päckchen",
+          fi: "Paketti",
+          fr: "Paquet",
+          ar: "رزمة",
+          it: "Pacchetto",
+        },
+        parcel: {
+          en: "Parcel",
+          zh: "大包裹",
+          ja: "小包",
+          ko: "택배",
+          es: "Paquete",
+          de: "Paket",
+          fi: "Paketti",
+          fr: "Colis",
+          ar: "طرد",
+          it: "Pacco",
+        },
 
-        check: { en: "Send", zh: "寄出" },
-        reset: { en: "Reset", zh: "重置" },
+        check: {
+          en: "Send",
+          zh: "寄出",
+          ja: "送信",
+          ko: "보내기",
+          es: "Enviar",
+          de: "Senden",
+          fi: "Lähetä",
+          fr: "Envoyer",
+          ar: "إرسال",
+          it: "Invia",
+        },
+        reset: {
+          en: "Reset",
+          zh: "重置",
+          ja: "リセット",
+          ko: "리셋",
+          es: "Reiniciar",
+          de: "Zurücksetzen",
+          fi: "Nollaa",
+          fr: "Réinitialiser",
+          ar: "إعادة تعيين",
+          it: "Resetta",
+        },
 
-        correct: { en: "Mailed Successfully!", zh: "成功寄出！" },
-        wrong: { en: "Incorrect Postage.", zh: "郵資不足或過多。" },
-        next: { en: "Next Mail", zh: "下一件" },
+        correct: {
+          en: "Mailed Successfully!",
+          zh: "成功寄出！",
+          ja: "郵送成功！",
+          ko: "발송 성공!",
+          es: "¡Enviado con Éxito!",
+          de: "Erfolgreich versendet!",
+          fi: "Postitus onnistui!",
+          fr: "Envoyé avec succès !",
+          ar: "تم إرسالها بنجاح!",
+          it: "Inviato con Successo!",
+        },
+        wrong: {
+          en: "Incorrect Postage.",
+          zh: "郵資不足或過多。",
+          ja: "料金が間違っています。",
+          ko: "우편요금이 틀렸습니다.",
+          es: "Franqueo incorrecto.",
+          de: "Falsches Porto.",
+          fi: "Väärä postimaksu.",
+          fr: "Affranchissement incorrect.",
+          ar: "رسوم بريدية غير صحيحة.",
+          it: "Affrancatura errata.",
+        },
+        next: {
+          en: "Next Mail",
+          zh: "下一件",
+          ja: "次の郵便物",
+          ko: "다음 우편물",
+          es: "Siguiente Correo",
+          de: "Nächste Post",
+          fi: "Seuraava posti",
+          fr: "Courrier suivant",
+          ar: "البريد التالي",
+          it: "Prossima Posta",
+        },
       };
 
       // Postage Rates (Simplified)
@@ -268,20 +403,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

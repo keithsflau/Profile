@@ -10,181 +10,318 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #fef3c7 0%, #d97706 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
-      const { motion } = window.Motion;
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
+
+      const t = {
+        title: {
+          en: "Parts of a Circle",
+          zh: "圓的各部分",
+          ja: "円の各部",
+          ko: "원의 각 부분",
+          es: "Partes de un Círculo",
+          de: "Teile eines Kreises",
+          fi: "Ympyrän osat",
+          fr: "Parties d'un cercle",
+          ar: "أجزاء الدائرة",
+          it: "Parti del Cerchio",
+        },
+        center: {
+          en: "Center",
+          zh: "圓心",
+          ja: "中心",
+          ko: "중심",
+          es: "Centro",
+          de: "Mittelpunkt",
+          fi: "Keskipiste",
+          fr: "Centre",
+          ar: "المركز",
+          it: "Centro",
+        },
+        radius: {
+          en: "Radius",
+          zh: "半徑",
+          ja: "半径",
+          ko: "반지름",
+          es: "Radio",
+          de: "Radius",
+          fi: "Säde",
+          fr: "Rayon",
+          ar: "نصف القطر",
+          it: "Raggio",
+        },
+        diameter: {
+          en: "Diameter",
+          zh: "直徑",
+          ja: "直径",
+          ko: "지름",
+          es: "Diámetro",
+          de: "Durchmesser",
+          fi: "Halkaisija",
+          fr: "Diamètre",
+          ar: "القطر",
+          it: "Diametro",
+        },
+        circumference: {
+          en: "Circumference",
+          zh: "圓周",
+          ja: "円周",
+          ko: "원주",
+          es: "Circunferencia",
+          de: "Umfang",
+          fi: "Kehä",
+          fr: "Circonférence",
+          ar: "المحيط",
+          it: "Circonferenza",
+        },
+        desc_center: {
+          en: "The exact middle point.",
+          zh: "圓的正中心點。",
+          ja: "円の中心点。",
+          ko: "정확한 중심점.",
+          es: "El punto central exacto.",
+          de: "Der genaue Mittelpunkt.",
+          fi: "Tarkka keskipiste.",
+          fr: "Le point central exact.",
+          ar: "نقطة المنتصف بالضبط.",
+          it: "Il punto centrale esatto.",
+        },
+        desc_radius: {
+          en: "Distance from center to edge.",
+          zh: "由圓心至圓周的距離。",
+          ja: "中心から端までの距離。",
+          ko: "중심에서 가장자리까지의 거리.",
+          es: "Distancia del centro al borde.",
+          de: "Abstand vom Zentrum zum Rand.",
+          fi: "Etäisyys keskipisteestä reunaan.",
+          fr: "Distance du centre au bord.",
+          ar: "المشافة من المركز إلى الحافة.",
+          it: "Distanza dal centro al bordo.",
+        },
+        desc_diameter: {
+          en: "Line through center, width of circle.",
+          zh: "穿過圓心的直線，圓的寬度。",
+          ja: "中心を通る線、円の幅。",
+          ko: "중심을 지나는 선, 원의 너비.",
+          es: "Línea a través del centro, ancho del círculo.",
+          de: "Linie durch die Mitte, Breite des Kreises.",
+          fi: "Viiva keskipisteen läpi, ympyrän leveys.",
+          fr: "Ligne traversant le centre, largeur du cercle.",
+          ar: "خط يمر عبر المركز، عرض الدائرة.",
+          it: "Linea attraverso il centro, larghezza del cerchio.",
+        },
+        desc_circumference: {
+          en: "The perimeter or distance around.",
+          zh: "圓的周界。",
+          ja: "周囲の長さ。",
+          ko: "둘레 또는 주변 거리.",
+          es: "El perímetro o distancia alrededor.",
+          de: "Der Umfang oder Abstand herum.",
+          fi: "Ympärysmitta tai matka ympäri.",
+          fr: "Le périmètre ou la distance autour.",
+          ar: "المحيط أو المسافة حول.",
+          it: "Il perimetro o distanza intorno.",
+        },
+      };
+
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
 
       function App() {
-        const [highlight, setHighlight] = useState("none");
+        const [lang, setLang] = useState("zh");
+        const [active, setActive] = useState(null); // 'center', 'radius', 'diameter', 'circumference'
 
-        const parts = [
-          {
-            id: "center",
-            name: "圓心 Center",
-            desc: "圓的正中心點 The exact center point",
-          },
-          {
-            id: "radius",
-            name: "半徑 Radius",
-            desc: "圓心到圓周的距離 Distance from center to edge",
-          },
-          {
-            id: "diameter",
-            name: "直徑 Diameter",
-            desc: "通過圓心的線，長度是半徑的兩倍 Line through center, 2x radius",
-          },
-          {
-            id: "circumference",
-            name: "圓周 Circumference",
-            desc: "圓的周界 The perimeter of the circle",
-          },
-        ];
+        const parts = ["center", "radius", "diameter", "circumference"];
 
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-amber-900 mb-2">
-              ⭕ 圓的各部分
-            </h1>
-            <p className="text-xl text-amber-700 font-bold mb-8">
-              Parts of a Circle
-            </p>
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-4xl w-full">
-              <div className="flex flex-col md:flex-row gap-8 items-center">
-                <div className="relative w-80 h-80">
-                  <svg viewBox="0 0 200 200" className="w-full h-full">
-                    {/* Circumference */}
+          <div className="min-h-screen flex flex-col items-center p-4 font-sans bg-slate-900 text-white">
+            <div className="w-full max-w-5xl flex justify-between items-center mb-10">
+              <h1 className="text-4xl font-black text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]">
+                ⭕ {getText("title", lang)}
+              </h1>
+              <div className="flex bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-amber-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+              {/* Interactive Diagram */}
+              <div className="flex justify-center relative">
+                <div className="relative w-80 h-80 md:w-96 md:h-96">
+                  <svg
+                    viewBox="0 0 400 400"
+                    className="w-full h-full drop-shadow-2xl"
+                  >
+                    {/* Glow Effect Background */}
                     <circle
-                      cx="100"
-                      cy="100"
-                      r="90"
+                      cx="200"
+                      cy="200"
+                      r="150"
                       fill="none"
-                      stroke="#f59e0b"
-                      strokeWidth={highlight === "circumference" ? "6" : "3"}
-                      className="transition-all duration-300"
+                      stroke="#fbbf24"
+                      strokeWidth="1"
+                      opacity="0.1"
+                      className="animate-pulse"
                     />
 
-                    {/* Diameter */}
-                    <line
-                      x1="10"
-                      y1="100"
-                      x2="190"
-                      y2="100"
-                      stroke="#ef4444"
-                      strokeWidth={highlight === "diameter" ? "6" : "3"}
-                      className={`transition-all duration-300 opacity-80 ${
-                        highlight === "diameter" || highlight === "none"
-                          ? "opacity-100"
-                          : "opacity-30"
-                      }`}
+                    {/* Circumference */}
+                    <motion.circle
+                      cx="200"
+                      cy="200"
+                      r="160"
+                      fill="none"
+                      stroke={
+                        active === "circumference" ? "#fbbf24" : "#475569"
+                      }
+                      strokeWidth={active === "circumference" ? 8 : 4}
+                      className="transition-colors duration-300 cursor-pointer"
+                      onClick={() => setActive("circumference")}
+                      whileHover={{ strokeWidth: 10 }}
                     />
 
-                    {/* Radius */}
-                    <line
-                      x1="100"
-                      y1="100"
-                      x2="163.6"
-                      y2="36.4"
-                      stroke="#3b82f6"
-                      strokeWidth={highlight === "radius" ? "6" : "3"}
-                      className={`transition-all duration-300 opacity-80 ${
-                        highlight === "radius" || highlight === "none"
-                          ? "opacity-100"
-                          : "opacity-30"
-                      }`}
+                    {/* Diameter (Diagonal line) */}
+                    <motion.line
+                      x1="86"
+                      y1="286"
+                      x2="314"
+                      y2="114" // approx 45 deg through center (200,200) length 320
+                      stroke={active === "diameter" ? "#f472b6" : "#475569"}
+                      strokeWidth={active === "diameter" ? 8 : 4}
+                      className="transition-colors duration-300 cursor-pointer"
+                      onClick={() => setActive("diameter")}
+                      whileHover={{ strokeWidth: 10 }}
+                    />
+
+                    {/* Radius (Horizontal to right) */}
+                    <motion.line
+                      x1="200"
+                      y1="200"
+                      x2="360"
+                      y2="200"
+                      stroke={active === "radius" ? "#22d3ee" : "#475569"}
+                      strokeWidth={active === "radius" ? 8 : 4}
+                      className="transition-colors duration-300 cursor-pointer"
+                      onClick={() => setActive("radius")}
+                      whileHover={{ strokeWidth: 10 }}
                     />
 
                     {/* Center */}
-                    <circle
-                      cx="100"
-                      cy="100"
-                      r={highlight === "center" ? "8" : "5"}
-                      fill="#1e293b"
-                      className="transition-all duration-300"
+                    <motion.circle
+                      cx="200"
+                      cy="200"
+                      r={active === "center" ? 12 : 8}
+                      fill={active === "center" ? "#ffffff" : "#94a3b8"}
+                      className="cursor-pointer transition-colors duration-300"
+                      onClick={() => setActive("center")}
+                      whileHover={{ scale: 1.5 }}
                     />
 
-                    {/* Labels on SVG */}
-                    {highlight === "radius" && (
-                      <text
-                        x="140"
-                        y="80"
-                        fill="#3b82f6"
-                        className="font-bold text-xs"
-                      >
-                        r
-                      </text>
-                    )}
-                    {highlight === "diameter" && (
-                      <text
-                        x="50"
-                        y="90"
-                        fill="#ef4444"
-                        className="font-bold text-xs"
-                      >
-                        d
-                      </text>
-                    )}
+                    {/* Labels */}
+                    <text
+                      x="200"
+                      y="380"
+                      textAnchor="middle"
+                      fill="#94a3b8"
+                      fontSize="12"
+                    >
+                      Click parts to explore
+                    </text>
                   </svg>
                 </div>
+              </div>
 
-                <div className="flex-1 grid grid-cols-1 gap-4">
-                  {parts.map((part) => (
-                    <motion.button
-                      key={part.id}
-                      onClick={() => setHighlight(part.id)}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className={`p-4 rounded-xl text-left border-2 transition-all ${
-                        highlight === part.id
-                          ? "bg-amber-100 border-amber-500 shadow-md"
-                          : "bg-slate-50 border-slate-200 hover:bg-slate-100"
-                      }`}
-                    >
-                      <div className="font-bold text-lg text-slate-800">
-                        {part.name}
-                      </div>
-                      <div className="text-sm text-slate-600">{part.desc}</div>
-                    </motion.button>
-                  ))}
-                  <button
-                    onClick={() => setHighlight("none")}
-                    className="p-2 text-slate-500 hover:text-slate-800 text-sm"
+              {/* Info Panel */}
+              <div className="flex flex-col gap-4">
+                {parts.map((part) => (
+                  <motion.button
+                    key={part}
+                    onClick={() => setActive(part)}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className={`p-6 rounded-2xl border-2 text-left transition-all ${
+                      active === part
+                        ? "bg-slate-800 border-white/50 shadow-[0_0_20px_rgba(255,255,255,0.1)]"
+                        : "bg-slate-800/30 border-white/5 hover:bg-slate-800/50"
+                    }`}
                   >
-                    重置 Reset
-                  </button>
-                </div>
+                    <div className="flex items-center justify-between pointer-events-none">
+                      <div>
+                        <h3
+                          className={`text-xl font-bold uppercase mb-1 ${
+                            part === "center"
+                              ? "text-white"
+                              : part === "radius"
+                              ? "text-cyan-400"
+                              : part === "diameter"
+                              ? "text-pink-400"
+                              : "text-amber-400"
+                          }`}
+                        >
+                          {getText(part, lang)}
+                        </h3>
+                        <p className="text-slate-400 text-sm">
+                          {getText(`desc_${part}`, lang)}
+                        </p>
+                      </div>
+                      {active === part && <div className="text-2xl">👈</div>}
+                    </div>
+                  </motion.button>
+                ))}
               </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

@@ -3,20 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小五數學：簡易方程 (二)</title>
+    <title>小五數學：簡易方程 (二) | Simple Equations (2)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.min.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <style>
       body {
-        font-family: "Fredoka", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        font-family: "Outfit", "Noto Sans TC", sans-serif;
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(236, 72, 153, 0.15); /* Pink 500 alpha */
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(244, 114, 182, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
@@ -24,313 +35,389 @@
     <div id="root"></div>
     <script type="text/babel">
       const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { Split, X, Divide, RefreshCw, Calculator, ArrowRight } =
+        window.LucideReact;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
 
-      const Calculator = () => (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <rect width="16" height="20" x="4" y="2" rx="2" />
-          <line x1="8" x2="16" y1="6" y2="6" />
-          <line x1="16" x2="16" y1="14" y2="18" />
-          <path d="M16 10h.01" />
-          <path d="M12 10h.01" />
-          <path d="M8 10h.01" />
-          <path d="M12 14h.01" />
-          <path d="M8 14h.01" />
-          <path d="M12 18h.01" />
-          <path d="M8 18h.01" />
-        </svg>
-      );
-      const RefreshCw = () => (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M3 12a9 9 0 0 1 9-9 9.97 9.97 0 0 1 5.9 2" />
-          <path d="M21 12a9 9 0 0 1-9 9 9.97 9.97 0 0 1-5.9-2" />
-          <path d="M2.5 12h5" />
-          <path d="M16.5 12h5" />
-          <path d="M21 21v-4.5" />
-          <path d="M3 7.5V3" />
-        </svg>
-      );
-      const X = () => (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M18 6 6 18" />
-          <path d="m6 6 12 12" />
-        </svg>
-      );
-      const Divide = () => (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <circle cx="12" cy="6" r="1" />
-          <line x1="5" x2="19" y1="12" y2="12" />
-          <circle cx="12" cy="18" r="1" />
-        </svg>
-      );
+      const t = {
+        title: {
+          en: "Simple Equations (2)",
+          zh: "簡易方程 (二)",
+          ja: "一次方程式 (2)",
+          ko: "일차방정식 (2)",
+          es: "Ecuaciones Simples (2)",
+          de: "Einfache Gleichungen (2)",
+          fi: "Yksinkertaiset yhtälöt (2)",
+          fr: "Équations simples (2)",
+          ar: "معادلات بسيطة (2)",
+          it: "Equazioni semplici (2)",
+        },
+        topic: {
+          en: "Equations (Mult/Div)",
+          zh: "方程 (乘除)",
+          ja: "方程式 (乗除)",
+          ko: "방정식 (곱셈/나눗셈)",
+          es: "Ecuaciones (Mult/Div)",
+          de: "Gleichungen (Mult/Div)",
+          fi: "Yhtälöt (Kerto/Jako)",
+          fr: "Équations (Mult/Div)",
+          ar: "معادلات (ضرب/قسمة)",
+          it: "Equazioni (Molt/Div)",
+        },
+        divideBoth: {
+          en: "Divide both sides by",
+          zh: "兩邊同時除以",
+          ja: "両辺を割る",
+          ko: "양변을 나누기",
+          es: "Dividir ambos lados por",
+          de: "Teile beide Seiten durch",
+          fi: "Jaa molemmat puolet luvulla",
+          fr: "Diviser les deux côtés par",
+          ar: "اقسم كلا الجانبين على",
+          it: "Dividi entrambi i lati per",
+        },
+        multiplyBoth: {
+          en: "Multiply both sides by",
+          zh: "兩邊同時乘以",
+          ja: "両辺に掛ける",
+          ko: "양변에 곱하기",
+          es: "Multiplicar ambos lados por",
+          de: "Multipliziere beide Seiten mit",
+          fi: "Kerro molemmat puolet luvulla",
+          fr: "Multiplier les deux côtés par",
+          ar: "اضرب كلا الجانبين في",
+          it: "Moltiplica entrambi i lati per",
+        },
+        next: {
+          en: "Next Question",
+          zh: "下一題",
+          ja: "次の問題",
+          ko: "다음 문제",
+          es: "Siguiente Pregunta",
+          de: "Nächste Frage",
+          fi: "Seuraava kysymys",
+          fr: "Question suivante",
+          ar: "السؤال التالي",
+          it: "Prossima domanda",
+        },
+        steps: {
+          en: "Step-by-step",
+          zh: "步驟解說",
+          ja: "ステップバイステップ",
+          ko: "단계별 설명",
+          es: "Paso a paso",
+          de: "Schritt für Schritt",
+          fi: "Vaihe vaiheelta",
+          fr: "Pas à pas",
+          ar: "خطوة بخطوة",
+          it: "Passo dopo passo",
+        },
+        equation: {
+          en: "Equation",
+          zh: "方程",
+          ja: "方程式",
+          ko: "방정식",
+          es: "Ecuación",
+          de: "Gleichung",
+          fi: "Yhtälö",
+          fr: "Équation",
+          ar: "معادلة",
+          it: "Equazione",
+        },
+      };
+
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
 
       function App() {
-        // type: 'mul' (Ax = B) or 'div' (x/A = B)
-        const [type, setType] = useState("mul");
-        const [varVal, setVarVal] = useState(4); // The answer
-        const [coeff, setCoeff] = useState(3); // The multiplier/divisor
-        const [step, setStep] = useState(0);
-        const [showHint, setShowHint] = useState(false);
+        const [lang, setLang] = useState("zh");
+        const [type, setType] = useState("mul"); // 'mul' (Ax=B) or 'div' (x/A=B)
+        const [yVal, setYVal] = useState(4); // The answer value of y
+        const [coeff, setCoeff] = useState(3); // A
+        const [step, setStep] = useState(0); // 0: init, 1: showing solution
 
         const generate = () => {
           const nextType = Math.random() > 0.5 ? "mul" : "div";
           setType(nextType);
-          setVarVal(Math.floor(Math.random() * 8) + 2); // 2-9
+          setYVal(Math.floor(Math.random() * 8) + 2); // 2-9
           setCoeff(Math.floor(Math.random() * 3) + 2); // 2-4
           setStep(0);
-          setShowHint(false);
         };
 
         useEffect(() => {
           generate();
         }, []);
 
-        const total = type === "mul" ? varVal * coeff : varVal;
-        // Equation strings
-        // Mul: 3y = 12
-        // Div: y/3 = 4
+        const total = type === "mul" ? yVal * coeff : yVal; // For mul: Right side is total. For div: Right side is coeff*yVal? No.
+        // wait.
+        // Mul: Ay = B -> y = B/A. So B = y*A. total = yVal*coeff.
+        // Div: y/A = B -> y = B*A. So B = yVal/A? No let's say B is integer.
+        // If type 'div', equation is y/A = B. y is big. y = B * A.
+        // Let's set 'B' (RHS) as integer.
+        // Equation: y / coeff = result. y = result * coeff.
+        // In this component state, `yVal` was originally 'the answer'.
+        // Let's keep `yVal` as the unknown's value.
+        // If div: y / coeff = (yVal / coeff).
+        // This implies yVal must be divisible by coeff for integer arithmetic displays.
 
-        const eqLeft =
-          type === "mul" ? (
-            <span>
-              {coeff}
-              <span className="text-indigo-600">y</span>
-            </span>
-          ) : (
-            <div className="flex flex-col items-center inline-flex align-middle">
-              <span className="text-indigo-600 border-b-2 border-black w-full text-center">
-                y
-              </span>
-              <span>{coeff}</span>
-            </div>
-          );
+        // Adjusted logic:
+        // Mul: Ay = B. y=target. B = A*target. Equ: A y = B.
+        // Div: y/A = B. y=target. B = target/A.
+        // For clean numbers, if Div, target must be multiple of A.
 
-        const eqRight = type === "mul" ? total : varVal;
+        // Let's re-init for cleanliness
+        useEffect(() => {
+          if (type === "div") {
+            const B = Math.floor(Math.random() * 5) + 2;
+            setYVal(B * coeff); // y is big
+          }
+        }, [type]);
+
+        const B = type === "mul" ? yVal * coeff : yVal / coeff; // The RHS displayed number
+
+        // Visualization Data
+        // Mul: Show 'coeff' groups of 'y'. Total items visible = B.
+        // Div: Show 'y' items, split into 'coeff' groups. Each group has B items.
 
         return (
-          <div className="min-h-screen p-6 flex flex-col items-center justify-center">
-            <div className="bg-white/90 backdrop-blur-xl rounded-[2rem] p-8 shadow-2xl border-4 border-white w-full max-w-3xl">
-              <div className="flex justify-between items-center mb-12">
-                <div className="flex items-center gap-3">
-                  <div className="p-3 bg-pink-100 rounded-2xl text-pink-500">
-                    <Calculator />
-                  </div>
-                  <h1 className="text-3xl font-black text-slate-800">
-                    簡易方程 (乘除)
-                  </h1>
-                </div>
-                <button
-                  onClick={generate}
-                  className="p-3 bg-slate-100 rounded-full hover:bg-slate-200"
-                >
-                  <RefreshCw size={20} />
-                </button>
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <div className="w-full max-w-5xl flex justify-between items-center mb-10">
+              <h1 className="text-3xl md:text-5xl font-black text-pink-400 drop-shadow-[0_0_15px_rgba(244,114,182,0.5)]">
+                🧮 {getText("title", lang)}
+              </h1>
+              <div className="bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-pink-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
               </div>
+            </div>
 
-              {/* Question Area */}
-              <div className="flex flex-col items-center mb-12">
-                <div className="bg-slate-50 border-2 border-slate-200 px-12 py-8 rounded-3xl text-6xl font-black text-slate-700 flex items-center gap-6 shadow-inner">
-                  {eqLeft}
-                  <span>=</span>
-                  <span>{eqRight}</span>
-                </div>
-              </div>
-
-              {/* Visualization */}
-              <div className="bg-white border-2 border-slate-100 rounded-2xl p-8 mb-8 relative min-h-[300px] flex flex-col items-center justify-center overflow-hidden">
-                {type === "mul" ? (
-                  // Multiplication Visual: 3 bags = 12 dots
-                  <div className="w-full">
-                    <div className="flex justify-center gap-4 mb-4">
-                      {Array.from({ length: coeff }).map((_, i) => (
-                        <div
-                          key={i}
-                          className={`relative bg-indigo-100 border-4 border-indigo-300 rounded-2xl p-4 w-32 h-40 flex flex-col items-center justify-center transition-all duration-500 ${
-                            step === 1
-                              ? "scale-110 border-green-400 bg-green-50"
-                              : ""
-                          }`}
-                        >
-                          <span className="absolute top-2 left-2 text-indigo-400 font-bold">
-                            y
-                          </span>
-                          <div className="flex flex-wrap gap-2 justify-center">
-                            {step === 1 ? (
-                              // Show dots inside
-                              Array.from({ length: varVal }).map((_, d) => (
-                                <div
-                                  key={d}
-                                  className="w-4 h-4 bg-green-500 rounded-full shadow-sm animate-[bounce_1s_ease-in-out]"
-                                ></div>
-                              ))
-                            ) : (
-                              <div className="text-5xl text-indigo-200 font-black">
-                                ?
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="text-center font-bold text-slate-400">
-                      總數 Total: {total}
-                    </div>
-                  </div>
-                ) : (
-                  // Division Visual: Bar cut into parts
-                  <div className="w-full px-8">
-                    <div className="flex w-full h-32 rounded-2xl overflow-hidden border-4 border-indigo-300">
-                      {Array.from({ length: coeff }).map((_, i) => (
-                        <div
-                          key={i}
-                          className={`flex-1 border-r-2 border-indigo-200 bg-indigo-50 flex items-center justify-center relative transition-colors duration-500 ${
-                            step === 1 ? "bg-green-100" : ""
-                          }`}
-                        >
-                          {step === 1 && (
-                            <span className="text-4xl font-black text-green-600">
-                              {varVal}
-                            </span>
-                          )}
-                          {!step && (
-                            <span className="text-xl font-bold text-indigo-300">
-                              y/{coeff}
-                            </span>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex justify-between mt-2 text-slate-400 font-bold">
-                      <span>0</span>
-                      <span>y (Total)</span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Hint overlay */}
-                {step === 0 && (
-                  <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center">
-                    <button
-                      onClick={() => setStep(1)}
-                      className="bg-slate-800 text-white px-8 py-4 rounded-full font-bold text-xl hover:scale-110 transition-transform shadow-xl hover:shadow-2xl flex items-center gap-3"
-                    >
-                      {type === "mul" ? "兩邊除以" : "兩邊乘以"} {coeff}
-                      {type === "mul" ? <Divide size={20} /> : <X size={20} />}
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* Solution */}
-              <div
-                className={`transition-all duration-500 ${
-                  step === 1
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 translate-y-10"
-                }`}
-              >
-                <div className="bg-green-100 border-2 border-green-400 p-6 rounded-2xl text-center">
-                  <div className="text-2xl font-bold text-green-800 mb-2">
-                    過程解說 Steps
-                  </div>
-                  <div className="text-3xl text-slate-700 font-mono">
+            <main className="w-full max-w-5xl grid lg:grid-cols-2 gap-8">
+              {/* Visual Area */}
+              <div className="glass-panel p-8 rounded-3xl flex flex-col items-center justify-center min-h-[400px] relative">
+                {/* Equation Top */}
+                <div className="absolute top-6 left-0 right-0 flex justify-center">
+                  <div className="bg-slate-900/60 backdrop-blur border border-pink-500/30 px-8 py-4 rounded-2xl text-4xl font-mono font-black text-white flex items-center gap-4 shadow-xl">
                     {type === "mul" ? (
                       <>
-                        {coeff}y ÷ {coeff} = {total} ÷ {coeff}
-                        <br />
-                        <span className="font-black text-green-600 mt-2 block">
-                          y = {varVal}
+                        <span>
+                          {coeff}
+                          <span className="text-pink-400">y</span>
                         </span>
+                        <span>=</span>
+                        <span className="text-blue-400">{B}</span>
                       </>
                     ) : (
                       <>
-                        y/{coeff} × {coeff} = {varVal} × {coeff}
-                        <br />
-                        <span className="font-black text-green-600 mt-2 block">
-                          y = {total}
-                        </span>
+                        <div className="flex flex-col items-center leading-none">
+                          <span className="text-pink-400 border-b-2 border-white/20 w-full text-center pb-1">
+                            y
+                          </span>
+                          <span className="text-sm pt-1">{coeff}</span>
+                        </div>
+                        <span>=</span>
+                        <span className="text-blue-400">{B}</span>
                       </>
                     )}
                   </div>
+                </div>
 
-                  <button
-                    onClick={generate}
-                    className="mt-6 bg-green-500 text-white px-8 py-3 rounded-xl font-bold hover:bg-green-600 shadow-lg"
-                  >
-                    下一題
-                  </button>
+                {/* Graphic */}
+                <div className="mt-20 w-full flex justify-center items-center">
+                  {type === "mul" ? (
+                    <div
+                      className="grid gap-4"
+                      style={{
+                        gridTemplateColumns: `repeat(${Math.min(
+                          coeff,
+                          3
+                        )}, 1fr)`,
+                      }}
+                    >
+                      {Array.from({ length: coeff }).map((_, i) => (
+                        <motion.div
+                          key={i}
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ delay: i * 0.1 }}
+                          className={`w-24 h-32 border-4 rounded-2xl flex flex-col items-center justify-center gap-2 relative transition-colors duration-500 ${
+                            step === 1
+                              ? "border-green-400 bg-green-500/10"
+                              : "border-pink-500 bg-pink-500/10"
+                          }`}
+                        >
+                          <span className="absolute top-2 left-2 text-xs font-bold text-pink-300">
+                            y
+                          </span>
+                          {step === 1 ? (
+                            /* Show dots */
+                            <div className="grid grid-cols-3 gap-1">
+                              {Array.from({ length: yVal }).map((_, d) => (
+                                <motion.div
+                                  key={d}
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  className="w-3 h-3 bg-green-400 rounded-full"
+                                />
+                              ))}
+                            </div>
+                          ) : (
+                            <span className="text-4xl font-black text-pink-300">
+                              ?
+                            </span>
+                          )}
+                        </motion.div>
+                      ))}
+                    </div>
+                  ) : (
+                    // Division Visual: A big bar split into Coeff parts. One part is B. Total length is y.
+                    <div className="w-full max-w-sm flex flex-col gap-2">
+                      <div className="flex w-full h-24 rounded-2xl overflow-hidden border-4 border-pink-500/50">
+                        {Array.from({ length: coeff }).map((_, i) => (
+                          <motion.div
+                            key={i}
+                            className={`flex-1 border-r border-pink-500/30 flex items-center justify-center relative ${
+                              step === 1 ? "bg-green-500/20" : "bg-pink-500/10"
+                            }`}
+                          >
+                            {i === 0 && (
+                              <span className="absolute inset-0 flex items-center justify-center text-2xl font-black text-blue-400">
+                                {!step ? B : ""}
+                              </span>
+                            )}
+                            {step === 1 && (
+                              <span className="text-xl font-bold text-green-400">
+                                {B}
+                              </span>
+                            )}
+                          </motion.div>
+                        ))}
+                      </div>
+                      <div className="flex justify-between text-xs font-bold text-pink-300 px-1">
+                        <span>0</span>
+                        <span>y</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
 
-            <div className="fixed bottom-4 left-4">
-              <a
-                href="../index.html"
-                className="bg-white/80 backdrop-blur hover:bg-white text-slate-600 px-6 py-3 rounded-full font-bold shadow-lg flex items-center gap-2 transition-all"
-              >
-                ← 返回目錄
-              </a>
-            </div>
+              {/* Control Panel */}
+              <div className="flex flex-col gap-6">
+                <div className="glass-panel p-8 rounded-3xl flex-1 flex flex-col justify-center">
+                  {step === 0 ? (
+                    <div className="flex flex-col gap-6">
+                      <h3 className="text-xl font-bold text-center text-white">
+                        {getText("steps", lang)}?
+                      </h3>
+                      <button
+                        onClick={() => setStep(1)}
+                        className="w-full py-4 bg-pink-600 hover:bg-pink-500 rounded-xl text-white font-bold text-lg shadow-lg flex items-center justify-center gap-3 transition-all transform hover:scale-105"
+                      >
+                        {type === "mul" ? (
+                          <>
+                            <span>
+                              {getText("divideBoth", lang)} {coeff}
+                            </span>
+                            <Divide size={24} />
+                          </>
+                        ) : (
+                          <>
+                            <span>
+                              {getText("multiplyBoth", lang)} {coeff}
+                            </span>
+                            <X size={24} />
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  ) : (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex flex-col items-center text-center gap-6"
+                    >
+                      <div className="text-2xl font-mono text-slate-300 bg-slate-900/50 p-6 rounded-2xl border border-white/10 w-full">
+                        {type === "mul" ? (
+                          <>
+                            <div className="mb-2 opacity-50">
+                              {coeff}y ÷ {coeff} = {B} ÷ {coeff}
+                            </div>
+                            <div className="text-4xl font-black text-green-400">
+                              y = {yVal}
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="mb-2 opacity-50 flex items-center justify-center gap-2">
+                              <span className="flex flex-col leading-none text-sm">
+                                <span className="border-b border-white">y</span>
+                                <span>{coeff}</span>
+                              </span>
+                              <span>
+                                × {coeff} = {B} × {coeff}
+                              </span>
+                            </div>
+                            <div className="text-4xl font-black text-green-400">
+                              y = {yVal}
+                            </div>
+                          </>
+                        )}
+                      </div>
+
+                      <button
+                        onClick={generate}
+                        className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-white font-bold flex items-center justify-center gap-2 transition-all"
+                      >
+                        <RefreshCw size={20} /> {getText("next", lang)}
+                      </button>
+                    </motion.div>
+                  )}
+                </div>
+
+                <div className="glass-panel p-6 rounded-2xl flex items-start gap-4">
+                  <Calculator className="text-pink-400 shrink-0 mt-1" />
+                  <div className="text-sm text-slate-300">
+                    {type === "mul"
+                      ? getText("divideBoth", lang) + ` ${coeff}`
+                      : getText("multiplyBoth", lang) + ` ${coeff}`}
+                    <br />
+                    <span className="opacity-50">
+                      Inverse operations help isolate the variable 'y'.
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </main>
           </div>
         );
       }
 
-      lucide.createIcons();
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

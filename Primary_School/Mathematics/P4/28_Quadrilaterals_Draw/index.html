@@ -3,12 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小四數學：繪製四邊形</title>
+    <title>小四數學：繪製四邊形 | Draw Quadrilaterals</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -25,8 +26,111 @@
     <script type="text/babel">
       const { useState, useRef } = React;
       const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Draw Quadrilaterals",
+          zh: "動手畫四邊形",
+          ja: "四角形を描く",
+          ko: "사각형 그리기",
+          es: "Dibujar Cuadriláteros",
+          de: "Vierecke zeichnen",
+          fi: "Piirrä nelikulmioita",
+          fr: "Dessiner des quadrilatères",
+          ar: "رسم الأشكال الرباعية",
+          it: "Disegna quadrilateri",
+        },
+        trapezium: {
+          en: "Trapezium",
+          zh: "梯形",
+          ja: "台形",
+          ko: "사다리꼴",
+          es: "Trapecio",
+          de: "Trapez",
+          fi: "Puolisuunnikas",
+          fr: "Trapèze",
+          ar: "شبه منحرف",
+          it: "Trapezio",
+        },
+        parallelogram: {
+          en: "Parallelogram",
+          zh: "平行四邊形",
+          ja: "平行四辺形",
+          ko: "평행사변형",
+          es: "Paralelogramo",
+          de: "Parallelogramm",
+          fi: "Suunnikas",
+          fr: "Parallélogramme",
+          ar: "متوازي الأضلاع",
+          it: "Parallelogramma",
+        },
+        topWidth: {
+          en: "Top Width",
+          zh: "上底長度",
+          ja: "上底の幅",
+          ko: "윗변 길이",
+          es: "Ancho Superior",
+          de: "Obere Breite",
+          fi: "Yläleveys",
+          fr: "Largeur supérieure",
+          ar: "العرض العلوي",
+          it: "Larghezza superiore",
+        },
+        bottomWidth: {
+          en: "Bottom Width",
+          zh: "下底長度",
+          ja: "下底の幅",
+          ko: "아랫변 길이",
+          es: "Ancho Inferior",
+          de: "Untere Breite",
+          fi: "Alaleveys",
+          fr: "Largeur inférieure",
+          ar: "العرض السفلي",
+          it: "Larghezza inferiore",
+        },
+        skew: {
+          en: "Skew",
+          zh: "平移 (Skew)",
+          ja: "スキュー",
+          ko: "기울기",
+          es: "Inclinación",
+          de: "Neigung",
+          fi: "Viistous",
+          fr: "Inclinaison",
+          ar: "انحراف",
+          it: "Inclinazione",
+        },
+        trapDesc: {
+          en: "Trapezium: Only one pair of parallel sides.",
+          zh: "梯形：只有一組對邊平行。",
+          ja: "台形：平行な辺は1組だけです。",
+          ko: "사다리꼴: 평행한 변이 한 쌍뿐입니다.",
+          es: "Trapecio: Solo un par de lados paralelos.",
+          de: "Trapez: Nur ein Paar parallele Seiten.",
+          fi: "Puolisuunnikas: Vain yksi pari samansuuntaisia sivuja.",
+          fr: "Trapèze : Une seule paire de côtés parallèles.",
+          ar: "شبه منحرف: زوج واحد فقط من الأضلاع المتوازية.",
+          it: "Trapezio: Solo una coppia di lati paralleli.",
+        },
+        paraDesc: {
+          en: "Parallelogram: Two pairs of parallel sides.",
+          zh: "平行四邊形：兩組對邊分別平行。",
+          ja: "平行四辺形：2組の対辺がそれぞれ平行です。",
+          ko: "평행사변형: 두 쌍의 대변이 각각 평행합니다.",
+          es: "Paralelogramo: Dos pares de lados paralelos.",
+          de: "Parallelogramm: Zwei Paare paralleler Seiten.",
+          fi: "Suunnikas: Kaksi paria samansuuntaisia sivuja.",
+          fr: "Parallélogramme : Deux paires de côtés parallèles.",
+          ar: "متوازي الأضلاع: زوجان من الأضلاع المتوازية.",
+          it: "Parallelogramma: Due coppie di lati paralleli.",
+        },
+      };
 
       function App() {
+        const [lang, setLang] = useState("zh");
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
         // Simple Drawing Board - 4 points
         const [points, setPoints] = useState([
           { x: 100, y: 100 },
@@ -34,8 +138,6 @@
           { x: 300, y: 300 },
           { x: 100, y: 300 },
         ]);
-        // Drag logic simple implementation?
-        // Better: Pre-defined shapes user can tweak sliders for.
 
         const [type, setType] = useState("trapezium");
         const [topWidth, setTopWidth] = useState(150);
@@ -68,8 +170,9 @@
 
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-purple-900 mb-8">
-              ✏️ 動手畫四邊形
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-purple-900 mb-8 mt-8">
+              ✏️ {getText("title")}
             </h1>
 
             <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-5xl w-full flex flex-col md:flex-row gap-8">
@@ -105,7 +208,7 @@
                         : "bg-slate-200"
                     }`}
                   >
-                    梯形
+                    {getText("trapezium")}
                   </button>
                   <button
                     onClick={() => setType("rhombus")}
@@ -115,7 +218,7 @@
                         : "bg-slate-200"
                     }`}
                   >
-                    平行四邊形
+                    {getText("parallelogram")}
                   </button>
                 </div>
 
@@ -123,7 +226,7 @@
                   <>
                     <div>
                       <label className="font-bold text-slate-600">
-                        上底長度
+                        {getText("topWidth")}
                       </label>
                       <input
                         type="range"
@@ -136,7 +239,7 @@
                     </div>
                     <div>
                       <label className="font-bold text-slate-600">
-                        下底長度
+                        {getText("bottomWidth")}
                       </label>
                       <input
                         type="range"
@@ -151,7 +254,7 @@
                     </div>
                     <div>
                       <label className="font-bold text-slate-600">
-                        平移 (Skew)
+                        {getText("skew")}
                       </label>
                       <input
                         type="range"
@@ -167,7 +270,9 @@
                 {type === "rhombus" && (
                   <>
                     <div>
-                      <label className="font-bold text-slate-600">傾斜度</label>
+                      <label className="font-bold text-slate-600">
+                        {getText("skew")}
+                      </label>
                       <input
                         type="range"
                         min="-100"
@@ -182,8 +287,8 @@
 
                 <div className="bg-purple-50 p-4 rounded-xl text-purple-900 border border-purple-200">
                   {type === "trapezium"
-                    ? "梯形：只有一組對邊平行。"
-                    : "平行四邊形：兩組對邊分別平行。"}
+                    ? getText("trapDesc")
+                    : getText("paraDesc")}
                 </div>
               </div>
             </div>
@@ -192,20 +297,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

@@ -3,12 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小三數學：數字規律</title>
+    <title>小三數學：數字規律 | Number Patterns</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -25,23 +26,144 @@
     <script type="text/babel">
       const { useState } = React;
       const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Number Patterns",
+          zh: "數字規律",
+          ja: "数の規則",
+          ko: "숫자 패턴",
+          es: "Patrones numéricos",
+          de: "Zahlenmuster",
+          fi: "Numerokaavat",
+          fr: "Modèles numériques",
+          ar: "أنماط الأرقام",
+          it: "Schemi numerici",
+        },
+        rule: {
+          en: "Rule:",
+          zh: "規律：",
+          ja: "ルール:",
+          ko: "규칙:",
+          es: "Regla:",
+          de: "Regel:",
+          fi: "Sääntö:",
+          fr: "Règle :",
+          ar: "القاعدة:",
+          it: "Regola:",
+        },
+        tryFind: {
+          en: "Try to find the next number",
+          zh: "試試找出下一個數字",
+          ja: "次の数字を見つけてみてください",
+          ko: "다음 숫자를 찾아보세요",
+          es: "Intenta encontrar el siguiente número",
+          de: "Versuche die nächste Zahl zu finden",
+          fi: "Yritä löytää seuraava numero",
+          fr: "Essayez de trouver le nombre suivant",
+          ar: "حاول إيجاد الرقم التالي",
+          it: "Prova a trovare il numero successivo",
+        },
+        nextIs: {
+          en: "The next number is:",
+          zh: "下一個數字是：",
+          ja: "次の数字は:",
+          ko: "다음 숫자는:",
+          es: "El siguiente número es:",
+          de: "Die nächste Zahl ist:",
+          fi: "Seuraava numero on:",
+          fr: "Le nombre suivant est :",
+          ar: "الرقم التالي هو:",
+          it: "Il numero successivo è:",
+        },
+        patterns: {
+          add2: {
+            en: "Add 2",
+            zh: "加2",
+            ja: "たす2",
+            ko: "더하기 2",
+            es: "Sumar 2",
+            de: "Plus 2",
+            fi: "Lisää 2",
+            fr: "Ajouter 2",
+            ar: "أضف 2",
+            it: "Aggiungi 2",
+          },
+          add5: {
+            en: "Add 5",
+            zh: "加5",
+            ja: "たす5",
+            ko: "더하기 5",
+            es: "Sumar 5",
+            de: "Plus 5",
+            fi: "Lisää 5",
+            fr: "Ajouter 5",
+            ar: "أضف 5",
+            it: "Aggiungi 5",
+          },
+          add10: {
+            en: "Add 10",
+            zh: "加10",
+            ja: "たす10",
+            ko: "더하기 10",
+            es: "Sumar 10",
+            de: "Plus 10",
+            fi: "Lisää 10",
+            fr: "Ajouter 10",
+            ar: "أضف 10",
+            it: "Aggiungi 10",
+          },
+          sub3: {
+            en: "Sub 3",
+            zh: "減3",
+            ja: "ひく3",
+            ko: "빼기 3",
+            es: "Restar 3",
+            de: "Minus 3",
+            fi: "Vähennä 3",
+            fr: "Soustraire 3",
+            ar: "اطرح 3",
+            it: "Sottrai 3",
+          },
+          mul2: {
+            en: "Mul 2",
+            zh: "乘2",
+            ja: "かける2",
+            ko: "곱하기 2",
+            es: "Mult 2",
+            de: "Mal 2",
+            fi: "Kerre 2",
+            fr: "Mult 2",
+            ar: "ضرب 2",
+            it: "Molt 2",
+          },
+        },
+      };
+
       function App() {
+        const [lang, setLang] = useState("zh");
         const patterns = [
-          { name: "加2", seq: [2, 4, 6, 8, 10, 12, 14], rule: "+2" },
-          { name: "加5", seq: [5, 10, 15, 20, 25, 30, 35], rule: "+5" },
-          { name: "加10", seq: [10, 20, 30, 40, 50, 60, 70], rule: "+10" },
-          { name: "減3", seq: [30, 27, 24, 21, 18, 15, 12], rule: "-3" },
-          { name: "乘2", seq: [2, 4, 8, 16, 32, 64, 128], rule: "×2" },
+          { key: "add2", seq: [2, 4, 6, 8, 10, 12, 14], rule: "+2" },
+          { key: "add5", seq: [5, 10, 15, 20, 25, 30, 35], rule: "+5" },
+          { key: "add10", seq: [10, 20, 30, 40, 50, 60, 70], rule: "+10" },
+          { key: "sub3", seq: [30, 27, 24, 21, 18, 15, 12], rule: "-3" },
+          { key: "mul2", seq: [2, 4, 8, 16, 32, 64, 128], rule: "×2" },
         ];
         const [current, setCurrent] = useState(0);
         const p = patterns[current];
+
+        const getPatName = (key) =>
+          t.patterns[key][lang] || t.patterns[key]["en"];
+
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-6xl font-black text-yellow-900 mb-8">
-              🔢 數字規律
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-6xl font-black text-yellow-900 mb-8 mt-8 text-center">
+              🔢 {t.title[lang] || t.title["en"]}
             </h1>
             <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-5xl w-full">
-              <div className="grid grid-cols-5 gap-4 mb-8">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
                 {patterns.map((pat, i) => (
                   <button
                     key={i}
@@ -52,13 +174,13 @@
                         : "bg-yellow-100 hover:bg-yellow-200"
                     }`}
                   >
-                    {pat.name}
+                    {getPatName(pat.key)}
                   </button>
                 ))}
               </div>
               <div className="text-center mb-8">
                 <div className="text-3xl font-black text-yellow-800 mb-4">
-                  規律：{p.rule}
+                  {t.rule[lang] || t.rule["en"]} {p.rule}
                 </div>
                 <div className="flex justify-center gap-4 flex-wrap">
                   {p.seq.map((num, i) => (
@@ -74,12 +196,12 @@
                   ))}
                 </div>
               </div>
-              <div className="bg-yellow-50 p-6 rounded-xl">
+              <div className="bg-yellow-50 p-6 rounded-xl text-center">
                 <div className="font-bold text-yellow-800 text-lg mb-3">
-                  💡 試試找出下一個數字
+                  💡 {t.tryFind[lang] || t.tryFind["en"]}
                 </div>
                 <div className="text-2xl font-black text-yellow-900">
-                  下一個數字是：
+                  {t.nextIs[lang] || t.nextIs["en"]}{" "}
                   {p.rule.includes("+")
                     ? p.seq[p.seq.length - 1] + parseInt(p.rule.slice(1))
                     : p.rule.includes("-")
@@ -93,20 +215,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

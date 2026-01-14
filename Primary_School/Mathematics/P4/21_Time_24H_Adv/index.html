@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小四數學：時間區間計算</title>
+    <title>小四數學：時間區間計算 | Time Duration</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -23,7 +24,87 @@
     <div id="root"></div>
     <script type="text/babel">
       const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Time Duration Calculator",
+          zh: "時間區間計算",
+          ja: "時間計算機",
+          ko: "시간 간격 계산기",
+          es: "Calculadora de Duración del Tiempo",
+          de: "Zeitdauer-Rechner",
+          fi: "Aikavälin laskin",
+          fr: "Calculateur de durée",
+          ar: "حاسبة المدة الزمنية",
+          it: "Calcolatore di durata",
+        },
+        startTime: {
+          en: "Start Time",
+          zh: "開始時間",
+          ja: "開始時間",
+          ko: "시작 시간",
+          es: "Hora de Inicio",
+          de: "Startzeit",
+          fi: "Aloitusaika",
+          fr: "Heure de début",
+          ar: "وقت البدء",
+          it: "Ora di inizio",
+        },
+        endTime: {
+          en: "End Time",
+          zh: "結束時間",
+          ja: "終了時間",
+          ko: "종료 시간",
+          es: "Hora de Finalización",
+          de: "Endzeit",
+          fi: "Lopetusaika",
+          fr: "Heure de fin",
+          ar: "وقت النهاية",
+          it: "Ora di fine",
+        },
+        duration: {
+          en: "Duration",
+          zh: "相隔時間",
+          ja: "期間",
+          ko: "지속 시간",
+          es: "Duración",
+          de: "Dauer",
+          fi: "Kesto",
+          fr: "Durée",
+          ar: "المدة",
+          it: "Durata",
+        },
+        result: {
+          en: "{h} Hours {m} Minutes",
+          zh: "{h} 小時 {m} 分鐘",
+          ja: "{h} 時間 {m} 分",
+          ko: "{h} 시간 {m} 분",
+          es: "{h} Horas {m} Minutos",
+          de: "{h} Stunden {m} Minuten",
+          fi: "{h} Tuntia {m} Minuuttia",
+          fr: "{h} Heures {m} Minutes",
+          ar: "{h} ساعات {m} دقائق",
+          it: "{h} Ore {m} Minuti",
+        },
+        timeline: {
+          en: "24-Hour Timeline",
+          zh: "24小時時間軸 (Time Line)",
+          ja: "24時間タイムライン",
+          ko: "24시간 타임라인",
+          es: "Línea de Tiempo de 24 Horas",
+          de: "24-Stunden-Zeitlinie",
+          fi: "24 tunnin aikajana",
+          fr: "Ligne du temps 24h",
+          ar: "خط زمني 24 ساعة",
+          it: "Linea temporale 24 ore",
+        },
+      };
+
       function App() {
+        const [lang, setLang] = useState("zh");
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
         // Time Duration Calculator
         const [startH, setStartH] = useState(14);
         const [startM, setStartM] = useState(30);
@@ -46,8 +127,9 @@
 
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-white mb-8">
-              ⏱️ 時間區間計算
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-white mb-8 mt-8">
+              ⏱️ {getText("title")}
             </h1>
 
             <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full">
@@ -55,7 +137,7 @@
                 {/* Start Time */}
                 <div className="bg-blue-50 p-6 rounded-2xl flex flex-col items-center border-2 border-blue-200">
                   <h3 className="text-xl font-bold text-blue-800 mb-4">
-                    開始時間
+                    {getText("startTime")}
                   </h3>
                   <input
                     type="time"
@@ -74,7 +156,7 @@
                 {/* End Time */}
                 <div className="bg-blue-50 p-6 rounded-2xl flex flex-col items-center border-2 border-blue-200">
                   <h3 className="text-xl font-bold text-blue-800 mb-4">
-                    結束時間
+                    {getText("endTime")}
                   </h3>
                   <input
                     type="time"
@@ -95,13 +177,15 @@
                   ⏳
                 </div>
                 <h3 className="text-2xl font-bold text-slate-300 mb-2">
-                  相隔時間
+                  {getText("duration")}
                 </h3>
                 <div className="text-6xl font-black text-yellow-400 mb-2">
-                  {diffH} 小時 {diffM} 分鐘
+                  {getText("result")
+                    .replace("{h}", diffH)
+                    .replace("{m}", diffM)}
                 </div>
                 <div className="text-slate-400 font-mono">
-                  ({endTotal} - {startTotal} = {diff} 分鐘)
+                  ({endTotal} - {startTotal} = {diff} min)
                 </div>
               </div>
 
@@ -128,7 +212,7 @@
                 ))}
               </div>
               <div className="mt-2 text-center text-slate-400 font-bold text-sm">
-                24小時時間軸 (Time Line)
+                {getText("timeline")}
               </div>
             </div>
           </div>
@@ -136,20 +220,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

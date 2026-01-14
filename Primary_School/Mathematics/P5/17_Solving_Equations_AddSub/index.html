@@ -3,65 +3,68 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小五數學：簡易方程 (加減) | Simple Equations (+−)</title>
+    <title>小五數學：簡易方程 (加減) | Simple Equations</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #dbeafe 0%, #3b82f6 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+      .balance-beam {
+        transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
-      const { LanguageSelector, get } = window.MathI18n;
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
 
       const t = {
         title: {
-          en: "Simple Equations (Add/Subtract)",
-          zh: "簡易方程 (加減)",
-          ja: "簡単な方程式 (足し算/引き算)",
-          ko: "간단한 방정식 (덧셈/뺄셈)",
-          es: "Ecuaciones Simples (Suma/Resta)",
-          de: "Einfache Gleichungen (Addition/Subtraktion)",
-          fi: "Yksinkertaiset yhtälöt (yhteen-/vähennyslasku)",
-          fr: "Équations simples (Addition/Soustraction)",
-          ar: "معادلات بسيطة (جمع/طرح)",
-          it: "Equazioni semplici (Addizione/Sottrazione)",
+          en: "One-Step Equations (+/-)",
+          zh: "一步方程 (加/減)",
+          ja: "一次方程式 (+/-)",
+          ko: "일차 방정식 (+/-)",
+          es: "Ecuaciones de un paso (+/-)",
+          de: "Einschritt-Gleichungen (+/-)",
+          fi: "Yhden askeleen yhtälöt (+/-)",
+          fr: "Équations à une étape (+/-)",
+          ar: "معادلات من خطوة واحدة (+/-)",
+          it: "Equazioni a un passo (+/-)",
         },
-        findX: {
-          en: "Find x:",
-          zh: "求 x 的值:",
-          ja: "x の値を求めよ:",
-          ko: "x의 값 구하기:",
-          es: "Encuentra x:",
-          de: "Finde x:",
-          fi: "Ratkaise x:",
-          fr: "Trouvez x :",
-          ar: "جد قيمة x:",
-          it: "Trova x:",
-        },
-        steps: {
-          en: "Solution Steps:",
-          zh: "解題步驟:",
-          ja: "解法の手順:",
-          ko: "풀이 단계:",
-          es: "Pasos de Solución:",
-          de: "Lösungsschritte:",
-          fi: "Ratkaisun vaiheet:",
-          fr: "Étapes de la solution :",
-          ar: "خطوات الحل:",
-          it: "Passaggi della soluzione:",
+        find: {
+          en: "Find value of x",
+          zh: "求 x 的值",
+          ja: "x の値を求める",
+          ko: "x의 값 구하기",
+          es: "Encontrar valor de x",
+          de: "Finde den Wert von x",
+          fi: "Etsi x:n arvo",
+          fr: "Trouver la valeur de x",
+          ar: "أوجد قيمة x",
+          it: "Trova il valore di x",
         },
         check: {
           en: "Check",
@@ -79,7 +82,7 @@
           en: "Correct!",
           zh: "答對了！",
           ja: "正解！",
-          ko: "정답입니다!",
+          ko: "정답!",
           es: "¡Correcto!",
           de: "Richtig!",
           fi: "Oikein!",
@@ -88,148 +91,239 @@
           it: "Corretto!",
         },
         wrong: {
-          en: "Try again! The answer is",
-          zh: "再試一次！答案是",
-          ja: "もう一度！答えは",
-          ko: "다시 시도하세요! 정답은",
-          es: "¡Inténtalo de nuevo! La respuesta es",
-          de: "Versuch es noch einmal! Die Antwort ist",
-          fi: "Yritä uudelleen! Vastaus on",
-          fr: "Réessayez ! La réponse est",
-          ar: "حاول مرة أخرى! الإجابة هي",
-          it: "Riprova! La risposta è",
+          en: "Try Again",
+          zh: "再試一次",
+          ja: "もう一度",
+          ko: "다시 시도",
+          es: "Inténtalo de nuevo",
+          de: "Versuch es nochmal",
+          fi: "Yritä uudelleen",
+          fr: "Réessayer",
+          ar: "حاول مرة أخرى",
+          it: "Riprova",
         },
-        newProblem: {
-          en: "New Problem",
-          zh: "新題目",
-          ja: "新しい問題",
-          ko: "새로운 문제",
-          es: "Nuevo Problema",
-          de: "Neues Problem",
-          fi: "Uusi tehtävä",
-          fr: "Nouveau problème",
-          ar: "مسألة جديدة",
-          it: "Nuovo problema",
+        next: {
+          en: "Next Problem",
+          zh: "下一題",
+          ja: "次の問題",
+          ko: "다음 문제",
+          es: "Siguiente Problema",
+          de: "Nächstes Problem",
+          fi: "Seuraava tehtävä",
+          fr: "Problème suivant",
+          ar: "المسألة التالية",
+          it: "Prossimo problema",
+        },
+        balance: {
+          en: "Keep the balance!",
+          zh: "保持平衡！",
+          ja: "バランスを保とう！",
+          ko: "균형을 유지하세요!",
+          es: "¡Mantén el equilibrio!",
+          de: "Halte das Gleichgewicht!",
+          fi: "Pidä tasapaino!",
+          fr: "Gardez l'équilibre !",
+          ar: "حافظ على التوازن!",
+          it: "Mantieni l'equilibrio!",
         },
       };
 
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
       function App() {
         const [lang, setLang] = useState("zh");
-        const getText = (key) => t[key][lang] || t[key]["en"];
-
-        const [problem, setProblem] = useState({ a: 5, b: 12, type: "add" });
-        const [userAnswer, setUserAnswer] = useState("");
-        const [feedback, setFeedback] = useState(null);
-
-        const correctAnswer =
-          problem.type === "add"
-            ? problem.b - problem.a
-            : problem.b + problem.a;
+        const [problem, setProblem] = useState({ type: "add", a: 5, b: 12 }); // x + a = b OR x - a = b
+        const [input, setInput] = useState("");
+        const [status, setStatus] = useState(null); // null, 'correct', 'wrong'
 
         const generate = () => {
           const type = Math.random() > 0.5 ? "add" : "sub";
-          const a = Math.floor(Math.random() * 10) + 2;
-          const ans = Math.floor(Math.random() * 15) + 3;
-          const b = type === "add" ? a + ans : ans - a;
-          setProblem({ a, b: Math.abs(b), type });
-          setUserAnswer("");
-          setFeedback(null);
+          const a = Math.floor(Math.random() * 20) + 1;
+          const x = Math.floor(Math.random() * 20) + 1;
+          // If add: x + a = b  => b = x+a
+          // If sub: x - a = b  => b = x-a (ensure x > a)
+
+          let finalProb = {};
+          if (type === "add") {
+            finalProb = { type, a, b: x + a, x };
+          } else {
+            const x_large = a + Math.floor(Math.random() * 15) + 1;
+            finalProb = { type, a, b: x_large - a, x: x_large };
+          }
+          setProblem(finalProb);
+          setInput("");
+          setStatus(null);
         };
 
+        useEffect(generate, []);
+
         const check = () => {
-          if (parseInt(userAnswer) === correctAnswer) {
-            setFeedback("correct");
+          const val = parseInt(input);
+          if (val === problem.x) {
+            setStatus("correct");
           } else {
-            setFeedback("wrong");
+            setStatus("wrong");
           }
         };
 
+        // Equation String
+        const eqStr =
+          problem.type === "add"
+            ? `x + ${problem.a} = ${problem.b}`
+            : `x - ${problem.a} = ${problem.b}`;
+
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <LanguageSelector lang={lang} setLang={setLang} />
-            <h1 className="text-5xl font-black text-blue-100 mb-2 mt-8">
-              🔢 {getText("title")}
-            </h1>
-
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-2xl w-full mt-8">
-              <div className="bg-blue-50 rounded-2xl p-8 mb-6 text-center border-2 border-blue-200">
-                <p className="text-sm text-blue-600 mb-2">{getText("findX")}</p>
-                <div className="text-5xl font-black text-slate-800 font-mono">
-                  x {problem.type === "add" ? "+" : "−"} {problem.a} ={" "}
-                  {problem.b}
-                </div>
+          <div className="min-h-screen flex flex-col items-center p-4 font-sans bg-slate-900 text-white">
+            <div className="w-full max-w-5xl flex justify-between items-center mb-10">
+              <h1 className="text-4xl font-black text-blue-400 drop-shadow-[0_0_15px_rgba(96,165,250,0.5)]">
+                ⚖️ {getText("title", lang)}
+              </h1>
+              <div className="flex bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-blue-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
               </div>
+            </div>
 
-              <div className="bg-slate-50 rounded-2xl p-6 mb-6">
-                <p className="font-bold text-slate-700 mb-4">
-                  {getText("steps")}
-                </p>
-                <div className="space-y-2 font-mono text-lg">
-                  <p>
-                    x {problem.type === "add" ? "+" : "−"} {problem.a} ={" "}
-                    {problem.b}
-                  </p>
-                  <p>
-                    x = {problem.b} {problem.type === "add" ? "−" : "+"}{" "}
-                    {problem.a}
-                  </p>
-                  <p className="text-blue-600 font-bold">x = ?</p>
-                </div>
-              </div>
+            <div className="w-full max-w-2xl flex flex-col gap-8">
+              {/* Visual Scale */}
+              <div className="relative h-64 w-full flex justify-center items-end pb-8">
+                {/* Base */}
+                <div className="absolute bottom-0 w-4 h-32 bg-slate-600 rounded-t-lg"></div>
+                <div className="absolute bottom-0 w-32 h-4 bg-slate-700 rounded-full"></div>
 
-              <div className="flex items-center justify-center gap-4 mb-6">
-                <span className="text-2xl font-bold">x =</span>
-                <input
-                  type="number"
-                  value={userAnswer}
-                  onChange={(e) => setUserAnswer(e.target.value)}
-                  className="w-24 text-3xl font-black text-center border-4 border-blue-300 rounded-xl p-2"
-                />
-                <button
-                  onClick={check}
-                  className="px-6 py-3 bg-blue-500 text-white rounded-xl font-bold hover:bg-blue-600"
+                {/* Beam */}
+                <motion.div
+                  className="w-3/4 h-2 bg-blue-500 rounded-full relative balance-beam origin-center"
+                  animate={{
+                    rotate:
+                      status === "correct"
+                        ? 0
+                        : problem.type === "add"
+                        ? -5
+                        : 5,
+                  }}
                 >
-                  {getText("check")}
-                </button>
+                  {/* Left Pan */}
+                  <div className="absolute left-0 top-1/2 -translate-x-1/2 flex flex-col items-center">
+                    <div className="w-0.5 h-16 bg-blue-400/50"></div>
+                    <div className="w-24 h-24 rounded-full border-4 border-blue-400 bg-slate-800/80 backdrop-blur flex items-center justify-center shadow-xl">
+                      <div className="text-2xl font-bold font-mono">
+                        {problem.type === "add"
+                          ? `x + ${problem.a}`
+                          : `x - ${problem.a}`}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Pan */}
+                  <div className="absolute right-0 top-1/2 translate-x-1/2 flex flex-col items-center">
+                    <div className="w-0.5 h-16 bg-blue-400/50"></div>
+                    <div className="w-24 h-24 rounded-full border-4 border-blue-400 bg-slate-800/80 backdrop-blur flex items-center justify-center shadow-xl">
+                      <div className="text-3xl font-bold font-mono text-blue-300">
+                        {problem.b}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Pivot Point */}
+                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 bg-white rounded-full shadow-lg border-4 border-slate-600 z-10"></div>
+                </motion.div>
               </div>
 
-              {feedback === "correct" && (
-                <div className="bg-emerald-100 border-4 border-emerald-300 rounded-2xl p-4 text-center text-emerald-800 font-bold text-xl">
-                  ✓ {getText("correct")}
+              {/* Question Panel */}
+              <div className="glass-panel p-8 rounded-3xl flex flex-col items-center gap-6">
+                <div className="text-slate-400 font-bold uppercase tracking-widest text-sm">
+                  {getText("find", lang)}
                 </div>
-              )}
-              {feedback === "wrong" && (
-                <div className="bg-red-100 border-4 border-red-300 rounded-2xl p-4 text-center text-red-800 font-bold text-xl">
-                  ✗ {getText("wrong")} {correctAnswer}
+                <div className="text-6xl font-black font-mono tracking-wider">
+                  {eqStr}
                 </div>
-              )}
 
-              <button
-                onClick={generate}
-                className="mt-6 w-full py-3 bg-slate-200 text-slate-700 rounded-xl font-bold hover:bg-slate-300"
-              >
-                {getText("newProblem")}
-              </button>
+                <div className="flex flex-col gap-2 w-full max-w-sm">
+                  <div className="flex gap-4">
+                    <input
+                      type="number"
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      className="flex-1 bg-slate-950/50 border-2 border-slate-700 rounded-xl px-4 text-center text-3xl font-bold focus:border-blue-500 outline-none transition-colors"
+                      placeholder="x = ?"
+                    />
+                    <button
+                      onClick={check}
+                      className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-xl transition-all active:scale-95 shadow-lg shadow-blue-500/20"
+                    >
+                      {getText("check", lang)}
+                    </button>
+                  </div>
+
+                  {/* Feedback */}
+                  <AnimatePresence>
+                    {status && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className={`p-4 rounded-xl text-center font-bold text-lg mt-2 ${
+                          status === "correct"
+                            ? "bg-green-500/20 text-green-300 border border-green-500/30"
+                            : "bg-red-500/20 text-red-300 border border-red-500/30"
+                        }`}
+                      >
+                        {getText(status, lang)}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {status === "correct" && (
+                    <motion.button
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      onClick={generate}
+                      className="w-full py-3 mt-2 rounded-xl border border-white/10 hover:bg-white/10 font-bold transition-all text-blue-200"
+                    >
+                      {getText("next", lang)} ➔
+                    </motion.button>
+                  )}
+                </div>
+              </div>
+
+              {/* Steps Hint */}
+              {status !== "correct" && (
+                <div className="text-center text-slate-500 font-mono text-sm">
+                  {getText("balance", lang)} <br />
+                  {problem.type === "add"
+                    ? `Subtract ${problem.a} from both sides`
+                    : `Add ${problem.a} to both sides`}
+                </div>
+              )}
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

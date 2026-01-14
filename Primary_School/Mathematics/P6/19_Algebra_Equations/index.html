@@ -8,154 +8,324 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #fef3c7 0%, #f59e0b 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
+
+      const t = {
+        title: {
+          en: "Equation Solver",
+          zh: "方程求解",
+          ja: "方程式を解く",
+          ko: "방정식 풀기",
+          es: "Resolución de Ecuaciones",
+          de: "Gleichungslöser",
+          fi: "Yhtälönratkaisija",
+          fr: "Résolveur d'équations",
+          ar: "حل المعادلات",
+          it: "Risolutore di Equazioni",
+        },
+        solveForX: {
+          en: "Solve for x",
+          zh: "求 x 的值",
+          ja: "x について解く",
+          ko: "x 값 구하기",
+          es: "Resuelve para x",
+          de: "Lösen Sie nach x auf",
+          fi: "Ratkaise x",
+          fr: "Résoudre pour x",
+          ar: "حل من أجل x",
+          it: "Risolvi per x",
+        },
+        check: {
+          en: "Check",
+          zh: "檢查",
+          ja: "確認",
+          ko: "확인",
+          es: "Comprobar",
+          de: "Überprüfen",
+          fi: "Tarkista",
+          fr: "Vérifier",
+          ar: "تحقق",
+          it: "Controlla",
+        },
+        correct: {
+          en: "Correct!",
+          zh: "答對了！",
+          ja: "正解！",
+          ko: "정답!",
+          es: "¡Correcto!",
+          de: "Richtig!",
+          fi: "Oikein!",
+          fr: "Correct !",
+          ar: "صحيح!",
+          it: "Corretto!",
+        },
+        wrong: {
+          en: "Try Again",
+          zh: "再試一次",
+          ja: "もう一度",
+          ko: "다시 시도",
+          es: "Inténtalo de nuevo",
+          de: "Versuchen Sie es erneut",
+          fi: "Yritä uudelleen",
+          fr: "Réessayez",
+          ar: "حاول مرة أخرى",
+          it: "Riprova",
+        },
+        next: {
+          en: "Next Problem",
+          zh: "下一題",
+          ja: "次の問題",
+          ko: "다음 문제",
+          es: "Siguiente Problema",
+          de: "Nächstes Problem",
+          fi: "Seuraava ongelma",
+          fr: "Problème suivant",
+          ar: "المسألة التالية",
+          it: "Prossimo Problema",
+        },
+        balance: {
+          en: "Balance Scale",
+          zh: "天平平衡",
+          ja: "天秤ばかり",
+          ko: "균형 저울",
+          es: "Balanza",
+          de: "Balkenwaage",
+          fi: "Vaa'an tasapaino",
+          fr: "Balance",
+          ar: "ميزان",
+          it: "Bilancia",
+        },
+      };
+
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
       function App() {
-        const calculateProblem = () => {
-          const type = Math.floor(Math.random() * 4); // 0:add, 1:sub, 2:mul, 3:div
-          let valX = Math.floor(Math.random() * 20) + 1;
-          let operand = Math.floor(Math.random() * 10) + 1;
-          let result;
-          let expr = "";
+        const [lang, setLang] = useState("zh");
+
+        const generateProblem = () => {
+          const type = Math.floor(Math.random() * 4);
+          let x = Math.floor(Math.random() * 15) + 2;
+          let op = Math.floor(Math.random() * 10) + 2;
+          let rhs, expr;
 
           if (type === 0) {
             // x + a = b
-            result = valX + operand;
-            expr = `x + ${operand} = ${result}`;
+            rhs = x + op;
+            expr = `x + ${op} = ${rhs}`;
           } else if (type === 1) {
             // x - a = b
-            valX = valX + operand; // ensure x > a
-            result = valX - operand;
-            expr = `x - ${operand} = ${result}`;
+            x = x + op; // ensure x > op
+            rhs = x - op;
+            expr = `x - ${op} = ${rhs}`;
           } else if (type === 2) {
             // ax = b
-            result = valX * operand;
-            expr = `${operand}x = ${result}`;
+            rhs = x * op;
+            expr = `${op}x = ${rhs}`;
           } else {
             // x / a = b
-            result = valX;
-            valX = result * operand;
-            expr = `x / ${operand} = ${result}`;
+            let res = x;
+            x = res * op;
+            rhs = res;
+            expr = `x / ${op} = ${rhs}`;
           }
-
-          return { expr, ans: valX, type };
+          return { expr, x, type, op, rhs };
         };
 
-        const [problem, setProblem] = useState(calculateProblem());
+        const [problem, setProblem] = useState(generateProblem());
         const [input, setInput] = useState("");
-        const [feedback, setFeedback] = useState("");
+        const [status, setStatus] = useState("idle"); // idle, correct, wrong
 
-        const checkAnswer = () => {
-          if (parseInt(input) === problem.ans) {
-            setFeedback("CORRECT");
+        const check = () => {
+          if (parseInt(input) === problem.x) {
+            setStatus("correct");
           } else {
-            setFeedback("WRONG");
+            setStatus("wrong");
           }
         };
 
         const next = () => {
-          setProblem(calculateProblem());
+          setProblem(generateProblem());
           setInput("");
-          setFeedback("");
+          setStatus("idle");
         };
 
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-amber-900 mb-2">
-              ⚖️ 方程求解
-            </h1>
-            <p className="text-xl text-amber-700 font-bold mb-8">
-              Solving Single-Step Equations
-            </p>
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-xl w-full text-center">
-              <div className="bg-amber-100 rounded-2xl p-12 mb-8 border-4 border-amber-300">
-                <div className="text-5xl font-black text-amber-900 font-mono tracking-wider">
-                  {problem.expr}
-                </div>
-                <div className="text-amber-700 mt-4 text-lg">
-                  求 x 的值 Solve for x
-                </div>
-              </div>
-
-              <div className="flex justify-center items-center gap-4 mb-6">
-                <span className="text-3xl font-bold text-amber-800">x = </span>
-                <input
-                  type="number"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  className="w-32 text-4xl p-2 text-center font-bold border-4 border-amber-400 rounded-xl focus:outline-none focus:border-amber-600"
-                />
-              </div>
-
-              {feedback === "" && (
-                <button
-                  onClick={checkAnswer}
-                  className="w-full py-4 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-2xl font-black transition-transform active:scale-95 shadow-lg"
-                >
-                  檢查 Check
-                </button>
-              )}
-
-              {feedback === "CORRECT" && (
-                <div className="space-y-4">
-                  <div className="bg-green-100 text-green-700 p-4 rounded-xl text-2xl font-black border-2 border-green-400 animate-bounce">
-                    答對了！ Correct!
-                  </div>
+          <div className="min-h-screen flex flex-col items-center p-4 font-sans bg-slate-900 text-white">
+            <div className="w-full max-w-4xl flex justify-between items-center mb-8">
+              <h1 className="text-4xl font-black text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]">
+                ⚖️ {getText("title", lang)}
+              </h1>
+              <div className="flex bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
                   <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-amber-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="w-full max-w-2xl flex flex-col gap-6">
+              {/* Equation Display */}
+              <div className="glass-panel p-12 rounded-3xl text-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-amber-900/10 -z-10"></div>
+                <div className="text-amber-500 font-bold mb-4 uppercase tracking-widest">
+                  {getText("solveForX", lang)}
+                </div>
+                <div className="text-6xl font-black font-mono text-white tracking-widest drop-shadow-lg">
+                  {problem.expr.split("=").map((part, i) => (
+                    <span key={i} className={i === 1 ? "text-amber-400" : ""}>
+                      {i === 1 ? "= " + part : part.replace("/", "÷")}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Visualize Balance Scale (Abstract) */}
+              <div className="glass-panel p-8 rounded-3xl flex flex-col items-center">
+                <div className="relative w-full h-32 flex items-end justify-center mb-4">
+                  {/* Fulcrum */}
+                  <div className="w-0 h-0 border-l-[20px] border-l-transparent border-r-[20px] border-r-transparent border-b-[40px] border-b-slate-600 absolute bottom-0 left-1/2 -translate-x-1/2"></div>
+
+                  {/* Beam */}
+                  <motion.div
+                    className="w-3/4 h-2 bg-slate-500 rounded relative mb-[40px]"
+                    animate={{
+                      rotate: status === "correct" ? 0 : [0, 2, -2, 0],
+                    }}
+                    transition={{
+                      repeat: status === "idle" ? Infinity : 0,
+                      duration: 4,
+                    }}
+                  >
+                    {/* Left Pan */}
+                    <div className="absolute left-0 top-2 w-24 h-24 border-2 border-slate-500/50 rounded-b-xl flex items-center justify-center bg-slate-800/50 backdrop-blur-sm -translate-x-1/2">
+                      <span className="font-mono font-bold text-lg text-slate-300">
+                        {problem.expr.split("=")[0].trim().replace("/", "÷")}
+                      </span>
+                    </div>
+
+                    {/* Right Pan */}
+                    <div className="absolute right-0 top-2 w-24 h-24 border-2 border-slate-500/50 rounded-b-xl flex items-center justify-center bg-slate-800/50 backdrop-blur-sm translate-x-1/2">
+                      <span className="font-mono font-bold text-lg text-amber-300">
+                        {problem.rhs}
+                      </span>
+                    </div>
+                  </motion.div>
+                </div>
+                <div className="text-xs text-slate-500 font-bold uppercase">
+                  {getText("balance", lang)}
+                </div>
+              </div>
+
+              {/* Input Area */}
+              <div className="glass-panel p-8 rounded-3xl text-center">
+                <div className="flex justify-center items-center gap-4 mb-8">
+                  <span className="text-4xl font-bold text-slate-400 font-mono">
+                    x =
+                  </span>
+                  <input
+                    type="number"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={(e) =>
+                      e.key === "Enter" && status !== "correct" && check()
+                    }
+                    className={`w-40 bg-slate-800 border-4 rounded-2xl px-4 py-4 text-4xl font-black text-center outline-none transition-colors ${
+                      status === "correct"
+                        ? "border-green-500 text-green-400"
+                        : status === "wrong"
+                        ? "border-red-500 text-red-400"
+                        : "border-slate-600 text-white focus:border-amber-500"
+                    }`}
+                    disabled={status === "correct"}
+                  />
+                </div>
+
+                {status === "idle" && (
+                  <button
+                    onClick={check}
+                    className="w-full py-4 bg-amber-500 hover:bg-amber-400 rounded-xl font-black text-xl text-slate-900 shadow-lg transition-transform active:scale-95"
+                  >
+                    {getText("check", lang)}
+                  </button>
+                )}
+
+                {status === "correct" && (
+                  <motion.button
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
                     onClick={next}
-                    className="w-full py-4 bg-green-500 hover:bg-green-600 text-white rounded-xl text-2xl font-black transition-transform active:scale-95 shadow-lg"
+                    className="w-full py-4 bg-green-500 hover:bg-green-400 rounded-xl font-black text-xl text-slate-900 shadow-[0_0_20px_rgba(34,197,94,0.4)] transition-transform active:scale-95"
                   >
-                    下一題 Next
-                  </button>
-                </div>
-              )}
+                    {getText("correct", lang)} {getText("next", lang)} ➔
+                  </motion.button>
+                )}
 
-              {feedback === "WRONG" && (
-                <div className="space-y-4">
-                  <div className="bg-red-100 text-red-700 p-4 rounded-xl text-2xl font-black border-2 border-red-400">
-                    再試一次 Try Again
-                  </div>
-                  <button
-                    onClick={() => setFeedback("")}
-                    className="w-full py-4 bg-slate-400 hover:bg-slate-500 text-white rounded-xl text-2xl font-black"
+                {status === "wrong" && (
+                  <motion.button
+                    initial={{ x: -10 }}
+                    animate={{ x: 0 }}
+                    onClick={() => setStatus("idle")}
+                    className="w-full py-4 bg-slate-700 hover:bg-slate-600 rounded-xl font-bold text-xl text-red-400"
                   >
-                    返回 Back
-                  </button>
-                </div>
-              )}
+                    {getText("wrong", lang)}
+                  </motion.button>
+                )}
+              </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

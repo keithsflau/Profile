@@ -3,159 +3,405 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小六數學：複合應用題 | Multi-Step Word Problems</title>
+    <title>小六數學：購物應用題 | Shopping Word Problems</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #ecfeff 0%, #06b6d4 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
-      function App() {
-        const [money, setMoney] = useState(500);
-        const [price, setPrice] = useState(50);
-        const [discount, setDiscount] = useState(10); // 10% off
-        const [count, setCount] = useState(4);
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
 
-        const discountedPrice = (price * (100 - discount)) / 100;
-        const total = discountedPrice * count;
-        const change = money - total;
+      const t = {
+        title: {
+          en: "Shopping Problems",
+          zh: "購物應用題",
+          ja: "買い物の問題",
+          ko: "쇼핑 문제",
+          es: "Problemas de Compras",
+          de: "Einkaufsprobleme",
+          fi: "Ostostehtävät",
+          fr: "Problèmes d'achats",
+          ar: "مشاكل التسوق",
+          it: "Problemi di Acquisto",
+        },
+        budget: {
+          en: "Your Budget",
+          zh: "你的預算",
+          ja: "予算",
+          ko: "예산",
+          es: "Tu Presupuesto",
+          de: "Dein Budget",
+          fi: "Budjettisi",
+          fr: "Votre budget",
+          ar: "ميزانيتك",
+          it: "Il tuo Budget",
+        },
+        itemPrice: {
+          en: "Price per Item",
+          zh: "單價",
+          ja: "単価",
+          ko: "단가",
+          es: "Precio por Artículo",
+          de: "Stückpreis",
+          fi: "Kappalehinta",
+          fr: "Prix par article",
+          ar: "السعر لكل صنف",
+          it: "Prezzo per Articolo",
+        },
+        quantity: {
+          en: "Quantity",
+          zh: "數量",
+          ja: "数量",
+          ko: "수량",
+          es: "Cantidad",
+          de: "Menge",
+          fi: "Määrä",
+          fr: "Quantité",
+          ar: "الكمية",
+          it: "Quantità",
+        },
+        discount: {
+          en: "Discount",
+          zh: "折扣",
+          ja: "割引",
+          ko: "할인",
+          es: "Descuento",
+          de: "Rabatt",
+          fi: "Alennus",
+          fr: "Remise",
+          ar: "خصم",
+          it: "Sconto",
+        },
+        receipt: {
+          en: "Receipt",
+          zh: "收據",
+          ja: "レシート",
+          ko: "영수증",
+          es: "Recibo",
+          de: "Quittung",
+          fi: "Kuitti",
+          fr: "Reçu",
+          ar: "إيصال",
+          it: "Ricevuta",
+        },
+        subtotal: {
+          en: "Subtotal",
+          zh: "小計",
+          ja: "小計",
+          ko: "소계",
+          es: "Subtotal",
+          de: "Zwischensumme",
+          fi: "Välisumma",
+          fr: "Sous-total",
+          ar: "المجموع الفرعي",
+          it: "Totale Parziale",
+        },
+        saving: {
+          en: "You Save",
+          zh: "節省",
+          ja: "節約",
+          ko: "절약",
+          es: "Ahorras",
+          de: "Du sparst",
+          fi: "Säästät",
+          fr: "Vous économisez",
+          ar: "أنت توفر",
+          it: "Risparmi",
+        },
+        total: {
+          en: "Total",
+          zh: "總計",
+          ja: "合計",
+          ko: "합계",
+          es: "Total",
+          de: "Gesamt",
+          fi: "Yhteensä",
+          fr: "Total",
+          ar: "المجموع",
+          it: "Totale",
+        },
+        change: {
+          en: "Change",
+          zh: "找贖",
+          ja: "お釣り",
+          ko: "거스름돈",
+          es: "Cambio",
+          de: "Wechselgeld",
+          fi: "Vaihtoraha",
+          fr: "Monnaie",
+          ar: "الباقي",
+          it: "Resto",
+        },
+        enough: {
+          en: "Affordable!",
+          zh: "夠錢買！",
+          ja: "購入可能！",
+          ko: "구매 가능!",
+          es: "¡Asequible!",
+          de: "Leistbar!",
+          fi: "Varat riittävät!",
+          fr: "Abordable !",
+          ar: "بأسعار معقولة!",
+          it: "Accessibile!",
+        },
+        notEnough: {
+          en: "Not Enough Money!",
+          zh: "不夠錢！",
+          ja: "お金が足りません！",
+          ko: "돈이 부족해요!",
+          es: "¡No hay suficiente dinero!",
+          de: "Nicht genug Geld!",
+          fi: "Ei tarpeeksi rahaa!",
+          fr: "Pas assez d'argent !",
+          ar: "لا يكفي من المال!",
+          it: "Non abbastanza soldi!",
+        },
+      };
+
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [budget, setBudget] = useState(500);
+        const [price, setPrice] = useState(50);
+        const [qty, setQty] = useState(5);
+        const [pctOff, setPctOff] = useState(10); // %
+
+        const gross = price * qty;
+        const discountAmt = gross * (pctOff / 100);
+        const net = gross - discountAmt;
+        const remaining = budget - net;
+        const isAffordable = remaining >= 0;
 
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-cyan-900 mb-2">
-              🛒 複合應用題
-            </h1>
-            <p className="text-xl text-cyan-700 font-bold mb-8">
-              Multi-Step Word Problems
-            </p>
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-2xl w-full">
-              <div className="bg-cyan-50 border-2 border-cyan-200 rounded-2xl p-6 mb-6 leading-loose text-lg text-slate-700">
-                <p>
-                  小明有{" "}
+          <div className="min-h-screen flex flex-col items-center p-4 font-sans bg-slate-900 text-white">
+            <div className="w-full max-w-5xl flex justify-between items-center mb-10">
+              <h1 className="text-4xl font-black text-cyan-400 drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]">
+                🛒 {getText("title", lang)}
+              </h1>
+              <div className="flex bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-cyan-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Inputs */}
+              <div className="flex flex-col gap-6">
+                {/* Wallet / Budget */}
+                <div className="glass-panel p-6 rounded-3xl border-l-4 border-emerald-500 bg-emerald-900/10">
+                  <label className="text-emerald-400 font-bold uppercase mb-2 block">
+                    {getText("budget", lang)} ($)
+                  </label>
                   <input
                     type="number"
-                    value={money}
-                    onChange={(e) =>
-                      setMoney(Math.max(0, parseInt(e.target.value) || 0))
-                    }
-                    className="w-20 text-center font-bold border rounded"
-                  />{" "}
-                  元。 他想買{" "}
-                  <input
-                    type="number"
-                    value={count}
-                    onChange={(e) =>
-                      setCount(Math.max(1, parseInt(e.target.value) || 1))
-                    }
-                    className="w-16 text-center font-bold border rounded"
-                  />{" "}
-                  本書。 每本書原價{" "}
-                  <input
-                    type="number"
-                    value={price}
-                    onChange={(e) =>
-                      setPrice(Math.max(0, parseInt(e.target.value) || 0))
-                    }
-                    className="w-20 text-center font-bold border rounded"
-                  />{" "}
-                  元， 現在全場{" "}
-                  <input
-                    type="number"
-                    value={discount}
-                    onChange={(e) =>
-                      setDiscount(Math.max(0, parseInt(e.target.value) || 0))
-                    }
-                    className="w-16 text-center font-bold border rounded"
+                    min="0"
+                    value={budget}
+                    onChange={(e) => setBudget(parseFloat(e.target.value) || 0)}
+                    className="w-full bg-slate-800 text-4xl font-black text-white p-4 rounded-xl border border-white/10 outline-none focus:border-emerald-500 transition-colors text-right"
                   />
-                  % OFF。
-                </p>
-                <p className="font-bold mt-2 text-cyan-800">
-                  問：他買完後還剩多少錢？
-                </p>
+                </div>
+
+                {/* Items Config */}
+                <div className="glass-panel p-8 rounded-3xl space-y-6">
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <label className="text-cyan-400 font-bold uppercase mb-2 block text-sm">
+                        {getText("itemPrice", lang)} ($)
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={price}
+                        onChange={(e) =>
+                          setPrice(parseFloat(e.target.value) || 0)
+                        }
+                        className="w-full bg-slate-800 text-2xl font-bold p-3 rounded-lg border border-white/10 text-center"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-purple-400 font-bold uppercase mb-2 block text-sm">
+                        {getText("quantity", lang)}
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setQty(Math.max(1, qty - 1))}
+                          className="w-10 h-10 bg-slate-700 rounded-lg text-xl hover:bg-slate-600"
+                        >
+                          -
+                        </button>
+                        <input
+                          type="number"
+                          min="1"
+                          value={qty}
+                          onChange={(e) =>
+                            setQty(parseInt(e.target.value) || 1)
+                          }
+                          className="flex-1 bg-slate-800 text-2xl font-bold p-1.5 rounded-lg border border-white/10 text-center"
+                        />
+                        <button
+                          onClick={() => setQty(qty + 1)}
+                          className="w-10 h-10 bg-slate-700 rounded-lg text-xl hover:bg-slate-600"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-pink-400 font-bold uppercase mb-2 block text-sm">
+                      {getText("discount", lang)} (%)
+                    </label>
+                    <input
+                      type="range"
+                      min="0"
+                      max="90"
+                      step="5"
+                      value={pctOff}
+                      onChange={(e) => setPctOff(parseInt(e.target.value) || 0)}
+                      className="w-full accent-pink-500 h-3 bg-slate-700 rounded-lg appearance-none cursor-pointer mb-2"
+                    />
+                    <div className="text-right font-bold text-pink-400">
+                      {pctOff}% OFF
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div className="space-y-4">
-                <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-slate-200">
-                  <span className="font-bold text-slate-500">
-                    1. 計算折後單價
-                  </span>
-                  <span className="font-mono font-bold text-xl">
-                    {price} × (100% - {discount}%) = $
-                    {discountedPrice.toFixed(1)}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-slate-200">
-                  <span className="font-bold text-slate-500">
-                    2. 計算總花費
-                  </span>
-                  <span className="font-mono font-bold text-xl">
-                    ${discountedPrice.toFixed(1)} × {count} = $
-                    {total.toFixed(1)}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-slate-200">
-                  <span className="font-bold text-slate-500">3. 計算找贖</span>
-                  <span className="font-mono font-bold text-xl">
-                    {money} - {total.toFixed(1)} ={" "}
-                  </span>
-                </div>
-              </div>
+              {/* Receipt / Output */}
+              <div className="glass-panel p-8 rounded-3xl relative flex flex-col items-center justify-center bg-white text-slate-900 shadow-[0_0_50px_rgba(0,0,0,0.5)] transform -rotate-1 perspective-1000">
+                {/* Paper Texture Effect */}
+                <div className="absolute top-0 left-0 w-full h-8 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIxMCIgdmlld0JveD0iMCAwIDIwIDEwIiBmaWxsPSIjZjhmOGY4Ij48cGF0aCBkPSJNMCAxMCBMMTAgMCBMMjAgMTBHIi8+PC9zdmc+')] bg-repeat-x -mt-8 rotate-180"></div>
+                <div className="absolute bottom-0 left-0 w-full h-8 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIxMCIgdmlld0JveD0iMCAwIDIwIDEwIiBmaWxsPSIjZmZmIj48cGF0aCBkPSJNMCAwIEwxMCAxMCBMMjAgMEwiLz48L3N2Zz4')] bg-repeat-x -mb-8"></div>
 
-              <div
-                className={`mt-6 p-6 rounded-2xl text-center border-4 ${
-                  change >= 0
-                    ? "bg-emerald-100 border-emerald-300"
-                    : "bg-red-100 border-red-300"
-                }`}
-              >
-                <div
-                  className={`font-bold ${
-                    change >= 0 ? "text-emerald-600" : "text-red-600"
-                  }`}
-                >
-                  {change >= 0 ? "剩餘金額 Change" : "不夠錢 Not enough money!"}
-                </div>
-                <div
-                  className={`text-5xl font-black ${
-                    change >= 0 ? "text-emerald-800" : "text-red-800"
-                  }`}
-                >
-                  ${Math.abs(change).toFixed(1)}
+                <div className="w-full max-w-sm space-y-4 font-mono text-lg">
+                  <div className="text-center border-b-2 border-dashed border-slate-300 pb-4 mb-4">
+                    <h2 className="text-3xl font-black uppercase tracking-widest">
+                      {getText("receipt", lang)}
+                    </h2>
+                    <div className="text-slate-500 text-xs">
+                      {new Date().toLocaleDateString()}
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between">
+                    <span>{getText("itemPrice", lang)}</span>
+                    <span>${price.toFixed(1)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>{getText("quantity", lang)}</span>
+                    <span>x {qty}</span>
+                  </div>
+                  <div className="flex justify-between font-bold border-t border-slate-200 pt-2">
+                    <span>{getText("subtotal", lang)}</span>
+                    <span>${gross.toFixed(1)}</span>
+                  </div>
+                  <div className="flex justify-between text-pink-600">
+                    <span>
+                      {getText("discount", lang)} ({pctOff}%)
+                    </span>
+                    <span>-${discountAmt.toFixed(1)}</span>
+                  </div>
+
+                  <div className="border-t-4 border-slate-900 pt-4 flex justify-between text-2xl font-black">
+                    <span>{getText("total", lang)}</span>
+                    <span>${net.toFixed(1)}</span>
+                  </div>
+
+                  <div className="py-4 border-b-2 border-dashed border-slate-300"></div>
+
+                  <div className="flex justify-between text-slate-600 pt-2">
+                    <span>{getText("budget", lang)}</span>
+                    <span>${budget.toFixed(1)}</span>
+                  </div>
+
+                  <div
+                    className={`p-4 mt-4 rounded-xl text-center border-2 ${
+                      isAffordable
+                        ? "bg-emerald-100 border-emerald-400 text-emerald-800"
+                        : "bg-red-100 border-red-400 text-red-800"
+                    }`}
+                  >
+                    <div className="font-bold uppercase text-xs mb-1">
+                      {isAffordable
+                        ? getText("remaining", lang)
+                        : getText("notEnough", lang)}
+                    </div>
+                    <div className="text-3xl font-black">
+                      {isAffordable ? (
+                        <span>
+                          {getText("change", lang)}: ${remaining.toFixed(1)}
+                        </span>
+                      ) : (
+                        <span>-${Math.abs(remaining).toFixed(1)}</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {pctOff > 0 && (
+                    <div className="text-center text-xs text-pink-600 font-bold mt-2">
+                      {getText("saving", lang)}: ${discountAmt.toFixed(1)}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

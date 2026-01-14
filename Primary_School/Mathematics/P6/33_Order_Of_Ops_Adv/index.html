@@ -3,136 +3,343 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小六數學：進階四則運算 | Advanced Order of Operations</title>
+    <title>小六數學：進階四則運算 | Order of Operations</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #fef3c7 0%, #d97706 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
-      function App() {
-        const [steps, setSteps] = useState([]);
-        const problems = [
-          {
-            expr: "3 + 4 × 2 - 5",
-            steps: ["4 × 2 = 8", "3 + 8 = 11", "11 - 5 = 6"],
-            ans: 6,
-          },
-          {
-            expr: "(8 + 4) ÷ 2 × 3",
-            steps: ["8 + 4 = 12", "12 ÷ 2 = 6", "6 × 3 = 18"],
-            ans: 18,
-          },
-          {
-            expr: "10 - 2 × (3 + 1)",
-            steps: ["3 + 1 = 4", "2 × 4 = 8", "10 - 8 = 2"],
-            ans: 2,
-          },
-          {
-            expr: "6 ÷ 2 × (1 + 2)",
-            steps: ["1 + 2 = 3", "6 ÷ 2 = 3", "3 × 3 = 9"],
-            ans: 9,
-          },
-        ];
-        const [curProb, setCurProb] = useState(0);
-        const [curStep, setCurStep] = useState(0); // 0 to show nothing, 1 first step...
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
 
-        const next = () => {
-          setCurProb((curProb + 1) % problems.length);
-          setCurStep(0);
+      const t = {
+        title: {
+          en: "Order of Operations",
+          zh: "四則運算",
+          ja: "計算の順序",
+          ko: "연산 순서",
+          es: "Orden de Operaciones",
+          de: "Rechenreihenfolge",
+          fi: "Laskujärjestys",
+          fr: "Ordre des opérations",
+          ar: "ترتيب العمليات",
+          it: "Ordine delle Operazioni",
+        },
+        instruction: {
+          en: "Tap the part to solve next!",
+          zh: "點擊下一步要計算的部分！",
+          ja: "次に計算する部分をタップ！",
+          ko: "다음에 계산할 부분을 누르세요!",
+          es: "¡Toca la parte para resolver!",
+          de: "Tippe auf den nächsten Schritt!",
+          fi: "Napauta seuraavaksi laskettavaa osaa!",
+          fr: "Touchez la partie à résoudre !",
+          ar: "اضغط على الجزء المراد حله تالياً!",
+          it: "Tocca la parte da risolvere!",
+        },
+        correct: {
+          en: "Correct!",
+          zh: "正確！",
+          ja: "正解！",
+          ko: "정답!",
+          es: "¡Correcto!",
+          de: "Richtig!",
+          fi: "Oikein!",
+          fr: "Correct !",
+          ar: "صحيح!",
+          it: "Corretto!",
+        },
+        wrong: {
+          en: "Ops! Check BODMAS rules.",
+          zh: "哎呀！檢查先乘除後加減。",
+          ja: "おっと！ルールの確認を。",
+          ko: "이런! 규칙을 확인하세요.",
+          es: "¡Ops! Revisa las reglas.",
+          de: "Hoppla! Regeln prüfen.",
+          fi: "Hups! Tarkista säännöt.",
+          fr: "Oups ! Vérifiez les règles.",
+          ar: "أووبس! تحقق من القواعد.",
+          it: "Ops! Controlla le regole.",
+        },
+        complete: {
+          en: "Expression Solved!",
+          zh: "式子已解開！",
+          ja: "計算完了！",
+          ko: "계산 완료!",
+          es: "¡Expresión Resuelta!",
+          de: "Ausdruck gelöst!",
+          fi: "Lauseke ratkaistu!",
+          fr: "Expression résolue !",
+          ar: "تم حل التعبير!",
+          it: "Espressione Risolta!",
+        },
+        next: {
+          en: "Next Problem",
+          zh: "下一題",
+          ja: "次の問題",
+          ko: "다음 문제",
+          es: "Siguiente Problema",
+          de: "Nächste Aufgabe",
+          fi: "Seuraava tehtävä",
+          fr: "Problème suivant",
+          ar: "المسألة التالية",
+          it: "Prossimo Problema",
+        },
+      };
+
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
+      // Simple parser/structure for problems
+      // A problem is a recursive structure or a list of steps
+      // Let's use a flat token list for simplicity in UI, but logic to track "clickable" ranges
+      const levels = [
+        {
+          id: 1,
+          expr: [3, "+", 4, "×", 2],
+          steps: [
+            { range: [2, 4], res: 8, newExpr: [3, "+", 8] },
+            { range: [0, 2], res: 11, newExpr: [11] },
+          ],
+        },
+        {
+          id: 2,
+          expr: [10, "-", 3, "×", 2],
+          steps: [
+            { range: [2, 4], res: 6, newExpr: [10, "-", 6] },
+            { range: [0, 2], res: 4, newExpr: [4] },
+          ],
+        },
+        {
+          id: 3,
+          expr: ["(", 5, "+", 3, ")", "×", 2],
+          steps: [
+            { range: [0, 4], res: 8, newExpr: [8, "×", 2] }, // ( 5 + 3 ) -> index 0 to 4
+            { range: [0, 2], res: 16, newExpr: [16] },
+          ],
+        },
+        {
+          id: 4,
+          expr: [20, "÷", "(", 6, "-", 2, ")"],
+          steps: [
+            { range: [2, 6], res: 4, newExpr: [20, "÷", 4] },
+            { range: [0, 2], res: 5, newExpr: [5] },
+          ],
+        },
+        {
+          id: 5,
+          expr: [2, "+", 3, "×", 4, "-", 5],
+          steps: [
+            { range: [2, 4], res: 12, newExpr: [2, "+", 12, "-", 5] },
+            { range: [0, 2], res: 14, newExpr: [14, "-", 5] }, // or 12-5 but left-to-right + is first
+            { range: [0, 2], res: 9, newExpr: [9] },
+          ],
+        },
+      ];
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [lvlIdx, setLvlIdx] = useState(0);
+        const [currentExpr, setCurrentExpr] = useState(levels[0].expr);
+        const [stepIdx, setStepIdx] = useState(0); // Which step we are on
+        const [feedback, setFeedback] = useState("");
+        const [history, setHistory] = useState([]);
+
+        useEffect(() => {
+          resetLevel();
+        }, [lvlIdx]);
+
+        const resetLevel = () => {
+          setCurrentExpr(levels[lvlIdx].expr);
+          setStepIdx(0);
+          setHistory([]);
+          setFeedback("");
         };
 
-        const showNextStep = () => {
-          if (curStep < problems[curProb].steps.length) {
-            setCurStep(curStep + 1);
+        const handleTokenClick = (index) => {
+          if (stepIdx >= levels[lvlIdx].steps.length) return;
+
+          const targetStep = levels[lvlIdx].steps[stepIdx];
+          // Check if click is within the target range
+          // Actually, we want them to click the operator usually, or any part of the sub-expression
+          if (index >= targetStep.range[0] && index <= targetStep.range[1]) {
+            // Correct
+            setFeedback("correct");
+            // Animate transition
+            setTimeout(() => {
+              setHistory((prev) => [...prev, currentExpr.join(" ") + " = ..."]);
+              setCurrentExpr(targetStep.newExpr);
+              setStepIdx(stepIdx + 1);
+              setFeedback("");
+            }, 800);
+          } else {
+            setFeedback("wrong");
+            setTimeout(() => setFeedback(""), 1500);
           }
         };
 
+        const isFinished = stepIdx >= levels[lvlIdx].steps.length;
+
+        const nextLevel = () => {
+          setLvlIdx((lvlIdx + 1) % levels.length);
+        };
+
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-amber-900 mb-2">
-              🔢 進階四則運算
-            </h1>
-            <p className="text-xl text-amber-700 font-bold mb-8">
-              Advanced Order of Operations
-            </p>
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-2xl w-full flex flex-col items-center">
-              <div className="bg-amber-100 p-8 rounded-2xl border-4 border-amber-300 w-full text-center mb-8">
-                <div className="text-4xl font-black text-amber-900 font-mono tracking-wider">
-                  {problems[curProb].expr}
-                </div>
+          <div className="min-h-screen flex flex-col items-center p-4 font-sans bg-slate-900 text-white">
+            <div className="w-full max-w-5xl flex justify-between items-center mb-10">
+              <h1 className="text-4xl font-black text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]">
+                🔢 {getText("title", lang)}
+              </h1>
+              <div className="flex bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-amber-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="w-full max-w-3xl flex flex-col gap-8">
+              {/* Main Display */}
+              <div className="glass-panel p-12 rounded-3xl min-h-[300px] flex flex-col items-center justify-center relative">
+                <AnimatePresence>
+                  {isFinished ? (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.5 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="text-center"
+                    >
+                      <div className="text-6xl font-black text-green-400 mb-4">
+                        {currentExpr[0]}
+                      </div>
+                      <div className="text-2xl font-bold text-slate-300 mb-8">
+                        {getText("complete", lang)}
+                      </div>
+                      <button
+                        onClick={nextLevel}
+                        className="bg-amber-500 hover:bg-amber-400 text-slate-900 px-8 py-3 rounded-xl font-bold shadow-lg transition-transform active:scale-95"
+                      >
+                        {getText("next", lang)}
+                      </button>
+                    </motion.div>
+                  ) : (
+                    <div className="flex flex-wrap gap-4 items-center justify-center text-5xl md:text-7xl font-mono font-bold">
+                      {currentExpr.map((token, i) => (
+                        <motion.button
+                          key={`${stepIdx}-${i}`} // Force re-render on step change
+                          layout
+                          whileHover={{ scale: 1.1, color: "#fbbf24" }}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={() => handleTokenClick(i)}
+                          className={`p-2 rounded-xl transition-colors ${
+                            typeof token === "number"
+                              ? "text-white"
+                              : "text-amber-400"
+                          }`}
+                        >
+                          {token}
+                        </motion.button>
+                      ))}
+                    </div>
+                  )}
+                </AnimatePresence>
+
+                {/* Feedback Overlay */}
+                <AnimatePresence>
+                  {feedback && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className={`absolute bottom-8 px-6 py-2 rounded-full font-bold text-lg pointer-events-none
+                                  ${
+                                    feedback === "correct"
+                                      ? "bg-green-500/20 text-green-400 border border-green-500/50"
+                                      : "bg-red-500/20 text-red-400 border border-red-500/50"
+                                  }
+                              `}
+                    >
+                      {getText(feedback, lang)}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
-              <div className="w-full space-y-4 mb-8">
-                {problems[curProb].steps.map((step, i) => (
+              {/* Instruction */}
+              {!isFinished && (
+                <div className="text-center text-slate-400 font-bold uppercase tracking-widest text-sm animate-pulse">
+                  {getText("instruction", lang)}
+                </div>
+              )}
+
+              {/* History/Steps */}
+              <div className="bg-slate-800/50 p-6 rounded-2xl border border-white/5">
+                <h3 className="text-sm font-bold text-slate-500 uppercase mb-4">
+                  Steps
+                </h3>
+                {history.length === 0 && (
+                  <div className="text-slate-600 italic text-sm">...</div>
+                )}
+                {history.map((h, i) => (
                   <div
                     key={i}
-                    className={`p-4 rounded-xl border-2 text-xl font-bold font-mono transition-all duration-500
-                       ${
-                         i < curStep
-                           ? "bg-white border-amber-400 text-amber-800 opacity-100 translate-x-0"
-                           : "opacity-0 translate-x-10"
-                       }`}
+                    className="text-slate-400 font-mono mb-2 text-lg opactiy-60"
                   >
-                    Step {i + 1}: {step}
+                    {h}
                   </div>
                 ))}
-
-                {curStep === problems[curProb].steps.length && (
-                  <div className="p-4 rounded-xl bg-green-100 border-4 border-green-400 text-3xl font-black text-green-800 text-center animate-bounce">
-                    答案 Answer: {problems[curProb].ans}
-                  </div>
-                )}
-              </div>
-
-              <div className="flex gap-4">
-                <button
-                  onClick={showNextStep}
-                  disabled={curStep === problems[curProb].steps.length}
-                  className="px-8 py-3 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white font-bold rounded-xl shadow-lg transition-transform active:scale-95"
-                >
-                  下一步 Step
-                </button>
-                <button
-                  onClick={next}
-                  className="px-8 py-3 bg-slate-500 hover:bg-slate-600 text-white font-bold rounded-xl shadow-lg transition-transform active:scale-95"
-                >
-                  下一題 Next
-                </button>
               </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

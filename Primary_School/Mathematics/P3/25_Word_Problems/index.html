@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>小三數學：應用題訓練</title>
+    <title>小三數學：應用題訓練 | Word Problems</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -23,24 +24,172 @@
     <div id="root"></div>
     <script type="text/babel">
       const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Word Problems",
+          zh: "應用題訓練",
+          ja: "文章問題",
+          ko: "문장제 문제",
+          es: "Problemas verbales",
+          de: "Textaufgaben",
+          fi: "Sanalliset tehtävät",
+          fr: "Problèmes écrits",
+          ar: "مسائل لفظية",
+          it: "Problemi verbali",
+        },
+        question: {
+          en: "Question {n}/{total}",
+          zh: "題目 {n}/{total}",
+          ja: "質問 {n}/{total}",
+          ko: "질문 {n}/{total}",
+          es: "Pregunta {n}/{total}",
+          de: "Frage {n}/{total}",
+          fi: "Kysymys {n}/{total}",
+          fr: "Question {n}/{total}",
+          ar: "السؤال {n}/{total}",
+          it: "Domanda {n}/{total}",
+        },
+        input: {
+          en: "Enter answer...",
+          zh: "輸入答案...",
+          ja: "答えを入力...",
+          ko: "답을 입력하세요...",
+          es: "Ingresar respuesta...",
+          de: "Antwort eingeben...",
+          fi: "Syötä vastaus...",
+          fr: "Entrer la réponse...",
+          ar: "أدخل الإجابة...",
+          it: "Inserisci risposta...",
+        },
+        submit: {
+          en: "Submit Answer",
+          zh: "提交答案",
+          ja: "回答を送信",
+          ko: "답변 제출",
+          es: "Enviar respuesta",
+          de: "Antwort senden",
+          fi: "Lähetä vastaus",
+          fr: "Soumettre la réponse",
+          ar: "إرسال الإجابة",
+          it: "Invia risposta",
+        },
+        correct: {
+          en: "✓ Correct!",
+          zh: "✓ 答對了！",
+          ja: "✓ 正解！",
+          ko: "✓ 정답!",
+          es: "✓ Correcto!",
+          de: "✓ Richtig!",
+          fi: "✓ Oikein!",
+          fr: "✓ Correct !",
+          ar: "✓ صحيح!",
+          it: "✓ Corretto!",
+        },
+        incorrect: {
+          en: "✗ Try again! Correct answer: {a}",
+          zh: "✗ 再想想！正確答案：{a}",
+          ja: "✗ もう一度！正解: {a}",
+          ko: "✗ 다시 시도하세요! 정답: {a}",
+          es: "✗ ¡Inténtalo de nuevo! Respuesta correcta: {a}",
+          de: "✗ Versuch es nochmal! Richtige Antwort: {a}",
+          fi: "✗ Yritä uudelleen! Oikea vastaus: {a}",
+          fr: "✗ Réessayez ! Réponse correcte : {a}",
+          ar: "✗ حاول مرة أخرى! الإجابة الصحيحة: {a}",
+          it: "✗ Riprova! Risposta corretta: {a}",
+        },
+        score: {
+          en: "Score: {s}",
+          zh: "總分：{s}",
+          ja: "スコア: {s}",
+          ko: "점수: {s}",
+          es: "Puntuación: {s}",
+          de: "Punktzahl: {s}",
+          fi: "Pisteet: {s}",
+          fr: "Score : {s}",
+          ar: "النتيجة: {s}",
+          it: "Punteggio: {s}",
+        },
+        problems: [
+          {
+            q: {
+              en: "Xiaoming has 24 apples. He ate 5. How many are left?",
+              zh: "小明有24個蘋果，吃了5個，還剩多少個？",
+              ja: "シャオミンは24個のリンゴを持っています。5個食べました。残りはいくつですか？",
+              ko: "샤오밍은 24개의 사과를 가지고 있습니다. 그는 5개를 먹었습니다. 몇 개가 남았습니까?",
+              es: "Xiaoming tiene 24 manzanas. Comió 5. ¿Cuántas quedan?",
+              de: "Xiaoming hat 24 Äpfel. Er aß 5. Wie viele sind übrig?",
+              fi: "Xiaomingilla on 24 omenaa. Hän söi 5. Kuinka monta on jäljellä?",
+              fr: "Xiaoming a 24 pommes. Il en a mangé 5. Combien en reste-t-il ?",
+              ar: "لدى شياومينغ 24 تفاحة. أكل 5. كم بقي؟",
+              it: "Xiaoming ha 24 mele. Ne ha mangiate 5. Quante ne rimangono?",
+            },
+            a: 19,
+          },
+          {
+            q: {
+              en: "A bookstore has 35 books. It stocked 18 more. Multiply the total books now.",
+              zh: "書店有35本書，又進貨了18本，現在共有多少本？",
+              ja: "書店には35冊の本があります。さらに18冊入荷しました。現在の合計冊数は？",
+              ko: "서점에 35권의 책이 있습니다. 18권을 더 입고했습니다. 현재 총 책의 수는?",
+              es: "Una librería tiene 35 libros. Suministraron 18 más. ¿Cuántos libros hay ahora?",
+              de: "Eine Buchhandlung hat 35 Bücher. Sie hat 18 weitere bestellt. Wie viele Bücher gibt es jetzt?",
+              fi: "Kirjakaupassa on 35 kirjaa. Se hankki 18 lisää. Kuinka monta kirjaa nyt on yhteensä?",
+              fr: "Une librairie a 35 livres. Elle en a stocké 18 de plus. Combien de livres y a-t-il maintenant ?",
+              ar: "مكتبة بها 35 كتابًا. خزن 18 آخر. كم عدد الكتب الآن؟",
+              it: "Una libreria ha 35 libri. Ne ha riforniti altri 18. Quanti libri ci sono ora?",
+            },
+            a: 53,
+          },
+          {
+            q: {
+              en: "A box has 6 cakes. How many cakes are in 8 boxes?",
+              zh: "一盒有6個蛋糕，8盒共有多少個？",
+              ja: "1箱に6個のケーキが入っています。8箱で何個になりますか？",
+              ko: "한 상자에 케이크가 6개 있습니다. 8상자에는 몇 개가 있습니까?",
+              es: "Una caja tiene 6 pasteles. ¿Cuántos pasteles hay en 8 cajas?",
+              de: "Eine Schachtel enthält 6 Kuchen. Wie viele Kuchen sind in 8 Schachteln?",
+              fi: "Laatikossa on 6 kakkua. Kuinka monta kakkua on 8 laatikossa?",
+              fr: "Une boîte contient 6 gâteaux. Combien de gâteaux y a-t-il dans 8 boîtes ?",
+              ar: "صندوق به 6 كعكات. كم عدد الكعك في 8 صناديق؟",
+              it: "Una scatola ha 6 torte. Quante torte ci sono in 8 scatole?",
+            },
+            a: 48,
+          },
+          {
+            q: {
+              en: "36 candies are shared equally among 4 children. How many does each get?",
+              zh: "36個糖果平均分給4個小朋友，每人得多少個？",
+              ja: "36個のキャンディーを4人の子供で等しく分けます。1人何個もらえますか？",
+              ko: "36개의 사탕을 4명의 아이들에게 똑같이 나누어 줍니다. 각자 몇 개를 받습니까?",
+              es: "36 caramelos se reparten equitativamente entre 4 niños. ¿Cuántos recibe cada uno?",
+              de: "36 Bonbons werden gleichmäßig auf 4 Kinder aufgeteilt. Wie viele bekommt jeder?",
+              fi: "36 karkkia jaetaan tasan 4 lapsen kesken. Kuinka monta kukin saa?",
+              fr: "36 bonbons sont partagés équitablement entre 4 enfants. Combien chacun reçoit-il ?",
+              ar: "يتم تقاسم 36 حلوى بالتساوي بين 4 أطفال. كم يحصل كل منهم؟",
+              it: "36 caramelle sono divise equamente tra 4 bambini. Quante ne riceve ciascuno?",
+            },
+            a: 9,
+          },
+        ],
+      };
+
       function App() {
-        const problems = [
-          { q: "小明有24個蘋果，吃了5個，還剩多少個？", a: 19, op: "-" },
-          { q: "書店有35本書，又進貨了18本，現在共有多少本？", a: 53, op: "+" },
-          { q: "一盒有6個蛋糕，8盒共有多少個？", a: 48, op: "×" },
-          { q: "36個糖果平均分給4個小朋友，每人得多少個？", a: 9, op: "÷" },
-        ];
+        const [lang, setLang] = useState("zh");
         const [current, setCurrent] = useState(0);
         const [answer, setAnswer] = useState("");
         const [feedback, setFeedback] = useState(null);
         const [score, setScore] = useState(0);
-        const p = problems[current];
+
+        const p = t.problems[current]; // Using translated structure directly
+
         const check = () => {
           if (parseInt(answer) === p.a) {
             setFeedback("correct");
             setScore((s) => s + 10);
             setTimeout(() => {
-              setCurrent((current + 1) % problems.length);
+              setCurrent((current + 1) % t.problems.length);
               setAnswer("");
               setFeedback(null);
             }, 1500);
@@ -48,18 +197,32 @@
             setFeedback("incorrect");
           }
         };
+
+        const getStatusText = (key) => t[key][lang] || t[key]["en"];
+        const getIncorrectText = () =>
+          (t.incorrect[lang] || t.incorrect["en"]).replace("{a}", p.a);
+        const getScoreText = () =>
+          (t.score[lang] || t.score["en"]).replace("{s}", score);
+        const getQuestionTitle = () => {
+          let text = t.question[lang] || t.question["en"];
+          return text
+            .replace("{n}", current + 1)
+            .replace("{total}", t.problems.length);
+        };
+
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-6xl font-black text-white mb-8">
-              📝 應用題訓練
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-6xl font-black text-white mb-8 mt-8 text-center">
+              📝 {t.title[lang] || t.title["en"]}
             </h1>
             <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-3xl w-full">
               <div className="text-2xl font-bold text-indigo-600 mb-2">
-                題目 {current + 1}/{problems.length}
+                {getQuestionTitle()}
               </div>
               <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-8 mb-8 border-4 border-indigo-300">
-                <div className="text-3xl font-bold text-indigo-900 leading-relaxed">
-                  {p.q}
+                <div className="text-2xl md:text-3xl font-bold text-indigo-900 leading-relaxed">
+                  {p.q[lang] || p.q["en"]}
                 </div>
               </div>
               <div className="mb-6">
@@ -68,7 +231,7 @@
                   value={answer}
                   onChange={(e) => setAnswer(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && check()}
-                  placeholder="輸入答案..."
+                  placeholder={t.input[lang] || t.input["en"]}
                   className="w-full px-8 py-6 text-5xl font-black text-center rounded-2xl border-4 border-indigo-300 focus:border-indigo-600 outline-none"
                 />
               </div>
@@ -76,20 +239,20 @@
                 onClick={check}
                 className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white text-2xl font-bold rounded-2xl mb-4"
               >
-                提交答案
+                {t.submit[lang] || t.submit["en"]}
               </button>
               {feedback === "correct" && (
                 <div className="bg-green-100 text-green-700 p-4 rounded-xl text-center font-bold text-xl">
-                  ✓ 答對了！
+                  {getStatusText("correct")}
                 </div>
               )}
               {feedback === "incorrect" && (
                 <div className="bg-red-100 text-red-700 p-4 rounded-xl text-center font-bold text-xl">
-                  ✗ 再想想！正確答案：{p.a}
+                  {getIncorrectText()}
                 </div>
               )}
               <div className="mt-6 text-center text-3xl font-black text-indigo-600">
-                總分：{score}
+                {getScoreText()}
               </div>
             </div>
           </div>
@@ -97,20 +260,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

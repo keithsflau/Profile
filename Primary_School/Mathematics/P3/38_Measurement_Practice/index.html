@@ -3,12 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小三數學：長度量度大師</title>
+    <title>小三數學：長度量度大師 | Measurement Master</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -19,25 +20,6 @@
         background: linear-gradient(135deg, #a5b4fc 0%, #6366f1 100%);
         overflow-x: hidden;
       }
-      .ruler {
-        background: repeating-linear-gradient(
-            90deg,
-            #fbbf24 0 1px,
-            transparent 1px 10px
-          ),
-          repeating-linear-gradient(90deg, #fbbf24 0 2px, transparent 2px 50px);
-        background-color: rgba(255, 255, 255, 0.9);
-      }
-      .marker {
-        height: 10px;
-        width: 1px;
-        background: #000;
-        position: absolute;
-        bottom: 0;
-      }
-      .marker.long {
-        height: 20px;
-      }
     </style>
   </head>
   <body>
@@ -45,8 +27,133 @@
     <script type="text/babel">
       const { useState, useRef, useEffect } = React;
       const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Length Measurement Master",
+          zh: "長度量度大師",
+          ja: "長さ測定マスター",
+          ko: "길이 측정 마스터",
+          es: "Maestro de medición de longitud",
+          de: "Längenmessmeister",
+          fi: "Pituuden mittauksen mestari",
+          fr: "Maître de la mesure de longueur",
+          ar: "سيد قياس الطول",
+          it: "Maestro di misurazione della lunghezza",
+        },
+        score: {
+          en: "Score",
+          zh: "得分",
+          ja: "スコア",
+          ko: "점수",
+          es: "Puntuación",
+          de: "Punktzahl",
+          fi: "Pisteet",
+          fr: "Score",
+          ar: "النتيجة",
+          it: "Punteggio",
+        },
+        next: {
+          en: "Next",
+          zh: "下一題",
+          ja: "次へ",
+          ko: "다음",
+          es: "Siguiente",
+          de: "Weiter",
+          fi: "Seuraava",
+          fr: "Suivant",
+          ar: "التالي",
+          it: "Avanti",
+        },
+        start: {
+          en: "Start",
+          zh: "起點",
+          ja: "開始",
+          ko: "시작",
+          es: "Inicio",
+          de: "Start",
+          fi: "Alku",
+          fr: "Début",
+          ar: "بداية",
+          it: "Inizio",
+        },
+        end: {
+          en: "End",
+          zh: "終點",
+          ja: "終了",
+          ko: "끝",
+          es: "Fin",
+          de: "Ende",
+          fi: "Loppu",
+          fr: "Fin",
+          ar: "نهاية",
+          it: "Fine",
+        },
+        dragTip: {
+          en: "👆 Drag ruler to measure",
+          zh: "👆 拖動間尺來量度",
+          ja: "👆 定規をドラッグして測定",
+          ko: "👆 자를 드래그하여 측정",
+          es: "👆 Arrastra la regla para medir",
+          de: "👆 Lineal ziehen zum Messen",
+          fi: "👆 Vedä viivainta mitataksesi",
+          fr: "👆 Faites glisser la règle pour mesurer",
+          ar: "👆 اسحب المسطرة للقياس",
+          it: "👆 Trascina il righello per misurare",
+        },
+        lengthIs: {
+          en: "Length is:",
+          zh: "這條線長度是：",
+          ja: "長さは：",
+          ko: "길이는:",
+          es: "La longitud es:",
+          de: "Länge ist:",
+          fi: "Pituus on:",
+          fr: "La longueur est :",
+          ar: "الطول هو:",
+          it: "La lunghezza è:",
+        },
+        check: {
+          en: "Check",
+          zh: "檢查",
+          ja: "確認",
+          ko: "확인",
+          es: "Comprobar",
+          de: "Prüfen",
+          fi: "Tarkista",
+          fr: "Vérifier",
+          ar: "تحقق",
+          it: "Controlla",
+        },
+        correct: {
+          en: "✓ Correct!",
+          zh: "✓ 答對了！",
+          ja: "✓ 正解！",
+          ko: "✓ 정답!",
+          es: "✓ Correcto!",
+          de: "✓ Richtig!",
+          fi: "✓ Oikein!",
+          fr: "✓ Correct !",
+          ar: "✓ صحيح!",
+          it: "✓ Corretto!",
+        },
+        incorrect: {
+          en: "✗ Try Again!",
+          zh: "✗ 再試一次！",
+          ja: "✗ もう一度！",
+          ko: "✗ 다시 시도!",
+          es: "✗ ¡Inténtalo de nuevo!",
+          de: "✗ Versuch es nochmal!",
+          fi: "✗ Yritä uudelleen!",
+          fr: "✗ Réessayez !",
+          ar: "✗ حاول مرة أخرى!",
+          it: "✗ Riprova!",
+        },
+      };
 
       function App() {
+        const [lang, setLang] = useState("zh");
         const [level, setLevel] = useState(1);
         const [targetLength, setTargetLength] = useState(0);
         const [rulerX, setRulerX] = useState(0);
@@ -54,13 +161,12 @@
         const [feedback, setFeedback] = useState(null);
         const [score, setScore] = useState(0);
 
-        // Random object generator
         const generateObject = () => {
           const len = Math.floor(Math.random() * 12) + 1; // 1 to 12 cm
           setTargetLength(len);
           setFeedback(null);
           setUserInput("");
-          setRulerX(Math.random() * 200 - 100); // Randomize ruler pos slightly
+          setRulerX(Math.random() * 200 - 100);
         };
 
         useEffect(() => {
@@ -76,18 +182,21 @@
           }
         };
 
-        const rulerRef = useRef(null);
+        const getText = (key) => t[key][lang] || t[key]["en"];
 
         return (
           <div className="min-h-screen p-8 flex flex-col items-center select-none">
-            <h1 className="text-5xl font-black text-white mb-8 drop-shadow-md">
-              📏 長度量度大師
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-6xl font-black text-white mb-8 mt-8 drop-shadow-md text-center">
+              📏 {getText("title")}
             </h1>
 
             <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl w-full max-w-4xl relative min-h-[500px] flex flex-col">
               <div className="flex justify-between items-center mb-8 bg-indigo-50 p-4 rounded-2xl">
                 <div>
-                  <span className="text-indigo-800 font-bold mr-2">得分:</span>
+                  <span className="text-indigo-800 font-bold mr-2">
+                    {getText("score")}:
+                  </span>
                   <span className="text-3xl font-black text-indigo-600">
                     {score}
                   </span>
@@ -96,7 +205,7 @@
                   onClick={generateObject}
                   className="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-2 rounded-xl font-bold transition-all"
                 >
-                  下一題
+                  {getText("next")}
                 </button>
               </div>
 
@@ -109,13 +218,13 @@
                     width: `${targetLength * 37.8}px`,
                     top: "40%",
                     left: "10%",
-                  }} // approx 37.8px per cm
+                  }}
                 >
-                  <div className="absolute -top-8 left-0 text-slate-400 font-bold text-xs">
-                    起點
+                  <div className="absolute -top-8 left-0 text-slate-400 font-bold text-xs whitespace-nowrap">
+                    {getText("start")}
                   </div>
-                  <div className="absolute -top-8 right-0 text-slate-400 font-bold text-xs">
-                    終點
+                  <div className="absolute -top-8 right-0 text-slate-400 font-bold text-xs whitespace-nowrap">
+                    {getText("end")}
                   </div>
                   <div className="absolute -left-1 -bottom-2 w-0.5 h-6 bg-slate-400"></div>
                   <div className="absolute -right-1 -bottom-2 w-0.5 h-6 bg-slate-400"></div>
@@ -157,14 +266,14 @@
                 </motion.div>
 
                 <div className="absolute bottom-4 left-4 text-slate-400 text-sm font-bold animate-bounce">
-                  👆 拖動間尺來量度
+                  {getText("dragTip")}
                 </div>
               </div>
 
               {/* Input Area */}
-              <div className="flex items-center justify-center gap-4">
+              <div className="flex flex-col md:flex-row items-center justify-center gap-4">
                 <div className="text-xl font-bold text-slate-600">
-                  這條線長度是：
+                  {getText("lengthIs")}
                 </div>
                 <input
                   type="number"
@@ -179,7 +288,7 @@
                   onClick={checkAnswer}
                   className="px-8 py-4 bg-green-500 hover:bg-green-600 text-white rounded-xl font-bold shadow-lg transition-transform active:scale-95"
                 >
-                  檢查
+                  {getText("check")}
                 </button>
               </div>
 
@@ -190,7 +299,7 @@
                   className="absolute inset-0 flex items-center justify-center pointer-events-none"
                 >
                   <div className="bg-green-500 text-white px-8 py-6 rounded-3xl text-4xl font-black shadow-2xl">
-                    ✓ 答對了！
+                    {getText("correct")}
                   </div>
                 </motion.div>
               )}
@@ -202,7 +311,7 @@
                   className="absolute inset-0 flex items-center justify-center pointer-events-none"
                 >
                   <div className="bg-red-500 text-white px-8 py-6 rounded-3xl text-4xl font-black shadow-2xl">
-                    ✗ 再試一次！
+                    {getText("incorrect")}
                   </div>
                 </motion.div>
               )}
@@ -210,24 +319,7 @@
           </div>
         );
       }
-
-      const root = ReactDOM.createRoot(document.getElementById("root"));
-      root.render(<App />);
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

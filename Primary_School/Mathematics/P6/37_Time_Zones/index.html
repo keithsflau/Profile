@@ -8,14 +8,24 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #e0e7ff 0%, #4f46e5 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
@@ -23,99 +33,271 @@
     <div id="root"></div>
     <script type="text/babel">
       const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
+
+      const t = {
+        title: {
+          en: "Time Zones",
+          zh: "時區換算",
+          ja: "タイムゾーン",
+          ko: "시간대",
+          es: "Zonas Horarias",
+          de: "Zeitzonen",
+          fi: "Aikavyöhykkeet",
+          fr: "Fuseaux horaires",
+          ar: "المناطق الزمنية",
+          it: "Fusi Orari",
+        },
+        hkTime: {
+          en: "Hong Kong Time",
+          zh: "香港時間",
+          ja: "香港時間",
+          ko: "홍콩 시간",
+          es: "Hora de Hong Kong",
+          de: "Hongkong Zeit",
+          fi: "Hongkongin aika",
+          fr: "Heure de Hong Kong",
+          ar: "توقيت هونغ كونغ",
+          it: "Orario di Hong Kong",
+        },
+        diff: {
+          en: "Difference",
+          zh: "時差",
+          ja: "時差",
+          ko: "시차",
+          es: "Diferencia",
+          de: "Unterschied",
+          fi: "Ero",
+          fr: "Différence",
+          ar: "الفرق",
+          it: "Differenza",
+        },
+        day: {
+          en: "Day",
+          zh: "日",
+          ja: "昼",
+          ko: "낮",
+          es: "Día",
+          de: "Tag",
+          fi: "Päivä",
+          fr: "Jour",
+          ar: "نهار",
+          it: "Giorno",
+        },
+        night: {
+          en: "Night",
+          zh: "夜",
+          ja: "夜",
+          ko: "밤",
+          es: "Noche",
+          de: "Nacht",
+          fi: "Yö",
+          fr: "Nuit",
+          ar: "ليل",
+          it: "Notte",
+        },
+        prevDay: {
+          en: "Previous Day",
+          zh: "前一日",
+          ja: "前日",
+          ko: "전날",
+          es: "Día Anterior",
+          de: "Vorheriger Tag",
+          fi: "Edellinen päivä",
+          fr: "Jour précédent",
+          ar: "اليوم السابق",
+          it: "Giorno Precedente",
+        },
+        nextDay: {
+          en: "Next Day",
+          zh: "後一日",
+          ja: "翌日",
+          ko: "다음 날",
+          es: "Día Siguiente",
+          de: "Nächster Tag",
+          fi: "Seuraava päivä",
+          fr: "Jour suivant",
+          ar: "اليوم التالي",
+          it: "Giorno Successivo",
+        },
+      };
+
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
       function App() {
-        const [hkTime, setHkTime] = useState(12); // Hour 0-23
+        const [lang, setLang] = useState("zh");
+        const [hkH, setHkH] = useState(12);
 
         const cities = [
-          { name: "香港 Hong Kong", offset: 8, icon: "🇭🇰" },
-          { name: "倫敦 London (GMT)", offset: 0, icon: "🇬🇧" },
-          { name: "紐約 New York (EST)", offset: -5, icon: "🇺🇸" },
-          { name: "東京 Tokyo", offset: 9, icon: "🇯🇵" },
-          { name: "雪梨 Sydney", offset: 11, icon: "🇦🇺" },
+          { name: "Hong Kong", utc: 8, icon: "🇨🇳" },
+          { name: "London", utc: 0, icon: "🇬🇧" },
+          { name: "New York", utc: -5, icon: "🇺🇸" },
+          { name: "Tokyo", utc: 9, icon: "🇯🇵" },
+          { name: "Sydney", utc: 11, icon: "🇦🇺" },
+          { name: "Paris", utc: 1, icon: "🇫🇷" },
         ];
 
-        const getTimeInCity = (offset) => {
-          // Base is UTC. HK is UTC+8.
-          // UTC time = HK Time - 8
-          // City Time = UTC + City Offset = (HK - 8) + City Offset
-          let h = hkTime - 8 + offset;
+        const formatTime = (totalH) => {
+          // totalH can be negative or > 24
+          let h = Math.floor(totalH);
+          let normalizedH = ((h % 24) + 24) % 24;
 
-          // Handle wrap around
-          while (h < 0) h += 24;
-          while (h >= 24) h -= 24;
+          let ampm = normalizedH >= 12 ? "PM" : "AM";
+          let displayH = normalizedH % 12 || 12;
 
-          return h;
+          return {
+            str: `${displayH}:00 ${ampm}`,
+            h24: normalizedH,
+            dayOffset: Math.floor(totalH / 24), // 0 same, -1 prev, 1 next
+          };
         };
 
-        const formatTime = (h) => {
-          const ampm = h >= 12 ? "PM" : "AM";
-          const h12 = h % 12 || 12;
-          return `${h12}:00 ${ampm}`;
-        };
-
-        const getBgColor = (h) => {
-          // Day: 6-18, Night: else
-          if (h >= 6 && h < 18) return "bg-sky-100 border-sky-300 text-sky-900";
-          return "bg-slate-800 border-slate-600 text-white";
-        };
+        // HK is UTC+8. UTC = HK - 8.
+        const baseUtc = hkH - 8;
 
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-indigo-100 mb-2">
-              🌍 時區換算
-            </h1>
-            <p className="text-xl text-indigo-200 font-bold mb-8">Time Zones</p>
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-2xl w-full">
-              <div className="bg-white p-6 rounded-2xl border-4 border-indigo-200 mb-8 shadow-lg">
-                <label className="block text-center font-bold text-indigo-800 mb-4 text-xl">
-                  設定香港時間 Set Hong Kong Time
-                </label>
-                <div className="flex items-center justify-center gap-4">
+          <div className="min-h-screen flex flex-col items-center p-4 font-sans bg-slate-900 text-white">
+            <div className="w-full max-w-5xl flex justify-between items-center mb-10">
+              <h1 className="text-4xl font-black text-indigo-400 drop-shadow-[0_0_15px_rgba(129,140,248,0.5)]">
+                🌍 {getText("title", lang)}
+              </h1>
+              <div className="flex bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-indigo-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="w-full max-w-4xl flex flex-col gap-10">
+              {/* Control Panel */}
+              <div className="glass-panel p-8 rounded-3xl flex flex-col items-center">
+                <h2 className="text-2xl font-bold uppercase text-indigo-300 mb-6">
+                  {getText("hkTime", lang)}
+                </h2>
+
+                <div className="text-6xl font-black font-mono text-white mb-8">
+                  {formatTime(hkH).str}
+                </div>
+
+                <div className="w-full max-w-lg relative px-4">
                   <input
                     type="range"
                     min="0"
                     max="23"
-                    value={hkTime}
-                    onChange={(e) => setHkTime(parseInt(e.target.value))}
-                    className="w-full max-w-md accent-indigo-600 h-4 bg-indigo-100 rounded-lg appearance-none cursor-pointer"
+                    step="1"
+                    value={hkH}
+                    onChange={(e) => setHkH(parseInt(e.target.value))}
+                    className="w-full accent-indigo-500 h-4 bg-slate-700 rounded-full appearance-none cursor-pointer z-10 relative"
                   />
-                </div>
-                <div className="text-center mt-4 text-4xl font-black text-indigo-900 font-mono">
-                  {formatTime(hkTime)}
+                  <div className="flex justify-between text-xs font-mono text-slate-500 mt-2 px-1">
+                    <span>00:00</span>
+                    <span>12:00</span>
+                    <span>23:00</span>
+                  </div>
                 </div>
               </div>
 
-              <div className="grid gap-4">
-                {cities.map((city, i) => {
-                  if (city.name.includes("Hong Kong")) return null; // Skip HK in list as it is control
-                  const t = getTimeInCity(city.offset);
-                  const isNextDay = hkTime - 8 + city.offset >= 24;
-                  const isPrevDay = hkTime - 8 + city.offset < 0;
+              {/* City Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {cities.map((c, i) => {
+                  const cityH = baseUtc + c.utc;
+                  const info = formatTime(cityH);
+                  const isDay = info.h24 >= 6 && info.h24 < 18;
 
                   return (
-                    <div
+                    <motion.div
                       key={i}
-                      className={`flex items-center justify-between p-4 rounded-xl border-l-8 shadow-sm transition-colors ${getBgColor(
-                        t
-                      )}`}
+                      layout
+                      className={`p-6 rounded-3xl border-2 transition-all relative overflow-hidden ${
+                        isDay
+                          ? "bg-sky-100 border-sky-300"
+                          : "bg-slate-800 border-indigo-900"
+                      }`}
                     >
-                      <div className="flex items-center gap-3">
-                        <span className="text-3xl">{city.icon}</span>
-                        <div className="font-bold text-lg">{city.name}</div>
+                      {/* Background Icon */}
+                      <div className="absolute -right-4 -bottom-4 text-9xl opacity-10 pointer-events-none grayscale">
+                        {c.icon}
                       </div>
-                      <div className="text-right">
-                        <div className="text-2xl font-black font-mono">
-                          {formatTime(t)}
+
+                      <div className="relative z-10 flex flex-col h-full justify-between">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <div className={`text-3xl mb-1`}>{c.icon}</div>
+                            <div
+                              className={`font-bold text-lg ${
+                                isDay ? "text-slate-800" : "text-slate-200"
+                              }`}
+                            >
+                              {c.name}
+                            </div>
+                            <div
+                              className={`text-xs font-bold uppercase ${
+                                isDay ? "text-sky-600" : "text-indigo-400"
+                              }`}
+                            >
+                              UTC {c.utc >= 0 ? "+" : ""}
+                              {c.utc}
+                            </div>
+                          </div>
+                          <div
+                            className={`text-xs font-black px-2 py-1 rounded uppercase ${
+                              isDay
+                                ? "bg-sky-200 text-sky-800"
+                                : "bg-indigo-900 text-indigo-200"
+                            }`}
+                          >
+                            {isDay
+                              ? getText("day", lang)
+                              : getText("night", lang)}
+                          </div>
                         </div>
-                        <div className="text-xs opacity-75 font-bold">
-                          {isNextDay
-                            ? "+1 Day"
-                            : isPrevDay
-                            ? "-1 Day"
-                            : "Same Day"}
+
+                        <div className="mt-6 text-right">
+                          <div
+                            className={`text-4xl font-black font-mono ${
+                              isDay ? "text-slate-900" : "text-white"
+                            }`}
+                          >
+                            {info.str}
+                          </div>
+                          {info.dayOffset !== 0 && (
+                            <div
+                              className={`text-xs font-bold uppercase mt-1 ${
+                                isDay ? "text-red-500" : "text-red-400"
+                              }`}
+                            >
+                              {info.dayOffset > 0
+                                ? getText("nextDay", lang)
+                                : getText("prevDay", lang)}
+                            </div>
+                          )}
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                   );
                 })}
               </div>
@@ -123,22 +305,9 @@
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

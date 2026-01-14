@@ -8,23 +8,40 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #fce7f3 0%, #ec4899 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(190, 24, 93, 0.2); /* Pink 900/800 mix */
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(244, 114, 182, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+      input[type="number"]::-webkit-inner-spin-button,
+      input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
-      const { LanguageSelector, get } = window.MathI18n;
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
 
       const t = {
         title: {
@@ -52,16 +69,16 @@
           it: "Dati di vendita",
         },
         tip: {
-          en: "Adjust the values and observe the line graph changes!",
+          en: "Change values to update graph!",
           zh: "調整數值，觀察折線圖的變化！",
-          ja: "値を調整して、折れ線グラフの変化を観察してください！",
-          ko: "값을 조정하고 꺾은선 그래프의 변화를 관찰하세요!",
-          es: "¡Ajusta los valores y observa los cambios en el gráfico lineal!",
-          de: "Passe die Werte an und beobachte die Änderungen im Liniendiagramm!",
-          fi: "Säädä arvoja ja havainnoi viivakaavion muutoksia!",
-          fr: "Ajustez les valeurs et observez les changements du graphique linéaire !",
-          ar: "اضبط القيم ولاحظ تغييرات الرسم البياني الخطي!",
-          it: "Regola i valori e osserva i cambiamenti del grafico a linee!",
+          ja: "値を変更してグラフを更新！",
+          ko: "값을 변경하여 그래프 업데이트!",
+          es: "¡Cambia valores para actualizar!",
+          de: "Ändere Werte zum Aktualisieren!",
+          fi: "Muuta arvoja päivittääksesi!",
+          fr: "Changez les valeurs pour maj !",
+          ar: "غيّر القيم لتحديث الرسم!",
+          it: "Cambia i valori per aggiornare!",
         },
         mon: {
           en: "Mon",
@@ -125,10 +142,10 @@
         },
       };
 
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
       function App() {
         const [lang, setLang] = useState("zh");
-        const getText = (key) => t[key][lang] || t[key]["en"];
-
         const [data, setData] = useState([
           { id: "mon", value: 20 },
           { id: "tue", value: 35 },
@@ -138,103 +155,174 @@
         ]);
         const maxVal = 50;
 
+        // SVG Layout
+        const width = 350;
+        const height = 210;
+        const padding = { top: 20, bottom: 30, left: 40, right: 20 };
+        const chartW = width - padding.left - padding.right;
+        const chartH = height - padding.top - padding.bottom;
+
         const points = data.map((d, i) => ({
-          x: 60 + i * 55,
-          y: 170 - (d.value / maxVal) * 150,
+          x: padding.left + i * (chartW / (data.length - 1)),
+          y: height - padding.bottom - (d.value / maxVal) * chartH,
           ...d,
         }));
 
+        const pointDescription = points.map((p) => `${p.x},${p.y}`).join(" ");
+
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <LanguageSelector lang={lang} setLang={setLang} />
-            <h1 className="text-5xl font-black text-pink-100 mb-2 mt-8">
-              ✏️ {getText("title")}
-            </h1>
-
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-3xl w-full mt-8">
-              <h3 className="text-xl font-bold text-center text-slate-700 mb-4">
-                {getText("graphTitle")}
-              </h3>
-
-              <svg
-                viewBox="0 0 350 210"
-                className="w-full max-w-lg mx-auto bg-slate-50 rounded-xl mb-6"
-              >
-                {/* Grid */}
-                {[0, 10, 20, 30, 40, 50].map((v, i) => (
-                  <g key={v}>
-                    <line
-                      x1="50"
-                      y1={170 - (v / maxVal) * 150}
-                      x2="320"
-                      y2={170 - (v / maxVal) * 150}
-                      stroke="#e2e8f0"
-                      strokeWidth="1"
-                    />
-                    <text
-                      x="45"
-                      y={175 - (v / maxVal) * 150}
-                      textAnchor="end"
-                      className="text-xs fill-slate-400"
-                    >
-                      {v}
-                    </text>
-                  </g>
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <div className="w-full max-w-4xl flex justify-between items-center mb-10">
+              <h1 className="text-4xl font-black text-pink-400 drop-shadow-[0_0_15px_rgba(236,72,153,0.5)]">
+                ✏️ {getText("title", lang)}
+              </h1>
+              <div className="bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-pink-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
                 ))}
-                {/* Axes */}
-                <line
-                  x1="50"
-                  y1="20"
-                  x2="50"
-                  y2="170"
-                  stroke="#94a3b8"
-                  strokeWidth="2"
-                />
-                <line
-                  x1="50"
-                  y1="170"
-                  x2="320"
-                  y2="170"
-                  stroke="#94a3b8"
-                  strokeWidth="2"
-                />
-                {/* Line */}
-                <polyline
-                  fill="none"
-                  stroke="#ec4899"
-                  strokeWidth="3"
-                  strokeLinejoin="round"
-                  points={points.map((p) => `${p.x},${p.y}`).join(" ")}
-                />
-                {/* Points */}
-                {points.map((p, i) => (
-                  <g key={i}>
-                    <circle
-                      cx={p.x}
-                      cy={p.y}
-                      r="6"
-                      fill="#ec4899"
-                      stroke="white"
+              </div>
+            </div>
+
+            <div className="w-full max-w-3xl flex flex-col gap-6">
+              {/* Graph Area */}
+              <div className="glass-panel p-8 rounded-3xl flex flex-col items-center">
+                <h3 className="text-xl font-bold text-pink-200 mb-6 uppercase tracking-widest border-b border-pink-500/20 pb-2">
+                  {getText("graphTitle", lang)}
+                </h3>
+
+                <div className="w-full max-w-lg">
+                  <svg
+                    viewBox={`0 0 ${width} ${height}`}
+                    className="w-full h-auto overflow-visible"
+                  >
+                    {/* Grid & Axis Y */}
+                    {[0, 10, 20, 30, 40, 50].map((v) => {
+                      const y = height - padding.bottom - (v / maxVal) * chartH;
+                      return (
+                        <g key={v}>
+                          <line
+                            x1={padding.left}
+                            y1={y}
+                            x2={width - padding.right}
+                            y2={y}
+                            stroke="rgba(255,255,255,0.1)"
+                            strokeWidth="1"
+                          />
+                          <text
+                            x={padding.left - 5}
+                            y={y + 3}
+                            textAnchor="end"
+                            className="text-[10px] fill-slate-400 font-mono"
+                          >
+                            {v}
+                          </text>
+                        </g>
+                      );
+                    })}
+
+                    {/* Axis Lines */}
+                    <line
+                      x1={padding.left}
+                      y1={padding.top}
+                      x2={padding.left}
+                      y2={height - padding.bottom}
+                      stroke="#94a3b8"
                       strokeWidth="2"
                     />
-                    <text
-                      x={p.x}
-                      y="185"
-                      textAnchor="middle"
-                      className="text-xs fill-slate-600 font-bold"
-                    >
-                      {getText(p.id)}
-                    </text>
-                  </g>
-                ))}
-              </svg>
+                    <line
+                      x1={padding.left}
+                      y1={height - padding.bottom}
+                      x2={width - padding.right}
+                      y2={height - padding.bottom}
+                      stroke="#94a3b8"
+                      strokeWidth="2"
+                    />
 
-              <div className="grid grid-cols-5 gap-2 mb-4">
+                    {/* Line Path */}
+                    <motion.path
+                      initial={false}
+                      animate={{ d: `M${pointDescription}` }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 30,
+                      }}
+                      fill="none"
+                      stroke="#ec4899"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+
+                    {/* Area fill */}
+                    <motion.path
+                      initial={false}
+                      animate={{
+                        d: `M${points[0].x},${
+                          height - padding.bottom
+                        } L${pointDescription} L${
+                          points[points.length - 1].x
+                        },${height - padding.bottom} Z`,
+                      }}
+                      fill="rgba(236, 72, 153, 0.1)"
+                    />
+
+                    {/* Points & Labels X */}
+                    {points.map((p, i) => (
+                      <g key={i}>
+                        <motion.circle
+                          cx={p.x}
+                          animate={{ cy: p.y }}
+                          r="5"
+                          fill="#be185d"
+                          stroke="white"
+                          strokeWidth="2"
+                        />
+                        <text
+                          x={p.x}
+                          y={height - 10}
+                          textAnchor="middle"
+                          className="text-[10px] fill-slate-300 font-bold uppercase tracking-wider"
+                        >
+                          {getText(p.id, lang)}
+                        </text>
+                      </g>
+                    ))}
+                  </svg>
+                </div>
+              </div>
+
+              {/* Input Controls */}
+              <div className="grid grid-cols-5 gap-3">
                 {data.map((d, i) => (
-                  <div key={i} className="text-center">
-                    <div className="text-sm font-bold text-slate-600">
-                      {getText(d.id)}
-                    </div>
+                  <div
+                    key={d.id}
+                    className="glass-panel p-3 rounded-xl flex flex-col items-center gap-2"
+                  >
+                    <label className="text-xs font-bold text-pink-300 uppercase">
+                      {getText(d.id, lang)}
+                    </label>
                     <input
                       type="number"
                       min="0"
@@ -242,38 +330,31 @@
                       value={d.value}
                       onChange={(e) => {
                         const n = [...data];
-                        n[i].value = parseInt(e.target.value) || 0;
+                        let val = parseInt(e.target.value);
+                        if (isNaN(val)) val = 0;
+                        if (val > 50) val = 50;
+                        if (val < 0) val = 0;
+                        n[i].value = val;
                         setData(n);
                       }}
-                      className="w-full text-center border-2 border-pink-300 rounded p-1 font-bold"
+                      className="w-full bg-slate-900 border border-pink-500/30 rounded-lg text-center font-black text-xl text-white outline-none focus:border-pink-500"
                     />
                   </div>
                 ))}
               </div>
 
-              <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
-                <p className="font-bold">💡 {getText("tip")}</p>
+              {/* Tip */}
+              <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-xl flex gap-3 text-amber-200 text-sm justify-center items-center">
+                <span className="text-2xl">💡</span>
+                <span className="font-bold">{getText("tip", lang)}</span>
               </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

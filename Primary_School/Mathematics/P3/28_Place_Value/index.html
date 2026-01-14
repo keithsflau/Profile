@@ -2,11 +2,12 @@
 <html lang="zh-HK">
   <head>
     <meta charset="UTF-8" />
-    <title>小三數學：數位值</title>
+    <title>小三數學：數位值 | Place Value</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@900&family=Fredoka:wght@600&display=swap"
       rel="stylesheet"
@@ -22,18 +23,90 @@
     <div id="root"></div>
     <script type="text/babel">
       const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Place Value",
+          zh: "數位值",
+          ja: "位取り",
+          ko: "자릿수",
+          es: "Valor posicional",
+          de: "Stellenwert",
+          fi: "Paikka-arvo",
+          fr: "Valeur de position",
+          ar: "القيمة المكانية",
+          it: "Valore posizionale",
+        },
+        thousands: {
+          en: "Thousands",
+          zh: "千位",
+          ja: "千の位",
+          ko: "천의 자리",
+          es: "Millares",
+          de: "Tausender",
+          fi: "Tuhannet",
+          fr: "Milliers",
+          ar: "آلاف",
+          it: "Migliaia",
+        },
+        hundreds: {
+          en: "Hundreds",
+          zh: "百位",
+          ja: "百の位",
+          ko: "백의 자리",
+          es: "Centenas",
+          de: "Hunderter",
+          fi: "Sadat",
+          fr: "Centaines",
+          ar: "مئات",
+          it: "Centinaia",
+        },
+        tens: {
+          en: "Tens",
+          zh: "十位",
+          ja: "十の位",
+          ko: "십의 자리",
+          es: "Decenas",
+          de: "Zehner",
+          fi: "Kymmenet",
+          fr: "Dizaines",
+          ar: "عشرات",
+          it: "Decine",
+        },
+        ones: {
+          en: "Ones",
+          zh: "個位",
+          ja: "一の位",
+          ko: "일의 자리",
+          es: "Unidades",
+          de: "Einer",
+          fi: "Ykköset",
+          fr: "Unités",
+          ar: "آحاد",
+          it: "Unità",
+        },
+      };
+
       function App() {
+        const [lang, setLang] = useState("zh");
         const [num, setNum] = useState(5847);
         const str = num.toString().padStart(4, "0");
         const digits = [
-          { name: "千位", val: str[0], place: 1000 },
-          { name: "百位", val: str[1], place: 100 },
-          { name: "十位", val: str[2], place: 10 },
-          { name: "個位", val: str[3], place: 1 },
+          { key: "thousands", val: str[0], place: 1000 },
+          { key: "hundreds", val: str[1], place: 100 },
+          { key: "tens", val: str[2], place: 10 },
+          { key: "ones", val: str[3], place: 1 },
         ];
+
+        const getPlaceName = (key) => t[key][lang] || t[key]["en"];
+
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-6xl font-black text-white mb-8">🔢 數位值</h1>
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-6xl font-black text-white mb-8 mt-8 text-center">
+              🔢 {t.title[lang] || t.title["en"]}
+            </h1>
             <div className="bg-white/90 rounded-3xl p-8 shadow-2xl max-w-4xl w-full">
               <input
                 type="number"
@@ -45,14 +118,14 @@
                 }
                 className="w-full px-8 py-6 text-7xl font-black text-center rounded-2xl border-4 border-purple-300 mb-8"
               />
-              <div className="grid grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {digits.map((d, i) => (
                   <div
                     key={i}
                     className="bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl p-6 text-center border-4 border-purple-300"
                   >
                     <div className="text-lg font-bold text-purple-800 mb-2">
-                      {d.name}
+                      {getPlaceName(d.key)}
                     </div>
                     <div className="text-6xl font-black text-purple-600 mb-2">
                       {d.val}
@@ -69,20 +142,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

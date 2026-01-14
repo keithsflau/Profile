@@ -8,148 +8,407 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #f0fdf4 0%, #16a34a 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
+
+      const t = {
+        title: {
+          en: "Probability Types",
+          zh: "概率事件分類",
+          ja: "確率の種類",
+          ko: "확률의 유형",
+          es: "Tipos de Probabilidad",
+          de: "Wahrscheinlichkeitsarten",
+          fi: "Todennäköisyystyypit",
+          fr: "Types de probabilité",
+          ar: "أنواع الاحتمالات",
+          it: "Tipi di Probabilità",
+        },
+        classify: {
+          en: "Classify the Event",
+          zh: "分類事件",
+          ja: "イベントを分類",
+          ko: "사건 분류",
+          es: "Clasificar el Evento",
+          de: "Das Ereignis klassifizieren",
+          fi: "Luokittele tapahtuma",
+          fr: "Classer l'événement",
+          ar: "تصنيف الحدث",
+          it: "Classifica l'Evento",
+        },
+        impossible: {
+          en: "Impossible",
+          zh: "不可能",
+          ja: "不可能",
+          ko: "불가능",
+          es: "Imposible",
+          de: "Unmöglich",
+          fi: "Mahdoton",
+          fr: "Impossible",
+          ar: "مستحيل",
+          it: "Impossibile",
+        },
+        possible: {
+          en: "Possible",
+          zh: "可能",
+          ja: "可能",
+          ko: "가능",
+          es: "Posible",
+          de: "Möglich",
+          fi: "Mahdollinen",
+          fr: "Possible",
+          ar: "ممكن",
+          it: "Possibile",
+        },
+        certain: {
+          en: "Certain",
+          zh: "一定",
+          ja: "確実",
+          ko: "확실",
+          es: "Cierto",
+          de: "Sicher",
+          fi: "Varma",
+          fr: "Certain",
+          ar: "مؤكد",
+          it: "Certo",
+        },
+        correct: {
+          en: "Correct!",
+          zh: "答對了！",
+          ja: "正解！",
+          ko: "정답!",
+          es: "¡Correcto!",
+          de: "Richtig!",
+          fi: "Oikein!",
+          fr: "Correct !",
+          ar: "صحيح!",
+          it: "Corretto!",
+        },
+        wrong: {
+          en: "Try Again",
+          zh: "再試一次",
+          ja: "もう一度",
+          ko: "다시 시도",
+          es: "Inténtalo de nuevo",
+          de: "Versuchen Sie es erneut",
+          fi: "Yritä uudelleen",
+          fr: "Réessayez",
+          ar: "حاول مرة أخرى",
+          it: "Riprova",
+        },
+        next: {
+          en: "Next",
+          zh: "下一題",
+          ja: "次へ",
+          ko: "다음",
+          es: "Siguiente",
+          de: "Weiter",
+          fi: "Seuraava",
+          fr: "Suivant",
+          ar: "التالي",
+          it: "Avanti",
+        },
+      };
+
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
+      const EVENTS = [
+        {
+          prob: "certain",
+          text: {
+            en: "The sun rises in the east",
+            zh: "太陽從東邊升起",
+            ja: "太陽は東から昇る",
+            ko: "해는 동쪽에서 뜬다",
+            es: "El sol sale por el este",
+            de: "Die Sonne geht im Osten auf",
+            fr: "Le soleil se lève à l'est",
+            it: "Il sole sorge a est",
+          },
+        },
+        {
+          prob: "impossible",
+          text: {
+            en: "Rolling a 7 on a standard die",
+            zh: "擲骰子擲出 7",
+            ja: "サイコロで7が出る",
+            ko: "주사위에서 7이 나온다",
+            es: "Sacar un 7 en un dado",
+            de: "Eine 7 würfeln",
+            fr: "Obtenir un 7 sur un dé",
+            it: "Fare 7 con un dado",
+          },
+        },
+        {
+          prob: "possible",
+          text: {
+            en: "It will rain tomorrow",
+            zh: "明天會下雨",
+            ja: "明日は雨が降る",
+            ko: "내일 비가 올 것이다",
+            es: "Lloverá mañana",
+            de: "Morgen wird es regnen",
+            fr: "Il pleuvra demain",
+            it: "Domani pioverà",
+          },
+        },
+        {
+          prob: "possible",
+          text: {
+            en: "Flipping a coin gives Heads",
+            zh: "擲硬幣是公 (洋紫荊)",
+            ja: "コイン投げで表が出る",
+            ko: "동전 던지기 앞면",
+            es: "Sale cara al lanzar moneda",
+            de: "Münzwurf ergibt Kopf",
+            fr: "Pile ou face donne Face",
+            it: "Testa al lancio della moneta",
+          },
+          sub: {
+            en: "(Equal Chance)",
+            zh: "(機會均等)",
+            ja: "(五分五分)",
+            ko: "(반반)",
+            es: "(Probabilidad Igual)",
+            de: "(Gleiche Chance)",
+            fr: "(Chance égale)",
+            it: "(Possibilità uguale)",
+          },
+        },
+        {
+          prob: "impossible",
+          text: {
+            en: "Dividing by zero",
+            zh: "被零除",
+            ja: "ゼロで割る",
+            ko: "0으로 나누기",
+            es: "Dividir por cero",
+            de: "Durch Null teilen",
+            fr: "Diviser par zéro",
+            it: "Dividere per zero",
+          },
+        },
+        {
+          prob: "certain",
+          text: {
+            en: "Triangle has 3 sides",
+            zh: "三角形有 3 條邊",
+            ja: "三角形には3つの辺がある",
+            ko: "삼각형은 3개의 변을 가진다",
+            es: "El triángulo tiene 3 lados",
+            de: "Ein Dreieck hat 3 Seiten",
+            fr: "Un triangle a 3 côtés",
+            it: "Il triangolo ha 3 lati",
+          },
+        },
+      ];
+
       function App() {
-        const events = [
-          { name: "太陽從東邊升起 Sun rises in East", prob: "certain" },
-          { name: "擲骰子擲出 7 Rolling a 7 on a die", prob: "impossible" },
-          { name: "明天會下雨 It will rain tomorrow", prob: "possible" },
-          { name: "擲硬幣是公 Head on coin flip", prob: "equal" }, // 50/50
-          { name: "人會長生不老 Humans live forever", prob: "impossible" },
-        ];
+        const [lang, setLang] = useState("zh");
+        const [currentIdx, setCurrentIdx] = useState(0);
+        const [status, setStatus] = useState("idle"); // idle, correct, wrong
+        const [selectedType, setSelectedType] = useState(null);
 
-        const [current, setCurrent] = useState(0);
-        const [selected, setSelected] = useState(null);
-        const [feedback, setFeedback] = useState("");
+        const currentEvent = EVENTS[currentIdx];
+        const eventText = currentEvent.text[lang] || currentEvent.text["en"];
+        const subText = currentEvent.sub
+          ? currentEvent.sub[lang] || currentEvent.sub["en"]
+          : "";
 
-        const check = (p) => {
-          setSelected(p);
-          if (p === events[current].prob) {
-            setFeedback("correct");
+        const handleSelect = (type) => {
+          if (status === "correct") return;
+          setSelectedType(type);
+
+          // Special logic: 'possible' covers equal chance too for simplicity in UI classification
+          // But let's check exact match logic
+          const isCorrect =
+            currentEvent.prob === type ||
+            (currentEvent.prob === "equal" && type === "possible"); // Assuming 'equal' maps to 'possible' in this simplified 3-choice UI?
+
+          // Actually, the previous data only had impossible/possible/certain, but one item was labeled 'equal'.
+          // Let's stick to 3 categories: Impossible (0%), Possible (>0% <100%), Certain (100%).
+          // So 'equal' is a subset of 'possible'.
+
+          if (
+            type === currentEvent.prob ||
+            (currentEvent.prob === "equal" && type === "possible")
+          ) {
+            setStatus("correct");
           } else {
-            setFeedback("wrong");
+            setStatus("wrong");
           }
         };
 
         const next = () => {
-          setCurrent((current + 1) % events.length);
-          setSelected(null);
-          setFeedback("");
+          setCurrentIdx((currentIdx + 1) % EVENTS.length);
+          setStatus("idle");
+          setSelectedType(null);
         };
 
+        const CHOICE_BTNS = [
+          { type: "impossible", color: "bg-red-500", label: "impossible" },
+          { type: "possible", color: "bg-yellow-500", label: "possible" },
+          { type: "certain", color: "bg-green-500", label: "certain" },
+        ];
+
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-green-900 mb-2">
-              🔮 概率事件
-            </h1>
-            <p className="text-xl text-green-700 font-bold mb-8">
-              Probability Events
-            </p>
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-xl w-full text-center">
-              <div className="bg-slate-50 p-8 rounded-2xl border-4 border-slate-200 mb-8 min-h-[160px] flex items-center justify-center">
-                <h2 className="text-3xl font-bold text-slate-800">
-                  {events[current].name}
+          <div className="min-h-screen flex flex-col items-center p-4 font-sans bg-slate-900 text-white">
+            <div className="w-full max-w-4xl flex justify-between items-center mb-10">
+              <h1 className="text-4xl font-black text-emerald-400 drop-shadow-[0_0_15px_rgba(52,211,153,0.5)]">
+                🔮 {getText("title", lang)}
+              </h1>
+              <div className="flex bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-emerald-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="w-full max-w-3xl flex flex-col gap-8">
+              {/* Question Card */}
+              <motion.div
+                key={currentIdx}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="glass-panel p-12 rounded-3xl min-h-[200px] flex flex-col items-center justify-center text-center relative overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-emerald-900/10 -z-10"></div>
+                <h2 className="text-3xl md:text-4xl font-black text-white mb-4 leading-tight">
+                  {eventText}
                 </h2>
+                {subText && (
+                  <p className="text-slate-400 font-bold">{subText}</p>
+                )}
+              </motion.div>
+
+              {/* Classification Buttons */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {CHOICE_BTNS.map((btn) => {
+                  const isSelected = selectedType === btn.type;
+                  let stateClass = "opacity-100";
+                  if (status !== "idle" && !isSelected)
+                    stateClass = "opacity-50 blur-[1px]";
+
+                  return (
+                    <button
+                      key={btn.type}
+                      onClick={() => handleSelect(btn.type)}
+                      className={`
+                                   relative h-32 rounded-2xl border-4 transition-all duration-300 shadow-xl overflow-hidden group
+                                   ${
+                                     isSelected
+                                       ? status === "correct"
+                                         ? "border-green-400 scale-105 z-10"
+                                         : "border-red-400 scale-105 z-10"
+                                       : "border-transparent hover:border-white/20 hover:scale-105"
+                                   }
+                                   ${stateClass}
+                                   ${btn.color}
+                               `}
+                    >
+                      <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors"></div>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-2xl font-black uppercase tracking-wider drop-shadow-md pb-2">
+                          {getText(btn.label, lang)}
+                        </span>
+                      </div>
+
+                      {/* Probability Bar Visualization */}
+                      <div className="absolute bottom-4 left-4 right-4 h-2 bg-black/30 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-white"
+                          style={{
+                            width:
+                              btn.type === "impossible"
+                                ? "0%"
+                                : btn.type === "certain"
+                                ? "100%"
+                                : "50%",
+                          }}
+                        ></div>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
 
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                <button
-                  onClick={() => check("impossible")}
-                  className={`p-4 rounded-xl font-bold text-lg border-2 ${
-                    selected === "impossible"
-                      ? feedback === "correct"
-                        ? "bg-green-100 border-green-500 text-green-800"
-                        : "bg-red-100 border-red-500 text-red-800"
-                      : "bg-white border-slate-300 hover:bg-slate-50"
-                  }`}
+              {/* Feedback / Next */}
+              {status !== "idle" && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  className="flex justify-center"
                 >
-                  不可能 Impossible
-                </button>
-                <button
-                  onClick={() => check("possible")}
-                  className={`p-4 rounded-xl font-bold text-lg border-2 ${
-                    selected === "possible"
-                      ? feedback === "correct"
-                        ? "bg-green-100 border-green-500 text-green-800"
-                        : "bg-red-100 border-red-500 text-red-800"
-                      : "bg-white border-slate-300 hover:bg-slate-50"
-                  }`}
-                >
-                  可能 Possible
-                </button>
-                <button
-                  onClick={() => check("equal")}
-                  className={`p-4 rounded-xl font-bold text-lg border-2 ${
-                    selected === "equal"
-                      ? feedback === "correct"
-                        ? "bg-green-100 border-green-500 text-green-800"
-                        : "bg-red-100 border-red-500 text-red-800"
-                      : "bg-white border-slate-300 hover:bg-slate-50"
-                  }`}
-                >
-                  機會均等 Equal Chance
-                </button>
-                <button
-                  onClick={() => check("certain")}
-                  className={`p-4 rounded-xl font-bold text-lg border-2 ${
-                    selected === "certain"
-                      ? feedback === "correct"
-                        ? "bg-green-100 border-green-500 text-green-800"
-                        : "bg-red-100 border-red-500 text-red-800"
-                      : "bg-white border-slate-300 hover:bg-slate-50"
-                  }`}
-                >
-                  一定 Certain
-                </button>
-              </div>
-
-              {feedback === "correct" && (
-                <button
-                  onClick={next}
-                  className="w-full py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl text-xl font-bold shadow-lg animate-bounce"
-                >
-                  下一題 Next
-                </button>
-              )}
-              {feedback === "wrong" && (
-                <div className="text-red-500 font-bold mb-4">
-                  再試一次 Try Again
-                </div>
+                  {status === "correct" ? (
+                    <button
+                      onClick={next}
+                      className="px-12 py-4 bg-green-500 hover:bg-green-400 text-slate-900 text-xl font-black rounded-2xl shadow-[0_0_20px_rgba(34,197,94,0.5)] transition-transform active:scale-95 flex items-center gap-3"
+                    >
+                      <span>🎉 {getText("correct", lang)}</span>
+                      <span>{getText("next", lang)} ➔</span>
+                    </button>
+                  ) : (
+                    <div className="px-12 py-4 bg-slate-700 text-red-400 text-xl font-bold rounded-2xl border-2 border-red-500/50">
+                      {getText("wrong", lang)}
+                    </div>
+                  )}
+                </motion.div>
               )}
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

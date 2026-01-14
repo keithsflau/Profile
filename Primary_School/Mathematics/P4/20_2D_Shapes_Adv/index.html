@@ -3,12 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小四數學：拼砌圖形</title>
+    <title>小四數學：拼砌圖形 | Shape Assembler</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -25,33 +26,97 @@
     <script type="text/babel">
       const { useState } = React;
       const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Shape Assembler",
+          zh: "拼砌圖形",
+          ja: "形アセンブラ",
+          ko: "도형 조립",
+          es: "Ensamblador de Formas",
+          de: "Form-Assembler",
+          fi: "Muotokokoonpano",
+          fr: "Assembleur de formes",
+          ar: "مجمع الأشكال",
+          it: "Assemblatore di forme",
+        },
+        assemble: {
+          en: "Assemble",
+          zh: "拼合",
+          ja: "組み立てる",
+          ko: "조립",
+          es: "Ensamblar",
+          de: "Zusammenbauen",
+          fi: "Kokoa",
+          fr: "Assembler",
+          ar: "تجميع",
+          it: "Assembla",
+        },
+        explode: {
+          en: "Explode",
+          zh: "拆解",
+          ja: "分解",
+          ko: "분해",
+          es: "Desmontar",
+          de: "Zerlegen",
+          fi: "Hajota",
+          fr: "Désassembler",
+          ar: "تفكيك",
+          it: "Esplodi",
+        },
+        explanation: {
+          en: "Four isosceles right triangles can form a large square! This is the magic of shape assembly.",
+          zh: "四個等腰直角三角形，可以拼成一個大正方形！這就是圖形拼砌的神奇之處。",
+          ja: "4つの直角二等辺三角形で大きな正方形を作ることができます！これが形アセンブリの魔法です。",
+          ko: "네 개의 직각이등변삼각형으로 큰 정사각형을 만들 수 있습니다! 이것이 도형 조립의 마법입니다.",
+          es: "¡Cuatro triángulos rectángulos isósceles pueden formar un cuadrado grande! Esta es la magia del ensamblaje de formas.",
+          de: "Vier gleichschenklige rechtwinklige Dreiecke können ein großes Quadrat bilden! Das ist die Magie der Formmontage.",
+          fi: "Neljä tasakylkistä suorakulmaista kolmiota voi muodostaa suuren neliön! Tämä on muotojen kokoamisen taikaa.",
+          fr: "Quatre triangles rectangles isocèles peuvent former un grand carré ! C'est la magie de l'assemblage de formes.",
+          ar: "أربعة مثلثات قائمة الزاوية متساوية الساقين يمكن أن تشكل مربعًا كبيرًا! هذا هو سحر تجميع الأشكال.",
+          it: "Quattro triangoli rettangoli isosceli possono formare un grande quadrato! Questa è la magia dell'assemblaggio delle forme.",
+        },
+      };
 
       function App() {
+        const [lang, setLang] = useState("zh");
         const [assembled, setAssembled] = useState(true);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
 
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-indigo-900 mb-8">
-              🧩 圖形拼砌
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-indigo-900 mb-8 mt-8">
+              🧩 {getText("title")}
             </h1>
 
             <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full flex flex-col items-center">
               <div className="flex gap-4 mb-8">
                 <button
                   onClick={() => setAssembled(true)}
-                  className="px-6 py-2 bg-indigo-500 text-white rounded-xl font-bold hover:bg-indigo-600 transition-all"
+                  className={`px-6 py-2 rounded-xl font-bold transition-all ${
+                    assembled
+                      ? "bg-indigo-600 text-white shadow-lg"
+                      : "bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
+                  }`}
                 >
-                  拼合 (Assemble)
+                  {getText("assemble")}
                 </button>
                 <button
                   onClick={() => setAssembled(false)}
-                  className="px-6 py-2 bg-pink-500 text-white rounded-xl font-bold hover:bg-pink-600 transition-all"
+                  className={`px-6 py-2 rounded-xl font-bold transition-all ${
+                    !assembled
+                      ? "bg-pink-600 text-white shadow-lg"
+                      : "bg-pink-100 text-pink-600 hover:bg-pink-200"
+                  }`}
                 >
-                  拆解 (Explode)
+                  {getText("explode")}
                 </button>
               </div>
 
-              <div className="relative w-[400px] h-[400px] border-4 border-slate-200 rounded-3xl bg-slate-50 flex items-center justify-center overflow-hidden">
+              <div className="relative w-[300px] h-[300px] md:w-[400px] md:h-[400px] border-4 border-slate-200 rounded-3xl bg-slate-50 overflow-hidden">
                 <div
                   className="absolute inset-0 opacity-10"
                   style={{
@@ -61,50 +126,78 @@
                   }}
                 ></div>
 
-                {/* Top Triangle */}
+                {/* 
+                  Center is 50%, 50%.
+                  We align triangles so they meet at center.
+                */}
+
+                {/* Top Triangle (Points Down) */}
                 <motion.div
-                  className="absolute w-0 h-0 border-l-[100px] border-r-[100px] border-b-[100px] border-l-transparent border-r-transparent border-b-indigo-500 origin-bottom"
-                  animate={{
-                    y: assembled ? -50 : -120,
-                    x: assembled ? 0 : 0,
-                    rotate: assembled ? 0 : 180,
+                  className="absolute top-1/2 left-1/2 w-0 h-0"
+                  style={{
+                    marginLeft: "-100px", // Align center
+                    marginTop: "-100px", // Align so point (bottom) is at center
+                    borderLeft: "100px solid transparent",
+                    borderRight: "100px solid transparent",
+                    borderTop: "100px solid #6366f1", // indigo-500
                   }}
-                  transition={{ type: "spring", stiffness: 60 }}
+                  animate={{
+                    y: assembled ? 0 : -60,
+                  }}
+                  transition={{ type: "spring", stiffness: 80, damping: 15 }}
                 />
-                {/* Bottom Triangle */}
+
+                {/* Bottom Triangle (Points Up) */}
                 <motion.div
-                  className="absolute w-0 h-0 border-l-[100px] border-r-[100px] border-t-[100px] border-l-transparent border-r-transparent border-t-emerald-500 origin-top"
-                  animate={{
-                    y: assembled ? 50 : 120,
-                    x: assembled ? 0 : 0,
-                    rotate: assembled ? 0 : 180,
+                  className="absolute top-1/2 left-1/2 w-0 h-0"
+                  style={{
+                    marginLeft: "-100px",
+                    marginTop: "0px", // Point (top) is at top of box, so at center
+                    borderLeft: "100px solid transparent",
+                    borderRight: "100px solid transparent",
+                    borderBottom: "100px solid #10b981", // emerald-500
                   }}
-                  transition={{ type: "spring", stiffness: 60 }}
+                  animate={{
+                    y: assembled ? 0 : 60,
+                  }}
+                  transition={{ type: "spring", stiffness: 80, damping: 15 }}
                 />
-                {/* Left Triangle */}
+
+                {/* Left Triangle (Points Right) */}
                 <motion.div
-                  className="absolute w-0 h-0 border-t-[100px] border-b-[100px] border-r-[100px] border-t-transparent border-b-transparent border-r-amber-500 origin-right"
-                  animate={{
-                    x: assembled ? -50 : -120,
-                    y: assembled ? 0 : 0,
-                    rotate: assembled ? 0 : 180,
+                  className="absolute top-1/2 left-1/2 w-0 h-0"
+                  style={{
+                    marginLeft: "-100px", // Box is 100 wide. Point is at right (100).
+                    marginTop: "-100px",
+                    borderTop: "100px solid transparent",
+                    borderBottom: "100px solid transparent",
+                    borderLeft: "100px solid #f59e0b", // amber-500
                   }}
-                  transition={{ type: "spring", stiffness: 60 }}
+                  animate={{
+                    x: assembled ? 0 : -60,
+                  }}
+                  transition={{ type: "spring", stiffness: 80, damping: 15 }}
                 />
-                {/* Right Triangle */}
+
+                {/* Right Triangle (Points Left) */}
                 <motion.div
-                  className="absolute w-0 h-0 border-t-[100px] border-b-[100px] border-l-[100px] border-t-transparent border-b-transparent border-l-purple-500 origin-left"
-                  animate={{
-                    x: assembled ? 50 : 120,
-                    y: assembled ? 0 : 0,
-                    rotate: assembled ? 0 : 180,
+                  className="absolute top-1/2 left-1/2 w-0 h-0"
+                  style={{
+                    marginLeft: "0px", // Point is at left (0).
+                    marginTop: "-100px",
+                    borderTop: "100px solid transparent",
+                    borderBottom: "100px solid transparent",
+                    borderRight: "100px solid #a855f7", // purple-500
                   }}
-                  transition={{ type: "spring", stiffness: 60 }}
+                  animate={{
+                    x: assembled ? 0 : 60,
+                  }}
+                  transition={{ type: "spring", stiffness: 80, damping: 15 }}
                 />
               </div>
 
-              <div className="mt-8 text-center text-slate-500 font-bold w-full max-w-md">
-                四個等腰直角三角形，可以拼成一個大正方形！這就是圖形拼砌的神奇之處。
+              <div className="mt-8 text-center text-slate-600 font-bold w-full max-w-md bg-white/50 p-4 rounded-xl">
+                {getText("explanation")}
               </div>
             </div>
           </div>
@@ -113,20 +206,5 @@
       const root = ReactDOM.createRoot(document.getElementById("root"));
       root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

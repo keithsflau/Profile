@@ -8,23 +8,35 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #fef3c7 0%, #f59e0b 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(180, 83, 9, 0.2); /* Amber 700 alpha */
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(251, 191, 36, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
-      const { LanguageSelector, get } = window.MathI18n;
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
 
       const t = {
         title: {
@@ -40,28 +52,28 @@
           it: "Conversione percentuale",
         },
         toPercent: {
-          en: "Fraction → Percentage",
+          en: "Fraction → %",
           zh: "分數 → 百分數",
-          ja: "分数 → パーセンテージ",
-          ko: "분수 → 백분율",
-          es: "Fracción → Porcentaje",
-          de: "Bruch → Prozent",
-          fi: "Murtoluku → Prosentti",
-          fr: "Fraction → Pourcentage",
-          ar: "كسر → نسبة مئوية",
-          it: "Frazione → Percentuale",
+          ja: "分数 → %",
+          ko: "분수 → %",
+          es: "Fracción → %",
+          de: "Bruch → %",
+          fi: "Murtoluku → %",
+          fr: "Fraction → %",
+          ar: "كسر → %",
+          it: "Frazione → %",
         },
         fromPercent: {
-          en: "Percentage → Fraction/Decimal",
+          en: "% → Fraction/Decimal",
           zh: "百分數 → 分數/小數",
-          ja: "パーセンテージ → 分数/小数",
-          ko: "백분율 → 분수/소수",
-          es: "Porcentaje → Fracción/Decimal",
-          de: "Prozent → Bruch/Dezimalzahl",
-          fi: "Prosentti → Murtoluku/Desimaali",
-          fr: "Pourcentage → Fraction/Décimal",
-          ar: "نسبة مئوية → كسر/عشري",
-          it: "Percentuale → Frazione/Decimale",
+          ja: "% → 分数/小数",
+          ko: "% → 분수/소수",
+          es: "% → Fracción/Decimal",
+          de: "% → Bruch/Dezimal",
+          fi: "% → Murtoluku/Desimaali",
+          fr: "% → Fraction/Décimal",
+          ar: "% → كسر/عشري",
+          it: "% → Frazione/Decimale",
         },
         fraction: {
           en: "Fraction",
@@ -87,139 +99,189 @@
           ar: "عشري",
           it: "Decimale",
         },
+        calcStep: {
+          en: "{n} ÷ {d} × 100 = {res}%",
+          zh: "{n} ÷ {d} × 100 = {res}%",
+          ja: "{n} ÷ {d} × 100 = {res}%",
+          ko: "{n} ÷ {d} × 100 = {res}%",
+          es: "{n} ÷ {d} × 100 = {res}%",
+          de: "{n} ÷ {d} × 100 = {res}%",
+          fi: "{n} ÷ {d} × 100 = {res}%",
+          fr: "{n} ÷ {d} × 100 = {res}%",
+          ar: "{n} ÷ {d} × 100 = {res}%",
+          it: "{n} ÷ {d} × 100 = {res}%",
+        },
+      };
+
+      const getText = (key, lang, params = {}) => {
+        let text = t[key]?.[lang] || t[key]?.["en"] || key;
+        for (const k in params) {
+          text = text.replace(`{${k}}`, params[k]);
+        }
+        return text;
       };
 
       function App() {
         const [lang, setLang] = useState("zh");
-        const getText = (key) => t[key][lang] || t[key]["en"];
-
-        const [mode, setMode] = useState("toPercent"); // toPercent or fromPercent
+        const [mode, setMode] = useState("toPercent");
         const [num, setNum] = useState(3);
         const [denom, setDenom] = useState(4);
         const [percent, setPercent] = useState(75);
 
-        const fracToPercent = ((num / denom) * 100).toFixed(2);
+        const fracToPercent = ((num / denom) * 100)
+          .toFixed(2)
+          .replace(/\.00$/, "");
         const percentToFrac = percent / 100;
 
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <LanguageSelector lang={lang} setLang={setLang} />
-            <h1 className="text-5xl font-black text-amber-900 mb-2 mt-8">
-              🔄 {getText("title")}
-            </h1>
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <div className="w-full max-w-4xl flex justify-between items-center mb-10">
+              <h1 className="text-4xl font-black text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]">
+                🔄 {getText("title", lang)}
+              </h1>
+              <div className="bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-amber-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-2xl w-full mt-8">
-              <div className="flex justify-center gap-4 mb-8">
-                <button
-                  onClick={() => setMode("toPercent")}
-                  className={`px-6 py-3 rounded-xl font-bold ${
-                    mode === "toPercent"
-                      ? "bg-amber-500 text-white"
-                      : "bg-slate-100"
-                  }`}
-                >
-                  {getText("toPercent")}
-                </button>
-                <button
-                  onClick={() => setMode("fromPercent")}
-                  className={`px-6 py-3 rounded-xl font-bold ${
-                    mode === "fromPercent"
-                      ? "bg-amber-500 text-white"
-                      : "bg-slate-100"
-                  }`}
-                >
-                  {getText("fromPercent")}
-                </button>
+            <div className="w-full max-w-3xl flex flex-col gap-6">
+              {/* Mode Switch */}
+              <div className="flex bg-slate-900/50 p-1.5 rounded-2xl border border-amber-500/20 w-fit mx-auto">
+                {[
+                  { id: "toPercent", label: getText("toPercent", lang) },
+                  { id: "fromPercent", label: getText("fromPercent", lang) },
+                ].map((m) => (
+                  <button
+                    key={m.id}
+                    onClick={() => setMode(m.id)}
+                    className={`px-6 py-3 rounded-xl font-bold transition-all text-sm md:text-base ${
+                      mode === m.id
+                        ? "bg-amber-600 text-white shadow-lg shadow-amber-900/50"
+                        : "text-amber-200/60 hover:text-amber-200 hover:bg-white/5"
+                    }`}
+                  >
+                    {m.label}
+                  </button>
+                ))}
               </div>
 
-              {mode === "toPercent" && (
-                <div className="space-y-6">
-                  <div className="flex items-center justify-center gap-4">
-                    <div className="flex flex-col items-center">
-                      <input
-                        type="number"
-                        min="0"
-                        value={num}
-                        onChange={(e) => setNum(parseInt(e.target.value) || 0)}
-                        className="w-16 text-3xl font-black text-center border-b-4 border-amber-400 bg-transparent"
-                      />
-                      <div className="w-16 h-1 bg-amber-800 my-1"></div>
-                      <input
-                        type="number"
-                        min="1"
-                        value={denom}
-                        onChange={(e) =>
-                          setDenom(Math.max(1, parseInt(e.target.value) || 1))
-                        }
-                        className="w-16 text-3xl font-black text-center bg-transparent"
-                      />
-                    </div>
-                    <span className="text-4xl">=</span>
-                    <div className="text-5xl font-black text-amber-600">
-                      {fracToPercent}%
-                    </div>
-                  </div>
-                  <div className="bg-slate-50 rounded-xl p-4 text-center">
-                    <p className="font-mono">
-                      {num} ÷ {denom} × 100 = {fracToPercent}%
-                    </p>
-                  </div>
-                </div>
-              )}
+              {/* Main Panel */}
+              <div className="glass-panel p-8 rounded-3xl min-h-[400px] flex flex-col items-center justify-center relative overflow-hidden">
+                <AnimatePresence mode="wait">
+                  {mode === "toPercent" ? (
+                    <motion.div
+                      key="toPercent"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                      className="flex flex-col items-center gap-8 w-full"
+                    >
+                      <div className="flex items-center gap-4 text-white">
+                        <div className="flex flex-col items-center gap-2">
+                          <input
+                            type="number"
+                            value={num}
+                            onChange={(e) => setNum(Number(e.target.value))}
+                            className="w-24 bg-transparent border-b-2 border-amber-400 text-4xl font-black text-center outline-none focus:border-amber-200"
+                          />
+                          <div className="w-full h-1 bg-white/20 rounded-full"></div>
+                          <input
+                            type="number"
+                            value={denom}
+                            onChange={(e) =>
+                              setDenom(Number(e.target.value) || 1)
+                            }
+                            className="w-24 bg-transparent border-b-2 border-amber-400 text-4xl font-black text-center outline-none focus:border-amber-200"
+                          />
+                        </div>
+                        <div className="text-4xl text-amber-200/50 font-black">
+                          =
+                        </div>
+                        <div className="text-6xl font-black text-amber-400 font-mono drop-shadow-[0_0_20px_rgba(251,191,36,0.3)]">
+                          {fracToPercent}%
+                        </div>
+                      </div>
 
-              {mode === "fromPercent" && (
-                <div className="space-y-6">
-                  <div className="flex items-center justify-center gap-4">
-                    <input
-                      type="number"
-                      min="0"
-                      max="200"
-                      value={percent}
-                      onChange={(e) =>
-                        setPercent(parseInt(e.target.value) || 0)
-                      }
-                      className="w-24 text-4xl font-black text-center border-4 border-amber-300 rounded-xl p-2"
-                    />
-                    <span className="text-4xl font-black text-amber-600">
-                      %
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-amber-50 rounded-xl p-4 text-center border-2 border-amber-200">
-                      <p className="font-bold text-amber-700">
-                        {getText("fraction")}
-                      </p>
-                      <p className="text-3xl font-black">{percent}/100</p>
-                    </div>
-                    <div className="bg-green-50 rounded-xl p-4 text-center border-2 border-green-200">
-                      <p className="font-bold text-green-700">
-                        {getText("decimal")}
-                      </p>
-                      <p className="text-3xl font-black">{percentToFrac}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
+                      <div className="bg-slate-900/40 p-4 rounded-xl text-amber-100 font-mono text-lg border border-white/5">
+                        {getText("calcStep", lang, {
+                          n: num,
+                          d: denom,
+                          res: fracToPercent,
+                        })}
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="fromPercent"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      className="flex flex-col items-center gap-8 w-full"
+                    >
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          value={percent}
+                          onChange={(e) => setPercent(Number(e.target.value))}
+                          className="w-40 bg-slate-900/50 border-2 border-amber-500/50 rounded-2xl p-4 text-5xl font-black text-center text-white outline-none focus:border-amber-400"
+                        />
+                        <span className="text-6xl font-black text-amber-400">
+                          %
+                        </span>
+                      </div>
+
+                      <div className="grid md:grid-cols-2 gap-4 w-full">
+                        <div className="bg-amber-900/40 border border-amber-500/20 p-6 rounded-2xl flex flex-col items-center">
+                          <div className="text-amber-200/60 font-bold uppercase text-xs mb-2">
+                            {getText("fraction", lang)}
+                          </div>
+                          <div className="text-4xl font-black text-white font-mono">
+                            {percent}/100
+                          </div>
+                        </div>
+                        <div className="bg-emerald-900/40 border border-emerald-500/20 p-6 rounded-2xl flex flex-col items-center">
+                          <div className="text-emerald-200/60 font-bold uppercase text-xs mb-2">
+                            {getText("decimal", lang)}
+                          </div>
+                          <div className="text-4xl font-black text-white font-mono">
+                            {percentToFrac.toFixed(2).replace(/\.00$/, "")}
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

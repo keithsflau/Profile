@@ -17,6 +17,7 @@
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.min.js"></script>
+    <script src="../../common/i18n.js"></script>
 
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
@@ -40,8 +41,554 @@
       const { Percent, TrendingUp, TrendingDown, Calculator, ShoppingBag } =
         window.LucideReact;
 
+      const { useState } = React;
+      const { motion } = window.Motion;
+      const { Percent, TrendingUp, TrendingDown, Calculator, ShoppingBag } =
+        window.LucideReact;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Percentage Master",
+          zh: "百分數全能計算機",
+          ja: "パーセンテージマスター",
+          ko: "백분율 마스터",
+          es: "Maestro de Porcentajes",
+          de: "Prozentmeister",
+          fi: "Prosenttimestari",
+          fr: "Maître des pourcentages",
+          ar: "سيد النسب المئوية",
+          it: "Maestro delle Percentuali",
+        },
+        header_grade: {
+          en: "P6 Math",
+          zh: "小六數學",
+          ja: "小6算数",
+          ko: "초6 수학",
+          es: "Matemáticas P6",
+          de: "Mathe 6. Klasse",
+          fi: "6. luokan matematiikka",
+          fr: "Maths P6",
+          ar: "الرياضيات للصف السادس",
+          it: "Matematica 6a elementare",
+        },
+        mode_basic: {
+          en: "Basic Calc",
+          zh: "基本計算",
+          ja: "基本計算",
+          ko: "기본 계산",
+          es: "Cálculo Básico",
+          de: "Basisrechnung",
+          fi: "Peruslaskenta",
+          fr: "Calcul de base",
+          ar: "حساب أساسي",
+          it: "Calcolo Base",
+        },
+        mode_discount: {
+          en: "Discount",
+          zh: "折扣計算",
+          ja: "割引計算",
+          ko: "할인 계산",
+          es: "Descuento",
+          de: "Rabatt",
+          fi: "Alennus",
+          fr: "Remise",
+          ar: "خصم",
+          it: "Sconto",
+        },
+        mode_scenarios: {
+          en: "Scenarios",
+          zh: "實際應用",
+          ja: "シナリオ",
+          ko: "실제 적용",
+          es: "Escenarios",
+          de: "Szenarien",
+          fi: "Skenaariot",
+          fr: "Scénarios",
+          ar: "سيناريوهات",
+          it: "Scenari",
+        },
+        basic_title: {
+          en: "Basic Percentage Calculation",
+          zh: "基本百分數計算",
+          ja: "基本的なパーセンテージ計算",
+          ko: "기본 백분율 계산",
+          es: "Cálculo de Porcentaje Básico",
+          de: "Grundlegende Prozentrechnung",
+          fi: "Perusprosenttilaskenta",
+          fr: "Calcul de pourcentage de base",
+          ar: "حساب النسبة المئوية الأساسية",
+          it: "Calcolo percentuale di base",
+        },
+        value: {
+          en: "Value",
+          zh: "數值",
+          ja: "値",
+          ko: "값",
+          es: "Valor",
+          de: "Wert",
+          fi: "Arvo",
+          fr: "Valeur",
+          ar: "قيمة",
+          it: "Valore",
+        },
+        percent: {
+          en: "Percentage (%)",
+          zh: "百分比 (%)",
+          ja: "パーセンテージ (%)",
+          ko: "백분율 (%)",
+          es: "Porcentaje (%)",
+          de: "Prozentsatz (%)",
+          fi: "Prosenttiosuus (%)",
+          fr: "Pourcentage (%)",
+          ar: "النسبة المئوية (%)",
+          it: "Percentuale (%)",
+        },
+        formula: {
+          en: "Formula",
+          zh: "計算公式",
+          ja: "公式",
+          ko: "공식",
+          es: "Fórmula",
+          de: "Formel",
+          fi: "Kaava",
+          fr: "Formule",
+          ar: "صيغة",
+          it: "Formula",
+        },
+        answer: {
+          en: "Answer",
+          zh: "答案",
+          ja: "答え",
+          ko: "정답",
+          es: "Respuesta",
+          de: "Antwort",
+          fi: "Vastaus",
+          fr: "Réponse",
+          ar: "إجابة",
+          it: "Risposta",
+        },
+
+        discount_title: {
+          en: "Shopping Discount",
+          zh: "購物折扣計算",
+          ja: "買い物割引",
+          ko: "쇼핑 할인",
+          es: "Descuento de compras",
+          de: "Einkaufsrabatt",
+          fi: "Ostosalennus",
+          fr: "Remise d'achat",
+          ar: "خصم التسوق",
+          it: "Sconto acquisti",
+        },
+        original_price: {
+          en: "Original Price ($)",
+          zh: "原價 ($)",
+          ja: "定価 ($)",
+          ko: "원가 ($)",
+          es: "Precio Original ($)",
+          de: "Originalpreis ($)",
+          fi: "Alkuperäinen hinta ($)",
+          fr: "Prix d'origine ($)",
+          ar: "السعر الأصلي ($)",
+          it: "Prezzo Originale ($)",
+        },
+        discount_rate: {
+          en: "Discount Rate (%)",
+          zh: "折扣率 (%)",
+          ja: "割引率 (%)",
+          ko: "할인율 (%)",
+          es: "Tasa de Descuento (%)",
+          de: "Rabattsatz (%)",
+          fi: "Alennusprosentti (%)",
+          fr: "Taux de remise (%)",
+          ar: "معدل الخصم (%)",
+          it: "Tasso di Sconto (%)",
+        },
+        label_original: {
+          en: "Original",
+          zh: "原價",
+          ja: "定価",
+          ko: "원가",
+          es: "Original",
+          de: "Original",
+          fi: "Alkuperäinen",
+          fr: "Origine",
+          ar: "أصلي",
+          it: "Originale",
+        },
+        label_saved: {
+          en: "Discount",
+          zh: "減價",
+          ja: "割引額",
+          ko: "할인액",
+          es: "Descuento",
+          de: "Rabatt",
+          fi: "Alennus",
+          fr: "Remise",
+          ar: "خصم",
+          it: "Sconto",
+        },
+        label_final: {
+          en: "Final",
+          zh: "實付",
+          ja: "支払額",
+          ko: "지불액",
+          es: "Final",
+          de: "Endpreis",
+          fi: "Lopullinen",
+          fr: "Final",
+          ar: "نهائي",
+          it: "Finale",
+        },
+        steps: {
+          en: "Calculation Steps:",
+          zh: "計算步驟：",
+          ja: "計算手順：",
+          ko: "계산 단계:",
+          es: "Pasos de cálculo:",
+          de: "Rechenschritte:",
+          fi: "Laskentavaiheet:",
+          fr: "Étapes de calcul :",
+          ar: "خطوات الحساب:",
+          it: "Fasi di calcolo:",
+        },
+        step1_desc: {
+          en: "Calculate Discount Amount:",
+          zh: "計算折扣金額：",
+          ja: "割引額を計算：",
+          ko: "할인 금액 계산:",
+          es: "Calcular monto de descuento:",
+          de: "Rabattbetrag berechnen:",
+          fi: "Laske alennuksen määrä:",
+          fr: "Calculer le montant de la remise :",
+          ar: "حساب مبلغ الخصم:",
+          it: "Calcola importo sconto:",
+        },
+        step2_desc: {
+          en: "Calculate Final Price:",
+          zh: "計算實付金額：",
+          ja: "支払額を計算：",
+          ko: "지불 금액 계산:",
+          es: "Calcular precio final:",
+          de: "Endpreis berechnen:",
+          fi: "Laske lopullinen hinta:",
+          fr: "Calculer le prix final :",
+          ar: "حساب السعر النهائي:",
+          it: "Calcola prezzo finale:",
+        },
+
+        scenarios_title: {
+          en: "Real Life Scenarios",
+          zh: "實際應用場景",
+          ja: "実生活シナリオ",
+          ko: "실생활 시나리오",
+          es: "Escenarios de la vida real",
+          de: "Alltagsszenarien",
+          fi: "Tosielämän skenaariot",
+          fr: "Scénarios de la vie réelle",
+          ar: "سيناريوهات الحياة الواقعية",
+          it: "Scenari di vita reale",
+        },
+        sc_discount: {
+          en: "Store Discount",
+          zh: "打折優惠",
+          ja: "店舗割引",
+          ko: "매장 할인",
+          es: "Descuento en tienda",
+          de: "Geschäftsrabatt",
+          fi: "Kauppa-alennus",
+          fr: "Remise en magasin",
+          ar: "خصم المتجر",
+          it: "Sconto negozio",
+        },
+        sc_increase: {
+          en: "Price Increase",
+          zh: "價格上升",
+          ja: "値上げ",
+          ko: "가격 인상",
+          es: "Aumento de precio",
+          de: "Preiserhöhung",
+          fi: "Hinnankorotus",
+          fr: "Augmentation de prix",
+          ar: "زيادة الأسعار",
+          it: "Aumento di prezzo",
+        },
+        sc_tax: {
+          en: "Value Added Tax",
+          zh: "增值稅",
+          ja: "付加価値税",
+          ko: "부가가치세",
+          es: "Impuesto al Valor Agregado",
+          de: "Mehrwertsteuer",
+          fi: "Arvonlisävero",
+          fr: "Taxe sur la valeur ajoutée",
+          ar: "ضريبة القيمة المضافة",
+          it: "Imposta sul Valore Aggiunto",
+        },
+        sc_commission: {
+          en: "Commission",
+          zh: "佣金計算",
+          ja: "手数料",
+          ko: "수수료",
+          es: "Comisión",
+          de: "Provision",
+          fi: "Komissio",
+          fr: "Commission",
+          ar: "عمولة",
+          it: "Commissione",
+        },
+
+        base: {
+          en: "Base/Original:",
+          zh: "原價/基數：",
+          ja: "基準/元値:",
+          ko: "기준/원가:",
+          es: "Base/Original:",
+          de: "Basis/Original:",
+          fi: "Perus/Alkuperäinen:",
+          fr: "Base/Origine :",
+          ar: "الأساس/الأصل:",
+          it: "Base/Originale:",
+        },
+        rate_label: {
+          en: "Rate:",
+          zh: "百分率：",
+          ja: "率:",
+          ko: "비율:",
+          es: "Tasa:",
+          de: "Rate:",
+          fi: "Korko:",
+          fr: "Taux :",
+          ar: "معدل:",
+          it: "Tasso:",
+        },
+        decrease: {
+          en: "Decrease:",
+          zh: "減少：",
+          ja: "減少:",
+          ko: "감소:",
+          es: "Disminución:",
+          de: "Abnahme:",
+          fi: "Vähennys:",
+          fr: "Diminution :",
+          ar: "نقصان:",
+          it: "Diminuzione:",
+        },
+        increase: {
+          en: "Increase:",
+          zh: "增加：",
+          ja: "増加:",
+          ko: "증가:",
+          es: "Aumento:",
+          de: "Zunahme:",
+          fi: "Lisäys:",
+          fr: "Augmentation :",
+          ar: "زيادة:",
+          it: "Aumento:",
+        },
+        final_label: {
+          en: "Final:",
+          zh: "最終：",
+          ja: "最終:",
+          ko: "최종:",
+          es: "Final:",
+          de: "Endgültig:",
+          fi: "Lopullinen:",
+          fr: "Final :",
+          ar: "نهائي:",
+          it: "Finale:",
+        },
+
+        info_concept: {
+          en: "Percentage Concept",
+          zh: "百分數概念",
+          ja: "パーセンテージの概念",
+          ko: "백분율 개념",
+          es: "Concepto de Porcentaje",
+          de: "Prozentkonzept",
+          fi: "Prosenttikäsite",
+          fr: "Concept de pourcentage",
+          ar: "مفهوم النسبة المئوية",
+          it: "Concetto di percentuale",
+        },
+        info_per100: {
+          en: "Represents parts per 100",
+          zh: "表示「每一百份中的若干份」",
+          ja: "100に対する割合を表す",
+          ko: "100당 부분을 나타냄",
+          es: "Representa partes por 100",
+          de: "Repräsentiert Teile pro 100",
+          fi: "Edustaa osia per 100",
+          fr: "Représente des parties pour 100",
+          ar: "يمثل أجزاء لكل 100",
+          it: "Rappresenta parti per 100",
+        },
+        info_decimal: {
+          en: "To Decimal:",
+          zh: "轉換小數：",
+          ja: "小数へ:",
+          ko: "소수로 변환:",
+          es: "A Decimal:",
+          de: "In Dezimal:",
+          fi: "Desimaaliksi:",
+          fr: "En décimal :",
+          ar: "إلى عشري:",
+          it: "In decimale:",
+        },
+        info_fraction: {
+          en: "To Fraction:",
+          zh: "轉換分數：",
+          ja: "分数へ:",
+          ko: "분수로 변환:",
+          es: "A Fracción:",
+          de: "In Bruch:",
+          fi: "Murtoluvuksi:",
+          fr: "En fraction :",
+          ar: "إلى كسر:",
+          it: "In frazione:",
+        },
+
+        info_common: {
+          en: "Common Percentages",
+          zh: "常用百分數",
+          ja: "一般的なパーセンテージ",
+          ko: "자주 쓰는 백분율",
+          es: "Porcentajes Comunes",
+          de: "Häufige Prozentsätze",
+          fi: "Yleiset prosentin",
+          fr: "Pourcentages courants",
+          ar: "النسب المئوية الشائعة",
+          it: "Percentuali Comuni",
+        },
+        all_whole: {
+          en: "All / Whole",
+          zh: "全部 / 整體",
+          ja: "全部 / 全体",
+          ko: "전체",
+          es: "Todo / Entero",
+          de: "Alles / Ganzes",
+          fi: "Kaikki / Kokonainen",
+          fr: "Tout / Entier",
+          ar: "الكل / كامل",
+          it: "Tutto / Intero",
+        },
+        half: {
+          en: "Half",
+          zh: "一半",
+          ja: "半分",
+          ko: "절반",
+          es: "Mitad",
+          de: "Hälfte",
+          fi: "Puoli",
+          fr: "Moitié",
+          ar: "نصف",
+          it: "Metà",
+        },
+        quarter: {
+          en: "Quarter",
+          zh: "四分之一",
+          ja: "四分の一",
+          ko: "4분의 1",
+          es: "Cuarto",
+          de: "Viertel",
+          fi: "Neljännes",
+          fr: "Quart",
+          ar: "ربع",
+          it: "Quarto",
+        },
+        tenth: {
+          en: "Tenth",
+          zh: "十分之一",
+          ja: "十分の一",
+          ko: "10분의 1",
+          es: "Décimo",
+          de: "Zehntel",
+          fi: "Kymmenesosa",
+          fr: "Dixième",
+          ar: "عشر",
+          it: "Decimo",
+        },
+
+        info_apps: {
+          en: "Applications",
+          zh: "應用範疇",
+          ja: "応用",
+          ko: "응용 분야",
+          es: "Aplicaciones",
+          de: "Anwendungen",
+          fi: "Sovellukset",
+          fr: "Applications",
+          ar: "تطبيقات",
+          it: "Applicazioni",
+        },
+        app_shop: {
+          en: "Store Discounts",
+          zh: "商店折扣優惠",
+          ja: "店舗割引",
+          ko: "매장 할인",
+          es: "Descuentos en tiendas",
+          de: "Ladenrabatte",
+          fi: "Kauppa-alennukset",
+          fr: "Remises en magasin",
+          ar: "خصومات المتاجر",
+          it: "Sconti negozio",
+        },
+        app_bank: {
+          en: "Bank Interest",
+          zh: "銀行利息計算",
+          ja: "銀行利子",
+          ko: "은행 이자",
+          es: "Interés bancario",
+          de: "Bankzinsen",
+          fi: "Pankkikorot",
+          fr: "Intérêts bancaires",
+          ar: "فوائد بنكية",
+          it: "Interessi bancari",
+        },
+        app_exam: {
+          en: "Exam Scores",
+          zh: "考試成績評分",
+          ja: "試験の点数",
+          ko: "시험 점수",
+          es: "Puntajes de examen",
+          de: "Prüfungsnoten",
+          fi: "Koetulokset",
+          fr: "Notes d'examen",
+          ar: "درجات الامتحان",
+          it: "Punteggi esame",
+        },
+        app_data: {
+          en: "Data Analysis",
+          zh: "統計數據分析",
+          ja: "データ分析",
+          ko: "데이터 분석",
+          es: "Análisis de datos",
+          de: "Datenanalyse",
+          fi: "Data-analyysi",
+          fr: "Analyse de données",
+          ar: "تحليل البيانات",
+          it: "Analisi dei dati",
+        },
+        app_tax: {
+          en: "Tax Calc",
+          zh: "稅務計算",
+          ja: "税金計算",
+          ko: "세금 계산",
+          es: "Cálculo de impuestos",
+          de: "Steuerberechnung",
+          fi: "Verolaskenta",
+          fr: "Calcul d'impôt",
+          ar: "حساب الضرائب",
+          it: "Calcolo tasse",
+        },
+      };
+
       function App() {
-        const [mode, setMode] = useState("basic"); // basic, discount, increase, problem
+        const [lang, setLang] = useState("zh");
+        const getText = (key) => t[key][lang] || t[key]["en"];
+
+        const [mode, setMode] = useState("basic"); // basic, discount, scenarios
         const [value, setValue] = useState(100);
         const [percentage, setPercentage] = useState(20);
         const [originalPrice, setOriginalPrice] = useState(500);
@@ -54,28 +601,28 @@
         const scenarios = [
           {
             type: "discount",
-            scenario: "打折優惠",
+            titleKey: "sc_discount",
             original: 800,
             rate: 25,
             icon: "🏷️",
           },
           {
             type: "increase",
-            scenario: "價格上升",
+            titleKey: "sc_increase",
             original: 300,
             rate: 15,
             icon: "📈",
           },
           {
             type: "tax",
-            scenario: "增值稅",
+            titleKey: "sc_tax",
             original: 1000,
             rate: 10,
             icon: "💰",
           },
           {
             type: "commission",
-            scenario: "佣金計算",
+            titleKey: "sc_commission",
             original: 5000,
             rate: 3,
             icon: "💼",
@@ -101,13 +648,16 @@
 
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <header className="text-center mb-8">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <header className="text-center mb-8 mt-8">
               <div className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-md px-6 py-3 rounded-full mb-4">
                 <Percent className="text-white" size={24} />
-                <span className="text-white font-bold text-lg">小六數學</span>
+                <span className="text-white font-bold text-lg">
+                  {getText("header_grade")}
+                </span>
               </div>
               <h1 className="text-5xl md:text-6xl font-black text-white mb-2 tracking-tight">
-                百分數全能計算機
+                {getText("title")}
               </h1>
               <p className="text-xl text-white/80 font-medium">
                 Percentage Master
@@ -124,7 +674,7 @@
                     : "bg-white/20 text-white"
                 }`}
               >
-                基本計算
+                {getText("mode_basic")}
               </button>
               <button
                 onClick={() => setMode("discount")}
@@ -134,7 +684,7 @@
                     : "bg-white/20 text-white"
                 }`}
               >
-                折扣計算
+                {getText("mode_discount")}
               </button>
               <button
                 onClick={() => setMode("scenarios")}
@@ -144,7 +694,7 @@
                     : "bg-white/20 text-white"
                 }`}
               >
-                實際應用
+                {getText("mode_scenarios")}
               </button>
             </div>
 
@@ -155,12 +705,12 @@
                 {mode === "basic" && (
                   <div>
                     <h2 className="text-2xl font-black text-slate-800 mb-6">
-                      基本百分數計算
+                      {getText("basic_title")}
                     </h2>
 
                     <div className="mb-6">
                       <label className="block text-sm font-bold text-slate-600 mb-3">
-                        數值
+                        {getText("value")}
                       </label>
                       <input
                         type="number"
@@ -174,7 +724,7 @@
 
                     <div className="mb-6">
                       <label className="block text-sm font-bold text-slate-600 mb-3">
-                        百分比 (%)
+                        {getText("percent")}
                       </label>
                       <input
                         type="range"
@@ -195,7 +745,7 @@
                     <div className="bg-gradient-to-br from-pink-50 to-orange-50 rounded-2xl p-8 border-2 border-pink-200">
                       <div className="text-center mb-4">
                         <div className="text-xl font-bold text-slate-600 mb-2">
-                          計算公式
+                          {getText("formula")}
                         </div>
                         <div className="text-2xl font-mono text-slate-800 mb-4">
                           {value} × {percentage}% = {value} ×{" "}
@@ -204,7 +754,7 @@
                       </div>
                       <div className="text-center">
                         <div className="text-lg font-bold text-slate-600 mb-2">
-                          答案
+                          {getText("answer")}
                         </div>
                         <div className="text-6xl font-black text-pink-600">
                           {result.toFixed(2)}
@@ -218,12 +768,12 @@
                 {mode === "discount" && (
                   <div>
                     <h2 className="text-2xl font-black text-slate-800 mb-6 flex items-center gap-2">
-                      <ShoppingBag /> 購物折扣計算
+                      <ShoppingBag /> {getText("discount_title")}
                     </h2>
 
                     <div className="mb-6">
                       <label className="block text-sm font-bold text-slate-600 mb-3">
-                        原價 ($)
+                        {getText("original_price")}
                       </label>
                       <input
                         type="number"
@@ -237,7 +787,7 @@
 
                     <div className="mb-6">
                       <label className="block text-sm font-bold text-slate-600 mb-3">
-                        折扣率 (%)
+                        {getText("discount_rate")}
                       </label>
                       <input
                         type="range"
@@ -258,7 +808,7 @@
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                       <div className="bg-slate-100 rounded-2xl p-4 text-center">
                         <div className="text-sm font-bold text-slate-600 mb-2">
-                          原價
+                          {getText("label_original")}
                         </div>
                         <div className="text-3xl font-black text-slate-800">
                           ${originalPrice}
@@ -266,7 +816,7 @@
                       </div>
                       <div className="bg-red-100 rounded-2xl p-4 text-center">
                         <div className="text-sm font-bold text-red-600 mb-2">
-                          減價
+                          {getText("label_saved")}
                         </div>
                         <div className="text-3xl font-black text-red-600">
                           -${discountAmount.toFixed(2)}
@@ -274,7 +824,7 @@
                       </div>
                       <div className="bg-green-100 rounded-2xl p-4 text-center border-2 border-green-400">
                         <div className="text-sm font-bold text-green-700 mb-2">
-                          實付
+                          {getText("label_final")}
                         </div>
                         <div className="text-3xl font-black text-green-600">
                           ${finalPrice.toFixed(2)}
@@ -284,16 +834,17 @@
 
                     <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6">
                       <h3 className="font-black text-lg text-slate-800 mb-3">
-                        計算步驟：
+                        {getText("steps")}
                       </h3>
                       <ol className="space-y-2 text-slate-700">
                         <li>
-                          <strong>1.</strong> 計算折扣金額：${originalPrice} ×{" "}
-                          {discountRate}% = ${discountAmount.toFixed(2)}
+                          <strong>1.</strong> {getText("step1_desc")} $
+                          {originalPrice} × {discountRate}% = $
+                          {discountAmount.toFixed(2)}
                         </li>
                         <li>
-                          <strong>2.</strong> 計算實付金額：${originalPrice} - $
-                          {discountAmount.toFixed(2)} ={" "}
+                          <strong>2.</strong> {getText("step2_desc")} $
+                          {originalPrice} - ${discountAmount.toFixed(2)} ={" "}
                           <span className="text-green-600 font-black">
                             ${finalPrice.toFixed(2)}
                           </span>
@@ -307,7 +858,7 @@
                 {mode === "scenarios" && (
                   <div>
                     <h2 className="text-2xl font-black text-slate-800 mb-6">
-                      實際應用場景
+                      {getText("scenarios_title")}
                     </h2>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -326,18 +877,18 @@
                           >
                             <div className="text-4xl mb-3">{scenario.icon}</div>
                             <h3 className="text-xl font-black text-slate-800 mb-4">
-                              {scenario.scenario}
+                              {getText(scenario.titleKey)}
                             </h3>
 
                             <div className="space-y-3 text-slate-700">
                               <div className="flex justify-between">
-                                <span>原價/基數：</span>
+                                <span>{getText("base")}</span>
                                 <span className="font-black">
                                   ${scenario.original}
                                 </span>
                               </div>
                               <div className="flex justify-between">
-                                <span>百分率：</span>
+                                <span>{getText("rate_label")}</span>
                                 <span className="font-black">
                                   {scenario.rate}%
                                 </span>
@@ -345,8 +896,8 @@
                               <div className="flex justify-between border-t-2 border-purple-200 pt-2">
                                 <span className="font-bold">
                                   {scenario.type === "discount"
-                                    ? "減少："
-                                    : "增加："}
+                                    ? getText("decrease")
+                                    : getText("increase")}
                                 </span>
                                 <span
                                   className={`font-black ${
@@ -359,7 +910,9 @@
                                 </span>
                               </div>
                               <div className="flex justify-between bg-white rounded-lg p-2 border-2 border-purple-300">
-                                <span className="font-bold">最終：</span>
+                                <span className="font-bold">
+                                  {getText("final_label")}
+                                </span>
                                 <span className="font-black text-purple-600 text-lg">
                                   ${final.toFixed(2)}
                                 </span>
@@ -377,23 +930,23 @@
               <div className="lg:col-span-4 flex flex-col gap-6">
                 <div className="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-lg">
                   <h3 className="text-lg font-black text-pink-600 mb-3">
-                    💡 百分數概念
+                    💡 {getText("info_concept")}
                   </h3>
                   <div className="text-sm text-slate-700 leading-relaxed space-y-3">
                     <div className="bg-pink-50 p-3 rounded-lg">
-                      <strong>百分數 (%)：</strong>
+                      <strong>{getText("percent")}</strong>
                       <p className="text-slate-600 mt-1">
-                        表示「每一百份中的若干份」
+                        {getText("info_per100")}
                       </p>
                     </div>
                     <div className="bg-blue-50 p-3 rounded-lg">
-                      <strong>轉換小數：</strong>
+                      <strong>{getText("info_decimal")}</strong>
                       <p className="text-slate-600 mt-1">
                         25% = 25 ÷ 100 = 0.25
                       </p>
                     </div>
                     <div className="bg-green-50 p-3 rounded-lg">
-                      <strong>轉換分數：</strong>
+                      <strong>{getText("info_fraction")}</strong>
                       <p className="text-slate-600 mt-1">50% = 50/100 = 1/2</p>
                     </div>
                   </div>
@@ -401,38 +954,38 @@
 
                 <div className="bg-gradient-to-br from-yellow-100 to-orange-100 rounded-3xl p-6 shadow-lg">
                   <h3 className="text-lg font-black text-orange-700 mb-3">
-                    📊 常用百分數
+                    📊 {getText("info_common")}
                   </h3>
                   <div className="space-y-2 text-sm">
                     <div className="bg-white p-2 rounded-lg flex justify-between">
                       <span>100%</span>
-                      <span className="font-black">全部 / 整體</span>
+                      <span className="font-black">{getText("all_whole")}</span>
                     </div>
                     <div className="bg-white p-2 rounded-lg flex justify-between">
                       <span>50%</span>
-                      <span className="font-black">一半</span>
+                      <span className="font-black">{getText("half")}</span>
                     </div>
                     <div className="bg-white p-2 rounded-lg flex justify-between">
                       <span>25%</span>
-                      <span className="font-black">四分之一</span>
+                      <span className="font-black">{getText("quarter")}</span>
                     </div>
                     <div className="bg-white p-2 rounded-lg flex justify-between">
                       <span>10%</span>
-                      <span className="font-black">十分之一</span>
+                      <span className="font-black">{getText("tenth")}</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-lg">
                   <h3 className="text-lg font-black text-slate-800 mb-3">
-                    🎯 應用範疇
+                    🎯 {getText("info_apps")}
                   </h3>
                   <ul className="text-sm text-slate-600 space-y-2">
-                    <li>✓ 商店折扣優惠</li>
-                    <li>✓ 銀行利息計算</li>
-                    <li>✓ 考試成績評分</li>
-                    <li>✓ 統計數據分析</li>
-                    <li>✓ 稅務計算</li>
+                    <li>✓ {getText("app_shop")}</li>
+                    <li>✓ {getText("app_bank")}</li>
+                    <li>✓ {getText("app_exam")}</li>
+                    <li>✓ {getText("app_data")}</li>
+                    <li>✓ {getText("app_tax")}</li>
                   </ul>
                 </div>
               </div>
@@ -444,20 +997,5 @@
       const root = ReactDOM.createRoot(document.getElementById("root"));
       root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

@@ -3,18 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小三數學：減法大挑戰</title>
+    <title>小三數學：減法大挑戰 | Subtraction Challenge</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script
-      src="https://unpkg.com/react@18/umd/react.development.js"
-      crossorigin
-    ></script>
-    <script
-      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
-      crossorigin
-    ></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
 
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
@@ -33,18 +28,6 @@
       .number-card:hover {
         transform: translateY(-4px);
       }
-      .borrow-indicator {
-        animation: bounce 0.5s infinite;
-      }
-      @keyframes bounce {
-        0%,
-        100% {
-          transform: translateY(0);
-        }
-        50% {
-          transform: translateY(-10px);
-        }
-      }
     </style>
   </head>
   <body>
@@ -53,7 +36,8 @@
     <script type="text/babel">
       const { useState, useEffect } = React;
       const { motion } = window.Motion;
-      // Inline Icons to replace Lucide
+      const { LanguageSelector, get } = window.MathI18n;
+
       const Minus = ({ size = 24, className = "" }) => (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -179,8 +163,178 @@
         </svg>
       );
 
+      const t = {
+        title: {
+          en: "Subtraction Challenge",
+          zh: "減法大挑戰",
+          ja: "引き算チャレンジ",
+          ko: "뺄셈 도전",
+          es: "Desafío de resta",
+          de: "Subtraktions-Herausforderung",
+          fi: "Vähennyslaskuhaaste",
+          fr: "Défi de soustraction",
+          ar: "تحدي الطرح",
+          it: "Sfida di sottrazione",
+        },
+        practice: {
+          en: "Practice",
+          zh: "練習模式",
+          ja: "練習モード",
+          ko: "연습 모드",
+          es: "Práctica",
+          de: "Übungsmodus",
+          fi: "Harjoitustila",
+          fr: "Mode entraînement",
+          ar: "وضع التدريب",
+          it: "Modalità pratica",
+        },
+        timed: {
+          en: "Timed",
+          zh: "計時挑戰",
+          ja: "タイムアタック",
+          ko: "시간 도전",
+          es: "Cronometrado",
+          de: "Auf Zeit",
+          fi: "Ajastettu",
+          fr: "Chronométré",
+          ar: "تحدي الوقت",
+          it: "A tempo",
+        },
+        story: {
+          en: "Word Problems",
+          zh: "應用題",
+          ja: "文章題",
+          ko: "서술형 문제",
+          es: "Problemas verbales",
+          de: "Textaufgaben",
+          fi: "Sanalliset tehtävät",
+          fr: "Problèmes écrits",
+          ar: "المسائل اللفظية",
+          it: "Problemi verbali",
+        },
+        borrow: {
+          en: "Borrow",
+          zh: "借位",
+          ja: "繰り下がり",
+          ko: "빌림",
+          es: "Llevar",
+          de: "Übertrag",
+          fi: "Lainaa",
+          fr: "Retenue",
+          ar: "الاستلاف",
+          it: "Prestito",
+        },
+        check: {
+          en: "Check Answer",
+          zh: "檢查答案",
+          ja: "答え合わせ",
+          ko: "정답 확인",
+          es: "Comprobar respuesta",
+          de: "Antwort prüfen",
+          fi: "Tarkista vastaus",
+          fr: "Vérifier la réponse",
+          ar: "تحقق من الإجابة",
+          it: "Controlla la risposta",
+        },
+        correct: {
+          en: "Correct! Answer is",
+          zh: "答對了！答案是",
+          ja: "正解！答えは",
+          ko: "정답! 정답은",
+          es: "¡Correcto! La respuesta es",
+          de: "Richtig! Antwort ist",
+          fi: "Oikein! Vastaus on",
+          fr: "Correct ! La réponse est",
+          ar: "صحيح! الإجابة هي",
+          it: "Corretto! La risposta è",
+        },
+        wrong: {
+          en: "Try again!",
+          zh: "再試試看！",
+          ja: "もう一度！",
+          ko: "다시 해보세요!",
+          es: "¡Inténtalo de nuevo!",
+          de: "Versuch es nochmal!",
+          fi: "Yritä uudelleen!",
+          fr: "Réessayez !",
+          ar: "حاول مرة أخرى!",
+          it: "Riprova!",
+        },
+        score: {
+          en: "Score",
+          zh: "得分",
+          ja: "スコア",
+          ko: "점수",
+          es: "Puntuación",
+          de: "Punktzahl",
+          fi: "Pisteet",
+          fr: "Score",
+          ar: "النتيجة",
+          it: "Punteggio",
+        },
+        answered: {
+          en: "Answered",
+          zh: "已答",
+          ja: "回答数",
+          ko: "답변함",
+          es: "Respondidas",
+          de: "Beantwortet",
+          fi: "Vastattu",
+          fr: "Répondu",
+          ar: "تمت الإجابة",
+          it: "Risposto",
+        },
+        tipsTitle: {
+          en: "Subtraction Tips",
+          zh: "減法要訣",
+          ja: "引き算のコツ",
+          ko: "뺄셈 팁",
+          es: "Consejos de resta",
+          de: "Subtraktionstipps",
+          fi: "Vähennyslaskuvinkit",
+          fr: "Conseils de soustraction",
+          ar: "نصائح الطرح",
+          it: "Suggerimenti per la sottrazione",
+        },
+        startTimed: {
+          en: "Start Timed Mode",
+          zh: "開始計時",
+          ja: "計時開始",
+          ko: "시간 측정 시작",
+          es: "Empezar cronometrado",
+          de: "Zeitmodus starten",
+          fi: "Aloita ajastettu tila",
+          fr: "Démarrer le mode chronométré",
+          ar: "بدء الوضع المؤقت",
+          it: "Avvia modalità a tempo",
+        },
+        storyTemplates: [
+          {
+            emoji: "📚",
+            en: "Library has {num1} books, lent {num2}. How many left?",
+            zh: "圖書館有 {num1} 本書，借出了 {num2} 本，還剩多少本？",
+          },
+          {
+            emoji: "🎈",
+            en: "Party has {num1} balloons, {num2} popped. How many left?",
+            zh: "生日會有 {num1} 個氣球，爆了 {num2} 個，還剩多少個？",
+          },
+          {
+            emoji: "🍎",
+            en: "Orchard harvested {num1} apples, sold {num2}. How many left?",
+            zh: "果園收成 {num1} 個蘋果，賣了 {num2} 個，還剩多少個？",
+          },
+          {
+            emoji: "🎟️",
+            en: "Cinema has {num1} tickets, sold {num2}. How many left?",
+            zh: "電影院有 {num1} 張票，售出 {num2} 張，還剩多少張？",
+          },
+        ],
+      };
+
       function App() {
-        const [mode, setMode] = useState("practice"); // practice, timed, story
+        const [lang, setLang] = useState("zh");
+        const [mode, setMode] = useState("practice");
         const [num1, setNum1] = useState(856);
         const [num2, setNum2] = useState(347);
         const [userInputs, setUserInputs] = useState(["", "", "", ""]);
@@ -190,6 +344,7 @@
         const [timeLeft, setTimeLeft] = useState(60);
         const [isTimerActive, setIsTimerActive] = useState(false);
         const [questionsAnswered, setQuestionsAnswered] = useState(0);
+        const [storyIdx, setStoryIdx] = useState(0);
 
         const correctAnswer = num1 - num2;
 
@@ -205,9 +360,9 @@
         const generateQuestion = () => {
           let n1, n2;
           if (mode === "story") {
-            // Story problems with context
             n1 = Math.floor(Math.random() * 900) + 100;
             n2 = Math.floor(Math.random() * (n1 - 50)) + 50;
+            setStoryIdx(Math.floor(Math.random() * t.storyTemplates.length));
           } else {
             n1 = Math.floor(Math.random() * 900) + 100;
             n2 = Math.floor(Math.random() * n1);
@@ -257,44 +412,23 @@
           generateQuestion();
         };
 
-        const storyScenarios = [
-          {
-            emoji: "📚",
-            context: "圖書館有 {num1} 本書，借出了 {num2} 本，還剩多少本？",
-          },
-          {
-            emoji: "🎈",
-            context: "生日會有 {num1} 個氣球，爆了 {num2} 個，還剩多少個？",
-          },
-          {
-            emoji: "🍎",
-            context: "果園收成 {num1} 個蘋果，賣了 {num2} 個，還剩多少個？",
-          },
-          {
-            emoji: "🎟️",
-            context: "電影院有 {num1} 張票，售出 {num2} 張，還剩多少張？",
-          },
-        ];
-
-        const currentStory =
-          storyScenarios[Math.floor(Math.random() * storyScenarios.length)];
-        const storyText = currentStory.context
-          .replace("{num1}", num1)
-          .replace("{num2}", num2);
+        const getStoryText = () => {
+          const tmpl = t.storyTemplates[storyIdx];
+          const text = tmpl[lang] || tmpl["en"];
+          return text.replace("{num1}", num1).replace("{num2}", num2);
+        };
 
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <header className="text-center mb-8">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <header className="text-center mb-8 mt-8">
               <div className="inline-flex items-center gap-3 bg-white/30 backdrop-blur-md px-6 py-3 rounded-full mb-4 shadow-lg">
                 <Minus className="text-amber-800" size={24} />
                 <span className="text-amber-800 font-bold text-lg">
-                  小三數學
+                  {t.title[lang] || t.title["en"]}
                 </span>
               </div>
-              <h1 className="text-5xl md:text-6xl font-black text-amber-900 mb-4 tracking-tight drop-shadow-lg">
-                減法大挑戰
-              </h1>
-              <div className="flex gap-4 justify-center">
+              <div className="flex gap-4 justify-center mt-4">
                 <button
                   onClick={() => setMode("practice")}
                   className={`px-6 py-3 rounded-2xl font-bold transition-all ${
@@ -303,7 +437,7 @@
                       : "bg-white/50 text-amber-700 hover:bg-white/70"
                   }`}
                 >
-                  練習模式
+                  {t.practice[lang] || t.practice["en"]}
                 </button>
                 <button
                   onClick={() => {
@@ -316,7 +450,7 @@
                       : "bg-white/50 text-amber-700 hover:bg-white/70"
                   }`}
                 >
-                  計時挑戰
+                  {t.timed[lang] || t.timed["en"]}
                 </button>
                 <button
                   onClick={() => setMode("story")}
@@ -326,7 +460,7 @@
                       : "bg-white/50 text-amber-700 hover:bg-white/70"
                   }`}
                 >
-                  應用題
+                  {t.story[lang] || t.story["en"]}
                 </button>
               </div>
             </header>
@@ -336,10 +470,10 @@
                 {mode === "story" && (
                   <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 mb-6 border-2 border-purple-200">
                     <div className="text-5xl mb-3 text-center">
-                      {currentStory.emoji}
+                      {t.storyTemplates[storyIdx].emoji}
                     </div>
                     <div className="text-xl font-bold text-purple-800 text-center leading-relaxed">
-                      {storyText}
+                      {getStoryText()}
                     </div>
                   </div>
                 )}
@@ -349,13 +483,14 @@
                     <div className="flex items-center gap-2">
                       <Trophy className="text-yellow-600" size={24} />
                       <span className="font-black text-2xl text-slate-800">
-                        得分: {score}
+                        {t.score[lang] || t.score["en"]}: {score}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Target className="text-blue-600" size={24} />
                       <span className="font-black text-2xl text-slate-800">
-                        已答: {questionsAnswered}
+                        {t.answered[lang] || t.answered["en"]}:{" "}
+                        {questionsAnswered}
                       </span>
                     </div>
                     <div
@@ -373,13 +508,12 @@
                 <div className="max-w-md mx-auto">
                   <div className="grid grid-cols-5 gap-2 text-center mb-2 text-amber-700 font-bold text-sm">
                     <div></div>
-                    <div>千</div>
-                    <div>百</div>
-                    <div>十</div>
-                    <div>個</div>
+                    <div>{lang === "zh" ? "千" : "1k"}</div>
+                    <div>{lang === "zh" ? "百" : "100"}</div>
+                    <div>{lang === "zh" ? "十" : "10"}</div>
+                    <div>{lang === "zh" ? "個" : "1"}</div>
                   </div>
 
-                  {/* Borrow Row */}
                   <div className="grid grid-cols-5 gap-2 mb-2 h-10">
                     <div></div>
                     {[0, 1, 2, 3].map((i) => (
@@ -391,50 +525,39 @@
                         value={borrows[i]}
                         onChange={(e) => handleBorrow(i, e.target.value)}
                         className="w-full h-10 rounded-lg text-center font-bold text-red-600 bg-red-50 border-2 border-dashed border-red-300 text-sm"
-                        placeholder="借位"
+                        placeholder={t.borrow[lang] || t.borrow["en"]}
                       />
                     ))}
                   </div>
 
-                  {/* First Number */}
                   <div className="grid grid-cols-5 gap-2 mb-2 text-2xl font-black text-slate-700">
                     <div></div>
-                    <div className="number-card flex items-center justify-center h-14 bg-blue-100 rounded-xl shadow-sm">
-                      {getDigit(num1, 0)}
-                    </div>
-                    <div className="number-card flex items-center justify-center h-14 bg-blue-100 rounded-xl shadow-sm">
-                      {getDigit(num1, 1)}
-                    </div>
-                    <div className="number-card flex items-center justify-center h-14 bg-blue-100 rounded-xl shadow-sm">
-                      {getDigit(num1, 2)}
-                    </div>
-                    <div className="number-card flex items-center justify-center h-14 bg-blue-100 rounded-xl shadow-sm">
-                      {getDigit(num1, 3)}
-                    </div>
+                    {[0, 1, 2, 3].map((i) => (
+                      <div
+                        key={i}
+                        className="number-card flex items-center justify-center h-14 bg-blue-100 rounded-xl shadow-sm"
+                      >
+                        {getDigit(num1, i)}
+                      </div>
+                    ))}
                   </div>
 
-                  {/* Second Number with Minus Sign */}
                   <div className="grid grid-cols-5 gap-2 mb-4 text-2xl font-black text-slate-700 relative">
                     <div className="flex items-center justify-center text-3xl text-red-600">
                       −
                     </div>
-                    <div className="number-card flex items-center justify-center h-14 bg-orange-100 rounded-xl shadow-sm">
-                      {getDigit(num2, 0)}
-                    </div>
-                    <div className="number-card flex items-center justify-center h-14 bg-orange-100 rounded-xl shadow-sm">
-                      {getDigit(num2, 1)}
-                    </div>
-                    <div className="number-card flex items-center justify-center h-14 bg-orange-100 rounded-xl shadow-sm">
-                      {getDigit(num2, 2)}
-                    </div>
-                    <div className="number-card flex items-center justify-center h-14 bg-orange-100 rounded-xl shadow-sm">
-                      {getDigit(num2, 3)}
-                    </div>
+                    {[0, 1, 2, 3].map((i) => (
+                      <div
+                        key={i}
+                        className="number-card flex items-center justify-center h-14 bg-orange-100 rounded-xl shadow-sm"
+                      >
+                        {getDigit(num2, i)}
+                      </div>
+                    ))}
                   </div>
 
                   <div className="border-b-4 border-amber-600 mb-4"></div>
 
-                  {/* Answer Inputs */}
                   <div className="grid grid-cols-5 gap-2 mb-6">
                     <div></div>
                     {[0, 1, 2, 3].map((idx) => (
@@ -455,7 +578,8 @@
                     onClick={checkAnswer}
                     className="w-full py-4 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl font-bold text-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 mb-4"
                   >
-                    <CheckCircle strokeWidth={3} /> 檢查答案
+                    <CheckCircle strokeWidth={3} />{" "}
+                    {t.check[lang] || t.check["en"]}
                   </button>
 
                   {feedback === "correct" && (
@@ -466,7 +590,7 @@
                     >
                       <CheckCircle size={32} />
                       <div className="text-lg">
-                        答對了！答案是 {correctAnswer}
+                        {t.correct[lang] || t.correct["en"]} {correctAnswer}
                       </div>
                       <button
                         onClick={generateQuestion}
@@ -483,7 +607,7 @@
                       animate={{ opacity: 1, y: 0 }}
                       className="bg-red-100 text-red-700 p-4 rounded-xl font-bold flex items-center justify-center gap-2 mb-4"
                     >
-                      <XCircle /> 再試試看！
+                      <XCircle /> {t.wrong[lang] || t.wrong["en"]}
                     </motion.div>
                   )}
                 </div>
@@ -492,78 +616,57 @@
               <div className="lg:col-span-4 flex flex-col gap-6">
                 <div className="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-lg">
                   <h3 className="text-xl font-black text-amber-600 mb-4">
-                    💡 減法要訣
+                    💡 {t.tipsTitle[lang] || t.tipsTitle["en"]}
                   </h3>
-                  <div className="space-y-3 text-sm text-slate-700">
-                    <div className="bg-yellow-50 p-3 rounded-lg border-l-4 border-yellow-400">
-                      <strong>步驟一：</strong>由個位開始計算
+                  {lang === "zh" ? (
+                    <div className="space-y-3 text-sm text-slate-700">
+                      <div className="bg-yellow-50 p-3 rounded-lg border-l-4 border-yellow-400">
+                        <strong>步驟一：</strong>由個位開始計算
+                      </div>
+                      <div className="bg-orange-50 p-3 rounded-lg border-l-4 border-orange-400">
+                        <strong>步驟二：</strong>如果上面數字較小，要向左借位
+                      </div>
+                      <div className="bg-red-50 p-3 rounded-lg border-l-4 border-red-400">
+                        <strong>步驟三：</strong>借位後該位數字+10，左邊減1
+                      </div>
+                      <div className="bg-green-50 p-3 rounded-lg border-l-4 border-green-400">
+                        <strong>步驟四：</strong>逐位計算直至完成
+                      </div>
                     </div>
-                    <div className="bg-orange-50 p-3 rounded-lg border-l-4 border-orange-400">
-                      <strong>步驟二：</strong>如果上面數字較小，要向左借位
+                  ) : (
+                    <div className="space-y-3 text-sm text-slate-700">
+                      <div className="bg-yellow-50 p-3 rounded-lg border-l-4 border-yellow-400">
+                        <strong>Step 1:</strong> Start from units.
+                      </div>
+                      <div className="bg-orange-50 p-3 rounded-lg border-l-4 border-orange-400">
+                        <strong>Step 2:</strong> If top number is smaller,
+                        borrow from left.
+                      </div>
+                      <div className="bg-red-50 p-3 rounded-lg border-l-4 border-red-400">
+                        <strong>Step 3:</strong> After borrowing, add 10 to
+                        current, subtract 1 from left.
+                      </div>
+                      <div className="bg-green-50 p-3 rounded-lg border-l-4 border-green-400">
+                        <strong>Step 4:</strong> Calculate digit by digit.
+                      </div>
                     </div>
-                    <div className="bg-red-50 p-3 rounded-lg border-l-4 border-red-400">
-                      <strong>步驟三：</strong>借位後該位數字+10，左邊減1
-                    </div>
-                    <div className="bg-green-50 p-3 rounded-lg border-l-4 border-green-400">
-                      <strong>步驟四：</strong>逐位計算直至完成
-                    </div>
-                  </div>
+                  )}
                 </div>
 
                 {mode === "practice" && (
                   <div className="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-lg">
-                    <h3 className="text-lg font-black text-slate-800 mb-3">
-                      練習設定
-                    </h3>
                     <button
                       onClick={generateQuestion}
                       className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-bold transition-all flex items-center justify-center gap-2 mb-3"
                     >
-                      <RotateCcw size={20} /> 新題目
+                      <RotateCcw size={20} /> New Question
                     </button>
                     <div className="text-center text-green-600 font-black text-2xl">
                       <Trophy className="inline mr-2" />
-                      總分: {score}
+                      {t.score[lang] || t.score["en"]}: {score}
                     </div>
                   </div>
                 )}
-
-                {mode === "timed" && !isTimerActive && timeLeft === 0 && (
-                  <div className="bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl p-6 shadow-lg border-2 border-purple-300">
-                    <h3 className="text-2xl font-black text-purple-700 mb-3 text-center">
-                      時間到！
-                    </h3>
-                    <div className="text-center mb-4">
-                      <div className="text-5xl font-black text-purple-600 mb-2">
-                        {score}
-                      </div>
-                      <div className="text-lg text-purple-700">最終得分</div>
-                      <div className="text-sm text-slate-600 mt-2">
-                        答對了 {questionsAnswered} 題
-                      </div>
-                    </div>
-                    <button
-                      onClick={startTimedMode}
-                      className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold transition-all"
-                    >
-                      再玩一次
-                    </button>
-                  </div>
-                )}
-
-                <div className="bg-gradient-to-br from-blue-100 to-cyan-100 rounded-3xl p-6 shadow-lg">
-                  <h3 className="text-lg font-black text-blue-700 mb-3">
-                    🎯 例子
-                  </h3>
-                  <div className="bg-white p-4 rounded-xl font-mono text-sm">
-                    <div className="text-right mb-1">456</div>
-                    <div className="text-right mb-1">- 178</div>
-                    <div className="border-b-2 border-blue-300 mb-1"></div>
-                    <div className="text-right text-blue-600 font-bold">
-                      278
-                    </div>
-                  </div>
-                </div>
               </div>
             </main>
           </div>
@@ -573,20 +676,5 @@
       const root = ReactDOM.createRoot(document.getElementById("root"));
       root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

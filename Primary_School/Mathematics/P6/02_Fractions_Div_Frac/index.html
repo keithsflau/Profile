@@ -3,150 +3,366 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小六數學：分數除以分數 | Fraction ÷ Fraction</title>
+    <title>小六數學：分數除法 | Fractions Division</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #fef9c3 0%, #eab308 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
+
+      const t = {
+        title: {
+          en: "Dividing Fractions",
+          zh: "分數除法",
+          ja: "分数の割り算",
+          ko: "분수 나눗셈",
+          es: "División de Fracciones",
+          de: "Brüche dividieren",
+          fi: "Murtolukujen jakolasku",
+          fr: "Division des fractions",
+          ar: "قسمة الكسور",
+          it: "Divisione Frazioni",
+        },
+        step1: {
+          en: "Keep",
+          zh: "保留",
+          ja: "そのまま",
+          ko: "유지",
+          es: "Mantener",
+          de: "Behalten",
+          fi: "Pidä",
+          fr: "Garder",
+          ar: "إبقاء",
+          it: "Mantieni",
+        },
+        step2: {
+          en: "Change to ×",
+          zh: "變乘號",
+          ja: "×に変える",
+          ko: "×로 변경",
+          es: "Cambiar a ×",
+          de: "Zu × ändern",
+          fi: "Vaihda ×",
+          fr: "Changer en ×",
+          ar: "تغيير إلى ×",
+          it: "Cambia in ×",
+        },
+        step3: {
+          en: "Flip",
+          zh: "倒轉",
+          ja: "逆数",
+          ko: "뒤집기",
+          es: "Invertir",
+          de: "Umkehren",
+          fi: "Käännä",
+          fr: "Inverser",
+          ar: "اقلب",
+          it: "Inverti",
+        },
+        input: {
+          en: "Input",
+          zh: "輸入",
+          ja: "入力",
+          ko: "입력",
+          es: "Entrada",
+          de: "Eingabe",
+          fi: "Syöte",
+          fr: "Entrée",
+          ar: "إدخال",
+          it: "Input",
+        },
+        result: {
+          en: "Result",
+          zh: "結果",
+          ja: "結果",
+          ko: "결과",
+          es: "Resultado",
+          de: "Ergebnis",
+          fi: "Tulos",
+          fr: "Résultat",
+          ar: "نتيجة",
+          it: "Risultato",
+        },
+        simplest: {
+          en: "Simplest Form",
+          zh: "最簡分數",
+          ja: "既約分数",
+          ko: "기약분수",
+          es: "Forma más simple",
+          de: "Einfachste Form",
+          fi: "Yksinkertaisin muoto",
+          fr: "Forme la plus simple",
+          ar: "أبسط صورة",
+          it: "Forma Più Semplice",
+        },
+      };
+
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
       function App() {
+        const [lang, setLang] = useState("zh");
         const [n1, setN1] = useState(3);
         const [d1, setD1] = useState(4);
         const [n2, setN2] = useState(1);
         const [d2, setD2] = useState(2);
+        const [step, setStep] = useState(0); // 0: input, 1: flip animation shown
 
-        const gcd = (a, b) => (b === 0 ? a : gcd(b, a % b));
-        // a/b ÷ c/d = a/b × d/c
+        const gcd = (x, y) => (!y ? x : gcd(y, x % y));
+
+        // Result Logic
         const resN = n1 * d2;
         const resD = d1 * n2;
-        const g = gcd(resN, resD);
-        const simN = resN / g;
-        const simD = resD / g;
+        const common = gcd(resN, resD);
+        const simN = resN / common;
+        const simD = resD / common;
+
+        // Reset animation when numbers change
+        useEffect(() => {
+          setStep(0);
+          const timer = setTimeout(() => setStep(1), 500);
+          return () => clearTimeout(timer);
+        }, [n1, d1, n2, d2]);
+
+        const FractionInput = ({ n, setN, d, setD, color }) => (
+          <div
+            className={`flex flex-col items-center gap-1 p-2 rounded-xl bg-${color}-500/10 border-2 border-${color}-500/30`}
+          >
+            <input
+              type="number"
+              value={n}
+              onChange={(e) => setN(Math.max(1, parseInt(e.target.value) || 1))}
+              className={`w-16 h-12 text-center text-2xl font-black bg-transparent border-b-2 border-${color}-400 outline-none text-white`}
+            />
+            <input
+              type="number"
+              value={d}
+              onChange={(e) => setD(Math.max(1, parseInt(e.target.value) || 1))}
+              className={`w-16 h-12 text-center text-2xl font-black bg-transparent outline-none text-white`}
+            />
+          </div>
+        );
 
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-yellow-900 mb-2">
-              ➗ 分數除以分數
-            </h1>
-            <p className="text-xl text-yellow-700 font-bold mb-8">
-              Fraction ÷ Fraction
-            </p>
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-3xl w-full">
-              <div className="flex items-center justify-center gap-4 mb-8 flex-wrap">
-                <div className="bg-orange-50 p-4 rounded-xl border-2 border-orange-200">
-                  <div className="flex flex-col items-center">
-                    <input
-                      type="number"
-                      min="1"
-                      value={n1}
-                      onChange={(e) =>
-                        setN1(Math.max(1, parseInt(e.target.value) || 1))
-                      }
-                      className="w-12 text-2xl font-black text-center border-b-4 border-orange-400 bg-transparent"
+          <div className="min-h-screen flex flex-col items-center p-4 font-sans bg-slate-900 text-white">
+            <div className="w-full max-w-5xl flex justify-between items-center mb-10">
+              <h1 className="text-4xl font-black text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]">
+                ➗ {getText("title", lang)}
+              </h1>
+              <div className="flex bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-amber-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="w-full max-w-4xl flex flex-col gap-12">
+              {/* Interactive Equation Builder */}
+              <div className="glass-panel p-8 rounded-3xl min-h-[300px] flex flex-col items-center justify-center relative overflow-hidden">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full items-center justify-items-center">
+                  {/* Step 1: Input */}
+                  <div className="flex items-center gap-4">
+                    <FractionInput
+                      n={n1}
+                      setN={setN1}
+                      d={d1}
+                      setD={setD1}
+                      color="blue"
                     />
-                    <div className="w-12 h-1 bg-orange-800 my-1"></div>
-                    <input
-                      type="number"
-                      min="1"
-                      value={d1}
-                      onChange={(e) =>
-                        setD1(Math.max(1, parseInt(e.target.value) || 1))
-                      }
-                      className="w-12 text-2xl font-black text-center bg-transparent"
+                    <div className="text-4xl font-black text-slate-500">÷</div>
+                    <FractionInput
+                      n={n2}
+                      setN={setN2}
+                      d={d2}
+                      setD={setD2}
+                      color="red"
                     />
                   </div>
-                </div>
-                <span className="text-3xl font-black text-yellow-400">÷</span>
-                <div className="bg-blue-50 p-4 rounded-xl border-2 border-blue-200">
-                  <div className="flex flex-col items-center">
-                    <input
-                      type="number"
-                      min="1"
-                      value={n2}
-                      onChange={(e) =>
-                        setN2(Math.max(1, parseInt(e.target.value) || 1))
-                      }
-                      className="w-12 text-2xl font-black text-center border-b-4 border-blue-400 bg-transparent"
-                    />
-                    <div className="w-12 h-1 bg-blue-800 my-1"></div>
-                    <input
-                      type="number"
-                      min="1"
-                      value={d2}
-                      onChange={(e) =>
-                        setD2(Math.max(1, parseInt(e.target.value) || 1))
-                      }
-                      className="w-12 text-2xl font-black text-center bg-transparent"
-                    />
+
+                  {/* Step 2: Transformation Arrow */}
+                  <div className="text-center">
+                    <motion.div
+                      animate={{
+                        scale: [1, 1.2, 1],
+                        rotateZ: [0, 360, 360],
+                        color: ["#cbd5e1", "#fbbf24", "#cbd5e1"],
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        repeatDelay: 2,
+                      }}
+                      className="text-4xl font-black mb-2"
+                    >
+                      ➔
+                    </motion.div>
+                    <div className="text-xs font-bold text-amber-400 uppercase tracking-widest">
+                      {getText("step3", lang)}!
+                    </div>
+                  </div>
+
+                  {/* Step 3: Resulting Multiplication */}
+                  <div className="flex items-center gap-4">
+                    {/* First Fraction stays same */}
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="text-2xl font-black text-blue-400">
+                        {n1}
+                      </div>
+                      <div className="w-8 h-0.5 bg-blue-400"></div>
+                      <div className="text-2xl font-black text-blue-400">
+                        {d1}
+                      </div>
+                      <div className="text-[10px] text-blue-300 uppercase font-bold">
+                        {getText("step1", lang)}
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="text-4xl font-black text-amber-400">
+                        ×
+                      </div>
+                      <div className="text-[10px] text-amber-300 uppercase font-bold">
+                        {getText("step2", lang)}
+                      </div>
+                    </div>
+
+                    {/* Second Fraction Flips */}
+                    <div className="flex flex-col items-center gap-2 relative">
+                      <AnimatePresence mode="popLayout">
+                        <motion.div
+                          key={`n-${d2}`} // Use d2 as key because it moves to top
+                          initial={{ y: 20, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          className="text-2xl font-black text-red-400"
+                        >
+                          {d2}
+                        </motion.div>
+                      </AnimatePresence>
+                      <div className="w-8 h-0.5 bg-red-400"></div>
+                      <AnimatePresence mode="popLayout">
+                        <motion.div
+                          key={`d-${n2}`} // Use n2 as key because it moves to bottom
+                          initial={{ y: -20, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          className="text-2xl font-black text-red-400"
+                        >
+                          {n2}
+                        </motion.div>
+                      </AnimatePresence>
+                      <div className="text-[10px] text-red-300 uppercase font-bold">
+                        {getText("step3", lang)}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-slate-50 rounded-2xl p-6 text-center mb-6">
-                <p className="text-lg mb-2">
-                  <b>公式:</b> 除以一個分數 = 乘以它的倒數
-                </p>
-                <p className="font-mono">
-                  {n1}/{d1} ÷ {n2}/{d2} = {n1}/{d1} × {d2}/{n2}
-                </p>
-                <p className="font-mono">
-                  = ({n1}×{d2}) / ({d1}×{n2})
-                </p>
-                <p className="font-mono">
-                  = {resN}/{resD}
-                </p>
-                {g > 1 && (
-                  <p className="text-slate-500">
-                    約簡 = {simN}/{simD}
-                  </p>
-                )}
-              </div>
-
-              <div className="bg-emerald-100 rounded-2xl p-6 text-center border-4 border-emerald-300">
-                <div className="text-emerald-600 font-bold">答案 Answer</div>
-                <div className="text-5xl font-black text-emerald-800">
-                  {simN}/{simD}
-                </div>
-                {simN >= simD && (
-                  <div className="text-emerald-600">
-                    = {Math.floor(simN / simD)} 又 {simN % simD}/{simD}
+              {/* Calculation & Result */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="glass-panel p-8 rounded-3xl border-l-4 border-amber-500 bg-amber-500/10 flex flex-col items-center justify-center">
+                  <h3 className="text-amber-400 font-bold uppercase mb-4">
+                    {getText("result", lang)}
+                  </h3>
+                  <div className="flex items-center gap-4 text-5xl font-black">
+                    <div className="flex flex-col items-center">
+                      <span>{resN}</span>
+                      <span className="text-sm text-slate-400 font-normal">
+                        ({n1} × {d2})
+                      </span>
+                    </div>
+                    <div className="w-full h-1 bg-white mx-2"></div>
+                    <div className="flex flex-col items-center">
+                      <span>{resD}</span>
+                      <span className="text-sm text-slate-400 font-normal">
+                        ({d1} × {n2})
+                      </span>
+                    </div>
                   </div>
-                )}
+                </div>
+
+                <div className="glass-panel p-8 rounded-3xl border-l-4 border-emerald-500 bg-emerald-500/10 flex flex-col items-center justify-center">
+                  <h3 className="text-emerald-400 font-bold uppercase mb-4">
+                    {getText("simplest", lang)}
+                  </h3>
+                  <div className="flex items-center gap-4 text-5xl font-black">
+                    <div className="flex flex-col items-center">
+                      <span>{simN}</span>
+                    </div>
+                    <div className="h-1 bg-white w-16"></div>
+                    <div className="flex flex-col items-center">
+                      <span>{simD}</span>
+                    </div>
+                  </div>
+                  {simN > simD && simD !== 1 && (
+                    <div className="mt-4 text-2xl font-black text-emerald-300">
+                      = {Math.floor(simN / simD)}{" "}
+                      <span className="text-lg mx-1">
+                        {simN % simD}/{simD}
+                      </span>
+                    </div>
+                  )}
+                  {simD === 1 && (
+                    <div className="mt-4 text-4xl font-black text-emerald-300">
+                      = {simN}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

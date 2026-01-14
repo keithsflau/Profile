@@ -8,23 +8,35 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #ecfeff 0%, #06b6d4 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(6, 182, 212, 0.15); /* Cyan 500 alpha */
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(34, 211, 238, 0.1); /* Cyan 400 */
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
-      const { LanguageSelector, get } = window.MathI18n;
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
 
       const t = {
         title: {
@@ -40,20 +52,20 @@
           it: "Concetto di percentuale",
         },
         gridTitle: {
-          en: "Number of cells filled out of 100",
+          en: "Cells filled (out of 100)",
           zh: "100 格中填滿的格數",
           ja: "100マスのうち塗りつぶされた数",
           ko: "100개 셀 중 채워진 셀 수",
-          es: "Número de celdas llenas de 100",
-          de: "Anzahl der gefüllten Zellen von 100",
-          fi: "100 ruudusta täytettyjen määrä",
-          fr: "Nombre de cellules remplies sur 100",
-          ar: "عدد الخلايا المملوءة من أصل 100",
-          it: "Numero di celle riempite su 100",
+          es: "Celdas llenas (de 100)",
+          de: "Gefüllte Zellen (von 100)",
+          fi: "Täytetyt solut (100:sta)",
+          fr: "Cellules remplies (sur 100)",
+          ar: "الخلايا المملوءة (من 100)",
+          it: "Celle riempite (su 100)",
         },
         fraction: {
           en: "Fraction",
-          zh: "分數寫法",
+          zh: "分數",
           ja: "分数",
           ko: "분수",
           es: "Fracción",
@@ -65,7 +77,7 @@
         },
         decimal: {
           en: "Decimal",
-          zh: "小數寫法",
+          zh: "小數",
           ja: "小数",
           ko: "소수",
           es: "Decimal",
@@ -81,118 +93,153 @@
           ja: "百分率 = 100あたりの部分",
           ko: "백분율 = 100개 중 부분",
           es: "Porcentaje = Partes por 100",
-          de: "Prozentsatz = Teile pro 100",
-          fi: "Prosenttiosuus = Osuutta sadasta",
+          de: "Prozent = Teile pro 100",
+          fi: "Prosentti = Osaa sadasta",
           fr: "Pourcentage = Parties pour 100",
           ar: "النسبة المئوية = أجزاء لكل 100",
           it: "Percentuale = Parti su 100",
         },
         tipText: {
-          en: "{percent}% represents {percent} parts out of 100 = {percent}/100 = {decimal}",
-          zh: "{percent}% 代表 100 份中的 {percent} 份 = {percent}/100 = {decimal}",
-          ja: "{percent}% は 100 のうち {percent} = {percent}/100 = {decimal}",
-          ko: "{percent}%는 100개 중 {percent} = {percent}/100 = {decimal}",
-          es: "{percent}% representa {percent} partes de 100 = {percent}/100 = {decimal}",
-          de: "{percent}% entspricht {percent} Teilen von 100 = {percent}/100 = {decimal}",
-          fi: "{percent}% edustaa {percent} osaa 100:sta = {percent}/100 = {decimal}",
-          fr: "{percent}% représente {percent} parties sur 100 = {percent}/100 = {decimal}",
-          ar: "{percent}% يمثل {percent} أجزاء من 100 = {percent}/100 = {decimal}",
-          it: "{percent}% rappresenta {percent} parti su 100 = {percent}/100 = {decimal}",
+          en: "{p}% means {p} parts out of 100",
+          zh: "{p}% 代表 100 份中的 {p} 份",
+          ja: "{p}% は 100 のうち {p}",
+          ko: "{p}%는 100개 중 {p}를 의미",
+          es: "{p}% significa {p} partes de 100",
+          de: "{p}% bedeutet {p} Teile von 100",
+          fi: "{p}% tarkoittaa {p} osaa 100:sta",
+          fr: "{p}% signifie {p} parties sur 100",
+          ar: "{p}% تعني {p} أجزاء من 100",
+          it: "{p}% significa {p} parti su 100",
         },
+      };
+
+      const getText = (key, lang, params = {}) => {
+        let text = t[key]?.[lang] || t[key]?.["en"] || key;
+        for (const [k, v] of Object.entries(params)) {
+          text = text.replace(`{${k}}`, v);
+        }
+        return text;
       };
 
       function App() {
         const [lang, setLang] = useState("zh");
-        const getText = (key) => t[key][lang] || t[key]["en"];
-
         const [percent, setPercent] = useState(75);
 
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <LanguageSelector lang={lang} setLang={setLang} />
-            <h1 className="text-5xl font-black text-cyan-900 mb-2 mt-8">
-              📊 {getText("title")}
-            </h1>
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <div className="w-full max-w-4xl flex justify-between items-center mb-10">
+              <h1 className="text-4xl font-black text-cyan-400 drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]">
+                📊 {getText("title", lang)}
+              </h1>
+              <div className="bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-cyan-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-3xl w-full mt-8">
-              <div className="text-center mb-6">
-                <div className="text-8xl font-black text-cyan-600">
-                  {percent}%
+            <div className="w-full max-w-3xl flex flex-col gap-6">
+              {/* Main Interactive Panel */}
+              <div className="glass-panel p-8 rounded-3xl flex flex-col items-center justify-center gap-6">
+                <div className="relative w-full max-w-lg mb-4">
+                  <div className="text-center font-black text-8xl text-cyan-400 drop-shadow-[0_0_30px_rgba(34,211,238,0.4)] font-mono mb-4">
+                    {percent}%
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={percent}
+                    onChange={(e) => setPercent(parseInt(e.target.value))}
+                    className="w-full h-3 bg-slate-700 rounded-full appearance-none cursor-pointer accent-cyan-500"
+                  />
                 </div>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={percent}
-                  onChange={(e) => setPercent(parseInt(e.target.value))}
-                  className="w-full max-w-md mt-4 accent-cyan-500"
-                />
+
+                <div className="grid md:grid-cols-2 gap-8 w-full">
+                  {/* Grid */}
+                  <div className="bg-slate-900/50 p-4 rounded-2xl border border-white/10 aspect-square flex flex-col">
+                    <div className="text-cyan-200 font-bold mb-2 text-center text-sm uppercase tracking-wider">
+                      {getText("gridTitle", lang)}
+                    </div>
+                    <div className="flex-1 grid grid-cols-10 gap-1 p-1">
+                      {[...Array(100)].map((_, i) => (
+                        <motion.div
+                          key={i}
+                          initial={false}
+                          animate={{
+                            backgroundColor:
+                              i < percent ? "#22d3ee" : "rgba(30, 41, 59, 0.5)",
+                            scale: i < percent ? 1 : 0.9,
+                          }}
+                          className="rounded-sm"
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Info Cards */}
+                  <div className="flex flex-col gap-4 justify-center">
+                    <div className="bg-cyan-900/40 p-6 rounded-2xl border border-cyan-500/30">
+                      <div className="text-cyan-400 font-bold uppercase text-sm mb-1">
+                        {getText("fraction", lang)}
+                      </div>
+                      <div className="text-5xl font-mono font-black text-white">
+                        {percent}/100
+                      </div>
+                    </div>
+
+                    <div className="bg-emerald-900/40 p-6 rounded-2xl border border-emerald-500/30">
+                      <div className="text-emerald-400 font-bold uppercase text-sm mb-1">
+                        {getText("decimal", lang)}
+                      </div>
+                      <div className="text-5xl font-mono font-black text-white">
+                        {(percent / 100).toFixed(2)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-6 mb-6">
-                <div className="bg-slate-100 rounded-2xl p-4">
-                  <p className="font-bold text-slate-700 mb-2">
-                    {getText("gridTitle")}
-                  </p>
-                  <div className="grid grid-cols-10 gap-0.5">
-                    {[...Array(100)].map((_, i) => (
-                      <div
-                        key={i}
-                        className={`aspect-square rounded-sm ${
-                          i < percent ? "bg-cyan-500" : "bg-slate-200"
-                        }`}
-                      ></div>
-                    ))}
+              {/* Tip */}
+              <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-xl flex gap-3 text-amber-200 text-sm items-center justify-center">
+                <span className="text-2xl">💡</span>
+                <div className="text-center">
+                  <div className="font-bold uppercase tracking-wider mb-1">
+                    {getText("tipTitle", lang)}
+                  </div>
+                  <div className="font-mono text-lg">
+                    {getText("tipText", lang, { p: percent })}
                   </div>
                 </div>
-                <div className="space-y-4">
-                  <div className="bg-cyan-50 rounded-xl p-4 border-2 border-cyan-200">
-                    <p className="font-bold text-cyan-800">
-                      {getText("fraction")}
-                    </p>
-                    <p className="text-3xl font-mono font-black text-cyan-600">
-                      {percent}/100
-                    </p>
-                  </div>
-                  <div className="bg-green-50 rounded-xl p-4 border-2 border-green-200">
-                    <p className="font-bold text-green-800">
-                      {getText("decimal")}
-                    </p>
-                    <p className="text-3xl font-mono font-black text-green-600">
-                      {(percent / 100).toFixed(2)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
-                <p className="font-bold">💡 {getText("tipTitle")}</p>
-                <p className="text-sm">
-                  {getText("tipText")
-                    .replace(/{percent}/g, percent)
-                    .replace("{decimal}", (percent / 100).toFixed(2))}
-                </p>
               </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

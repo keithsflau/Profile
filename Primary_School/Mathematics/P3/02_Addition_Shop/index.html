@@ -3,18 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小三數學：加法大作戰</title>
+    <title>小三數學：加法大作戰 | Addition Battle</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script
-      src="https://unpkg.com/react@18/umd/react.development.js"
-      crossorigin
-    ></script>
-    <script
-      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
-      crossorigin
-    ></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
 
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
@@ -62,7 +57,8 @@
     <script type="text/babel">
       const { useState, useEffect, useRef } = React;
       const { motion, AnimatePresence } = window.Motion;
-      // Inline Icons
+      const { LanguageSelector, get } = window.MathI18n;
+
       const ShoppingCart = ({ size = 24, className = "" }) => (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -79,31 +75,6 @@
           <circle cx="8" cy="21" r="1" />
           <circle cx="19" cy="21" r="1" />
           <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
-        </svg>
-      );
-      const Calculator = ({ size = 24, className = "" }) => (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width={size}
-          height={size}
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className={className}
-        >
-          <rect width="16" height="20" x="4" y="2" rx="2" />
-          <line x1="8" x2="16" y1="6" y2="6" />
-          <line x1="16" x2="16" y1="14" y2="18" />
-          <path d="M16 10h.01" />
-          <path d="M12 10h.01" />
-          <path d="M8 10h.01" />
-          <path d="M12 14h.01" />
-          <path d="M8 14h.01" />
-          <path d="M12 18h.01" />
-          <path d="M8 18h.01" />
         </svg>
       );
       const Check = ({ size = 24, className = "" }) => (
@@ -139,43 +110,6 @@
           <path d="m6 6 12 12" />
         </svg>
       );
-      const RefreshCw = ({ size = 24, className = "" }) => (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width={size}
-          height={size}
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className={className}
-        >
-          <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
-          <path d="M21 3v5h-5" />
-          <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
-          <path d="M8 16H3v5" />
-        </svg>
-      );
-      const ShoppingBag = ({ size = 24, className = "" }) => (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width={size}
-          height={size}
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className={className}
-        >
-          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
-          <path d="M3 6h18" />
-          <path d="M16 10a4 4 0 0 1-8 0" />
-        </svg>
-      );
       const Plus = ({ size = 24, className = "" }) => (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -194,23 +128,137 @@
         </svg>
       );
 
+      const t = {
+        title: {
+          en: "Supermarket Shopping",
+          zh: "超級市場大搜購",
+          ja: "スーパーマーケットでの買い物",
+          ko: "슈퍼마켓 쇼핑",
+          es: "Compras en el supermercado",
+          de: "Supermarkt-Einkauf",
+          fi: "Supermarket-ostokset",
+          fr: "Achats au supermarché",
+          ar: "التسوق في السوبر ماركت",
+          it: "Spesa al supermercato",
+        },
+        product: {
+          en: "Product",
+          zh: "商品",
+          ja: "商品",
+          ko: "상품",
+          es: "Producto",
+          de: "Produkt",
+          fi: "Tuote",
+          fr: "Produit",
+          ar: "منتج",
+          it: "Prodotto",
+        },
+        checkAnswer: {
+          en: "Check Answer",
+          zh: "核對答案",
+          ja: "答え合わせ",
+          ko: "정답 확인",
+          es: "Comprobar respuesta",
+          de: "Antwort prüfen",
+          fi: "Tarkista vastaus",
+          fr: "Vérifier la réponse",
+          ar: "تحقق من الإجابة",
+          it: "Controlla la risposta",
+        },
+        correct: {
+          en: "Correct! Total is",
+          zh: "答對了！總數是",
+          ja: "正解！合計は",
+          ko: "정답! 합계는",
+          es: "¡Correcto! El total es",
+          de: "Richtig! Summe ist",
+          fi: "Oikein! Yhteensä",
+          fr: "Correct ! Le total est",
+          ar: "صحيح! المجموع هو",
+          it: "Corretto! Il totale è",
+        },
+        incorrect: {
+          en: "Hmm... try again!",
+          zh: "唔...再算算看！",
+          ja: "うーん...もう一度！",
+          ko: "음... 다시 해보세요!",
+          es: "Mmm... ¡inténtalo de nuevo!",
+          de: "Hmm... versuch es nochmal!",
+          fi: "Hmm... yritä uudelleen!",
+          fr: "Hmm... réessayez !",
+          ar: "همم... حاول مرة أخرى!",
+          it: "Hmm... riprova!",
+        },
+        next: {
+          en: "Next",
+          zh: "下一題",
+          ja: "次へ",
+          ko: "다음",
+          es: "Siguiente",
+          de: "Weiter",
+          fi: "Seuraava",
+          fr: "Suivant",
+          ar: "التالي",
+          it: "Avanti",
+        },
+        places: [
+          { zh: "萬", en: "10k" },
+          { zh: "千", en: "1k" },
+          { zh: "百", en: "100" },
+          { zh: "十", en: "10" },
+          { zh: "個", en: "1" },
+        ],
+      };
+
       const ITEMS = [
-        { name: "遊戲機", priceRange: [1500, 3500], icon: "🎮" },
-        { name: "單車", priceRange: [800, 2500], icon: "🚲" },
-        { name: "書包", priceRange: [200, 500], icon: "🎒" },
-        { name: "波鞋", priceRange: [300, 900], icon: "👟" },
-        { name: "手錶", priceRange: [1000, 4000], icon: "⌚" },
-        { name: "結他", priceRange: [1200, 3000], icon: "🎸" },
-        { name: "平板電腦", priceRange: [2000, 5000], icon: "📱" },
-        { name: "玩具機械人", priceRange: [400, 1000], icon: "🤖" },
+        {
+          name: { zh: "遊戲機", en: "Console" },
+          priceRange: [1500, 3500],
+          icon: "🎮",
+        },
+        {
+          name: { zh: "單車", en: "Bicycle" },
+          priceRange: [800, 2500],
+          icon: "🚲",
+        },
+        {
+          name: { zh: "書包", en: "School Bag" },
+          priceRange: [200, 500],
+          icon: "🎒",
+        },
+        {
+          name: { zh: "波鞋", en: "Sneakers" },
+          priceRange: [300, 900],
+          icon: "👟",
+        },
+        {
+          name: { zh: "手錶", en: "Watch" },
+          priceRange: [1000, 4000],
+          icon: "⌚",
+        },
+        {
+          name: { zh: "結他", en: "Guitar" },
+          priceRange: [1200, 3000],
+          icon: "🎸",
+        },
+        {
+          name: { zh: "平板電腦", en: "Tablet" },
+          priceRange: [2000, 5000],
+          icon: "📱",
+        },
+        {
+          name: { zh: "玩具機械人", en: "Robot" },
+          priceRange: [400, 1000],
+          icon: "🤖",
+        },
       ];
 
       function App() {
+        const [lang, setLang] = useState("zh");
         const [item1, setItem1] = useState(null);
         const [item2, setItem2] = useState(null);
-        const [step, setStep] = useState(0); // 0: Browse, 1: Calculate, 2: Result
-        const [userInputs, setUserInputs] = useState(Array(5).fill("")); // 5 digits max result
-        const [carries, setCarries] = useState(Array(4).fill("")); // Carry over inputs
+        const [userInputs, setUserInputs] = useState(Array(5).fill(""));
+        const [carries, setCarries] = useState(Array(4).fill(""));
         const [feedback, setFeedback] = useState(null);
 
         const generateQuestion = () => {
@@ -228,7 +276,6 @@
 
           setItem1({ ...i1, price: price1 });
           setItem2({ ...i2, price: price2 });
-          setStep(0);
           setUserInputs(Array(5).fill(""));
           setCarries(Array(4).fill(""));
           setFeedback(null);
@@ -241,14 +288,6 @@
         if (!item1 || !item2) return null;
 
         const correctSum = item1.price + item2.price;
-        const price1Str = item1.price.toString().padStart(4, "0"); // Pad for alignment logic, though visualization handles logic better
-        const price2Str = item2.price.toString().padStart(4, "0");
-
-        // Decompose for grid
-        // Grid columns: 10000, 1000, 100, 10, 1 (Indices 0,1,2,3,4)
-        // But inputs usually go right to left.
-        // Let's use array index 4 as units, 3 as tens, etc.
-
         const getDigit = (num, posFromRight) => {
           const str = num.toString();
           if (posFromRight >= str.length) return null;
@@ -256,8 +295,6 @@
         };
 
         const checkAnswer = () => {
-          // Construct user number
-          // Inputs are [TenK, Thou, Hun, Ten, Unit]
           let userString = userInputs.join("");
           if (parseInt(userString) === correctSum) {
             setFeedback("correct");
@@ -280,22 +317,21 @@
           setCarries(newC);
         };
 
+        const getItemName = (item) => item.name[lang] || item.name["en"];
+
         return (
           <div className="min-h-screen p-4 flex flex-col items-center justify-center">
-            <header className="mb-8 text-center">
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <header className="mb-8 text-center mt-8">
               <div className="inline-flex items-center gap-2 bg-white px-6 py-2 rounded-full shadow-sm mb-4">
                 <ShoppingCart className="text-orange-500" size={20} />
                 <span className="font-bold text-slate-600">
-                  小三數學：加法直式
+                  {t.title[lang] || t.title["en"]}
                 </span>
               </div>
-              <h1 className="text-4xl font-black text-slate-800 tracking-tight">
-                超級市場大搜購
-              </h1>
             </header>
 
             <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Shopping Cart Side */}
               <div className="flex flex-col gap-4">
                 <div className="glossy-panel rounded-3xl p-6 flex items-center justify-between group cursor-default">
                   <div className="flex items-center gap-4">
@@ -303,9 +339,11 @@
                       {item1.icon}
                     </div>
                     <div>
-                      <div className="text-slate-500 font-bold">商品 1</div>
+                      <div className="text-slate-500 font-bold">
+                        {t.product[lang] || t.product["en"]} 1
+                      </div>
                       <div className="text-2xl font-black text-slate-800">
-                        {item1.name}
+                        {getItemName(item1)}
                       </div>
                     </div>
                   </div>
@@ -324,9 +362,11 @@
                       {item2.icon}
                     </div>
                     <div>
-                      <div className="text-slate-500 font-bold">商品 2</div>
+                      <div className="text-slate-500 font-bold">
+                        {t.product[lang] || t.product["en"]} 2
+                      </div>
                       <div className="text-2xl font-black text-slate-800">
-                        {item2.name}
+                        {getItemName(item2)}
                       </div>
                     </div>
                   </div>
@@ -336,21 +376,16 @@
                 </div>
               </div>
 
-              {/* Calculation Side */}
               <div className="glossy-panel rounded-3xl p-8 flex flex-col items-center">
                 <div className="w-full max-w-xs">
                   <div className="grid grid-cols-5 gap-2 text-center mb-2 text-slate-400 font-bold text-sm">
-                    <div>萬</div>
-                    <div>千</div>
-                    <div>百</div>
-                    <div>十</div>
-                    <div>個</div>
+                    {t.places.map((p, i) => (
+                      <div key={i}>{p[lang === "zh" ? "zh" : "en"]}</div>
+                    ))}
                   </div>
 
-                  {/* Carry Row */}
                   <div className="grid grid-cols-5 gap-2 mb-2 h-8">
-                    <div></div>{" "}
-                    {/* 10k carry usually not needed unless 6 digits, but here maybe */}
+                    <div></div>
                     {[0, 1, 2, 3].map((i) => (
                       <input
                         key={i}
@@ -364,46 +399,35 @@
                     ))}
                   </div>
 
-                  {/* First Number */}
                   <div className="grid grid-cols-5 gap-2 mb-2 text-2xl font-black text-slate-700 font-mono">
                     <div className="col-span-1"></div>
-                    <div className="flex items-center justify-center h-12 bg-white/30 rounded-lg">
-                      {getDigit(item1.price, 3)}
-                    </div>
-                    <div className="flex items-center justify-center h-12 bg-white/30 rounded-lg">
-                      {getDigit(item1.price, 2)}
-                    </div>
-                    <div className="flex items-center justify-center h-12 bg-white/30 rounded-lg">
-                      {getDigit(item1.price, 1)}
-                    </div>
-                    <div className="flex items-center justify-center h-12 bg-white/30 rounded-lg">
-                      {getDigit(item1.price, 0)}
-                    </div>
+                    {[3, 2, 1, 0].map((i) => (
+                      <div
+                        key={i}
+                        className="flex items-center justify-center h-12 bg-white/30 rounded-lg"
+                      >
+                        {getDigit(item1.price, i)}
+                      </div>
+                    ))}
                   </div>
 
-                  {/* Second Number with Plus Sign */}
                   <div className="grid grid-cols-5 gap-2 mb-4 text-2xl font-black text-slate-700 font-mono relative">
                     <div className="absolute -left-6 top-2 text-slate-400">
                       +
                     </div>
                     <div className="col-span-1"></div>
-                    <div className="flex items-center justify-center h-12 bg-white/30 rounded-lg">
-                      {getDigit(item2.price, 3)}
-                    </div>
-                    <div className="flex items-center justify-center h-12 bg-white/30 rounded-lg">
-                      {getDigit(item2.price, 2)}
-                    </div>
-                    <div className="flex items-center justify-center h-12 bg-white/30 rounded-lg">
-                      {getDigit(item2.price, 1)}
-                    </div>
-                    <div className="flex items-center justify-center h-12 bg-white/30 rounded-lg">
-                      {getDigit(item2.price, 0)}
-                    </div>
+                    {[3, 2, 1, 0].map((i) => (
+                      <div
+                        key={i}
+                        className="flex items-center justify-center h-12 bg-white/30 rounded-lg"
+                      >
+                        {getDigit(item2.price, i)}
+                      </div>
+                    ))}
                   </div>
 
                   <div className="border-b-4 border-slate-300 mb-4"></div>
 
-                  {/* Answer Inputs */}
                   <div className="grid grid-cols-5 gap-2 mb-8">
                     {[0, 1, 2, 3, 4].map((idx) => (
                       <input
@@ -419,12 +443,12 @@
                     ))}
                   </div>
 
-                  {/* Check Button */}
                   <button
                     onClick={checkAnswer}
                     className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-2xl font-bold text-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
                   >
-                    <Check strokeWidth={3} /> 核對答案
+                    <Check strokeWidth={3} />{" "}
+                    {t.checkAnswer[lang] || t.checkAnswer["en"]}
                   </button>
 
                   {feedback === "correct" && (
@@ -434,13 +458,14 @@
                       className="mt-4 w-full bg-green-100 text-green-700 p-4 rounded-xl font-bold flex flex-col items-center gap-2"
                     >
                       <div className="flex items-center gap-2">
-                        <Check /> 答對了！總數是 ${correctSum}
+                        <Check /> {t.correct[lang] || t.correct["en"]} $
+                        {correctSum}
                       </div>
                       <button
                         onClick={generateQuestion}
                         className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700"
                       >
-                        下一題
+                        {t.next[lang] || t.next["en"]}
                       </button>
                     </motion.div>
                   )}
@@ -451,7 +476,7 @@
                       animate={{ opacity: 1, y: 0 }}
                       className="mt-4 w-full bg-red-100 text-red-700 p-4 rounded-xl font-bold flex items-center justify-center gap-2"
                     >
-                      <X /> 唔...再算算看！
+                      <X /> {t.incorrect[lang] || t.incorrect["en"]}
                     </motion.div>
                   )}
                 </div>
@@ -464,20 +489,5 @@
       const root = ReactDOM.createRoot(document.getElementById("root"));
       root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

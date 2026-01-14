@@ -8,6 +8,7 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
       rel="stylesheet"
@@ -23,10 +24,90 @@
     <div id="root"></div>
     <script type="text/babel">
       const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Fraction ÷ Whole Number",
+          zh: "分數除以整數",
+          ja: "分数 ÷ 整数",
+          ko: "분수 ÷ 정수",
+          es: "Fracción ÷ Número entero",
+          de: "Bruch ÷ Ganze Zahl",
+          fi: "Murtoluku ÷ Kokonaisluku",
+          fr: "Fraction ÷ Nombre entier",
+          ar: "كسر ÷ عدد صحيح",
+          it: "Frazione ÷ Numero intero",
+        },
+        formula_title: {
+          en: "Formula:",
+          zh: "公式:",
+          ja: "公式:",
+          ko: "공식:",
+          es: "Fórmula:",
+          de: "Formel:",
+          fi: "Kaava:",
+          fr: "Formule :",
+          ar: "صيغة:",
+          it: "Formula:",
+        },
+        formula_desc: {
+          en: "Fraction ÷ Integer = Fraction × (1/Integer)",
+          zh: "分數 ÷ 整數 = 分數 × (1/整數)",
+          ja: "分数 ÷ 整数 = 分数 × (1/整数)",
+          ko: "분수 ÷ 정수 = 분수 × (1/정수)",
+          es: "Fracción ÷ Entero = Fracción × (1/Entero)",
+          de: "Bruch ÷ Ganze Zahl = Bruch × (1/Ganze Zahl)",
+          fi: "Murtoluku ÷ Kokonaisluku = Murtoluku × (1/Kokonaisluku)",
+          fr: "Fraction ÷ Entier = Fraction × (1/Entier)",
+          ar: "كسر ÷ عدد صحيح = كسر × (1/عدد صحيح)",
+          it: "Frazione ÷ Intero = Frazione × (1/Intero)",
+        },
+        simplify: {
+          en: "Simplify:",
+          zh: "約簡:",
+          ja: "約分:",
+          ko: "약분:",
+          es: "Simplificar:",
+          de: "Vereinfachen:",
+          fi: "Sievennä:",
+          fr: "Simplifier :",
+          ar: "تبسيط:",
+          it: "Semplifica:",
+        },
+        answer: {
+          en: "Answer",
+          zh: "答案",
+          ja: "答え",
+          ko: "정답",
+          es: "Respuesta",
+          de: "Antwort",
+          fi: "Vastaus",
+          fr: "Réponse",
+          ar: "إجابة",
+          it: "Risposta",
+        },
+        tip: {
+          en: "Remember: Dividing a fraction by an integer = Multiplying the denominator by that integer!",
+          zh: "記住: 分數除以整數 = 分母乘以該整數！",
+          ja: "覚えておこう：分数を整数で割る = 分母にその整数を掛ける！",
+          ko: "기억하세요: 분수를 정수로 나누는 것 = 분모에 그 정수를 곱하는 것!",
+          es: "Recuerda: ¡Dividir una fracción por un entero = Multiplicar el denominador por ese entero!",
+          de: "Denke daran: Einen Bruch durch eine ganze Zahl teilen = Den Nenner mit dieser Zahl multiplizieren!",
+          fi: "Muista: Murtoluvun jakaminen kokonaisluvulla = Nimittäjän kertominen kyseisellä luvulla!",
+          fr: "Rappel : Diviser une fraction par un entier = Multiplier le dénominateur par cet entier !",
+          ar: "تذكر: قسمة كسر على عدد صحيح = ضرب المقام في هذا العدد الصحيح!",
+          it: "Ricorda: Dividere una frazione per un intero = Moltiplicare il denominatore per quell'intero!",
+        },
+      };
+
       function App() {
+        const [lang, setLang] = useState("zh");
         const [num, setNum] = useState(3);
         const [denom, setDenom] = useState(4);
         const [divisor, setDivisor] = useState(2);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
 
         const gcd = (a, b) => (b === 0 ? a : gcd(b, a % b));
         const resultNum = num;
@@ -37,13 +118,12 @@
 
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-orange-900 mb-2">
-              ➗ 分數除以整數
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-5xl font-black text-orange-900 mb-2 mt-8">
+              ➗ {getText("title")}
             </h1>
-            <p className="text-xl text-orange-700 font-bold mb-8">
-              Fraction ÷ Whole Number
-            </p>
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-2xl w-full">
+
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-2xl w-full mt-8">
               <div className="flex items-center justify-center gap-6 mb-8 flex-wrap">
                 <div className="bg-orange-50 p-4 rounded-xl border-2 border-orange-200">
                   <div className="flex flex-col items-center">
@@ -82,7 +162,7 @@
 
               <div className="bg-slate-50 rounded-2xl p-6 text-center mb-6">
                 <p className="text-xl mb-2">
-                  <b>公式:</b> 分數 ÷ 整數 = 分數 × (1/整數)
+                  <b>{getText("formula_title")}</b> {getText("formula_desc")}
                 </p>
                 <p className="text-lg font-mono">
                   {num}/{denom} ÷ {divisor} = {num}/{denom} × 1/{divisor}
@@ -95,22 +175,22 @@
                 </p>
                 {g > 1 && (
                   <p className="text-sm text-slate-500">
-                    約簡: = {simNum}/{simDenom}
+                    {getText("simplify")} = {simNum}/{simDenom}
                   </p>
                 )}
               </div>
 
               <div className="bg-emerald-100 rounded-2xl p-6 text-center border-4 border-emerald-300">
-                <div className="text-emerald-600 font-bold">答案 Answer</div>
+                <div className="text-emerald-600 font-bold">
+                  {getText("answer")}
+                </div>
                 <div className="text-5xl font-black text-emerald-800">
                   {simNum}/{simDenom}
                 </div>
               </div>
 
               <div className="mt-6 bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
-                <p className="font-bold">
-                  💡 記住: 分數除以整數 = 分母乘以該整數！
-                </p>
+                <p className="font-bold">💡 {getText("tip")}</p>
               </div>
             </div>
           </div>
@@ -118,20 +198,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

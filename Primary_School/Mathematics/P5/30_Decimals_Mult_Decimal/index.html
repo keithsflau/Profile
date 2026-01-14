@@ -8,23 +8,35 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #fce7f3 0%, #ec4899 100%);
+        background: #0f172a; /* Slate 900 */
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(190, 24, 93, 0.15); /* Pink 700? */
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(244, 114, 182, 0.1); /* Pink 400 */
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
-      const { LanguageSelector, get } = window.MathI18n;
+      const { useState, useEffect } = React;
+      const { motion } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
 
       const t = {
         title: {
@@ -64,16 +76,16 @@
           it: "{d2} ha {places2} cifre decimali",
         },
         answerDecimalPlaces: {
-          en: "Answer should have {places1} + {places2} = {totalPlaces} decimal place(s)",
-          zh: "答案應有 {places1} + {places2} = {totalPlaces} 位小數",
-          ja: "答えは {places1} + {places2} = {totalPlaces} 桁の小数になります",
-          ko: "정답은 {places1} + {places2} = {totalPlaces} 자리 소수가 되어야 합니다",
-          es: "La respuesta debe tener {places1} + {places2} = {totalPlaces} lugares decimales",
-          de: "Die Antwort sollte {places1} + {places2} = {totalPlaces} Dezimalstellen haben",
-          fi: "Vastauksessa tulee olla {places1} + {places2} = {totalPlaces} desimaalipaikka(a)",
-          fr: "La réponse devrait avoir {places1} + {places2} = {totalPlaces} décimales",
-          ar: "يجب أن تحتوي الإجابة على {places1} + {places2} = {totalPlaces} منازل عشرية",
-          it: "La risposta dovrebbe avere {places1} + {places2} = {totalPlaces} cifre decimali",
+          en: "Answer decimals: {places1} + {places2} = {totalPlaces}",
+          zh: "答案小數位數: {places1} + {places2} = {totalPlaces}",
+          ja: "答えの小数桁数: {places1} + {places2} = {totalPlaces}",
+          ko: "정답 소수 자릿수: {places1} + {places2} = {totalPlaces}",
+          es: "Decimales de respuesta: {places1} + {places2} = {totalPlaces}",
+          de: "Antwort Dezimalstellen: {places1} + {places2} = {totalPlaces}",
+          fi: "Vastauksen desimaalit: {places1} + {places2} = {totalPlaces}",
+          fr: "Décimales de réponse: {places1} + {places2} = {totalPlaces}",
+          ar: "منازل الإجابة: {places1} + {places2} = {totalPlaces}",
+          it: "Decimali risposta: {places1} + {places2} = {totalPlaces}",
         },
         answer: {
           en: "Answer",
@@ -100,23 +112,29 @@
           it: "Regola:",
         },
         ruleText: {
-          en: "When multiplying two decimals, the number of decimal places in the answer = sum of decimal places in both multipliers!",
-          zh: "兩個小數相乘，答案的小數位數 = 兩個乘數的小數位數之和！",
-          ja: "2つの小数を掛けるとき、答えの小数点以下の桁数 = 両方の乗数の小数点以下の桁数の合計です！",
-          ko: "두 소수를 곱할 때 정답의 소수 자릿수 = 두 승수의 소수 자릿수의 합입니다!",
-          es: "¡Al multiplicar dos decimales, el número de lugares decimales en la respuesta = suma de lugares decimales en ambos multiplicadores!",
-          de: "Beim Multiplizieren zweier Dezimalzahlen ist die Anzahl der Dezimalstellen im Ergebnis = Summe der Dezimalstellen beider Faktoren!",
-          fi: "Kun kerrotaan kaksi desimaalia, vastauksen desimaalipaikkojen määrä = molempien kertojien desimaalipaikkojen summa!",
-          fr: "Lors de la multiplication de deux décimales, le nombre de décimales dans la réponse = somme des décimales des deux multiplicateurs !",
-          ar: "عند ضرب عددين عشريين، عدد المنازل العشرية في الإجابة = مجموع المنازل العشرية في كلا المضروبين!",
-          it: "Quando si moltiplicano due decimali, il numero di cifre decimali nella risposta = somma delle cifre decimali in entrambi i moltiplicatori!",
+          en: "Sum of decimal places in multipliers = decimal places in answer.",
+          zh: "乘數小數位數之和 = 答案的小數位數。",
+          ja: "乗数の小数点以下の桁数の合計 = 答えの小数点以下の桁数。",
+          ko: "승수의 소수 자릿수의 합 = 정답의 소수 자릿수.",
+          es: "Suma de decimales en multiplicadores = decimales en respuesta.",
+          de: "Summe der Dezimalstellen der Faktoren = Dezimalstellen im Ergebnis.",
+          fi: "Kertojien desimaalien summa = vastauksen desimaalit.",
+          fr: "Somme des décimales des multiplicateurs = décimales de la réponse.",
+          ar: "مجموع المنازل العشرية في المضروبات = المنازل العشرية في الإجابة.",
+          it: "Somma decimali moltiplicatori = decimali risposta.",
         },
+      };
+
+      const getText = (key, lang, params = {}) => {
+        let text = t[key]?.[lang] || t[key]?.["en"] || key;
+        for (const param in params) {
+          text = text.replace(`{${param}}`, params[param]);
+        }
+        return text;
       };
 
       function App() {
         const [lang, setLang] = useState("zh");
-        const getText = (key) => t[key][lang] || t[key]["en"];
-
         const [d1, setD1] = useState(2.4);
         const [d2, setD2] = useState(1.5);
 
@@ -130,99 +148,121 @@
         const result = d1 * d2;
 
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <LanguageSelector lang={lang} setLang={setLang} />
-            <h1 className="text-5xl font-black text-pink-100 mb-2 mt-8">
-              ✖️ {getText("title")}
-            </h1>
-
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-2xl w-full mt-8">
-              <div className="flex items-center justify-center gap-4 mb-8 flex-wrap">
-                <input
-                  type="number"
-                  step="0.1"
-                  value={d1}
-                  onChange={(e) => setD1(parseFloat(e.target.value) || 0)}
-                  className="w-24 text-3xl font-mono font-black text-center border-4 border-pink-300 rounded-xl p-2"
-                />
-                <span className="text-3xl font-black text-pink-400">×</span>
-                <input
-                  type="number"
-                  step="0.1"
-                  value={d2}
-                  onChange={(e) => setD2(parseFloat(e.target.value) || 0)}
-                  className="w-24 text-3xl font-mono font-black text-center border-4 border-pink-300 rounded-xl p-2"
-                />
+          <div className="min-h-screen flex flex-col items-center p-4">
+            <div className="w-full max-w-4xl flex justify-between items-center mb-10">
+              <h1 className="text-4xl font-black text-pink-400 drop-shadow-[0_0_15px_rgba(236,72,153,0.5)]">
+                ✖️ {getText("title", lang)}
+              </h1>
+              <div className="bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-pink-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
               </div>
+            </div>
 
-              <div className="bg-slate-50 rounded-2xl p-6 space-y-2 mb-6 text-center">
-                <p
-                  dangerouslySetInnerHTML={{
-                    __html: getText("hasDecimals1")
-                      .replace("{d1}", `<b>${d1}</b>`)
-                      .replace(
-                        "{places1}",
-                        `<span class="text-pink-600 font-bold">${places1}</span>`
-                      ),
-                  }}
-                ></p>
-                <p
-                  dangerouslySetInnerHTML={{
-                    __html: getText("hasDecimals2")
-                      .replace("{d2}", `<b>${d2}</b>`)
-                      .replace(
-                        "{places2}",
-                        `<span class="text-pink-600 font-bold">${places2}</span>`
-                      ),
-                  }}
-                ></p>
-                <p
-                  className="pt-2 border-t"
-                  dangerouslySetInnerHTML={{
-                    __html: getText("answerDecimalPlaces")
-                      .replace("{places1}", places1)
-                      .replace("{places2}", places2)
-                      .replace(
-                        "{totalPlaces}",
-                        `<span class="text-2xl font-black text-pink-600">${totalPlaces}</span>`
-                      ),
-                  }}
-                ></p>
-              </div>
-
-              <div className="bg-emerald-100 rounded-2xl p-6 text-center border-4 border-emerald-300">
-                <div className="text-emerald-600 font-bold">
-                  {getText("answer")}
+            <div className="w-full max-w-3xl flex flex-col gap-6">
+              {/* Input Section */}
+              <div className="glass-panel p-8 rounded-3xl flex flex-col md:flex-row items-center justify-center gap-8 border-pink-500/30">
+                <div className="flex flex-col items-center gap-2">
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={d1}
+                    onChange={(e) => setD1(parseFloat(e.target.value) || 0)}
+                    className="bg-slate-900/50 border-b-2 border-pink-400 text-3xl font-mono font-black text-center w-32 p-2 outline-none focus:border-pink-300 text-pink-200"
+                  />
+                  <div className="bg-pink-500/20 text-pink-300 text-xs px-2 py-1 rounded-md font-bold">
+                    {places1} d.p.
+                  </div>
                 </div>
-                <div className="text-5xl font-black text-emerald-800">
+
+                <div className="text-4xl font-black text-slate-500">×</div>
+
+                <div className="flex flex-col items-center gap-2">
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={d2}
+                    onChange={(e) => setD2(parseFloat(e.target.value) || 0)}
+                    className="bg-slate-900/50 border-b-2 border-purple-400 text-3xl font-mono font-black text-center w-32 p-2 outline-none focus:border-purple-300 text-purple-200"
+                  />
+                  <div className="bg-purple-500/20 text-purple-300 text-xs px-2 py-1 rounded-md font-bold">
+                    {places2} d.p.
+                  </div>
+                </div>
+              </div>
+
+              {/* Explanation */}
+              <div className="glass-panel p-6 rounded-2xl flex flex-col gap-3 text-center">
+                <p className="text-pink-100 font-mono text-lg">
+                  {getText("hasDecimals1", lang, { d1, places1 })}
+                </p>
+                <p className="text-purple-100 font-mono text-lg">
+                  {getText("hasDecimals2", lang, { d2, places2 })}
+                </p>
+                <div className="h-px bg-white/10 w-full my-1"></div>
+                <p className="text-xl font-bold bg-gradient-to-r from-pink-300 to-purple-300 bg-clip-text text-transparent">
+                  {getText("answerDecimalPlaces", lang, {
+                    places1,
+                    places2,
+                    totalPlaces,
+                  })}
+                </p>
+              </div>
+
+              {/* Result */}
+              <motion.div
+                key={result}
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="bg-gradient-to-r from-pink-900/40 to-purple-900/40 border border-pink-500/30 p-8 rounded-3xl text-center flex flex-col items-center"
+              >
+                <div className="text-pink-300 font-bold uppercase tracking-widest text-sm mb-2">
+                  {getText("answer", lang)}
+                </div>
+                <div className="text-6xl font-black text-white font-mono drop-shadow-[0_0_15px_rgba(236,72,153,0.6)]">
                   {result.toFixed(totalPlaces)}
                 </div>
-              </div>
+              </motion.div>
 
-              <div className="mt-6 bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
-                <p className="font-bold">💡 {getText("ruleTitle")}</p>
-                <p className="text-sm">{getText("ruleText")}</p>
+              {/* Tip */}
+              <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-xl flex gap-3 text-amber-200 text-sm items-center justify-center">
+                <span className="text-2xl">💡</span>
+                <div>
+                  <span className="font-bold mr-2 uppercase">
+                    {getText("ruleTitle", lang)}
+                  </span>
+                  {getText("ruleText", lang)}
+                </div>
               </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

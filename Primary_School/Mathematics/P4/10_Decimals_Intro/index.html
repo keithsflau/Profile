@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小四數學：認識小數</title>
+    <title>小四數學：認識小數 | Intro to Decimals</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -23,16 +24,126 @@
     <div id="root"></div>
     <script type="text/babel">
       const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Intro to Decimals",
+          zh: "認識小數",
+          ja: "小数の紹介",
+          ko: "소수 소개",
+          es: "Introducción a los Decimales",
+          de: "Einführung in Dezimalzahlen",
+          fi: "Desimaalilukujen alkeet",
+          fr: "Introduction aux décimaux",
+          ar: "مقدمة في الكسور العشرية",
+          it: "Introduzione ai decimali",
+        },
+        fractionForm: {
+          en: "Fraction Form",
+          zh: "分數形式",
+          ja: "分数形式",
+          ko: "분수 형태",
+          es: "Forma de Fracción",
+          de: "Bruchform",
+          fi: "Murtolukumuoto",
+          fr: "Forme fractionnaire",
+          ar: "شكل الكسر",
+          it: "Forma frazionaria",
+        },
+        readAs: {
+          en: "Read As",
+          zh: "讀法",
+          ja: "読み方",
+          ko: "읽는 법",
+          es: "Se lee como",
+          de: "Gelesen als",
+          fi: "Luetaan",
+          fr: "Se lit comme",
+          ar: "يقرأ كـ",
+          it: "Letto come",
+        },
+        zeroPoint: {
+          en: "Zero point ",
+          zh: "零點",
+          ja: "ゼロ点",
+          ko: "영 점 ",
+          es: "Cero coma ",
+          de: "Null Komma ",
+          fi: "Nolla pilkku ",
+          fr: "Zéro virgule ",
+          ar: "صفر فاصلة ",
+          it: "Zero virgola ",
+        },
+        gridExplain: {
+          en: "100 squares = 1, each square = 0.01",
+          zh: "100格代表 1，每格代表 0.01",
+          ja: "100マス = 1、各マス = 0.01",
+          ko: "100칸 = 1, 각 칸 = 0.01",
+          es: "100 cuadros = 1, cada cuadro = 0.01",
+          de: "100 Quadrate = 1, jedes Quadrat = 0.01",
+          fi: "100 ruutua = 1, jokainen ruutu = 0.01",
+          fr: "100 carrés = 1, chaque carré = 0.01",
+          ar: "100 مربع = 1، كل مربع = 0.01",
+          it: "100 quadrati = 1, ogni quadrato = 0.01",
+        },
+      };
+
+      const digitMap = {
+        zh: ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九"],
+        en: [
+          "zero",
+          "one",
+          "two",
+          "three",
+          "four",
+          "five",
+          "six",
+          "seven",
+          "eight",
+          "nine",
+        ],
+      };
+
+      function getReadAs(val, lang) {
+        if (lang === "zh") {
+          return (
+            "零點" +
+            val
+              .toFixed(2)
+              .split(".")[1]
+              .split("")
+              .map((d) => digitMap.zh[parseInt(d)])
+              .join(" ")
+          );
+        } else {
+          // Simple English reading
+          return (
+            "Zero point " +
+            val
+              .toFixed(2)
+              .split(".")[1]
+              .split("")
+              .map((d) => digitMap.en[parseInt(d)])
+              .join(" ")
+          );
+        }
+      }
+
       function App() {
+        const [lang, setLang] = useState("zh");
         const [val, setVal] = useState(0.45);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
 
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-fuchsia-900 mb-8">
-              🎯 認識小數
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-fuchsia-900 mb-8 mt-8">
+              🎯 {getText("title")}
             </h1>
 
-            <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full flex gap-12">
+            <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full flex flex-col md:flex-row gap-12">
               <div className="flex-1 flex flex-col items-center">
                 <div className="text-8xl font-black text-fuchsia-600 mb-8">
                   {val.toFixed(2)}
@@ -49,7 +160,7 @@
                 <div className="grid grid-cols-2 gap-4 w-full">
                   <div className="bg-fuchsia-50 p-4 rounded-xl text-center">
                     <div className="text-sm font-bold text-fuchsia-800">
-                      分數形式
+                      {getText("fractionForm")}
                     </div>
                     <div className="text-3xl font-black text-fuchsia-700">
                       {Math.round(val * 100)}/100
@@ -57,18 +168,18 @@
                   </div>
                   <div className="bg-purple-50 p-4 rounded-xl text-center">
                     <div className="text-sm font-bold text-purple-800">
-                      讀法
+                      {getText("readAs")}
                     </div>
-                    <div className="text-xl font-bold text-purple-700">
-                      零點{val.toFixed(2).split(".")[1].split("").join(" ")}
+                    <div className="text-xl font-bold text-purple-700 capitalize">
+                      {getReadAs(val, lang)}
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Hundred Grid Visualization */}
-              <div className="flex-none">
-                <div className="w-[400px] h-[400px] bg-white border-2 border-slate-300 grid grid-cols-10 grid-rows-10">
+              <div className="flex-none flex flex-col items-center">
+                <div className="w-[300px] h-[300px] md:w-[400px] md:h-[400px] bg-white border-2 border-slate-300 grid grid-cols-10 grid-rows-10">
                   {[...Array(100)].map((_, i) => (
                     <div
                       key={i}
@@ -79,7 +190,7 @@
                   ))}
                 </div>
                 <div className="text-center mt-2 text-slate-500 font-bold">
-                  100格代表 1，每格代表 0.01
+                  {getText("gridExplain")}
                 </div>
               </div>
             </div>
@@ -88,20 +199,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

@@ -3,65 +3,65 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小五數學：簡易方程 (乘除) | Simple Equations (×÷)</title>
+    <title>小五數學：簡易方程 (乘除) | Simple Equations</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #fef3c7 0%, #f59e0b 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
-      const { LanguageSelector, get } = window.MathI18n;
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
 
       const t = {
         title: {
-          en: "Simple Equations (Multiply/Divide)",
-          zh: "簡易方程 (乘除)",
-          ja: "簡単な方程式 (掛け算/割り算)",
-          ko: "간단한 방정식 (곱셈/나눗셈)",
-          es: "Ecuaciones Simples (Multiplicación/División)",
-          de: "Einfache Gleichungen (Multiplikation/Division)",
-          fi: "Yksinkertaiset yhtälöt (kerto-/jakolasku)",
-          fr: "Équations simples (Multiplication/Division)",
-          ar: "معادلات بسيطة (ضرب/قسمة)",
-          it: "Equazioni semplici (Moltiplicazione/Divisione)",
+          en: "One-Step Equations (×/÷)",
+          zh: "一步方程 (乘/除)",
+          ja: "一次方程式 (×/÷)",
+          ko: "일차 방정식 (×/÷)",
+          es: "Ecuaciones de un paso (×/÷)",
+          de: "Einschritt-Gleichungen (×/÷)",
+          fi: "Yhden askeleen yhtälöt (×/÷)",
+          fr: "Équations à une étape (×/÷)",
+          ar: "معادلات من خطوة واحدة (×/÷)",
+          it: "Equazioni a un passo (×/÷)",
         },
-        findX: {
-          en: "Find x:",
-          zh: "求 x 的值:",
-          ja: "x の値を求めよ:",
-          ko: "x의 값 구하기:",
-          es: "Encuentra x:",
-          de: "Finde x:",
-          fi: "Ratkaise x:",
-          fr: "Trouvez x :",
-          ar: "جد قيمة x:",
-          it: "Trova x:",
-        },
-        steps: {
-          en: "Solution Steps:",
-          zh: "解題步驟:",
-          ja: "解法の手順:",
-          ko: "풀이 단계:",
-          es: "Pasos de Solución:",
-          de: "Lösungsschritte:",
-          fi: "Ratkaisun vaiheet:",
-          fr: "Étapes de la solution :",
-          ar: "خطوات الحل:",
-          it: "Passaggi della soluzione:",
+        find: {
+          en: "Find value of x",
+          zh: "求 x 的值",
+          ja: "x の値を求める",
+          ko: "x의 값 구하기",
+          es: "Encontrar valor de x",
+          de: "Finde den Wert von x",
+          fi: "Etsi x:n arvo",
+          fr: "Trouver la valeur de x",
+          ar: "أوجد قيمة x",
+          it: "Trova il valore di x",
         },
         check: {
           en: "Check",
@@ -79,7 +79,7 @@
           en: "Correct!",
           zh: "答對了！",
           ja: "正解！",
-          ko: "정답입니다!",
+          ko: "정답!",
           es: "¡Correcto!",
           de: "Richtig!",
           fi: "Oikein!",
@@ -88,162 +88,276 @@
           it: "Corretto!",
         },
         wrong: {
-          en: "Try again! The answer is",
-          zh: "再試一次！答案是",
-          ja: "もう一度！答えは",
-          ko: "다시 시도하세요! 정답은",
-          es: "¡Inténtalo de nuevo! La respuesta es",
-          de: "Versuch es noch einmal! Die Antwort ist",
-          fi: "Yritä uudelleen! Vastaus on",
-          fr: "Réessayez ! La réponse est",
-          ar: "حاول مرة أخرى! الإجابة هي",
-          it: "Riprova! La risposta è",
+          en: "Try Again",
+          zh: "再試一次",
+          ja: "もう一度",
+          ko: "다시 시도",
+          es: "Inténtalo de nuevo",
+          de: "Versuch es nochmal",
+          fi: "Yritä uudelleen",
+          fr: "Réessayer",
+          ar: "حاول مرة أخرى",
+          it: "Riprova",
         },
-        newProblem: {
-          en: "New Problem",
-          zh: "新題目",
-          ja: "新しい問題",
-          ko: "새로운 문제",
-          es: "Nuevo Problema",
-          de: "Neues Problem",
-          fi: "Uusi tehtävä",
-          fr: "Nouveau problème",
-          ar: "مسألة جديدة",
-          it: "Nuovo problema",
+        next: {
+          en: "Next Problem",
+          zh: "下一題",
+          ja: "次の問題",
+          ko: "다음 문제",
+          es: "Siguiente Problema",
+          de: "Nächstes Problem",
+          fi: "Seuraava tehtävä",
+          fr: "Problème suivant",
+          ar: "المسألة التالية",
+          it: "Prossimo problema",
+        },
+        hint: {
+          en: "Reverse the operation!",
+          zh: "使用相反運算！",
+          ja: "逆の操作をしよう！",
+          ko: "반대 연산을 사용하세요!",
+          es: "¡Invierte la operación!",
+          de: "Kehre die Operation um!",
+          fi: "Käännä operaatio!",
+          fr: "Inversez l'opération !",
+          ar: "اعكس العملية!",
+          it: "Inverti l'operazione!",
         },
       };
 
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
       function App() {
         const [lang, setLang] = useState("zh");
-        const getText = (key) => t[key][lang] || t[key]["en"];
-
-        const [problem, setProblem] = useState({ a: 3, b: 15, type: "mult" });
-        const [userAnswer, setUserAnswer] = useState("");
-        const [feedback, setFeedback] = useState(null);
-
-        const correctAnswer =
-          problem.type === "mult"
-            ? problem.b / problem.a
-            : problem.b * problem.a;
+        const [problem, setProblem] = useState({ type: "mult", a: 3, b: 12 });
+        const [input, setInput] = useState("");
+        const [status, setStatus] = useState(null);
 
         const generate = () => {
           const type = Math.random() > 0.5 ? "mult" : "div";
-          const a = Math.floor(Math.random() * 8) + 2;
-          const ans = Math.floor(Math.random() * 10) + 2;
-          const b = type === "mult" ? a * ans : ans;
-          setProblem({ a, b, type });
-          setUserAnswer("");
-          setFeedback(null);
+          const a = Math.floor(Math.random() * 9) + 2;
+          const x = Math.floor(Math.random() * 12) + 2;
+
+          // If mult: a * x = b  => b = a*x
+          // If div: x / a = b   => b = b (wait, b is result). x = a*b?
+          // x / a = result. Let's make "b" represents RHS.
+          // x / a = b => x = a * b.
+
+          let finalProb = {};
+          if (type === "mult") {
+            finalProb = { type, a, b: a * x, x }; // ax = b
+          } else {
+            finalProb = { type, a, b: x, x: a * x }; // x/a = b actually. No.
+            // We want x / a = Result.
+            // Let result be 'b'.
+            // We want nice integer result.
+            // result = x_orig.
+            // x = result * a.
+            // Let's call RHS 'b' in all cases.
+            // Case 2: x / a = b.  x = a * b.
+            // Wait, problem state is a, b.
+            // let RHS be the visual "b".
+            const RHS = Math.floor(Math.random() * 10) + 2;
+            finalProb = { type, a, b: RHS, x: a * RHS };
+          }
+          setProblem(finalProb);
+          setInput("");
+          setStatus(null);
         };
 
+        useEffect(generate, []);
+
         const check = () => {
-          if (parseInt(userAnswer) === correctAnswer) {
-            setFeedback("correct");
+          const val = parseInt(input);
+          if (val === problem.x) {
+            setStatus("correct");
           } else {
-            setFeedback("wrong");
+            setStatus("wrong");
           }
         };
 
+        const eqStr =
+          problem.type === "mult"
+            ? `${problem.a}x = ${problem.b}`
+            : `x ÷ ${problem.a} = ${problem.b}`; // or x/a
+
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <LanguageSelector lang={lang} setLang={setLang} />
-            <h1 className="text-5xl font-black text-amber-900 mb-2 mt-8">
-              🔢 {getText("title")}
-            </h1>
+          <div className="min-h-screen flex flex-col items-center p-4 font-sans bg-slate-900 text-white">
+            <div className="w-full max-w-5xl flex justify-between items-center mb-10">
+              <h1 className="text-4xl font-black text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]">
+                ✖️ {getText("title", lang)} ➗
+              </h1>
+              <div className="flex bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-amber-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-2xl w-full mt-8">
-              <div className="bg-amber-50 rounded-2xl p-8 mb-6 text-center border-2 border-amber-200">
-                <p className="text-sm text-amber-600 mb-2">
-                  {getText("findX")}
-                </p>
-                <div className="text-5xl font-black text-slate-800 font-mono">
-                  {problem.type === "mult"
-                    ? `${problem.a}x = ${problem.b}`
-                    : `x ÷ ${problem.a} = ${problem.b}`}
-                </div>
+            <div className="w-full max-w-2xl flex flex-col gap-8">
+              {/* Visual Representation (Area or Groups) */}
+              <div className="glass-panel p-8 rounded-3xl min-h-[200px] flex items-center justify-center relative overflow-hidden">
+                <div className="absolute inset-0 opacity-10 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+
+                {problem.type === "mult" ? (
+                  <div className="flex flex-wrap gap-4 justify-center">
+                    {/* Show 'a' groups of 'x' (unknown) ? No, we show result 'b' divided into 'a' groups? */}
+                    {/* Let's visualize the equation: ax = b. */}
+                    {/* We have 'b' total items. We want to find size of 'x'. */}
+                    {/* Or we have 'a' boxes of unknown size 'x', total is 'b'. */}
+
+                    {Array.from({ length: problem.a }).map((_, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: i * 0.1 }}
+                        className="w-20 h-24 bg-amber-500/20 border-2 border-amber-500/50 rounded-xl flex items-center justify-center relative group"
+                      >
+                        <span className="text-2xl font-black text-amber-300">
+                          x
+                        </span>
+
+                        {/* Reveal answer inside */}
+                        {status === "correct" && (
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="absolute inset-0 bg-amber-500 flex items-center justify-center text-white text-2xl font-black rounded-xl"
+                          >
+                            {problem.x}
+                          </motion.div>
+                        )}
+                      </motion.div>
+                    ))}
+                    <div className="flex items-center text-4xl font-black text-white ml-4">
+                      = {problem.b}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-4">
+                    {/* x / a = b. */}
+                    {/* Big unknown 'x' is split into 'a' parts. Each part is 'b'. */}
+                    <div className="flex gap-1 bg-slate-800 p-2 rounded-xl">
+                      {Array.from({ length: problem.a }).map((_, i) => (
+                        <div
+                          key={i}
+                          className="w-20 h-24 bg-amber-500/20 border border-amber-500/30 rounded-lg flex items-center justify-center"
+                        >
+                          <span className="text-xl font-bold text-amber-300">
+                            {problem.b}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="text-white text-sm font-bold uppercase tracking-widest">
+                      Total is x
+                    </div>
+
+                    {status === "correct" && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-3xl font-black text-amber-400"
+                      >
+                        x = {problem.x}
+                      </motion.div>
+                    )}
+                  </div>
+                )}
               </div>
 
-              <div className="bg-slate-50 rounded-2xl p-6 mb-6">
-                <p className="font-bold text-slate-700 mb-4">
-                  {getText("steps")}
-                </p>
-                <div className="space-y-2 font-mono text-lg">
-                  {problem.type === "mult" ? (
-                    <>
-                      <p>
-                        {problem.a}x = {problem.b}
-                      </p>
-                      <p>
-                        x = {problem.b} ÷ {problem.a}
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <p>
-                        x ÷ {problem.a} = {problem.b}
-                      </p>
-                      <p>
-                        x = {problem.b} × {problem.a}
-                      </p>
-                    </>
+              {/* Interaction Panel */}
+              <div className="glass-panel p-8 rounded-3xl flex flex-col items-center gap-6">
+                <div className="text-slate-400 font-bold uppercase tracking-widest text-sm">
+                  {getText("find", lang)}
+                </div>
+                <div className="text-6xl font-black font-mono tracking-wider">
+                  {eqStr}
+                </div>
+
+                <div className="flex flex-col gap-2 w-full max-w-sm">
+                  <div className="flex gap-4">
+                    <input
+                      type="number"
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      className="flex-1 bg-slate-950/50 border-2 border-slate-700 rounded-xl px-4 text-center text-3xl font-bold focus:border-amber-500 outline-none transition-colors"
+                      placeholder="x = ?"
+                    />
+                    <button
+                      onClick={check}
+                      className="bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 px-8 rounded-xl transition-all active:scale-95 shadow-lg shadow-amber-500/20"
+                    >
+                      {getText("check", lang)}
+                    </button>
+                  </div>
+
+                  <AnimatePresence>
+                    {status && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className={`p-4 rounded-xl text-center font-bold text-lg mt-2 ${
+                          status === "correct"
+                            ? "bg-green-500/20 text-green-300 border border-green-500/30"
+                            : "bg-red-500/20 text-red-300 border border-red-500/30"
+                        }`}
+                      >
+                        {getText(status, lang)}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {status === "correct" && (
+                    <motion.button
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      onClick={generate}
+                      className="w-full py-3 mt-2 rounded-xl border border-white/10 hover:bg-white/10 font-bold transition-all text-amber-200"
+                    >
+                      {getText("next", lang)} ➔
+                    </motion.button>
                   )}
-                  <p className="text-amber-600 font-bold">x = ?</p>
                 </div>
               </div>
 
-              <div className="flex items-center justify-center gap-4 mb-6">
-                <span className="text-2xl font-bold">x =</span>
-                <input
-                  type="number"
-                  value={userAnswer}
-                  onChange={(e) => setUserAnswer(e.target.value)}
-                  className="w-24 text-3xl font-black text-center border-4 border-amber-300 rounded-xl p-2"
-                />
-                <button
-                  onClick={check}
-                  className="px-6 py-3 bg-amber-500 text-white rounded-xl font-bold hover:bg-amber-600"
-                >
-                  {getText("check")}
-                </button>
-              </div>
-
-              {feedback === "correct" && (
-                <div className="bg-emerald-100 border-4 border-emerald-300 rounded-2xl p-4 text-center text-emerald-800 font-bold text-xl">
-                  ✓ {getText("correct")}
+              {status !== "correct" && (
+                <div className="text-center text-slate-500 font-mono text-sm">
+                  {getText("hint", lang)} <br />
+                  {problem.type === "mult"
+                    ? `Divide by ${problem.a}`
+                    : `Multiply by ${problem.a}`}
                 </div>
               )}
-              {feedback === "wrong" && (
-                <div className="bg-red-100 border-4 border-red-300 rounded-2xl p-4 text-center text-red-800 font-bold text-xl">
-                  ✗ {getText("wrong")} {correctAnswer}
-                </div>
-              )}
-
-              <button
-                onClick={generate}
-                className="mt-6 w-full py-3 bg-slate-200 text-slate-700 rounded-xl font-bold hover:bg-slate-300"
-              >
-                {getText("newProblem")}
-              </button>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

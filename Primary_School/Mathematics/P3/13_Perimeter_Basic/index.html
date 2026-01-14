@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小三數學：周界計算</title>
+    <title>小三數學：周界計算 | Perimeter Calculation</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -23,24 +24,104 @@
     <div id="root"></div>
     <script type="text/babel">
       const { useState } = React;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Perimeter Calculation",
+          zh: "周界計算",
+          ja: "周囲の長さ計算",
+          ko: "둘레 계산",
+          es: "Cálculo del perímetro",
+          de: "Umfangsberechnung",
+          fi: "Piirin laskenta",
+          fr: "Calcul du périmètre",
+          ar: "حساب المحيط",
+          it: "Calcolo del perimetro",
+        },
+        dimensions: {
+          en: "Rectangle Dimensions",
+          zh: "長方形尺寸",
+          ja: "長方形の寸法",
+          ko: "직사각형 치수",
+          es: "Dimensiones del rectángulo",
+          de: "Rechteckabmessungen",
+          fi: "Suorakulmion mitat",
+          fr: "Dimensions du rectangle",
+          ar: "أبعاد المستطيل",
+          it: "Dimensioni del rettangolo",
+        },
+        length: {
+          en: "Length",
+          zh: "長度",
+          ja: "長さ",
+          ko: "길이",
+          es: "Longitud",
+          de: "Länge",
+          fi: "Pituus",
+          fr: "Longueur",
+          ar: "الطول",
+          it: "Lunghezza",
+        },
+        width: {
+          en: "Width",
+          zh: "闊度",
+          ja: "幅",
+          ko: "너비",
+          es: "Ancho",
+          de: "Breite",
+          fi: "Leveys",
+          fr: "Largeur",
+          ar: "العرض",
+          it: "Larghezza",
+        },
+        formulaTitle: {
+          en: "Perimeter Formula",
+          zh: "周界公式",
+          ja: "周囲の長さの公式",
+          ko: "둘레 공식",
+          es: "Fórmula del perímetro",
+          de: "Umfangsformel",
+          fi: "Piirin kaava",
+          fr: "Formule du périmètre",
+          ar: "صيغة المحيط",
+          it: "Formula del perimetro",
+        },
+        formulaText: {
+          en: "2 × (Length + Width)",
+          zh: "2 × (長 + 闊)",
+          ja: "2 × (長さ + 幅)",
+          ko: "2 × (길이 + 너비)",
+          es: "2 × (Largo + Ancho)",
+          de: "2 × (Länge + Breite)",
+          fi: "2 × (Pituus + Leveys)",
+          fr: "2 × (Longueur + Largeur)",
+          ar: "2 × (الطول + العرض)",
+          it: "2 × (Lunghezza + Larghezza)",
+        },
+      };
+
       function App() {
+        const [lang, setLang] = useState("zh");
         const [length, setLength] = useState(8);
         const [width, setWidth] = useState(5);
         const perimeter = 2 * (length + width);
+
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-6xl font-black text-blue-900 mb-8">
-              📏 周界計算
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-6xl font-black text-blue-900 mb-8 mt-8 text-center">
+              📏 {t.title[lang] || t.title["en"]}
             </h1>
             <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-5xl w-full">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div>
                   <h3 className="text-2xl font-black text-blue-800 mb-6">
-                    長方形尺寸
+                    {t.dimensions[lang] || t.dimensions["en"]}
                   </h3>
                   <div className="mb-6">
                     <label className="block text-lg font-bold mb-2">
-                      長度：{length} cm
+                      {t.length[lang] || t.length["en"]}：{length} cm
                     </label>
                     <input
                       type="range"
@@ -53,7 +134,7 @@
                   </div>
                   <div className="mb-6">
                     <label className="block text-lg font-bold mb-2">
-                      闊度：{width} cm
+                      {t.width[lang] || t.width["en"]}：{width} cm
                     </label>
                     <input
                       type="range"
@@ -66,10 +147,10 @@
                   </div>
                   <div className="bg-gradient-to-r from-blue-100 to-cyan-100 rounded-2xl p-6 border-4 border-blue-400">
                     <div className="text-lg font-bold text-blue-700 mb-2">
-                      周界公式
+                      {t.formulaTitle[lang] || t.formulaTitle["en"]}
                     </div>
-                    <div className="text-3xl font-black text-blue-600 mb-4">
-                      2 × (長 + 闊)
+                    <div className="text-2xl md:text-3xl font-black text-blue-600 mb-4 whitespace-nowrap">
+                      {t.formulaText[lang] || t.formulaText["en"]}
                     </div>
                     <div className="text-2xl font-mono text-blue-800">
                       = 2 × ({length} + {width})
@@ -82,50 +163,61 @@
                     </div>
                   </div>
                 </div>
-                <div className="bg-blue-50 rounded-2xl p-6 flex items-center justify-center">
-                  <svg width="400" height="300">
-                    <rect
-                      x="50"
-                      y="50"
-                      width={length * 20}
-                      height={width * 20}
-                      fill="#dbeafe"
-                      stroke="#2563eb"
-                      strokeWidth="4"
-                    />
-                    <text
-                      x={50 + length * 10}
-                      y="35"
-                      textAnchor="middle"
-                      className="text-2xl font-black fill-blue-600"
-                    >
-                      {length} cm
-                    </text>
-                    <text
-                      x={60 + length * 20}
-                      y={50 + width * 10}
-                      textAnchor="start"
-                      className="text-2xl font-black fill-blue-600"
-                    >
-                      {width} cm
-                    </text>
-                    <text
-                      x={50 + length * 10}
-                      y={65 + width * 20}
-                      textAnchor="middle"
-                      className="text-2xl font-black fill-blue-600"
-                    >
-                      {length} cm
-                    </text>
-                    <text
-                      x="25"
-                      y={50 + width * 10}
-                      textAnchor="end"
-                      className="text-2xl font-black fill-blue-600"
-                    >
-                      {width} cm
-                    </text>
-                  </svg>
+                <div className="bg-blue-50 rounded-2xl p-6 flex items-center justify-center overflow-auto">
+                  <div
+                    style={{
+                      width: "400px",
+                      height: "300px",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <svg width="400" height="300" viewBox="0 0 500 500">
+                      {/* Scale box to fit */}
+                      <rect
+                        x="50"
+                        y="50"
+                        width={length * 15}
+                        height={width * 15}
+                        fill="#dbeafe"
+                        stroke="#2563eb"
+                        strokeWidth="4"
+                      />
+                      <text
+                        x={50 + length * 7.5}
+                        y="35"
+                        textAnchor="middle"
+                        className="text-2xl font-black fill-blue-600"
+                      >
+                        {length} cm
+                      </text>
+                      <text
+                        x={60 + length * 15}
+                        y={50 + width * 7.5}
+                        textAnchor="start"
+                        className="text-2xl font-black fill-blue-600"
+                      >
+                        {width} cm
+                      </text>
+                      <text
+                        x={50 + length * 7.5}
+                        y={70 + width * 15}
+                        textAnchor="middle"
+                        className="text-2xl font-black fill-blue-600"
+                      >
+                        {length} cm
+                      </text>
+                      <text
+                        x="25"
+                        y={50 + width * 7.5}
+                        textAnchor="end"
+                        className="text-2xl font-black fill-blue-600"
+                      >
+                        {width} cm
+                      </text>
+                    </svg>
+                  </div>
                 </div>
               </div>
             </div>
@@ -134,20 +226,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

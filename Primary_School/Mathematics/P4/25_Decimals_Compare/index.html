@@ -3,12 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小四數學：小數比較</title>
+    <title>小四數學：小數比較 | Comparing Decimals</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -25,10 +26,53 @@
     <script type="text/babel">
       const { useState } = React;
       const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Comparing Decimals",
+          zh: "小數比較",
+          ja: "小数の比較",
+          ko: "소수 비교",
+          es: "Comparación de Decimales",
+          de: "Dezimalzahlen vergleichen",
+          fi: "Desimaalilukujen vertailu",
+          fr: "Comparaison de décimaux",
+          ar: "مقارنة الكسور العشرية",
+          it: "Confronto decimali",
+        },
+        grids: {
+          en: "0.01 Grids",
+          zh: "0.01 格仔",
+          ja: "0.01目盛り",
+          ko: "0.01 그리드",
+          es: "Cuadrículas de 0.01",
+          de: "0.01 Gitter",
+          fi: "0.01 ruudukot",
+          fr: "Grilles de 0.01",
+          ar: "شبكات 0.01",
+          it: "Griglie 0.01",
+        },
+        tip: {
+          en: "Tip: Align decimal places when comparing (e.g., 0.4 = 0.40)",
+          zh: "提示：比較時，可以把小數位數補齊 (例如 0.4 = 0.40)",
+          ja: "ヒント：比較するときは小数点以下の桁数を揃えてください（例：0.4 = 0.40）",
+          ko: "팁: 비교할 때 소수점 자리를 맞추세요 (예: 0.4 = 0.40)",
+          es: "Consejo: Alinea los lugares decimales al comparar (ej. 0.4 = 0.40)",
+          de: "Tipp: Richten Sie Dezimalstellen beim Vergleichen aus (z. B. 0.4 = 0.40)",
+          fi: "Vinkki: Kohdista desimaalit vertailussa (esim. 0.4 = 0.40)",
+          fr: "Astuce : Alignez les décimales lors de la comparaison (par ex. 0.4 = 0.40)",
+          ar: "نصيحة: قم بمحاذاة المنازل العشرية عند المقارنة (على سبيل المثال، 0.4 = 0.40)",
+          it: "Suggerimento: allinea le cifre decimali quando confronti (ad es. 0.4 = 0.40)",
+        },
+      };
 
       function App() {
+        const [lang, setLang] = useState("zh");
         const [n1, setN1] = useState(0.4);
         const [n2, setN2] = useState(0.35);
+
+        const getText = (key) => t[key][lang] || t[key]["en"];
 
         let sign = "=";
         if (n1 > n2) sign = ">";
@@ -40,12 +84,13 @@
 
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-pink-900 mb-8">
-              🔢 小數比較
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-5xl font-black text-pink-900 mb-8 mt-8">
+              🔢 {getText("title")}
             </h1>
 
             <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl max-w-4xl w-full flex flex-col items-center">
-              <div className="flex items-center gap-8 mb-12 w-full justify-center">
+              <div className="flex items-center gap-8 mb-12 w-full justify-center flex-wrap">
                 <input
                   type="number"
                   step="0.01"
@@ -71,10 +116,10 @@
               </div>
 
               {/* Place Value Visualization */}
-              <div className="flex gap-12 w-full justify-center mb-8">
+              <div className="flex gap-12 w-full justify-center mb-8 flex-wrap">
                 <div className="bg-pink-100 p-6 rounded-2xl w-48 text-center">
                   <div className="text-sm font-bold text-pink-800 mb-2">
-                    0.01 格仔 ({(n1 * 100).toFixed(0)})
+                    {getText("grids")} ({(n1 * 100).toFixed(0)})
                   </div>
                   <div className="grid grid-cols-10 grid-rows-10 bg-white border border-pink-200 aspect-square">
                     {[...Array(100)].map((_, i) => (
@@ -90,7 +135,7 @@
 
                 <div className="bg-purple-100 p-6 rounded-2xl w-48 text-center">
                   <div className="text-sm font-bold text-purple-800 mb-2">
-                    0.01 格仔 ({(n2 * 100).toFixed(0)})
+                    {getText("grids")} ({(n2 * 100).toFixed(0)})
                   </div>
                   <div className="grid grid-cols-10 grid-rows-10 bg-white border border-purple-200 aspect-square">
                     {[...Array(100)].map((_, i) => (
@@ -109,7 +154,7 @@
                 <span className="text-pink-600 font-bold">{s1}</span> vs{" "}
                 <span className="text-purple-600 font-bold">{s2}</span>
                 <div className="text-sm mt-2 font-sans text-slate-400">
-                  提示：比較時，可以把小數位數補齊 (例如 0.4 = 0.40)
+                  {getText("tip")}
                 </div>
               </div>
             </div>
@@ -118,20 +163,5 @@
       }
       ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

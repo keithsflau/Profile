@@ -8,205 +8,381 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #fef9c3 0%, #eab308 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
-      function App() {
-        const [mode, setMode] = useState("findDistance");
-        const [speed, setSpeed] = useState(60);
-        const [time, setTime] = useState(2.5);
-        const [distance, setDistance] = useState(150);
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
 
-        const calcDistance = speed * time;
-        const calcTime = distance / speed;
-        const calcSpeed = distance / time;
+      const t = {
+        title: {
+          en: "Speed Word Problems",
+          zh: "速率應用題",
+          ja: "速さの文章題",
+          ko: "속력 문장제",
+          es: "Problemas de Velocidad",
+          de: "Geschwindigkeitsaufgaben",
+          fi: "Nopeustehtävät",
+          fr: "Problèmes de vitesse",
+          ar: "مسائل السرعة",
+          it: "Problemi di Velocità",
+        },
+        findDist: {
+          en: "Find Distance",
+          zh: "求距離",
+          ja: "距離を求める",
+          ko: "거리 구하기",
+          es: "Encontrar Distancia",
+          de: "Distanz finden",
+          fi: "Etsi matka",
+          fr: "Trouver Distance",
+          ar: "إيجاد المسافة",
+          it: "Trova Distanza",
+        },
+        findTime: {
+          en: "Find Time",
+          zh: "求時間",
+          ja: "時間を求める",
+          ko: "시간 구하기",
+          es: "Encontrar Tiempo",
+          de: "Zeit finden",
+          fi: "Etsi aika",
+          fr: "Trouver Temps",
+          ar: "إيجاد الزمن",
+          it: "Trova Tempo",
+        },
+        findSpeed: {
+          en: "Find Speed",
+          zh: "求速率",
+          ja: "速さを求める",
+          ko: "속력 구하기",
+          es: "Encontrar Velocidad",
+          de: "Geschwindigkeit finden",
+          fi: "Etsi nopeus",
+          fr: "Trouver Vitesse",
+          ar: "إيجاد السرعة",
+          it: "Trova Velocità",
+        },
+        carTravels: {
+          en: "A car travels at",
+          zh: "一輛車以",
+          ja: "車が",
+          ko: "차가",
+          es: "Un coche viaja a",
+          de: "Ein Auto fährt mit",
+          fi: "Auto kulkee",
+          fr: "Une voiture roule à",
+          ar: "تسير سيارة بسرعة",
+          it: "Un'auto viaggia a",
+        },
+        forTime: {
+          en: "for",
+          zh: "行駛",
+          ja: "の間",
+          ko: "동안",
+          es: "durante",
+          de: "für",
+          fi: "ajan",
+          fr: "pendant",
+          ar: "لمدة",
+          it: "per",
+        },
+        covers: {
+          en: "covers",
+          zh: "行駛了",
+          ja: "移動する",
+          ko: "이동함",
+          es: "recorre",
+          de: "legt zurück",
+          fi: "kattaa",
+          fr: "couvre",
+          ar: "يغطي",
+          it: "copre",
+        },
+        questionDist: {
+          en: "How far did it go?",
+          zh: "它行駛了多遠？",
+          ja: "どれくらい進んだ？",
+          ko: "얼마나 갔나요?",
+          es: "¿Qué distancia recorrió?",
+          de: "Wie weit ist es gefahren?",
+          fi: "Kuinka kauas se meni?",
+          fr: "Quelle distance a-t-elle parcourue ?",
+          ar: "كم المسافة التي قطعتها؟",
+          it: "Quanto è andata lontano?",
+        },
+        questionTime: {
+          en: "How long did it take?",
+          zh: "需時多久？",
+          ja: "どれくらいかかった？",
+          ko: "얼마나 걸렸나요?",
+          es: "¿Cuánto tiempo tomó?",
+          de: "Wie lange hat es gedauert?",
+          fi: "Kauanko se kesti?",
+          fr: "Combien de temps cela a-t-il pris ?",
+          ar: "كم استغرقت من الوقت؟",
+          it: "Quanto tempo ci è voluto?",
+        },
+        questionSpeed: {
+          en: "What was the speed?",
+          zh: "速率是多少？",
+          ja: "速さは？",
+          ko: "속력은 얼마인가요?",
+          es: "¿Cuál fue la velocidad?",
+          de: "Was war die Geschwindigkeit?",
+          fi: "Mikä oli nopeus?",
+          fr: "Quelle était la vitesse ?",
+          ar: "كم كانت السرعة؟",
+          it: "Qual era la velocità?",
+        },
+      };
+
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
+      function App() {
+        const [lang, setLang] = useState("zh");
+        const [mode, setMode] = useState("findDist");
+        const [val1, setVal1] = useState(60); // Speed or Speed or Time
+        const [val2, setVal2] = useState(2); // Time or Dist or Dist
+
+        // Mapping inputs based on mode
+        // findDist: val1=Speed, val2=Time
+        // findTime: val1=Speed, val2=Dist
+        // findSpeed: val1=Time, val2=Dist
+
+        const getResult = () => {
+          if (mode === "findDist") return val1 * val2; // S * T
+          if (mode === "findTime") return val2 / val1; // D / S
+          if (mode === "findSpeed") return val2 / val1; // D / T
+          return 0;
+        };
+
+        const result = getResult();
 
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-amber-900 mb-2">
-              🚗 速率應用題
-            </h1>
-            <p className="text-xl text-amber-700 font-bold mb-8">
-              Speed Word Problems
-            </p>
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-2xl w-full">
-              <div className="flex justify-center gap-2 mb-6 flex-wrap">
-                <button
-                  onClick={() => setMode("findDistance")}
-                  className={`px-4 py-2 rounded-xl font-bold ${
-                    mode === "findDistance"
-                      ? "bg-amber-500 text-white"
-                      : "bg-slate-100"
-                  }`}
-                >
-                  求距離
-                </button>
-                <button
-                  onClick={() => setMode("findTime")}
-                  className={`px-4 py-2 rounded-xl font-bold ${
-                    mode === "findTime"
-                      ? "bg-amber-500 text-white"
-                      : "bg-slate-100"
-                  }`}
-                >
-                  求時間
-                </button>
-                <button
-                  onClick={() => setMode("findSpeed")}
-                  className={`px-4 py-2 rounded-xl font-bold ${
-                    mode === "findSpeed"
-                      ? "bg-amber-500 text-white"
-                      : "bg-slate-100"
-                  }`}
-                >
-                  求速率
-                </button>
+          <div className="min-h-screen flex flex-col items-center p-4 font-sans bg-slate-900 text-white">
+            <div className="w-full max-w-5xl flex justify-between items-center mb-10">
+              <h1 className="text-4xl font-black text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]">
+                🚀 {getText("title", lang)}
+              </h1>
+              <div className="flex bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-amber-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="w-full max-w-4xl flex flex-col gap-8">
+              {/* Mode Selector */}
+              <div className="glass-panel p-2 rounded-2xl flex p-1 bg-slate-800/50">
+                {[
+                  { id: "findDist", icon: "📏" },
+                  { id: "findTime", icon: "⏱️" },
+                  { id: "findSpeed", icon: "⚡" },
+                ].map((m) => (
+                  <button
+                    key={m.id}
+                    onClick={() => setMode(m.id)}
+                    className={`flex-1 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${
+                      mode === m.id
+                        ? "bg-amber-500 text-slate-900 shadow-lg"
+                        : "text-slate-400 hover:bg-white/5"
+                    }`}
+                  >
+                    <span className="text-xl">{m.icon}</span>
+                    <span>{getText(m.id, lang)}</span>
+                  </button>
+                ))}
               </div>
 
-              {mode === "findDistance" && (
-                <div className="space-y-4">
-                  <div className="bg-amber-50 p-4 rounded-xl border-2 border-amber-200">
-                    <p>
-                      一輛車以{" "}
-                      <input
-                        type="number"
-                        value={speed}
-                        onChange={(e) =>
-                          setSpeed(parseFloat(e.target.value) || 0)
-                        }
-                        className="w-16 text-center border-2 rounded mx-1 font-bold"
-                      />{" "}
-                      km/h 行駛{" "}
-                      <input
-                        type="number"
-                        step="0.5"
-                        value={time}
-                        onChange={(e) =>
-                          setTime(parseFloat(e.target.value) || 0)
-                        }
-                        className="w-16 text-center border-2 rounded mx-1 font-bold"
-                      />{" "}
-                      小時。
-                    </p>
-                    <p className="font-bold mt-2">問：行駛了多少公里？</p>
-                  </div>
-                  <div className="bg-emerald-100 rounded-2xl p-6 text-center border-4 border-emerald-300">
-                    <p className="text-lg">
-                      距離 = {speed} × {time} ={" "}
-                      <span className="text-4xl font-black text-emerald-800">
-                        {calcDistance} km
-                      </span>
-                    </p>
-                  </div>
+              {/* Problem Statement */}
+              <div className="glass-panel p-8 rounded-3xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-8 opacity-10 text-9xl">
+                  🏎️
                 </div>
-              )}
 
-              {mode === "findTime" && (
-                <div className="space-y-4">
-                  <div className="bg-amber-50 p-4 rounded-xl border-2 border-amber-200">
-                    <p>
-                      一輛車以{" "}
+                <div className="text-xl md:text-2xl font-bold leading-loose text-slate-200">
+                  {mode === "findDist" && (
+                    <>
+                      <span>{getText("carTravels", lang)}</span>
                       <input
                         type="number"
-                        value={speed}
+                        value={val1}
                         onChange={(e) =>
-                          setSpeed(parseFloat(e.target.value) || 1)
+                          setVal1(Math.max(1, parseFloat(e.target.value) || 1))
                         }
-                        className="w-16 text-center border-2 rounded mx-1 font-bold"
-                      />{" "}
-                      km/h 行駛{" "}
+                        className="inline-block w-24 mx-2 bg-slate-800 border-b-2 border-amber-500 text-center text-amber-400 outline-none"
+                      />
+                      <span className="text-amber-400">km/h</span>
+                      <span> {getText("forTime", lang)} </span>
                       <input
                         type="number"
-                        value={distance}
+                        value={val2}
                         onChange={(e) =>
-                          setDistance(parseFloat(e.target.value) || 0)
+                          setVal2(
+                            Math.max(0.1, parseFloat(e.target.value) || 1)
+                          )
                         }
-                        className="w-16 text-center border-2 rounded mx-1 font-bold"
-                      />{" "}
-                      km。
-                    </p>
-                    <p className="font-bold mt-2">問：需要多少時間？</p>
-                  </div>
-                  <div className="bg-emerald-100 rounded-2xl p-6 text-center border-4 border-emerald-300">
-                    <p className="text-lg">
-                      時間 = {distance} ÷ {speed} ={" "}
-                      <span className="text-4xl font-black text-emerald-800">
-                        {calcTime.toFixed(2)} 小時
-                      </span>
-                    </p>
-                  </div>
-                </div>
-              )}
+                        className="inline-block w-24 mx-2 bg-slate-800 border-b-2 border-lime-500 text-center text-lime-400 outline-none"
+                      />
+                      <span className="text-lime-400">h</span>.
+                      <div className="mt-4 text-amber-200">
+                        {getText("questionDist", lang)}
+                      </div>
+                    </>
+                  )}
 
-              {mode === "findSpeed" && (
-                <div className="space-y-4">
-                  <div className="bg-amber-50 p-4 rounded-xl border-2 border-amber-200">
-                    <p>
-                      一輛車用了{" "}
+                  {mode === "findTime" && (
+                    <>
+                      <span>{getText("carTravels", lang)}</span>
                       <input
                         type="number"
-                        step="0.5"
-                        value={time}
+                        value={val1}
                         onChange={(e) =>
-                          setTime(parseFloat(e.target.value) || 1)
+                          setVal1(Math.max(1, parseFloat(e.target.value) || 1))
                         }
-                        className="w-16 text-center border-2 rounded mx-1 font-bold"
-                      />{" "}
-                      小時行駛{" "}
+                        className="inline-block w-24 mx-2 bg-slate-800 border-b-2 border-amber-500 text-center text-amber-400 outline-none"
+                      />
+                      <span className="text-amber-400">km/h</span>
+                      <span> {getText("covers", lang)} </span>
                       <input
                         type="number"
-                        value={distance}
+                        value={val2}
                         onChange={(e) =>
-                          setDistance(parseFloat(e.target.value) || 0)
+                          setVal2(Math.max(1, parseFloat(e.target.value) || 1))
                         }
-                        className="w-16 text-center border-2 rounded mx-1 font-bold"
-                      />{" "}
-                      km。
-                    </p>
-                    <p className="font-bold mt-2">問：它的速率是多少？</p>
-                  </div>
-                  <div className="bg-emerald-100 rounded-2xl p-6 text-center border-4 border-emerald-300">
-                    <p className="text-lg">
-                      速率 = {distance} ÷ {time} ={" "}
-                      <span className="text-4xl font-black text-emerald-800">
-                        {calcSpeed.toFixed(1)} km/h
-                      </span>
-                    </p>
+                        className="inline-block w-24 mx-2 bg-slate-800 border-b-2 border-blue-500 text-center text-blue-400 outline-none"
+                      />
+                      <span className="text-blue-400">km</span>.
+                      <div className="mt-4 text-lime-200">
+                        {getText("questionTime", lang)}
+                      </div>
+                    </>
+                  )}
+
+                  {mode === "findSpeed" && (
+                    <>
+                      <span>{getText("carTravels", lang)}</span>
+                      <input
+                        type="number"
+                        value={val2}
+                        onChange={(e) =>
+                          setVal2(Math.max(1, parseFloat(e.target.value) || 1))
+                        }
+                        className="inline-block w-24 mx-2 bg-slate-800 border-b-2 border-blue-500 text-center text-blue-400 outline-none"
+                      />
+                      <span className="text-blue-400">km</span>
+                      <span> {getText("forTime", lang)} </span>
+                      <input
+                        type="number"
+                        value={val1}
+                        onChange={(e) =>
+                          setVal1(
+                            Math.max(0.1, parseFloat(e.target.value) || 1)
+                          )
+                        }
+                        className="inline-block w-24 mx-2 bg-slate-800 border-b-2 border-lime-500 text-center text-lime-400 outline-none"
+                      />
+                      <span className="text-lime-400">h</span>.
+                      <div className="mt-4 text-amber-200">
+                        {getText("questionSpeed", lang)}
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Calculation & Result */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="glass-panel p-8 rounded-3xl bg-slate-800/50 flex flex-col justify-center">
+                  <h3 className="text-slate-400 font-bold uppercase mb-4 text-sm">
+                    Formula
+                  </h3>
+                  <div className="text-3xl font-mono text-white">
+                    {mode === "findDist" && (
+                      <>
+                        {val1} <span className="text-amber-500">×</span> {val2}
+                      </>
+                    )}
+                    {mode === "findTime" && (
+                      <>
+                        {val2} <span className="text-amber-500">÷</span> {val1}
+                      </>
+                    )}
+                    {mode === "findSpeed" && (
+                      <>
+                        {val2} <span className="text-amber-500">÷</span> {val1}
+                      </>
+                    )}
                   </div>
                 </div>
-              )}
+
+                <div className="glass-panel p-8 rounded-3xl border-l-4 border-amber-500 bg-amber-500/10 flex flex-col justify-center items-center">
+                  <h3 className="text-amber-400 font-bold uppercase mb-2">
+                    Answer
+                  </h3>
+                  <div className="text-5xl font-black text-white">
+                    {parseFloat(result.toFixed(2))}
+                    <span className="text-xl ml-2 text-slate-300">
+                      {mode === "findDist" && "km"}
+                      {mode === "findTime" && "h"}
+                      {mode === "findSpeed" && "km/h"}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

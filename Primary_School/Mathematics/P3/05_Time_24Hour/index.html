@@ -3,18 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小三數學：24小時時間學習</title>
+    <title>小三數學：24小時時間學習 | 24-Hour Time</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script
-      src="https://unpkg.com/react@18/umd/react.development.js"
-      crossorigin
-    ></script>
-    <script
-      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
-      crossorigin
-    ></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="../../common/i18n.js"></script>
+
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -35,43 +31,272 @@
     <script type="text/babel">
       const { useState, useEffect } = React;
       const { motion } = window.Motion;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "24-Hour Time",
+          zh: "24小時時間",
+          ja: "24時間表記",
+          ko: "24시간제",
+          es: "Hora de 24 horas",
+          de: "24-Stunden-Format",
+          fi: "24 tunnin kello",
+          fr: "Format 24 heures",
+          ar: "توقيت 24 ساعة",
+          it: "Formato 24 ore",
+        },
+        subtitle: {
+          en: "Learn 12-Hour vs 24-Hour",
+          zh: "認識12小時制與24小時制",
+          ja: "12時間制と24時間制を学ぶ",
+          ko: "12시간제와 24시간제 배우기",
+          es: "Aprenda 12 horas frente a 24 horas",
+          de: "Lernen Sie 12-Stunden vs. 24-Stunden",
+          fi: "Opi 12 tunnin ja 24 tunnin kellot",
+          fr: "Apprendre 12 heures contre 24 heures",
+          ar: "تعلم 12 ساعة مقابل 24 ساعة",
+          it: "Impara 12 ore contro 24 ore",
+        },
+        format12: {
+          en: "12-Hour Format",
+          zh: "12小時制",
+          ja: "12時間制",
+          ko: "12시간제",
+          es: "Formato de 12 horas",
+          de: "12-Stunden-Format",
+          fi: "12 tunnin muoto",
+          fr: "Format 12 heures",
+          ar: "تنسيق 12 ساعة",
+          it: "Formato 12 ore",
+        },
+        format24: {
+          en: "24-Hour Format",
+          zh: "24小時制",
+          ja: "24時間制",
+          ko: "24시간제",
+          es: "Formato de 24 horas",
+          de: "24-Stunden-Format",
+          fi: "24 tunnin muoto",
+          fr: "Format 24 heures",
+          ar: "تنسيق 24 ساعة",
+          it: "Formato 24 ore",
+        },
+        am: {
+          en: "AM",
+          zh: "上午",
+          ja: "午前",
+          ko: "오전",
+          es: "AM",
+          de: "Vormittag",
+          fi: "AP",
+          fr: "Matin",
+          ar: "صباحاً",
+          it: "Mattina",
+        },
+        pm: {
+          en: "PM",
+          zh: "下午",
+          ja: "午後",
+          ko: "오후",
+          es: "PM",
+          de: "Nachmittag",
+          fi: "IP",
+          fr: "Après-midi",
+          ar: "مساءً",
+          it: "Pomeriggio",
+        },
+        adjust: {
+          en: "Adjust Time",
+          zh: "調整時間",
+          ja: "時間を調整",
+          ko: "시간 조정",
+          es: "Ajustar la hora",
+          de: "Zeit einstellen",
+          fi: "Säädä aikaa",
+          fr: "Régler l'heure",
+          ar: "ضبط الوقت",
+          it: "Regola l'ora",
+        },
+        hour: {
+          en: "Hour",
+          zh: "小時",
+          ja: "時",
+          ko: "시",
+          es: "Hora",
+          de: "Stunde",
+          fi: "Tunti",
+          fr: "Heure",
+          ar: "ساعة",
+          it: "Ora",
+        },
+        minute: {
+          en: "Minute",
+          zh: "分鐘",
+          ja: "分",
+          ko: "분",
+          es: "Minuto",
+          de: "Minute",
+          fi: "Minuutti",
+          fr: "Minute",
+          ar: "دقيقة",
+          it: "Minuto",
+        },
+        tips: {
+          en: "Time Tips",
+          zh: "小貼士",
+          ja: "ヒント",
+          ko: "팁",
+          es: "Consejos",
+          de: "Tipps",
+          fi: "Vinkit",
+          fr: "Conseils",
+          ar: "نصائح",
+          it: "Suggerimenti",
+        },
+        common: {
+          en: "Common Times",
+          zh: "常用時間",
+          ja: "よく使う時間",
+          ko: "일반적인 시간",
+          es: "Horas comunes",
+          de: "Übliche Zeiten",
+          fi: "Yleiset ajat",
+          fr: "Heures courantes",
+          ar: "أوقات شائعة",
+          it: "Orari comuni",
+        },
+        tip1: {
+          en: "12-Hour: Uses AM and PM.",
+          zh: "12小時制：分為上午（AM）和下午（PM）",
+          ja: "12時間制：午前(AM)と午後(PM)を使用",
+          ko: "12시간제: 오전(AM)과 오후(PM) 사용",
+          es: "12 horas: utiliza AM y PM.",
+          de: "12-Stunden: Verwendet AM und PM.",
+          fi: "12 tunnin: Käyttää ap. ja ip.",
+          fr: "12 heures : utilise AM et PM.",
+          ar: "12 ساعة: تستخدم صباحًا ومساءً.",
+          it: "12 ore: usa AM e PM.",
+        },
+        tip2: {
+          en: "24-Hour: From 00:00 to 23:59.",
+          zh: "24小時制：由00:00至23:59",
+          ja: "24時間制：00:00から23:59まで",
+          ko: "24시간제: 00:00부터 23:59까지",
+          es: "24 horas: De 00:00 a 23:59.",
+          de: "24-Stunden: Von 00:00 bis 23:59.",
+          fi: "24 tunnin: 00:00 - 23:59.",
+          fr: "24 heures : de 00:00 à 23:59.",
+          ar: "24 ساعة: من 00:00 إلى 23:59.",
+          it: "24 ore: da 00:00 a 23:59.",
+        },
+        tip3: {
+          en: "Conversion: PM Time = 12 + Hour.",
+          zh: "轉換方法：下午時間 = 12 + 小時",
+          ja: "変換：午後の時間 = 12 + 時",
+          ko: "변환: 오후 시간 = 12 + 시",
+          es: "Conversión: Hora PM = 12 + Hora.",
+          de: "Umrechnung: Nachmittagszeit = 12 + Stunde.",
+          fi: "Muunnos: IP-aika = 12 + tunti.",
+          fr: "Conversion : Heure PM = 12 + Heure.",
+          ar: "التحويل: وقت المساء = 12 + الساعة.",
+          it: "Conversione: Ora PM = 12 + Ora.",
+        },
+        schoolStart: {
+          en: "School Start",
+          zh: "早上上學",
+          ja: "登校",
+          ko: "등교",
+          es: "Inicio escolar",
+          de: "Schulbeginn",
+          fi: "Koulu alkaa",
+          fr: "Début de l'école",
+          ar: "بداية المدرسة",
+          it: "Inizio scuola",
+        },
+        lunch: {
+          en: "Lunch",
+          zh: "中午午膳",
+          ja: "昼食",
+          ko: "점심",
+          es: "Almuerzo",
+          de: "Mittagessen",
+          fi: "Lounas",
+          fr: "Déjeuner",
+          ar: "الغداء",
+          it: "Pranzo",
+        },
+        schoolEnd: {
+          en: "School End",
+          zh: "下午放學",
+          ja: "下校",
+          ko: "하교",
+          es: "Fin escolar",
+          de: "Schulende",
+          fi: "Koulu loppuu",
+          fr: "Fin de l'école",
+          ar: "نهاية المدرسة",
+          it: "Fine scuola",
+        },
+        sleep: {
+          en: "Sleep",
+          zh: "晚上睡覺",
+          ja: "就寝",
+          ko: "취침",
+          es: "Dormir",
+          de: "Schlafen",
+          fi: "Nukkumaan",
+          fr: "Dormir",
+          ar: "النوم",
+          it: "Sonno",
+        },
+      };
 
       function App() {
+        const [lang, setLang] = useState("zh");
         const [hour, setHour] = useState(9);
         const [minute, setMinute] = useState(30);
-        const [mode, setMode] = useState("12"); // 12 or 24
 
         const hour12 = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
-        const period = hour >= 12 ? "下午" : "上午";
+        const period =
+          hour >= 12 ? t.pm[lang] || t.pm["en"] : t.am[lang] || t.am["en"];
         const hourAngle = ((hour % 12) + minute / 60) * 30;
         const minuteAngle = minute * 6;
 
         return (
           <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-6xl font-black text-blue-900 mb-4">
-              24小時時間
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-6xl font-black text-blue-900 mb-4 mt-8">
+              {t.title[lang] || t.title["en"]}
             </h1>
-            <p className="text-xl text-blue-700 mb-8 font-bold">
-              認識12小時制與24小時制
+            <p className="text-xl text-blue-700 mb-8 font-bold text-center">
+              {t.subtitle[lang] || t.subtitle["en"]}
             </p>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full max-w-6xl">
-              {/* Clock Display */}
               <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl">
-                <div className="relative w-96 h-96 mx-auto bg-white rounded-full border-8 border-blue-600 shadow-inner">
-                  {/* Clock Numbers */}
+                <div className="relative w-72 h-72 md:w-96 md:h-96 mx-auto bg-white rounded-full border-8 border-blue-600 shadow-inner">
                   {[...Array(12)].map((_, i) => {
                     const angle = (i + 1) * 30 - 90;
-                    const x = 160 + 140 * Math.cos((angle * Math.PI) / 180);
-                    const y = 160 + 140 * Math.sin((angle * Math.PI) / 180);
+                    const radius = 140;
+                    const x =
+                      50 +
+                      (radius / 384) * 100 * Math.cos((angle * Math.PI) / 180);
+                    // Using simpler fixed positioning for numbers might be safer or just map absolute pixels relative to center
+                    // Let's stick to pixels relative to center for simplicity
+                    // container is w-96 (384px) -> center 192, radius 140
+                    // if w-72 (288px) -> center 144, radius ~105
+                    // We can use % to be responsive
                     return (
                       <div
                         key={i}
-                        className="absolute text-2xl font-black text-blue-800"
+                        className="absolute text-xl md:text-2xl font-black text-blue-800"
                         style={{
-                          left: `${x}px`,
-                          top: `${y}px`,
-                          transform: "translate(-50%, -50%)",
+                          left: `50%`,
+                          top: `50%`,
+                          transform: `translate(-50%, -50%) rotate(${
+                            angle + 90
+                          }deg) translate(0, -130px) rotate(-${angle + 90}deg)`, // simplified placement logic
                         }}
                       >
                         {i + 1}
@@ -79,20 +304,17 @@
                     );
                   })}
 
-                  {/* Center Dot */}
                   <div className="absolute top-1/2 left-1/2 w-4 h-4 bg-red-600 rounded-full -translate-x-1/2 -translate-y-1/2 z-20"></div>
 
-                  {/* Hour Hand */}
                   <div
-                    className="clock-hand absolute top-1/2 left-1/2 w-2 h-24 bg-blue-800 rounded-full -translate-x-1/2 origin-bottom z-10"
+                    className="clock-hand absolute top-1/2 left-1/2 w-2 h-20 md:h-24 bg-blue-800 rounded-full -translate-x-1/2 origin-bottom z-10"
                     style={{
                       transform: `translate(-50%, -100%) rotate(${hourAngle}deg)`,
                     }}
                   ></div>
 
-                  {/* Minute Hand */}
                   <div
-                    className="clock-hand absolute top-1/2 left-1/2 w-1.5 h-32 bg-blue-600 rounded-full -translate-x-1/2 origin-bottom z-10"
+                    className="clock-hand absolute top-1/2 left-1/2 w-1.5 h-24 md:h-32 bg-blue-600 rounded-full -translate-x-1/2 origin-bottom z-10"
                     style={{
                       transform: `translate(-50%, -100%) rotate(${minuteAngle}deg)`,
                     }}
@@ -102,7 +324,7 @@
                 <div className="mt-8 grid grid-cols-2 gap-4">
                   <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-2xl p-6 text-center border-2 border-blue-300">
                     <div className="text-sm font-bold text-blue-700 mb-2">
-                      12小時制
+                      {t.format12[lang] || t.format12["en"]}
                     </div>
                     <div className="text-4xl font-black text-blue-900">
                       {period}
@@ -114,7 +336,7 @@
                   </div>
                   <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-2xl p-6 text-center border-2 border-purple-300">
                     <div className="text-sm font-bold text-purple-700 mb-2">
-                      24小時制
+                      {t.format24[lang] || t.format24["en"]}
                     </div>
                     <div className="text-5xl font-black text-purple-600 mt-8">
                       {String(hour).padStart(2, "0")}:
@@ -124,16 +346,15 @@
                 </div>
               </div>
 
-              {/* Controls */}
               <div className="space-y-6">
                 <div className="bg-white/90 backdrop-blur-md rounded-3xl p-6 shadow-xl">
                   <h3 className="text-2xl font-black text-blue-900 mb-4">
-                    調整時間
+                    {t.adjust[lang] || t.adjust["en"]}
                   </h3>
 
                   <div className="mb-6">
                     <label className="block text-lg font-bold text-blue-800 mb-2">
-                      小時: {hour}
+                      {t.hour[lang] || t.hour["en"]}: {hour}
                     </label>
                     <input
                       type="range"
@@ -147,7 +368,7 @@
 
                   <div className="mb-6">
                     <label className="block text-lg font-bold text-blue-800 mb-2">
-                      分鐘: {minute}
+                      {t.minute[lang] || t.minute["en"]}: {minute}
                     </label>
                     <input
                       type="range"
@@ -177,31 +398,39 @@
 
                 <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-3xl p-6 shadow-xl border-2 border-yellow-300">
                   <h3 className="text-xl font-black text-orange-800 mb-4">
-                    💡 小貼士
+                    💡 {t.tips[lang] || t.tips["en"]}
                   </h3>
                   <div className="space-y-3 text-sm text-slate-700">
                     <div className="bg-white p-3 rounded-lg">
-                      <strong>12小時制：</strong>分為上午（AM）和下午（PM）
+                      <strong>{t.tip1[lang] || t.tip1["en"]}</strong>
                     </div>
                     <div className="bg-white p-3 rounded-lg">
-                      <strong>24小時制：</strong>由00:00至23:59
+                      <strong>{t.tip2[lang] || t.tip2["en"]}</strong>
                     </div>
                     <div className="bg-white p-3 rounded-lg">
-                      <strong>轉換方法：</strong>下午時間 = 12 + 小時
+                      <strong>{t.tip3[lang] || t.tip3["en"]}</strong>
                     </div>
                   </div>
                 </div>
 
                 <div className="bg-white/90 backdrop-blur-md rounded-3xl p-6 shadow-xl">
                   <h3 className="text-xl font-black text-blue-900 mb-4">
-                    常用時間
+                    {t.common[lang] || t.common["en"]}
                   </h3>
                   <div className="grid grid-cols-2 gap-3">
                     {[
-                      { label: "早上上學", h: 8, m: 0 },
-                      { label: "中午午膳", h: 12, m: 30 },
-                      { label: "下午放學", h: 15, m: 30 },
-                      { label: "晚上睡覺", h: 21, m: 0 },
+                      {
+                        label: t.schoolStart[lang] || t.schoolStart["en"],
+                        h: 8,
+                        m: 0,
+                      },
+                      { label: t.lunch[lang] || t.lunch["en"], h: 12, m: 30 },
+                      {
+                        label: t.schoolEnd[lang] || t.schoolEnd["en"],
+                        h: 15,
+                        m: 30,
+                      },
+                      { label: t.sleep[lang] || t.sleep["en"], h: 21, m: 0 },
                     ].map((time, i) => (
                       <button
                         key={i}
@@ -225,20 +454,5 @@
       const root = ReactDOM.createRoot(document.getElementById("root"));
       root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

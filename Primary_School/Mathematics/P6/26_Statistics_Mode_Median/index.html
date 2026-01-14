@@ -3,19 +3,29 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小六數學：眾數與中位數 | Mode and Median</title>
+    <title>小六數學：眾數與中位數 | Mode & Median</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #fef9c3 0%, #a16207 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
@@ -23,163 +33,343 @@
     <div id="root"></div>
     <script type="text/babel">
       const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
+
+      const t = {
+        title: {
+          en: "Mode & Median",
+          zh: "眾數與中位數",
+          ja: "最頻値と中央値",
+          ko: "최빈값과 중앙값",
+          es: "Moda y Mediana",
+          de: "Modus und Median",
+          fi: "Moodi ja Mediaani",
+          fr: "Mode et Médiane",
+          ar: "المنوال والوسيط",
+          it: "Moda e Mediana",
+        },
+        rawData: {
+          en: "Raw Data",
+          zh: "原始數據",
+          ja: "生データ",
+          ko: "원시 데이터",
+          es: "Datos Sin Procesar",
+          de: "Rohdaten",
+          fi: "Raaka Data",
+          fr: "Données brutes",
+          ar: "البيانات الخام",
+          it: "Dati Grezzi",
+        },
+        sortedData: {
+          en: "Sorted Data",
+          zh: "排序後數據",
+          ja: "ソートされたデータ",
+          ko: "정렬된 데이터",
+          es: "Datos Ordenados",
+          de: "Sortierte Daten",
+          fi: "Lajiteltu Data",
+          fr: "Données triées",
+          ar: "البيانات المرتبة",
+          it: "Dati Ordinati",
+        },
+        mode: {
+          en: "Mode",
+          zh: "眾數",
+          ja: "最頻値",
+          ko: "최빈값",
+          es: "Moda",
+          de: "Modus",
+          fi: "Moodi",
+          fr: "Mode",
+          ar: "المنوال",
+          it: "Moda",
+        },
+        median: {
+          en: "Median",
+          zh: "中位數",
+          ja: "中央値",
+          ko: "중앙값",
+          es: "Mediana",
+          de: "Median",
+          fi: "Mediaani",
+          fr: "Médiane",
+          ar: "الوسيط",
+          it: "Mediana",
+        },
+        mean: {
+          en: "Mean",
+          zh: "平均數",
+          ja: "平均",
+          ko: "평균",
+          es: "Media",
+          de: "Mittelwert",
+          fi: "Keskiarvo",
+          fr: "Moyenne",
+          ar: "المتوسط",
+          it: "Media",
+        },
+        modeDesc: {
+          en: "Most frequent number",
+          zh: "出現最多次的數",
+          ja: "最も頻繁に現れる数",
+          ko: "가장 자주 나타나는 수",
+          es: "Número más frecuente",
+          de: "Häufigste Zahl",
+          fi: "Yleisin luku",
+          fr: "Nombre le plus fréquent",
+          ar: "الرقم الأكثر تكرارًا",
+          it: "Numero più frequente",
+        },
+        medianDesc: {
+          en: "The middle number",
+          zh: "中間的數",
+          ja: "真ん中の数",
+          ko: "중간 수",
+          es: "El número del medio",
+          de: "Die mittlere Zahl",
+          fi: "Keskimmäinen luku",
+          fr: "Le nombre du milieu",
+          ar: "الرقم الأوسط",
+          it: "Il numero centrale",
+        },
+        noMode: {
+          en: "None",
+          zh: "沒有",
+          ja: "なし",
+          ko: "없음",
+          es: "Ninguno",
+          de: "Keiner",
+          fi: "Ei mitään",
+          fr: "Aucun",
+          ar: "لا يوجد",
+          it: "Nessuno",
+        },
+        generate: {
+          en: "Randomize",
+          zh: "隨機生成",
+          ja: "ランダム化",
+          ko: "무작위",
+          es: "Aleatorizar",
+          de: "Zufällig",
+          fi: "Satunnainen",
+          fr: "Aléatoire",
+          ar: "عشوائي",
+          it: "Casualizza",
+        },
+      };
+
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
       function App() {
-        const [nums, setNums] = useState([5, 2, 8, 2, 9, 5, 2]);
-        const [sorted, setSorted] = useState([]);
-        const [mode, setMode] = useState([]);
-        const [median, setMedian] = useState(null);
+        const [lang, setLang] = useState("zh");
+        const [data, setData] = useState([2, 5, 2, 8, 5, 2, 9]);
+        const [isSorted, setIsSorted] = useState(false);
 
-        useEffect(() => {
-          // Sort
-          const s = [...nums].sort((a, b) => a - b);
-          setSorted(s);
+        const sortedData = [...data].sort((a, b) => a - b);
 
-          // Mode
-          const counts = {};
-          nums.forEach((n) => (counts[n] = (counts[n] || 0) + 1));
-          let maxCount = 0;
-          for (let n in counts) if (counts[n] > maxCount) maxCount = counts[n];
-          const m = [];
-          if (maxCount > 1) {
-            for (let n in counts)
-              if (counts[n] === maxCount) m.push(parseInt(n));
-          }
-          setMode(
-            m.length > 0 ? m : ["沒有 None (所有數只出現一次 all unique)"]
-          );
+        // Calculate Statistics
+        const counts = {};
+        data.forEach((n) => (counts[n] = (counts[n] || 0) + 1));
+        let maxCount = 0;
+        Object.values(counts).forEach((c) => {
+          if (c > maxCount) maxCount = c;
+        });
+        const modes = Object.keys(counts)
+          .filter((k) => counts[k] === maxCount && maxCount > 1)
+          .map(Number);
 
-          // Median
-          const mid = Math.floor(s.length / 2);
-          if (s.length % 2 !== 0) {
-            setMedian(s[mid]);
-          } else {
-            setMedian((s[mid - 1] + s[mid]) / 2);
-          }
-        }, [nums]);
+        const mid = Math.floor(sortedData.length / 2);
+        const medianVal =
+          sortedData.length % 2 !== 0
+            ? sortedData[mid]
+            : (sortedData[mid - 1] + sortedData[mid]) / 2;
 
         const randomize = () => {
-          const newNums = Array.from(
-            { length: 7 },
+          const len = Math.floor(Math.random() * 5) + 5; // 5 to 9 items
+          const newData = Array.from(
+            { length: len },
             () => Math.floor(Math.random() * 9) + 1
           );
-          setNums(newNums);
+          setData(newData);
+          setIsSorted(false);
         };
 
+        const toggleSort = () => setIsSorted(!isSorted);
+
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-yellow-900 mb-2">
-              📊 眾數與中位數
-            </h1>
-            <p className="text-xl text-yellow-700 font-bold mb-8">
-              Mode and Median
-            </p>
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-3xl w-full">
-              <div className="text-center mb-8">
+          <div className="min-h-screen flex flex-col items-center p-4 font-sans bg-slate-900 text-white">
+            <div className="w-full max-w-5xl flex justify-between items-center mb-8">
+              <h1 className="text-4xl font-black text-yellow-400 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]">
+                📊 {getText("title", lang)}
+              </h1>
+              <div className="flex bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-yellow-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="w-full max-w-5xl flex flex-col gap-8">
+              {/* Controls */}
+              <div className="flex justify-center gap-4">
                 <button
                   onClick={randomize}
-                  className="px-6 py-2 bg-yellow-500 text-white font-bold rounded-lg hover:bg-yellow-600 transition-colors"
+                  className="px-6 py-3 bg-slate-700 hover:bg-slate-600 rounded-xl font-bold transition-all shadow-lg"
                 >
-                  隨機生成 Random Generate
+                  🎲 {getText("generate", lang)}
+                </button>
+                <button
+                  onClick={toggleSort}
+                  className={`px-6 py-3 rounded-xl font-bold transition-all shadow-lg ${
+                    isSorted
+                      ? "bg-indigo-600 text-white"
+                      : "bg-slate-700 text-slate-300 hover:bg-slate-600"
+                  }`}
+                >
+                  Show:{" "}
+                  {isSorted
+                    ? getText("sortedData", lang)
+                    : getText("rawData", lang)}
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Raw Data */}
-                <div className="bg-slate-50 p-6 rounded-2xl border-2 border-slate-200">
-                  <h3 className="text-lg font-bold text-slate-500 mb-4 uppercase">
-                    原始數據 Raw Data
-                  </h3>
-                  <div className="flex flex-wrap gap-2 justify-center">
-                    {nums.map((n, i) => (
-                      <div
-                        key={i}
-                        className="w-12 h-12 bg-white rounded-lg border-2 border-slate-300 flex items-center justify-center text-xl font-black text-slate-700 shadow-sm"
-                      >
-                        {n}
-                      </div>
-                    ))}
-                  </div>
-                </div>
+              {/* Visualization Area */}
+              <div className="glass-panel p-8 rounded-3xl min-h-[200px] flex items-center justify-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-yellow-900/5 -z-10"></div>
 
-                {/* Sorted Data */}
-                <div className="bg-blue-50 p-6 rounded-2xl border-2 border-blue-200 relative">
-                  <h3 className="text-lg font-bold text-blue-500 mb-4 uppercase">
-                    排序後 Sorted (小 → 大)
-                  </h3>
-                  <div className="flex flex-wrap gap-2 justify-center">
-                    {sorted.map((n, i) => (
-                      <div
-                        key={i}
-                        className={`w-12 h-12 rounded-lg border-2 flex items-center justify-center text-xl font-black shadow-sm
-                          ${
-                            (sorted.length % 2 !== 0 &&
-                              i === Math.floor(sorted.length / 2)) ||
-                            (sorted.length % 2 === 0 &&
-                              (i === sorted.length / 2 - 1 ||
-                                i === sorted.length / 2))
-                              ? "bg-indigo-100 border-indigo-400 text-indigo-800 scale-110 z-10"
-                              : "bg-white border-slate-300 text-slate-700"
-                          }`}
-                      >
-                        {n}
-                      </div>
-                    ))}
-                  </div>
-                  {/* Median Arrow/Label logic could be complex, keeping it simple visual highlight above */}
-                </div>
-              </div>
+                <div className="flex flex-wrap gap-4 justify-center items-center">
+                  <AnimatePresence mode="popLayout">
+                    {(isSorted ? sortedData : data).map((n, i) => {
+                      // Highlight logic
+                      let isMode = modes.includes(n);
+                      let isMedian =
+                        isSorted &&
+                        ((sortedData.length % 2 !== 0 && i === mid) ||
+                          (sortedData.length % 2 === 0 &&
+                            (i === mid - 1 || i === mid)));
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-                <div className="bg-green-100 p-6 rounded-2xl border-4 border-green-300 text-center">
-                  <div className="text-green-700 font-bold mb-1">眾數 Mode</div>
-                  <div className="text-sm text-green-600 mb-2">
-                    出現最多次的數 Most frequent
-                  </div>
-                  <div className="text-4xl font-black text-green-800">
-                    {mode.join(", ")}
-                  </div>
-                </div>
-
-                <div className="bg-indigo-100 p-6 rounded-2xl border-4 border-indigo-300 text-center">
-                  <div className="text-indigo-700 font-bold mb-1">
-                    中位數 Median
-                  </div>
-                  <div className="text-sm text-indigo-600 mb-2">
-                    中間的數 The middle number
-                  </div>
-                  <div className="text-4xl font-black text-indigo-800">
-                    {median}
-                  </div>
+                      return (
+                        <motion.div
+                          layout
+                          key={isSorted ? `sorted-${i}-${n}` : `raw-${i}-${n}`}
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          exit={{ scale: 0, opacity: 0 }}
+                          transition={{
+                            type: "spring",
+                            stiffness: 300,
+                            damping: 25,
+                          }}
+                          className={`
+                                            w-16 h-20 rounded-2xl flex flex-col items-center justify-center font-black text-2xl shadow-xl border-b-4
+                                            ${
+                                              isMedian
+                                                ? "bg-indigo-500 border-indigo-700"
+                                                : isMode
+                                                ? "bg-yellow-500 border-yellow-700 text-black"
+                                                : "bg-slate-700 border-slate-900 text-slate-300"
+                                            }
+                                            relative
+                                       `}
+                        >
+                          {n}
+                          {isMedian && (
+                            <span className="absolute -top-3 px-2 py-0.5 bg-indigo-700 text-[10px] text-white rounded-full uppercase font-bold tracking-wider">
+                              Median
+                            </span>
+                          )}
+                          {!isMedian && isMode && (
+                            <span className="absolute -bottom-3 px-2 py-0.5 bg-yellow-700 text-[10px] text-white rounded-full uppercase font-bold tracking-wider">
+                              Mode
+                            </span>
+                          )}
+                        </motion.div>
+                      );
+                    })}
+                  </AnimatePresence>
                 </div>
               </div>
 
-              <div className="mt-8 bg-amber-50 p-4 rounded-xl border border-amber-200 text-amber-800 text-sm text-center">
-                <p>注意：如果中間有兩個數，中位數是這兩個數的平均值。</p>
-                <p>
-                  Note: If there are two middle numbers, the median is their
-                  average.
-                </p>
+              {/* Analysis Panels */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Mode Panel */}
+                <div className="glass-panel p-6 rounded-3xl border-l-4 border-yellow-500 relative overflow-hidden group hover:bg-slate-800/80 transition-colors">
+                  <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform select-none text-9xl font-black text-yellow-500">
+                    M
+                  </div>
+                  <div className="relative z-10">
+                    <h3 className="text-yellow-400 font-bold uppercase tracking-widest text-sm mb-1">
+                      {getText("mode", lang)}
+                    </h3>
+                    <div className="text-sm text-slate-400 mb-4">
+                      {getText("modeDesc", lang)}
+                    </div>
+                    <div className="text-5xl font-black text-white">
+                      {modes.length > 0 ? (
+                        modes.join(", ")
+                      ) : (
+                        <span className="text-slate-500 text-3xl">
+                          {getText("noMode", lang)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Median Panel */}
+                <div className="glass-panel p-6 rounded-3xl border-l-4 border-indigo-500 relative overflow-hidden group hover:bg-slate-800/80 transition-colors">
+                  <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform select-none text-9xl font-black text-indigo-500">
+                    M
+                  </div>
+                  <div className="relative z-10">
+                    <h3 className="text-indigo-400 font-bold uppercase tracking-widest text-sm mb-1">
+                      {getText("median", lang)}
+                    </h3>
+                    <div className="text-sm text-slate-400 mb-4">
+                      {getText("medianDesc", lang)}
+                    </div>
+                    <div className="text-5xl font-black text-white">
+                      {medianVal}
+                    </div>
+                    {sortedData.length % 2 === 0 && (
+                      <div className="mt-2 text-xs text-indigo-300/80 font-mono">
+                        ({sortedData[mid - 1]} + {sortedData[mid]}) ÷ 2
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

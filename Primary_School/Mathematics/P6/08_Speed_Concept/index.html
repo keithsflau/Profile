@@ -8,117 +8,329 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #ecfeff 0%, #06b6d4 100%);
+        background: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
+      const { useState, useEffect } = React;
+      const { motion, AnimatePresence } = window.Motion;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
+
+      const t = {
+        title: {
+          en: "Speed, Time, Distance",
+          zh: "速率、時間、距離",
+          ja: "速さ、時間、距離",
+          ko: "속력, 시간, 거리",
+          es: "Velocidad, Tiempo, Distancia",
+          de: "Geschwindigkeit, Zeit, Distanz",
+          fi: "Nopeus, Aika, Matka",
+          fr: "Vitesse, Temps, Distance",
+          ar: "السرعة، الزمن، المسافة",
+          it: "Velocità, Tempo, Distanza",
+        },
+        dist: {
+          en: "Distance",
+          zh: "距離",
+          ja: "距離",
+          ko: "거리",
+          es: "Distancia",
+          de: "Distanz",
+          fi: "Matka",
+          fr: "Distance",
+          ar: "مسافة",
+          it: "Distanza",
+        },
+        time: {
+          en: "Time",
+          zh: "時間",
+          ja: "時間",
+          ko: "시간",
+          es: "Tiempo",
+          de: "Zeit",
+          fi: "Aika",
+          fr: "Temps",
+          ar: "زمن",
+          it: "Tempo",
+        },
+        speed: {
+          en: "Speed",
+          zh: "速率",
+          ja: "速さ",
+          ko: "속력",
+          es: "Velocidad",
+          de: "Geschwindigkeit",
+          fi: "Nopeus",
+          fr: "Vitesse",
+          ar: "سرعة",
+          it: "Velocità",
+        },
+        calcSpeed: {
+          en: "Calculate Speed",
+          zh: "計算速率",
+          ja: "速さを計算",
+          ko: "속력 계산",
+          es: "Calcular Velocidad",
+          de: "Geschwindigkeit berechnen",
+          fi: "Laske nopeus",
+          fr: "Calculer Vitesse",
+          ar: "حساب السرعة",
+          it: "Calcola Velocità",
+        },
+        run: {
+          en: "Run Simulation",
+          zh: "運行模擬",
+          ja: "シミュレーション",
+          ko: "시뮬레이션 실행",
+          es: "Ejecutar Simulación",
+          de: "Simulation starten",
+          fi: "Suorita simulaatio",
+          fr: "Lancer Simulation",
+          ar: "تشغيل المحاكاة",
+          it: "Esegui Simulazione",
+        },
+      };
+
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
       function App() {
-        const [distance, setDistance] = useState(120);
-        const [time, setTime] = useState(2);
-        const speed = distance / time;
+        const [lang, setLang] = useState("zh");
+        const [dist, setDist] = useState(100); // km
+        const [time, setTime] = useState(2); // h
+        const [isRunning, setIsRunning] = useState(false);
+
+        const speed = dist / time;
+
+        const handleRun = () => {
+          setIsRunning(true);
+          // Reset after animation (animation duration based on time for realism? No, too slow. Just visuals.)
+          // Let's make animation duration fixed (e.g. 2s) but show "speed" via text?
+          // Or better: speed varies the duration.
+          // 100km at 50km/h vs 100km/h
+
+          setTimeout(() => {
+            setIsRunning(false);
+          }, 3000);
+        };
 
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-5xl font-black text-cyan-900 mb-2">
-              🚗 速率概念
-            </h1>
-            <p className="text-xl text-cyan-700 font-bold mb-8">
-              Speed Concept
-            </p>
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-2xl w-full">
-              <div className="grid grid-cols-2 gap-6 mb-8">
-                <div className="text-center">
-                  <label className="block font-bold text-cyan-700 mb-2">
-                    距離 Distance (km)
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={distance}
-                    onChange={(e) =>
-                      setDistance(Math.max(1, parseInt(e.target.value) || 1))
+          <div className="min-h-screen flex flex-col items-center p-4 font-sans bg-slate-900 text-white">
+            <div className="w-full max-w-5xl flex justify-between items-center mb-8">
+              <h1 className="text-4xl font-black text-cyan-400 drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]">
+                🚀 {getText("title", lang)}
+              </h1>
+              <div className="flex bg-slate-800/80 p-1.5 rounded-xl border border-white/10 flex-wrap justify-end gap-1 max-w-[50%]">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-cyan-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Formula Triangle */}
+              <div className="glass-panel p-8 rounded-3xl flex flex-col items-center justify-center min-h-[300px]">
+                <div className="relative w-64 h-56">
+                  {/* Triangle Shape using CSS clip-path or SVG */}
+                  <svg
+                    viewBox="0 0 200 170"
+                    className="w-full h-full drop-shadow-2xl"
+                  >
+                    <path
+                      d="M100 10 L190 160 L10 160 Z"
+                      fill="rgba(30, 41, 59, 0.8)"
+                      stroke="#22d3ee"
+                      strokeWidth="4"
+                    />
+                    {/* Horizontal Divider */}
+                    <line
+                      x1="55"
+                      y1="85"
+                      x2="145"
+                      y2="85"
+                      stroke="#22d3ee"
+                      strokeWidth="2"
+                    />
+                    {/* Vertical Divider */}
+                    <line
+                      x1="100"
+                      y1="85"
+                      x2="100"
+                      y2="160"
+                      stroke="#22d3ee"
+                      strokeWidth="2"
+                    />
+
+                    {/* Labels */}
+                    <text
+                      x="100"
+                      y="65"
+                      textAnchor="middle"
+                      fill="#fbbf24"
+                      fontSize="30"
+                      fontWeight="bold"
+                    >
+                      D
+                    </text>
+                    <text
+                      x="75"
+                      y="135"
+                      textAnchor="middle"
+                      fill="#f472b6"
+                      fontSize="30"
+                      fontWeight="bold"
+                    >
+                      S
+                    </text>
+                    <text
+                      x="125"
+                      y="135"
+                      textAnchor="middle"
+                      fill="#a3e635"
+                      fontSize="30"
+                      fontWeight="bold"
+                    >
+                      T
+                    </text>
+                  </svg>
+
+                  <div className="absolute top-0 right-0 left-0 bottom-0 pointer-events-none flex flex-col items-center justify-end pb-2">
+                    {/* Interactive tooltips could go here */}
+                  </div>
+                </div>
+
+                <div className="mt-8 text-center text-sm font-bold text-slate-400 bg-slate-800/50 px-4 py-2 rounded-xl">
+                  {getText("speed", lang)} (S) = {getText("dist", lang)} (D) ÷{" "}
+                  {getText("time", lang)} (T)
+                </div>
+              </div>
+
+              {/* Calculator & Sim */}
+              <div className="flex flex-col gap-6">
+                <div className="glass-panel p-6 rounded-3xl grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-amber-400 font-bold uppercase mb-2 block">
+                      {getText("dist", lang)} (km)
+                    </label>
+                    <input
+                      type="number"
+                      value={dist}
+                      onChange={(e) =>
+                        setDist(Math.max(1, parseInt(e.target.value) || 1))
+                      }
+                      className="w-full text-3xl font-black text-center bg-slate-800 border-b-4 border-amber-500 rounded-xl py-2 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-lime-400 font-bold uppercase mb-2 block">
+                      {getText("time", lang)} (h)
+                    </label>
+                    <input
+                      type="number"
+                      value={time}
+                      onChange={(e) =>
+                        setTime(Math.max(1, parseInt(e.target.value) || 1))
+                      }
+                      className="w-full text-3xl font-black text-center bg-slate-800 border-b-4 border-lime-500 rounded-xl py-2 outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="glass-panel p-6 rounded-3xl border-l-4 border-pink-500 bg-pink-900/10 flex justify-between items-center">
+                  <div>
+                    <div className="text-pink-400 font-bold uppercase mb-1">
+                      {getText("speed", lang)}
+                    </div>
+                    <div className="text-4xl font-black text-white">
+                      {parseFloat(speed.toFixed(1))}{" "}
+                      <span className="text-xl text-slate-400">km/h</span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleRun}
+                    className="px-6 py-3 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl font-bold shadow-lg transition-transform active:scale-95"
+                  >
+                    {getText("run", lang)} 🏁
+                  </button>
+                </div>
+
+                {/* Sim Visualization */}
+                <div className="glass-panel p-4 rounded-3xl relative overflow-hidden h-32 flex items-center bg-slate-800/50">
+                  {/* Road Marking */}
+                  <div className="absolute top-1/2 w-full h-px bg-slate-600 border-t border-dashed border-slate-400"></div>
+
+                  {/* Car */}
+                  <motion.div
+                    className="absolute text-4xl"
+                    initial={{ x: "0%" }}
+                    animate={
+                      isRunning ? { x: "calc(100% - 40px)" } : { x: "0%" }
                     }
-                    className="w-full text-3xl font-black text-center border-4 border-cyan-300 rounded-xl p-2"
-                  />
+                    transition={{
+                      duration: isRunning ? 300 / speed : 0,
+                      ease: "linear",
+                    }} // Faster speed = Lower duration
+                  >
+                    🏎️
+                  </motion.div>
+
+                  {/* We simulate distance by just running from left to right. 
+                           The duration depends on speed? 
+                           If speed is 50, duration = 2s.
+                           If speed is 100, duration = 1s.
+                           Let's normalize: 100 / speed * constant
+                       */}
                 </div>
-                <div className="text-center">
-                  <label className="block font-bold text-cyan-700 mb-2">
-                    時間 Time (小時 hours)
-                  </label>
-                  <input
-                    type="number"
-                    min="0.5"
-                    step="0.5"
-                    value={time}
-                    onChange={(e) =>
-                      setTime(Math.max(0.5, parseFloat(e.target.value) || 0.5))
-                    }
-                    className="w-full text-3xl font-black text-center border-4 border-cyan-300 rounded-xl p-2"
-                  />
-                </div>
-              </div>
-
-              <div className="bg-cyan-50 rounded-2xl p-6 text-center mb-6 border-2 border-cyan-200">
-                <p className="text-2xl font-bold text-cyan-800">
-                  速率 = 距離 ÷ 時間
-                </p>
-                <p className="text-xl font-mono mt-2">
-                  Speed = Distance ÷ Time
-                </p>
-              </div>
-
-              <div className="bg-slate-50 rounded-2xl p-4 text-center mb-6">
-                <p className="text-xl font-mono">
-                  {distance} km ÷ {time} h = {speed.toFixed(1)} km/h
-                </p>
-              </div>
-
-              <div className="bg-emerald-100 rounded-2xl p-6 text-center border-4 border-emerald-300">
-                <div className="text-emerald-600 font-bold">速率 Speed</div>
-                <div className="text-5xl font-black text-emerald-800">
-                  {speed.toFixed(1)} km/h
-                </div>
-              </div>
-
-              <div className="mt-6 bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
-                <p className="font-bold">💡 記住三個公式:</p>
-                <ul className="list-disc list-inside text-sm mt-2">
-                  <li>速率 = 距離 ÷ 時間</li>
-                  <li>距離 = 速率 × 時間</li>
-                  <li>時間 = 距離 ÷ 速率</li>
-                </ul>
               </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

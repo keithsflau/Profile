@@ -3,20 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小三數學：乘數表速記訓練</title>
+    <title>小三數學：乘數表速記訓練 | Multiplication Tables</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script
-      src="https://unpkg.com/react@18/umd/react.development.js"
-      crossorigin
-    ></script>
-    <script
-      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
-      crossorigin
-    ></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.min.js"></script>
+    <script src="../../common/i18n.js"></script>
+
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@400;600&display=swap"
       rel="stylesheet"
@@ -33,9 +27,85 @@
     <script type="text/babel">
       const { useState, useEffect } = React;
       const { motion } = window.Motion;
-      const { Zap, Trophy, Star } = window.LucideReact;
+      const { LanguageSelector, get } = window.MathI18n;
+
+      const t = {
+        title: {
+          en: "Multiplication Tables",
+          zh: "乘數表速記訓練",
+          ja: "九九の練習",
+          ko: "구구단 연습",
+          es: "Tablas de multiplicar",
+          de: "Einmaleins",
+          fi: "Kertotaulut",
+          fr: "Tables de multiplication",
+          ar: "جداول الضرب",
+          it: "Tabelline",
+        },
+        score: {
+          en: "Score",
+          zh: "得分",
+          ja: "スコア",
+          ko: "점수",
+          es: "Puntuación",
+          de: "Punktzahl",
+          fi: "Pisteet",
+          fr: "Score",
+          ar: "النتيجة",
+          it: "Punteggio",
+        },
+        streak: {
+          en: "Streak",
+          zh: "連勝",
+          ja: "連続正解",
+          ko: "연승",
+          es: "Racha",
+          de: "Serie",
+          fi: "Putki",
+          fr: "Série",
+          ar: "سلسلة",
+          it: "Serie",
+        },
+        check: {
+          en: "Check Answer",
+          zh: "確認答案",
+          ja: "答え合わせ",
+          ko: "정답 확인",
+          es: "Comprobar respuesta",
+          de: "Antwort prüfen",
+          fi: "Tarkista vastaus",
+          fr: "Vérifier la réponse",
+          ar: "تحقق من الإجابة",
+          it: "Controlla la risposta",
+        },
+        correct: {
+          en: "Correct!",
+          zh: "答對了！",
+          ja: "正解！",
+          ko: "정답!",
+          es: "¡Correcto!",
+          de: "Richtig!",
+          fi: "Oikein!",
+          fr: "Correct !",
+          ar: "صحيح!",
+          it: "Corretto!",
+        },
+        incorrect: {
+          en: "Answer:",
+          zh: "答案:",
+          ja: "答え:",
+          ko: "정답:",
+          es: "Respuesta:",
+          de: "Antwort:",
+          fi: "Vastaus:",
+          fr: "Réponse :",
+          ar: "الإجابة:",
+          it: "Risposta:",
+        },
+      };
 
       function App() {
+        const [lang, setLang] = useState("zh");
         const [table, setTable] = useState(2);
         const [question, setQuestion] = useState({ a: 2, b: 1 });
         const [userAnswer, setUserAnswer] = useState("");
@@ -70,15 +140,18 @@
 
         return (
           <div className="min-h-screen p-8 flex flex-col items-center justify-center">
-            <h1 className="text-6xl font-black text-white mb-8">
-              乘數表速記訓練
+            <LanguageSelector lang={lang} setLang={setLang} />
+            <h1 className="text-4xl md:text-6xl font-black text-white mb-8 text-center mt-8">
+              {t.title[lang] || t.title["en"]}
             </h1>
 
             <div className="bg-white/95 backdrop-blur-md rounded-3xl p-12 shadow-2xl max-w-2xl w-full">
               <div className="flex justify-between mb-8">
-                <div className="text-2xl font-black">得分: {score}</div>
+                <div className="text-2xl font-black">
+                  {t.score[lang] || t.score["en"]}: {score}
+                </div>
                 <div className="text-2xl font-black text-orange-500">
-                  連勝: {streak} 🔥
+                  {t.streak[lang] || t.streak["en"]}: {streak} 🔥
                 </div>
               </div>
 
@@ -117,7 +190,7 @@
                 onClick={checkAnswer}
                 className="w-full py-4 bg-purple-600 hover:bg-purple-700 text-white text-xl font-bold rounded-2xl shadow-lg transition-all"
               >
-                確認答案
+                {t.check[lang] || t.check["en"]}
               </button>
 
               {feedback === "correct" && (
@@ -126,7 +199,7 @@
                   animate={{ scale: 1 }}
                   className="mt-4 bg-green-100 text-green-700 p-4 rounded-xl text-center font-bold text-xl"
                 >
-                  ✓ 答對了！
+                  ✓ {t.correct[lang] || t.correct["en"]}
                 </motion.div>
               )}
 
@@ -136,7 +209,8 @@
                   animate={{ scale: 1 }}
                   className="mt-4 bg-red-100 text-red-700 p-4 rounded-xl text-center font-bold text-xl"
                 >
-                  ✗ 答案: {question.a * question.b}
+                  ✗ {t.incorrect[lang] || t.incorrect["en"]}{" "}
+                  {question.a * question.b}
                 </motion.div>
               )}
             </div>
@@ -147,20 +221,5 @@
       const root = ReactDOM.createRoot(document.getElementById("root"));
       root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

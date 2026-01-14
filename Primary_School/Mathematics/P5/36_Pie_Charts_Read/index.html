@@ -3,41 +3,51 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小五數學：圓形圖入門 | Introduction to Pie Charts</title>
+    <title>小五數學：圓形圖大師 | Pie Chart Master</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <script src="../../common/i18n.js"></script>
     <style>
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #e0e7ff 0%, #6366f1 100%);
+        background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0f172a 100%);
+        color: white;
+      }
+      .glass-panel {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
-      const { LanguageSelector, get } = window.MathI18n;
+      const { useState, useEffect, useRef } = React;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
 
       const t = {
         title: {
-          en: "Introduction to Pie Charts",
-          zh: "圓形圖入門",
-          ja: "円グラフ入門",
-          ko: "원형 차트 소개",
-          es: "Introducción a los Gráficos Circulares",
-          de: "Einführung in Kreisdiagramme",
-          fi: "Johdatus ympyräkaavioihin",
-          fr: "Introduction aux diagrammes circulaires",
-          ar: "مقدمة في الرسوم البيانية الدائرية",
-          it: "Introduzione ai grafici a torta",
+          en: "Pie Charts Master",
+          zh: "圓形圖大師",
+          ja: "円グラフマスター",
+          ko: "원형 차트 마스터",
+          es: "Maestro de Gráficos Circulares",
+          de: "Kreisdiagramm-Meister",
+          fi: "Ympyräkaaviomestari",
+          fr: "Maître des Diagrammes Circulaires",
+          ar: "سيد الرسوم البيانية الدائرية",
+          it: "Maestro dei Grafici a Torta",
         },
         chartTitle: {
           en: "Favorite Sports",
@@ -47,9 +57,9 @@
           es: "Deportes Favoritos",
           de: "Lieblingssportarten",
           fi: "Suosikkiurheilulajit",
-          fr: "Sports préférés",
+          fr: "Sports Préférés",
           ar: "الرياضات المفضلة",
-          it: "Sport preferiti",
+          it: "Sport Preferiti",
         },
         football: {
           en: "Football",
@@ -71,7 +81,7 @@
           es: "Baloncesto",
           de: "Basketball",
           fi: "Koripallo",
-          fr: "Basket-ball",
+          fr: "Basketball",
           ar: "كرة السلة",
           it: "Pallacanestro",
         },
@@ -96,7 +106,7 @@
           de: "Laufen",
           fi: "Juoksu",
           fr: "Course à pied",
-          ar: "الجري",
+          ar: "الركض",
           it: "Corsa",
         },
         others: {
@@ -111,146 +121,239 @@
           ar: "أخرى",
           it: "Altri",
         },
-        people: {
-          en: "people",
-          zh: "人",
-          ja: "人",
-          ko: "명",
-          es: "personas",
-          de: "Personen",
-          fi: "hlö",
-          fr: "personnes",
-          ar: "شخص",
-          it: "persone",
+        edit: {
+          en: "Edit Values",
+          zh: "編輯數值",
+          ja: "値を編集",
+          ko: "값 편집",
+          es: "Editar Valores",
+          de: "Werte bearbeiten",
+          fi: "Muokkaa arvoja",
+          fr: "Modifier les valeurs",
+          ar: "تعديل القيم",
+          it: "Modifica Valori",
         },
-        tip: {
-          en: "Pie charts show the proportion of each part to the whole.",
-          zh: "圓形圖顯示各部分佔整體的比例",
-          ja: "円グラフは、全体に対する各部分の割合を示します。",
-          ko: "원형 차트는 전체에 대한 각 부분의 비율을 보여줍니다.",
-          es: "Los gráficos circulares muestran la proporción de cada parte con respecto al todo.",
-          de: "Kreisdiagramme zeigen den Anteil jedes Teils am Ganzen.",
-          fi: "Ympyräkaaviot osoittavat kunkin osan osuuden kokonaisuudesta.",
-          fr: "Les diagrammes circulaires montrent la proportion de chaque partie par rapport à l'ensemble.",
-          ar: "تظهر الرسوم البيانية الدائرية نسبة كل جزء إلى الكل.",
-          it: "I grafici a torta mostrano la proporzione di ogni parte rispetto al tutto.",
+        total: {
+          en: "Total",
+          zh: "總數",
+          ja: "合計",
+          ko: "합계",
+          es: "Total",
+          de: "Gesamt",
+          fi: "Yhteensä",
+          fr: "Total",
+          ar: "المجموع",
+          it: "Totale",
         },
       };
 
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
       function App() {
         const [lang, setLang] = useState("zh");
-        const getText = (key) => t[key][lang] || t[key]["en"];
-
-        const data = [
+        const chartRef = useRef(null);
+        const [chartInstance, setChartInstance] = useState(null);
+        const [data, setData] = useState([
           { id: "football", value: 30, color: "#3b82f6" },
           { id: "basketball", value: 25, color: "#ef4444" },
           { id: "swimming", value: 20, color: "#22c55e" },
           { id: "running", value: 15, color: "#f59e0b" },
           { id: "others", value: 10, color: "#8b5cf6" },
-        ];
-        const total = data.reduce((s, d) => s + d.value, 0);
-        const [selected, setSelected] = useState(null);
+        ]);
 
-        // Calculate pie slices
-        let cumulative = 0;
-        const slices = data.map((d) => {
-          const start = cumulative;
-          cumulative += (d.value / total) * 360;
-          return { ...d, startAngle: start, endAngle: cumulative };
-        });
+        useEffect(() => {
+          if (chartInstance) {
+            chartInstance.destroy();
+          }
 
-        const describeArc = (cx, cy, r, startAngle, endAngle) => {
-          const start = polarToCartesian(cx, cy, r, endAngle);
-          const end = polarToCartesian(cx, cy, r, startAngle);
-          const largeArc = endAngle - startAngle <= 180 ? 0 : 1;
-          return `M ${cx} ${cy} L ${start.x} ${start.y} A ${r} ${r} 0 ${largeArc} 0 ${end.x} ${end.y} Z`;
+          const ctx = chartRef.current.getContext("2d");
+          const newChart = new Chart(ctx, {
+            type: "doughnut",
+            data: {
+              labels: data.map((d) => getText(d.id, lang)),
+              datasets: [
+                {
+                  data: data.map((d) => d.value),
+                  backgroundColor: data.map((d) => d.color),
+                  borderWidth: 0,
+                  hoverOffset: 20,
+                  hoverBorderWidth: 4,
+                  hoverBorderColor: "white",
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              cutout: "60%",
+              plugins: {
+                legend: {
+                  display: false,
+                },
+                tooltip: {
+                  titleFont: { size: 16, family: "Outfit" },
+                  bodyFont: { size: 14, family: "Outfit" },
+                  padding: 16,
+                  cornerRadius: 12,
+                  displayColors: true,
+                  backgroundColor: "rgba(0,0,0,0.8)",
+                  backdropFilter: "blur(4px)",
+                  callbacks: {
+                    label: function (context) {
+                      let label = context.label || "";
+                      if (label) label += ": ";
+                      label += context.raw;
+                      const total =
+                        context.chart._metasets[context.datasetIndex].total;
+                      const percentage =
+                        Math.round((context.raw / total) * 100) + "%";
+                      return label + " (" + percentage + ")";
+                    },
+                  },
+                },
+              },
+              animation: {
+                animateScale: true,
+                animateRotate: true,
+              },
+            },
+          });
+          setChartInstance(newChart);
+
+          return () => {
+            if (newChart) newChart.destroy();
+          };
+        }, [data, lang]);
+
+        const updateValue = (index, val) => {
+          const newData = [...data];
+          newData[index].value = Number(val);
+          setData(newData);
         };
 
-        const polarToCartesian = (cx, cy, r, angle) => {
-          const rad = ((angle - 90) * Math.PI) / 180;
-          return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
-        };
+        const total = data.reduce((a, b) => a + b.value, 0);
 
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <LanguageSelector lang={lang} setLang={setLang} />
-            <h1 className="text-5xl font-black text-indigo-100 mb-2 mt-8">
-              🥧 {getText("title")}
-            </h1>
+          <div className="min-h-screen p-4 md:p-8 flex flex-col items-center font-sans">
+            <div className="w-full max-w-7xl flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+              <h1 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent drop-shadow-lg text-center md:text-left">
+                {getText("title", lang)}
+              </h1>
+              {/* Language Selector (All 8+) */}
+              <div className="bg-slate-800/80 p-1.5 rounded-xl flex flex-wrap justify-center gap-1 backdrop-blur-md border border-white/10 max-w-full">
+                {[
+                  "zh",
+                  "en",
+                  "ja",
+                  "ko",
+                  "es",
+                  "de",
+                  "fi",
+                  "fr",
+                  "ar",
+                  "it",
+                ].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                      lang === l
+                        ? "bg-blue-600 text-white shadow-lg scale-105"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-4xl w-full mt-8">
-              <h3 className="text-xl font-bold text-center text-slate-700 mb-4">
-                {getText("chartTitle")}
-              </h3>
-
-              <div className="flex flex-col md:flex-row gap-8 items-center">
-                <svg viewBox="0 0 220 220" className="w-64 h-64">
-                  {slices.map((s, i) => (
-                    <path
-                      key={i}
-                      d={describeArc(110, 110, 100, s.startAngle, s.endAngle)}
-                      fill={s.color}
-                      stroke="white"
-                      strokeWidth="2"
-                      onClick={() => setSelected(i)}
-                      className={`cursor-pointer transition-transform ${
-                        selected === i ? "scale-105" : ""
-                      }`}
-                      style={{ transformOrigin: "110px 110px" }}
-                    />
-                  ))}
-                </svg>
-                <div className="flex-1 space-y-2">
-                  {data.map((d, i) => (
-                    <div
-                      key={i}
-                      onClick={() => setSelected(i)}
-                      className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer ${
-                        selected === i
-                          ? "bg-slate-100 ring-2 ring-indigo-400"
-                          : ""
-                      }`}
-                    >
-                      <div
-                        className="w-6 h-6 rounded"
-                        style={{ backgroundColor: d.color }}
-                      ></div>
-                      <span className="font-bold flex-1">{getText(d.id)}</span>
-                      <span className="font-mono">
-                        {d.value}
-                        {getText("people")}
-                      </span>
-                      <span className="text-slate-500">
-                        ({Math.round((d.value / total) * 100)}%)
-                      </span>
+            <div className="flex flex-col lg:flex-row gap-8 w-full max-w-7xl flex-1 min-h-[500px]">
+              {/* Chart Section */}
+              <div className="flex-1 glass-panel rounded-3xl p-8 flex flex-col items-center justify-center relative min-h-[400px] border border-white/10 shadow-[0_0_50px_rgba(59,130,246,0.1)]">
+                <h2 className="absolute top-8 left-8 text-2xl font-black text-slate-300 tracking-tight">
+                  {getText("chartTitle", lang)}
+                </h2>
+                <div className="relative w-full h-[400px] lg:h-full flex items-center justify-center mt-12 lg:mt-0">
+                  <canvas ref={chartRef}></canvas>
+                  {/* Center Text */}
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="text-center">
+                      <div className="text-6xl font-black text-white drop-shadow-xl font-mono">
+                        {total}
+                      </div>
+                      <div className="text-blue-300 font-bold uppercase tracking-widest text-sm mt-1">
+                        {getText("total", lang)}
+                      </div>
                     </div>
-                  ))}
+                  </div>
                 </div>
               </div>
 
-              <div className="mt-6 bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
-                <p className="font-bold">💡 {getText("tip")}</p>
+              {/* Controls Section */}
+              <div className="w-full lg:w-96 flex flex-col gap-4">
+                <div className="glass-panel p-6 rounded-3xl flex-1 flex flex-col gap-4 overflow-y-auto">
+                  <div className="flex justify-between items-center mb-2 px-2">
+                    <h3 className="font-bold text-lg text-slate-300 flex items-center gap-2">
+                      <span className="w-2 h-6 bg-blue-500 rounded-full"></span>
+                      {getText("edit", lang)}
+                    </h3>
+                  </div>
+
+                  {data.map((d, i) => (
+                    <div
+                      key={d.id}
+                      className="bg-slate-800/40 p-4 rounded-2xl border border-white/5 group hover:border-blue-500/30 hover:bg-slate-800/60 transition-all"
+                    >
+                      <div className="flex justify-between items-center mb-3">
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="w-3 h-3 rounded-full shadow-[0_0_8px_currentColor]"
+                            style={{ color: d.color, backgroundColor: d.color }}
+                          ></div>
+                          <span className="font-bold text-base text-white">
+                            {getText(d.id, lang)}
+                          </span>
+                        </div>
+                        <div className="bg-black/30 px-2 py-1 rounded-md text-xs font-mono font-bold text-blue-300">
+                          {total > 0 ? Math.round((d.value / total) * 100) : 0}%
+                        </div>
+                      </div>
+
+                      <div className="relative h-8 flex items-center">
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          value={d.value}
+                          onChange={(e) => updateValue(i, e.target.value)}
+                          className="w-full accent-blue-500 h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer z-10"
+                        />
+                        {/* Value Tag */}
+                        <div
+                          className="absolute -top-6 px-2 py-0.5 bg-blue-600 rounded text-[10px] font-bold text-white pointer-events-none transform -translate-x-1/2 transition-all opacity-0 group-hover:opacity-100"
+                          style={{ left: `${d.value}%` }}
+                        >
+                          {d.value}
+                        </div>
+                      </div>
+
+                      <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider text-slate-500 mt-1">
+                        <span>0</span>
+                        <span>{d.value}</span>
+                        <span>100</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>

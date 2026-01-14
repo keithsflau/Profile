@@ -3,282 +3,420 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小五數學：體積概念 | Volume Concept</title>
+    <title>小五數學：體積概念 | Volume Cubes</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap"
       rel="stylesheet"
     />
     <script src="../../common/i18n.js"></script>
     <style>
+      :root {
+        --glass-bg: rgba(30, 41, 59, 0.7);
+        --glass-border: rgba(255, 255, 255, 0.1);
+      }
       body {
         font-family: "Outfit", "Noto Sans TC", sans-serif;
-        background: linear-gradient(135deg, #e0e7ff 0%, #6366f1 100%);
+        background: #0f172a;
+        color: white;
+        overflow: hidden; /* ThreeJS handles scroll */
+        margin: 0;
+      }
+      .glass-panel {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+      input[type="range"] {
+        -webkit-appearance: none;
+        background: transparent;
+        height: 6px;
+        border-radius: 3px;
+        background: rgba(255, 255, 255, 0.2);
+        cursor: pointer;
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        height: 18px;
+        width: 18px;
+        border-radius: 50%;
+        background: #6366f1;
+        margin-top: -6px;
+        box-shadow: 0 0 10px #6366f1;
+        border: 2px solid white;
+        transition: transform 0.1s;
+      }
+      input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.2);
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState } = React;
-      const { LanguageSelector, get } = window.MathI18n;
+      const { useState, useEffect, useRef, useLayoutEffect } = React;
+      const { LanguageSelector } = window.MathI18n || {
+        LanguageSelector: () => null,
+      };
 
       const t = {
         title: {
-          en: "Volume Concept",
-          zh: "體積概念",
-          ja: "体積の概念",
-          ko: "부피 개념",
-          es: "Concepto de Volumen",
-          de: "Volumenkonzept",
-          fi: "Tilavuuden käsite",
-          fr: "Concept de volume",
-          ar: "مفهوم الحجم",
-          it: "Concetto di volume",
-        },
-        subtitle: {
-          en: "Volume Concept - Counting Unit Cubes",
-          zh: "體積概念 - 數立方塊",
-          ja: "体積の概念 - 単位立方体を数える",
-          ko: "부피 개념 - 단위 정육면체 세기",
-          es: "Concepto de Volumen - Contando Cubos Unitarios",
-          de: "Volumenkonzept - Einheitswürfel zählen",
-          fi: "Tilavuuden käsite - Yksikkökuutioiden laskeminen",
-          fr: "Concept de volume - Compter les cubes unitaires",
-          ar: "مفهوم الحجم - عد المكعبات الوحدوية",
-          it: "Concetto di volume - Contare cubi unitari",
+          en: "Volume Explorer",
+          zh: "體積探究",
+          ja: "体積エクスプローラー",
+          ko: "부피 탐험기",
+          es: "Explorador de Volumen",
+          de: "Volumenforscher",
+          fi: "Tilavuuden tutkimus",
+          fr: "Explorateur de Volume",
+          ar: "مستكشف الحجم",
+          it: "Esploratore di Volume",
         },
         length: {
-          en: "Length (cubes):",
-          zh: "長 (塊):",
-          ja: "長さ (個):",
-          ko: "길이 (개):",
-          es: "Longitud (cubos):",
-          de: "Länge (Würfel):",
-          fi: "Pituus (kuutiot):",
-          fr: "Longueur (cubes) :",
-          ar: "الطول (مكعبات):",
-          it: "Lunghezza (cubi):",
+          en: "Length",
+          zh: "長",
+          ja: "長さ",
+          ko: "길이",
+          es: "Largo",
+          de: "Länge",
+          fi: "Pituus",
+          fr: "Longueur",
+          ar: "الطول",
+          it: "Lunghezza",
         },
         width: {
-          en: "Width (cubes):",
-          zh: "闊 (塊):",
-          ja: "幅 (個):",
-          ko: "너비 (개):",
-          es: "Ancho (cubos):",
-          de: "Breite (Würfel):",
-          fi: "Leveys (kuutiot):",
-          fr: "Largeur (cubes) :",
-          ar: "العرض (مكعبات):",
-          it: "Larghezza (cubi):",
+          en: "Width",
+          zh: "闊",
+          ja: "幅",
+          ko: "너비",
+          es: "Ancho",
+          de: "Breite",
+          fi: "Leveys",
+          fr: "Largeur",
+          ar: "العرض",
+          it: "Larghezza",
         },
         height: {
-          en: "Height (layers):",
-          zh: "高 (層):",
-          ja: "高さ (層):",
-          ko: "높이 (층):",
-          es: "Altura (capas):",
-          de: "Höhe (Schichten):",
-          fi: "Korkeus (kerrokset):",
-          fr: "Hauteur (couches) :",
-          ar: "الارتفاع (طبقات):",
-          it: "Altezza (strati):",
+          en: "Height",
+          zh: "高",
+          ja: "高さ",
+          ko: "높이",
+          es: "Altura",
+          de: "Höhe",
+          fi: "Korkeus",
+          fr: "Hauteur",
+          ar: "الارتفاع",
+          it: "Altezza",
         },
-        calculation: {
-          en: "Calculation:",
-          zh: "計算:",
-          ja: "計算:",
-          ko: "계산:",
-          es: "Cálculo:",
-          de: "Berechnung:",
-          fi: "Laskenta:",
-          fr: "Calcul :",
-          ar: "الحساب:",
-          it: "Calcolo:",
-        },
-        volume: {
-          en: "Volume",
-          zh: "體積",
-          ja: "体積",
-          ko: "부피",
-          es: "Volumen",
-          de: "Volumen",
-          fi: "Tilavuus",
-          fr: "Volume",
-          ar: "الحجم",
-          it: "Volume",
-        },
-        cubicUnits: {
-          en: "cubic units",
-          zh: "立方單位",
-          ja: "立方単位",
-          ko: "세제곱 단위",
-          es: "unidades cúbicas",
-          de: "Kubikeinheiten",
-          fi: "kuutioyksikköä",
-          fr: "unités cubiques",
-          ar: "وحدات مكعبة",
-          it: "unità cubiche",
-        },
-        tip: {
-          en: "Volume = Length × Width × Height (number of unit cubes)",
-          zh: "體積 = 長 × 闊 × 高 (單位立方體的數量)",
-          ja: "体積 = 長さ × 幅 × 高さ (単位立方体の数)",
-          ko: "부피 = 길이 × 너비 × 높이 (단위 정육면체의 수)",
-          es: "Volumen = Longitud × Ancho × Altura (número de cubos unitarios)",
-          de: "Volumen = Länge × Breite × Höhe (Anzahl der Einheitswürfel)",
-          fi: "Tilavuus = Pituus × Leveys × Korkeus (yksikkökuutioiden määrä)",
-          fr: "Volume = Longueur × Largeur × Hauteur (nombre de cubes unitaires)",
-          ar: "الحجم = الطول × العرض × الارتفاع (عدد المكعبات الوحدوية)",
-          it: "Volume = Lunghezza × Larghezza × Altezza (numero di cubi unitari)",
+        total: {
+          en: "Total Cubes",
+          zh: "總方塊數",
+          ja: "総キューブ数",
+          ko: "총 큐브 수",
+          es: "Total de Cubos",
+          de: "Würfel Gesamt",
+          fi: "Kuutiot yhteensä",
+          fr: "Total des Cubes",
+          ar: "إجمالي المكعبات",
+          it: "Totale Cubi",
         },
       };
 
+      const getText = (key, lang) => t[key]?.[lang] || t[key]?.["en"] || key;
+
+      function Scene({ dim }) {
+        const mountRef = useRef(null);
+        const sceneDataRef = useRef({});
+
+        useLayoutEffect(() => {
+          const w = mountRef.current.clientWidth;
+          const h = mountRef.current.clientHeight;
+
+          const scene = new THREE.Scene();
+          // scene.background = new THREE.Color(0x0f172a); // Let CSS handle BG
+          const camera = new THREE.PerspectiveCamera(40, w / h, 0.1, 100);
+          camera.position.set(15, 15, 15);
+          camera.lookAt(0, 0, 0);
+
+          const renderer = new THREE.WebGLRenderer({
+            antialias: true,
+            alpha: true,
+          });
+          renderer.setSize(w, h);
+          renderer.setPixelRatio(window.devicePixelRatio);
+          renderer.shadowMap.enabled = true;
+          mountRef.current.appendChild(renderer.domElement);
+
+          // Lights
+          const amb = new THREE.AmbientLight(0xffffff, 0.7);
+          scene.add(amb);
+          const dir = new THREE.DirectionalLight(0xffffff, 0.8);
+          dir.position.set(5, 12, 8);
+          dir.castShadow = true;
+          dir.shadow.mapSize.width = 1024;
+          dir.shadow.mapSize.height = 1024;
+          scene.add(dir);
+
+          // Floor Grid
+          const grid = new THREE.GridHelper(20, 20, 0x475569, 0x1e293b);
+          scene.add(grid);
+
+          // Instanced Mesh
+          const maxCount = 1000;
+          const boxGeo = new THREE.BoxGeometry(0.95, 0.95, 0.95);
+          const boxMat = new THREE.MeshPhysicalMaterial({
+            color: 0x6366f1, // Indigo-500
+            metalness: 0.1,
+            roughness: 0.2,
+            clearcoat: 0.5,
+            clearcoatRoughness: 0.1,
+          });
+          const instances = new THREE.InstancedMesh(boxGeo, boxMat, maxCount);
+          instances.castShadow = true;
+          instances.receiveShadow = true;
+          instances.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+          scene.add(instances);
+
+          sceneDataRef.current = { scene, camera, renderer, instances };
+
+          // Rotation Logic (Orbit controls simulation)
+          const pivot = new THREE.Group();
+          pivot.add(grid);
+          pivot.add(instances);
+          scene.add(pivot);
+
+          let isDragging = false;
+          let previousMousePosition = { x: 0, y: 0 };
+          const cvs = renderer.domElement;
+
+          const onMouseDown = (e) => {
+            isDragging = true;
+            previousMousePosition = { x: e.clientX, y: e.clientY };
+          };
+          const onMouseMove = (e) => {
+            if (isDragging) {
+              const deltaMove = {
+                x: e.clientX - previousMousePosition.x,
+                y: e.clientY - previousMousePosition.y,
+              };
+              pivot.rotation.y += deltaMove.x * 0.005;
+              // pivot.rotation.x += deltaMove.y * 0.005; // Optional X rotation
+              previousMousePosition = { x: e.clientX, y: e.clientY };
+            }
+          };
+          const onMouseUp = () => {
+            isDragging = false;
+          };
+
+          cvs.addEventListener("mousedown", onMouseDown);
+          cvs.addEventListener("mousemove", onMouseMove);
+          window.addEventListener("mouseup", onMouseUp);
+
+          // Touch support
+          const onTouchStart = (e) => {
+            isDragging = true;
+            previousMousePosition = {
+              x: e.touches[0].clientX,
+              y: e.touches[0].clientY,
+            };
+          };
+          const onTouchMove = (e) => {
+            if (isDragging) {
+              const deltaMove = {
+                x: e.touches[0].clientX - previousMousePosition.x,
+                y: e.touches[0].clientY - previousMousePosition.y,
+              };
+              pivot.rotation.y += deltaMove.x * 0.005;
+              previousMousePosition = {
+                x: e.touches[0].clientX,
+                y: e.touches[0].clientY,
+              };
+            }
+          };
+          const onTouchEnd = () => {
+            isDragging = false;
+          };
+          cvs.addEventListener("touchstart", onTouchStart, { passive: false });
+          cvs.addEventListener("touchmove", onTouchMove, { passive: false });
+          cvs.addEventListener("touchend", onTouchEnd);
+
+          const animate = () => {
+            requestAnimationFrame(animate);
+            // Gentle auto rotation if not dragging
+            if (!isDragging && Math.abs(pivot.rotation.y) > 0.01) {
+              // pivot.rotation.y += 0.001;
+            }
+            renderer.render(scene, camera);
+          };
+          animate();
+
+          const handleResize = () => {
+            if (!mountRef.current) return;
+            const mw = mountRef.current.clientWidth;
+            const mh = mountRef.current.clientHeight;
+            renderer.setSize(mw, mh);
+            camera.aspect = mw / mh;
+            camera.updateProjectionMatrix();
+          };
+          window.addEventListener("resize", handleResize);
+
+          return () => {
+            window.removeEventListener("resize", handleResize);
+            window.removeEventListener("mouseup", onMouseUp);
+            cvs.removeEventListener("mousedown", onMouseDown);
+            cvs.removeEventListener("mousemove", onMouseMove);
+            if (mountRef.current && renderer.domElement) {
+              mountRef.current.removeChild(renderer.domElement);
+            }
+          };
+        }, []);
+
+        useEffect(() => {
+          const { instances } = sceneDataRef.current;
+          if (!instances) return;
+
+          let count = 0;
+          const dummy = new THREE.Object3D();
+          const cx = (dim.l - 1) * 0.5;
+          const cz = (dim.w - 1) * 0.5;
+
+          for (let x = 0; x < dim.l; x++) {
+            for (let y = 0; y < dim.h; y++) {
+              for (let z = 0; z < dim.w; z++) {
+                dummy.position.set(x - cx, y + 0.5, z - cz);
+                dummy.updateMatrix();
+                instances.setMatrixAt(count++, dummy.matrix);
+              }
+            }
+          }
+          instances.count = count;
+          instances.instanceMatrix.needsUpdate = true;
+        }, [dim]);
+
+        return <div ref={mountRef} className="w-full h-full" />;
+      }
+
       function App() {
         const [lang, setLang] = useState("zh");
-        const getText = (key) => t[key][lang] || t[key]["en"];
-
-        const [layers, setLayers] = useState(3);
-        const [rows, setRows] = useState(3);
-        const [cols, setCols] = useState(4);
-        const volume = layers * rows * cols;
+        const [dim, setDim] = useState({ l: 3, w: 2, h: 2 });
 
         return (
-          <div className="min-h-screen p-8 flex flex-col items-center">
-            <LanguageSelector lang={lang} setLang={setLang} />
-            <h1 className="text-5xl font-black text-indigo-100 mb-2 mt-8">
-              📦 {getText("title")}
-            </h1>
-            <p className="text-xl text-indigo-200 font-bold mb-8">
-              {getText("subtitle")}
-            </p>
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl max-w-4xl w-full">
-              <div className="flex flex-col md:flex-row gap-8">
-                <div className="flex-1 bg-slate-100 rounded-2xl p-6 flex items-center justify-center min-h-[300px]">
-                  <div
-                    className="perspective-1000"
-                    style={{ perspective: "600px" }}
-                  >
-                    <div
-                      style={{
-                        transform: "rotateX(-20deg) rotateY(30deg)",
-                        transformStyle: "preserve-3d",
-                      }}
-                    >
-                      {[...Array(layers)].map((_, l) => (
-                        <div
-                          key={l}
-                          className="flex flex-col"
-                          style={{ transform: `translateZ(${l * 28}px)` }}
-                        >
-                          {[...Array(rows)].map((_, r) => (
-                            <div key={r} className="flex">
-                              {[...Array(cols)].map((_, c) => (
-                                <div
-                                  key={c}
-                                  className="w-7 h-7 border border-indigo-300 bg-indigo-400 m-px"
-                                  style={{
-                                    boxShadow:
-                                      "inset -2px -2px 0 rgba(0,0,0,0.1), inset 2px 2px 0 rgba(255,255,255,0.3)",
-                                  }}
-                                ></div>
-                              ))}
-                            </div>
-                          ))}
-                        </div>
-                      ))}
-                    </div>
+          <div className="relative w-screen h-screen overflow-hidden bg-slate-900">
+            {/* Background Gradient */}
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/40 via-slate-900 to-black pointer-events-none"></div>
+
+            {/* ThreeJS Scene */}
+            <div className="absolute inset-0 z-0">
+              <Scene dim={dim} />
+            </div>
+
+            {/* UI Overlay */}
+            <div className="absolute inset-0 pointer-events-none p-4 md:p-8 flex flex-col justify-between z-10">
+              {/* Header */}
+              <div className="flex justify-between items-start pointer-events-auto">
+                <div className="glass-panel px-6 py-4 rounded-3xl">
+                  <h1 className="text-3xl font-black text-indigo-400 drop-shadow-md">
+                    {getText("title", lang)}
+                  </h1>
+                  <div className="text-xs text-slate-400 font-bold tracking-widest uppercase mt-1">
+                    Interactive 3D Grid
                   </div>
                 </div>
-                <div className="flex-1 space-y-4">
-                  <div>
-                    <label className="block font-bold text-indigo-800 mb-1">
-                      {getText("length")} {cols}
-                    </label>
-                    <input
-                      type="range"
-                      min="1"
-                      max="6"
-                      value={cols}
-                      onChange={(e) => setCols(parseInt(e.target.value))}
-                      className="w-full accent-indigo-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-bold text-indigo-800 mb-1">
-                      {getText("width")} {rows}
-                    </label>
-                    <input
-                      type="range"
-                      min="1"
-                      max="5"
-                      value={rows}
-                      onChange={(e) => setRows(parseInt(e.target.value))}
-                      className="w-full accent-indigo-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-bold text-indigo-800 mb-1">
-                      {getText("height")} {layers}
-                    </label>
-                    <input
-                      type="range"
-                      min="1"
-                      max="5"
-                      value={layers}
-                      onChange={(e) => setLayers(parseInt(e.target.value))}
-                      className="w-full accent-indigo-500"
-                    />
-                  </div>
 
-                  <div className="bg-indigo-50 rounded-xl p-4 border-2 border-indigo-200">
-                    <p className="text-center font-bold">
-                      {getText("calculation")}
-                    </p>
-                    <p className="text-center text-xl font-mono">
-                      {cols} × {rows} × {layers} = {volume}
-                    </p>
-                  </div>
-
-                  <div className="bg-emerald-100 rounded-2xl p-6 text-center border-4 border-emerald-300">
-                    <div className="text-emerald-600 font-bold">
-                      {getText("volume")}
-                    </div>
-                    <div className="text-5xl font-black text-emerald-800">
-                      {volume}
-                    </div>
-                    <div className="text-emerald-600">
-                      {getText("cubicUnits")}
-                    </div>
-                  </div>
+                <div className="glass-panel p-2 rounded-xl flex gap-1 items-start max-w-[40%] flex-wrap justify-end">
+                  {[
+                    "zh",
+                    "en",
+                    "ja",
+                    "ko",
+                    "es",
+                    "de",
+                    "fi",
+                    "fr",
+                    "ar",
+                    "it",
+                  ].map((l) => (
+                    <button
+                      key={l}
+                      onClick={() => setLang(l)}
+                      className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase transition-all ${
+                        lang === l
+                          ? "bg-indigo-600 text-white shadow-lg"
+                          : "text-slate-400 hover:text-white hover:bg-white/10"
+                      }`}
+                    >
+                      {l}
+                    </button>
+                  ))}
                 </div>
               </div>
-              <div className="mt-6 bg-amber-50 border-2 border-amber-200 rounded-xl p-4 text-amber-800">
-                <p className="font-bold">💡 {getText("tip")}</p>
+
+              {/* Controls */}
+              <div className="pointer-events-auto self-end md:self-start glass-panel p-6 rounded-3xl w-full md:w-80 flex flex-col gap-6">
+                {/* Total Display */}
+                <div className="flex justify-between items-center pb-4 border-b border-white/10">
+                  <span className="text-slate-400 font-bold uppercase text-xs tracking-widest">
+                    {getText("total", lang)}
+                  </span>
+                  <span className="text-4xl font-black text-indigo-400">
+                    {dim.l * dim.w * dim.h}
+                  </span>
+                </div>
+
+                {/* Sliders */}
+                <ControlSlider
+                  label={getText("length", lang)}
+                  val={dim.l}
+                  set={(v) => setDim({ ...dim, l: v })}
+                  color="text-indigo-300"
+                />
+                <ControlSlider
+                  label={getText("width", lang)}
+                  val={dim.w}
+                  set={(v) => setDim({ ...dim, w: v })}
+                  color="text-indigo-300"
+                />
+                <ControlSlider
+                  label={getText("height", lang)}
+                  val={dim.h}
+                  set={(v) => setDim({ ...dim, h: v })}
+                  color="text-indigo-300"
+                />
+
+                <div className="bg-black/30 p-3 rounded-xl border border-white/5 text-center font-mono text-indigo-200">
+                  {dim.l} × {dim.w} × {dim.h} = {dim.l * dim.w * dim.h}
+                </div>
               </div>
             </div>
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      const ControlSlider = ({ label, val, set, color }) => (
+        <div className="flex flex-col gap-2">
+          <div className={`flex justify-between font-bold text-sm ${color}`}>
+            <label>{label}</label>
+            <span>{val}</span>
+          </div>
+          <input
+            type="range"
+            min="1"
+            max="10"
+            value={val}
+            onChange={(e) => set(Number(e.target.value))}
+            className="w-full"
+          />
+        </div>
+      );
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
     </script>
-  
-      
-      <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-</body>
+  </body>
 </html>
