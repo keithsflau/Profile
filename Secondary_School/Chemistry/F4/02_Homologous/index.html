@@ -47,7 +47,7 @@
             <span class="text-gray-500 text-sm ml-2">同系列大師</span>
           </h1>
           <p class="text-xs text-gray-400">
-            Genearal Formula & Physical Properties
+            General Formula & Physical Properties
           </p>
         </div>
       </div>
@@ -381,7 +381,7 @@
       }
 
       function generateStickString(n, type) {
-        n = parseInt(n);
+        n = parseInt(n, 10);
         // A simple ASCII-like art for the structure, now with HTML subscripts
         if (type === "alkane") {
           if (n === 1) return "H<br>|<br>H-C-H<br>|<br>H";
@@ -452,7 +452,7 @@
 
         // Highlight current point
         const pointRadii = points.map((_, idx) =>
-          idx + 1 === parseInt(currentN) ? 8 : 4
+          idx + 1 === parseInt(currentN, 10) ? 8 : 4
         );
         chartInstance.data.datasets[0].pointRadius = pointRadii;
 

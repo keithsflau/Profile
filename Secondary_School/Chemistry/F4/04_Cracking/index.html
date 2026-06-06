@@ -214,7 +214,7 @@
           class="bg-red-900/50 border border-red-500 text-red-200 p-4 rounded-xl opacity-0 transition-opacity"
         >
           <strong>Suck-back Warning!</strong><br />
-          Remove the delivery tube calculated before stopping heating to prevent
+          Remove the delivery tube before stopping heating to prevent
           cold water suck-back!
         </div>
       </div>
@@ -235,7 +235,7 @@
       let bromineTested = false;
 
       tempSlider.addEventListener("input", (e) => {
-        temperature = parseInt(e.target.value);
+        temperature = parseInt(e.target.value, 10);
         // Flame visualization
         if (temperature > 0) {
           flame.style.opacity = 0.5 + temperature / 200;
