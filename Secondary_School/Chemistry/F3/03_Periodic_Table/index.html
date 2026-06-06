@@ -16,19 +16,49 @@
       .element-card {
         aspect-ratio: 1;
         transition: all 0.2s ease;
+        min-height: 52px;
+        font-size: 10px;
       }
       .element-card:hover {
-        transform: scale(1.15);
+        transform: scale(1.12);
         z-index: 10;
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
       }
-      /* Grid Layout for Periodic Table (18 columns) */
+      .element-card.dimmed {
+        opacity: 0.15;
+        pointer-events: none;
+      }
+      .element-card.highlight {
+        box-shadow: 0 0 0 2px #38bdf8;
+      }
       .periodic-grid {
         display: grid;
-        grid-template-columns: repeat(18, 1fr);
-        gap: 4px;
+        grid-template-columns: repeat(18, minmax(0, 1fr));
+        gap: 3px;
         width: 100%;
         max-width: 1400px;
+      }
+      @media (min-width: 768px) {
+        .periodic-grid {
+          gap: 4px;
+        }
+        .element-card {
+          min-height: 64px;
+          font-size: 11px;
+        }
+      }
+      .f-block-label {
+        grid-column: 3;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        color: #94a3b8;
+        border: 1px dashed #475569;
+        border-radius: 6px;
+        background: rgba(15, 23, 42, 0.5);
+        cursor: default;
+        aspect-ratio: 1;
       }
       /* Categories Colors */
       .cat-alkali {
@@ -74,9 +104,18 @@
 
       .cat-lanthanide {
         background-color: #d946ef;
+        border-color: #a21caf;
+        color: white;
       }
       .cat-actinide {
         background-color: #ec4899;
+        border-color: #be185d;
+        color: white;
+      }
+      .cat-unknown {
+        background-color: #64748b;
+        border-color: #475569;
+        color: white;
       }
 
       .empty-cell {
@@ -95,15 +134,23 @@
         <a href="../../index.html" class="text-slate-400 hover:text-white transition-colors" aria-label="Back to Chemistry hub">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
         </a>
-        <h1 class="text-xl font-bold">
-          Scientific Periodic Table
-          <span class="text-slate-500 font-normal text-sm ml-2"
-            >元素週期表</span
-          >
-        </h1>
+        <div>
+          <h1 class="text-xl font-bold">
+            Scientific Periodic Table
+            <span class="text-slate-500 font-normal text-sm ml-2">元素週期表</span>
+          </h1>
+          <p class="text-xs text-slate-500 mt-1">118 elements · 完整週期表</p>
+        </div>
       </div>
 
-      <div class="flex gap-4 items-center">
+      <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center w-full md:w-auto">
+        <input
+          id="search-input"
+          type="search"
+          placeholder="Search symbol / name / number…"
+          class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 w-full sm:w-56"
+          oninput="filterElements(this.value)"
+        />
         <div class="text-sm text-slate-400">View Mode:</div>
         <div class="bg-slate-800 p-1 rounded-lg flex" id="mode-buttons">
           <button
@@ -158,6 +205,22 @@
         <div class="flex items-center gap-2">
           <div class="w-3 h-3 bg-purple-500 rounded"></div>
           Noble Gases
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 bg-fuchsia-500 rounded"></div>
+          Lanthanides
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 bg-pink-500 rounded"></div>
+          Actinides
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 bg-lime-500 rounded"></div>
+          Post-transition
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 bg-emerald-500 rounded"></div>
+          Metalloids
         </div>
       </div>
 
@@ -253,6 +316,14 @@
               <div class="text-xs text-slate-500 uppercase">Boiling Point</div>
               <div class="text-lg text-slate-200" id="m-bp">-253 °C</div>
             </div>
+            <div class="bg-slate-800/50 p-4 rounded-lg">
+              <div class="text-xs text-slate-500 uppercase">Atomic Radius</div>
+              <div class="text-lg text-slate-200" id="m-radius">53 pm</div>
+            </div>
+            <div class="bg-slate-800/50 p-4 rounded-lg">
+              <div class="text-xs text-slate-500 uppercase">Atomic Number</div>
+              <div class="text-lg text-slate-200" id="m-z">1</div>
+            </div>
           </div>
         </div>
 
@@ -266,309 +337,83 @@
       </div>
     </div>
 
+    <script src="elements-data.js"></script>
     <script>
-      // --- Data (Condensed for F3 focus, but full structural placeholders) ---
-      // Format: [Number, Symbol, Name, Mass, Group, Period, Category, MP(C), BP(C), Config, Desc]
-      const ELEMENTS_DATA = [
-        // Period 1
-        {
-          n: 1,
-          s: "H",
-          name: "Hydrogen",
-          m: "1.008",
-          g: 1,
-          p: 1,
-          cat: "nonmetal",
-          mp: -259,
-          bp: -253,
-          c: "1",
-          desc: "Lightest element, fuel of stars.",
-        },
-        {
-          n: 2,
-          s: "He",
-          name: "Helium",
-          m: "4.003",
-          g: 18,
-          p: 1,
-          cat: "noble",
-          mp: -272,
-          bp: -269,
-          c: "2",
-          desc: "Inert gas, used in balloons.",
-        },
+      const CAT_LABELS = {
+        alkali: "Alkali Metal",
+        alkaline: "Alkaline Earth Metal",
+        transition: "Transition Metal",
+        "post-transition": "Post-transition Metal",
+        metalloid: "Metalloid",
+        nonmetal: "Non-metal",
+        halogen: "Halogen",
+        noble: "Noble Gas",
+        lanthanide: "Lanthanide",
+        actinide: "Actinide",
+        unknown: "Unknown / Synthetic",
+      };
 
-        // Period 2
-        {
-          n: 3,
-          s: "Li",
-          name: "Lithium",
-          m: "6.94",
-          g: 1,
-          p: 2,
-          cat: "alkali",
-          mp: 180,
-          bp: 1342,
-          c: "2,1",
-          desc: "Lightest metal, used in batteries.",
-        },
-        {
-          n: 4,
-          s: "Be",
-          name: "Beryllium",
-          m: "9.01",
-          g: 2,
-          p: 2,
-          cat: "alkaline",
-          mp: 1287,
-          bp: 2469,
-          c: "2,2",
-          desc: "Strong but toxic lightweight metal.",
-        },
-        {
-          n: 5,
-          s: "B",
-          name: "Boron",
-          m: "10.81",
-          g: 13,
-          p: 2,
-          cat: "metalloid",
-          mp: 2075,
-          bp: 4000,
-          c: "2,3",
-          desc: "Crucial for plant growth.",
-        },
-        {
-          n: 6,
-          s: "C",
-          name: "Carbon",
-          m: "12.01",
-          g: 14,
-          p: 2,
-          cat: "nonmetal",
-          mp: 3550,
-          bp: 4827,
-          c: "2,4",
-          desc: "Basis of life and organic chemistry.",
-        },
-        {
-          n: 7,
-          s: "N",
-          name: "Nitrogen",
-          m: "14.01",
-          g: 15,
-          p: 2,
-          cat: "nonmetal",
-          mp: -210,
-          bp: -196,
-          c: "2,5",
-          desc: "78% of Earth's atmosphere.",
-        },
-        {
-          n: 8,
-          s: "O",
-          name: "Oxygen",
-          m: "16.00",
-          g: 16,
-          p: 2,
-          cat: "nonmetal",
-          mp: -218,
-          bp: -183,
-          c: "2,6",
-          desc: "Essential for respiration and combustion.",
-        },
-        {
-          n: 9,
-          s: "F",
-          name: "Fluorine",
-          m: "19.00",
-          g: 17,
-          p: 2,
-          cat: "halogen",
-          mp: -220,
-          bp: -188,
-          c: "2,7",
-          desc: "Most reactive non-metal.",
-        },
-        {
-          n: 10,
-          s: "Ne",
-          name: "Neon",
-          m: "20.18",
-          g: 18,
-          p: 2,
-          cat: "noble",
-          mp: -249,
-          bp: -246,
-          c: "2,8",
-          desc: "Used in glowing signs.",
-        },
-
-        // Period 3
-        {
-          n: 11,
-          s: "Na",
-          name: "Sodium",
-          m: "22.99",
-          g: 1,
-          p: 3,
-          cat: "alkali",
-          mp: 98,
-          bp: 883,
-          c: "2,8,1",
-          desc: "Reactive metal, component of salt.",
-        },
-        {
-          n: 12,
-          s: "Mg",
-          name: "Magnesium",
-          m: "24.31",
-          g: 2,
-          p: 3,
-          cat: "alkaline",
-          mp: 650,
-          bp: 1090,
-          c: "2,8,2",
-          desc: "Burns with bright white light.",
-        },
-        {
-          n: 13,
-          s: "Al",
-          name: "Aluminium",
-          m: "26.98",
-          g: 13,
-          p: 3,
-          cat: "post-transition",
-          mp: 660,
-          bp: 2519,
-          c: "2,8,3",
-          desc: "Low density, resists corrosion.",
-        },
-        {
-          n: 14,
-          s: "Si",
-          name: "Silicon",
-          m: "28.09",
-          g: 14,
-          p: 3,
-          cat: "metalloid",
-          mp: 1414,
-          bp: 3265,
-          c: "2,8,4",
-          desc: "Basis of semiconductors.",
-        },
-        {
-          n: 15,
-          s: "P",
-          name: "Phosphorus",
-          m: "30.97",
-          g: 15,
-          p: 3,
-          cat: "nonmetal",
-          mp: 44,
-          bp: 280,
-          c: "2,8,5",
-          desc: "Highly reactive, found in DNA.",
-        },
-        {
-          n: 16,
-          s: "S",
-          name: "Sulfur",
-          m: "32.06",
-          g: 16,
-          p: 3,
-          cat: "nonmetal",
-          mp: 115,
-          bp: 445,
-          c: "2,8,6",
-          desc: "Yellow solid, volcanic.",
-        },
-        {
-          n: 17,
-          s: "Cl",
-          name: "Chlorine",
-          m: "35.45",
-          g: 17,
-          p: 3,
-          cat: "halogen",
-          mp: -101,
-          bp: -34,
-          c: "2,8,7",
-          desc: "Green poison gas, disinfectant.",
-        },
-        {
-          n: 18,
-          s: "Ar",
-          name: "Argon",
-          m: "39.95",
-          g: 18,
-          p: 3,
-          cat: "noble",
-          mp: -189,
-          bp: -186,
-          c: "2,8,8",
-          desc: "Inert gas in lightbulbs.",
-        },
-
-        // Period 4 (Selected key ones for F3 + Transitions)
-        {
-          n: 19,
-          s: "K",
-          name: "Potassium",
-          m: "39.10",
-          g: 1,
-          p: 4,
-          cat: "alkali",
-          mp: 63,
-          bp: 759,
-          c: "2,8,8,1",
-          desc: "Highly reactive alkali metal.",
-        },
-        {
-          n: 20,
-          s: "Ca",
-          name: "Calcium",
-          m: "40.08",
-          g: 2,
-          p: 4,
-          cat: "alkaline",
-          mp: 842,
-          bp: 1484,
-          c: "2,8,8,2",
-          desc: "Essential for bones and shells.",
-        },
+      const ORBITAL_ORDER = [
+        { n: 1, l: "s", cap: 2 },
+        { n: 2, l: "s", cap: 2 }, { n: 2, l: "p", cap: 6 },
+        { n: 3, l: "s", cap: 2 }, { n: 3, l: "p", cap: 6 },
+        { n: 4, l: "s", cap: 2 }, { n: 3, l: "d", cap: 10 }, { n: 4, l: "p", cap: 6 },
+        { n: 5, l: "s", cap: 2 }, { n: 4, l: "d", cap: 10 }, { n: 5, l: "p", cap: 6 },
+        { n: 6, l: "s", cap: 2 }, { n: 4, l: "f", cap: 14 }, { n: 5, l: "d", cap: 10 }, { n: 6, l: "p", cap: 6 },
+        { n: 7, l: "s", cap: 2 }, { n: 5, l: "f", cap: 14 }, { n: 6, l: "d", cap: 10 }, { n: 7, l: "p", cap: 6 },
       ];
 
-      // Fill gaps manually for layout (simplified approach: we will place elements by coordinate in grid)
-      // Grid 18 columns.
-      // H: 1,1
-      // He: 1,18
-      // Li: 2,1 ... Ne: 2,18 (gap 2-12 skipped)
-      // We need a map of Atomic Number -> Grid Column/Row or just compute it.
-      // Standard Periodic Table Layout logic:
-
-      function getGridPos(n) {
-        // Hardcoded typical layout
-        if (n == 1) return { r: 1, c: 1 };
-        if (n == 2) return { r: 1, c: 18 };
-        if (n >= 3 && n <= 4) return { r: 2, c: n - 2 }; // 3->1, 4->2
-        if (n >= 5 && n <= 10) return { r: 2, c: n + 8 }; // 5->13, 10->18
-        if (n >= 11 && n <= 12) return { r: 3, c: n - 10 };
-        if (n >= 13 && n <= 18) return { r: 3, c: n + 0 };
-        if (n >= 19 && n <= 36) return { r: 4, c: n - 18 }; // 19->1, 20->2...
-        // Limit to 20 for this demo as per data
-        return { r: 5, c: 1 };
+      function toSuperscript(number) {
+        const map = { 0: "⁰", 1: "¹", 2: "²", 3: "³", 4: "⁴", 5: "⁵", 6: "⁶", 7: "⁷", 8: "⁸", 9: "⁹" };
+        return String(number).split("").map((d) => map[d] || "").join("");
       }
 
-      // Atomic radius (pm) for first 20 elements
-      const ATOMIC_RADIUS = {
-        1: 53, 2: 31, 3: 167, 4: 112, 5: 87, 6: 67, 7: 56, 8: 48, 9: 42, 10: 38,
-        11: 190, 12: 145, 13: 118, 14: 111, 15: 98, 16: 88, 17: 79, 18: 71,
-        19: 243, 20: 194,
-      };
+      function getElectronConfig(z) {
+        if (z === 24) return "1s² 2s² 2p⁶ 3s² 3p⁶ 4s¹ 3d⁵";
+        if (z === 29) return "1s² 2s² 2p⁶ 3s² 3p⁶ 4s¹ 3d¹⁰";
+        let left = z;
+        const parts = [];
+        for (const orbital of ORBITAL_ORDER) {
+          if (left <= 0) break;
+          const count = Math.min(left, orbital.cap);
+          parts.push(`${orbital.n}${orbital.l}${toSuperscript(count)}`);
+          left -= count;
+        }
+        return parts.join(" ");
+      }
+
+      function getGridPos(n) {
+        if (n === 1) return { r: 1, c: 1 };
+        if (n === 2) return { r: 1, c: 18 };
+        if (n >= 3 && n <= 4) return { r: 2, c: n - 2 };
+        if (n >= 5 && n <= 10) return { r: 2, c: n + 8 };
+        if (n >= 11 && n <= 12) return { r: 3, c: n - 10 };
+        if (n >= 13 && n <= 18) return { r: 3, c: n };
+        if (n >= 19 && n <= 36) return { r: 4, c: n - 18 };
+        if (n >= 37 && n <= 54) return { r: 5, c: n - 36 };
+        if (n === 55) return { r: 6, c: 1 };
+        if (n === 56) return { r: 6, c: 2 };
+        if (n >= 72 && n <= 86) return { r: 6, c: n - 68 };
+        if (n === 87) return { r: 7, c: 1 };
+        if (n === 88) return { r: 7, c: 2 };
+        if (n >= 104 && n <= 118) return { r: 7, c: n - 100 };
+        if (n >= 57 && n <= 71) return { r: 9, c: n - 53 };
+        if (n >= 89 && n <= 103) return { r: 10, c: n - 85 };
+        return { r: 11, c: 1 };
+      }
+
+      const PLACEHOLDERS = [
+        { r: 6, c: 3, label: "57–71", title: "Lanthanides" },
+        { r: 7, c: 3, label: "89–103", title: "Actinides" },
+      ];
 
       const container = document.getElementById("grid-container");
       let currentMode = "standard";
+      let searchQuery = "";
+
+      function formatTemp(value) {
+        return value === null || value === undefined ? "N/A" : `${value} °C`;
+      }
 
       function heatmapColor(value, min, max) {
         const tNorm = Math.min(Math.max((value - min) / (max - min), 0), 1);
@@ -577,47 +422,89 @@
         return `rgb(${r}, 50, ${b})`;
       }
 
+      function matchesSearch(el, query) {
+        if (!query) return true;
+        const q = query.trim().toLowerCase();
+        return (
+          el.s.toLowerCase().includes(q) ||
+          el.name.toLowerCase().includes(q) ||
+          String(el.n) === q ||
+          String(el.n).startsWith(q)
+        );
+      }
+
+      function styleCard(card, el) {
+        card.style.color = "white";
+        card.style.backgroundColor = "";
+        card.style.borderColor = "";
+
+        if (currentMode === "standard") {
+          card.classList.add(`cat-${el.cat}`);
+        } else if (currentMode === "mp") {
+          const mpVal = el.mp ?? 500;
+          const color = heatmapColor(mpVal, -273, 3500);
+          card.style.backgroundColor = color;
+          card.style.borderColor = color;
+        } else if (currentMode === "radius") {
+          const color = heatmapColor(el.r, 31, 298);
+          card.style.backgroundColor = color;
+          card.style.borderColor = color;
+        }
+      }
+
       function renderGrid() {
         container.innerHTML = "";
+        container.style.gridTemplateRows = "repeat(10, minmax(52px, auto))";
+
+        PLACEHOLDERS.forEach((ph) => {
+          const label = document.createElement("div");
+          label.className = "f-block-label";
+          label.style.gridColumn = ph.c;
+          label.style.gridRow = ph.r;
+          label.title = ph.title;
+          label.textContent = ph.label;
+          container.appendChild(label);
+        });
 
         ELEMENTS_DATA.forEach((el) => {
           const pos = getGridPos(el.n);
           const card = document.createElement("div");
-          card.className = `element-card rounded-lg border border-slate-700/50 p-1 flex flex-col items-center justify-between cursor-pointer relative overflow-hidden`;
+          card.dataset.z = el.n;
+          card.className =
+            "element-card rounded-lg border border-slate-700/50 p-0.5 md:p-1 flex flex-col items-center justify-center cursor-pointer relative overflow-hidden";
           card.style.gridColumn = pos.c;
           card.style.gridRow = pos.r;
-          card.style.color = "white";
 
-          if (currentMode === "standard") {
-            card.classList.add(`cat-${el.cat}`);
-          } else if (currentMode === "mp") {
-            const color = heatmapColor(el.mp, -273, 1500);
-            card.style.backgroundColor = color;
-            card.style.borderColor = color;
-          } else if (currentMode === "radius") {
-            const radius = ATOMIC_RADIUS[el.n] || 100;
-            const color = heatmapColor(radius, 31, 243);
-            card.style.backgroundColor = color;
-            card.style.borderColor = color;
-          }
+          const matched = matchesSearch(el, searchQuery);
+          if (!matched) card.classList.add("dimmed");
+          if (searchQuery && matched) card.classList.add("highlight");
+
+          styleCard(card, el);
 
           const extra =
             currentMode === "mp"
-              ? `<span class="text-[8px] opacity-70">${el.mp}°C</span>`
+              ? `<span class="text-[7px] md:text-[8px] opacity-70 leading-none">${el.mp ?? "N/A"}°C</span>`
               : currentMode === "radius"
-              ? `<span class="text-[8px] opacity-70">${ATOMIC_RADIUS[el.n] || "?"} pm</span>`
+              ? `<span class="text-[7px] md:text-[8px] opacity-70 leading-none">${el.r} pm</span>`
               : "";
 
+          const nameShort = el.name.length > 9 ? el.name.slice(0, 8) + "…" : el.name;
+
           card.innerHTML = `
-                    <span class="text-[10px] self-start opacity-70 font-mono">${el.n}</span>
-                    <span class="text-xl font-bold -mt-1">${el.s}</span>
-                    <span class="text-[9px] truncate w-full text-center opacity-80">${el.name}</span>
-                    ${extra}
-                `;
+            <span class="text-[8px] md:text-[10px] self-start opacity-70 font-mono leading-none">${el.n}</span>
+            <span class="text-sm md:text-xl font-bold leading-none my-0.5">${el.s}</span>
+            <span class="text-[7px] md:text-[9px] truncate w-full text-center opacity-80 leading-tight px-0.5">${nameShort}</span>
+            ${extra}
+          `;
 
           card.onclick = () => openModal(el);
           container.appendChild(card);
         });
+      }
+
+      function filterElements(query) {
+        searchQuery = query;
+        renderGrid();
       }
 
       function setMode(mode) {
@@ -639,17 +526,18 @@
         document.getElementById("m-name").innerText = el.name;
         document.getElementById("m-symbol").innerText = el.s;
         document.getElementById("m-number").innerText = el.n;
+        document.getElementById("m-z").innerText = el.n;
         document.getElementById("m-mass").innerText = el.m;
-        document.getElementById("m-category").innerText =
-          el.cat.charAt(0).toUpperCase() + el.cat.slice(1);
+        document.getElementById("m-category").innerText = CAT_LABELS[el.cat] || el.cat;
         document.getElementById("m-desc").innerText = el.desc;
-        document.getElementById("m-mp").innerText = el.mp + " °C";
-        document.getElementById("m-bp").innerText = el.bp + " °C";
-        document.getElementById("m-config").innerText = el.c;
+        document.getElementById("m-mp").innerText = formatTemp(el.mp);
+        document.getElementById("m-bp").innerText = formatTemp(el.bp);
+        document.getElementById("m-phase").innerText = el.phase || "—";
+        document.getElementById("m-radius").innerText = `${el.r} pm`;
+        document.getElementById("m-config").innerText = getElectronConfig(el.n);
 
         const m = document.getElementById("modal");
         m.classList.remove("hidden");
-        // Allow display:block to apply before opacity transition
         requestAnimationFrame(() => {
           m.classList.remove("opacity-0");
           document.getElementById("modal-content").classList.remove("scale-95");
@@ -662,12 +550,17 @@
         m.classList.add("opacity-0");
         document.getElementById("modal-content").classList.remove("scale-100");
         document.getElementById("modal-content").classList.add("scale-95");
-        setTimeout(() => {
-          m.classList.add("hidden");
-        }, 300);
+        setTimeout(() => m.classList.add("hidden"), 300);
       }
 
-      // Init
+      document.getElementById("modal").addEventListener("click", (e) => {
+        if (e.target.id === "modal") closeModal();
+      });
+
+      if (!window.ELEMENTS_DATA || ELEMENTS_DATA.length !== 118) {
+        console.error("Expected 118 elements in elements-data.js");
+      }
+
       renderGrid();
     </script>
   
