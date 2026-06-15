@@ -263,18 +263,36 @@ window.BATTLE_DATA = (function () {
     sources:"地理：AWS Terrarium DEM、EOX Sentinel-2 cloudless。史實：ISW、BBC、Reuters、Ukrainian General Staff、維基百科（交叉查證）。",
   };
 
+  const analysis = {
+    military:"俄軍開戰初期多軸突擊基輔、哈爾科夫與南部，但補給線過長、士氣與指揮混亂；烏軍以城市防禦、遊擊與西方情報支援守住首都。2022秋反攻與2024庫爾斯克突擊顯示烏軍機動能力，但2023夏反攻在雷區前受阻；頓巴斯消耗戰使雙方均元氣大傷。",
+    leaders:"俄羅斯普京下令「特別軍事行動」；總參謀長格拉西莫夫、防長紹伊古主導戰略。烏克蘭澤連斯基留守基輔振奮民心；扎盧日內、瑟爾斯基歷任總司令策劃反攻。普里戈任與瓦格納集團在巴赫穆特顯示俄內部權力鬥爭；西方領袖提供武器與制裁，影響戰爭持久力。",
+    nationalPower:"俄羅斯人口與工業基礎遠大於烏克蘭，但受制裁、動員瓶頸與腐敗拖累；烏克蘭倚賴西方財政、武器與訓練，國內動員率高但人口與經濟受創嚴重。戰爭成為俄歐對抗與全球能源、糧食供應鏈的焦點。",
+    impact:"逾千萬人流離失所；全球糧價與能源市場震盪；北約東翼加固、芬蘭瑞典入約；國際刑事法院對普京發出逮捕令。戰爭重塑歐洲安全秩序，和平談判至今無突破。",
+  };
+
+  const meta = {
+    title_zh:"俄烏戰爭", title_en:"Russia's War on Ukraine",
+    introCam:{ lng:31.50, lat:48.80, dist:3400, az:0, el:52 },
+    titleCard:{ zh:"俄烏戰爭", en:"RUSSIA'S WAR ON UKRAINE · 2022–2026",
+      narr_zh:"2022年2月24日起 · 全面入侵與四年抵抗", narr_en:"Full-scale invasion · four years of resistance" },
+    nextBattle:{ href:"../dse-wars/", title_zh:"DSE 西方史戰役地圖", title_en:"HKDSE Western History War Maps" },
+  };
+
   const storyboard = [
     { day:1, hold:9, cam:{lng:32.00,lat:49.00,dist:2800,az:0,el:50,orbit:0.5},
       dateLabel:"2022年2月24日", title_zh:"全面入侵", title_en:"The Full-Scale Invasion",
       narration_zh:"俄軍從北、東、南多軸進攻；導彈襲擊全烏克蘭，戰爭在拂曉打響。",
       narration_en:"Russia strikes from north, east and south; missiles hit across Ukraine — the war begins at dawn.",
-      commanders:[{zh:"格拉西莫夫",en:"Gen. Gerasimov"}], focus:["ru_gen","ru_air","ua_gen"], side:"ru" },
+      commanders:[{zh:"格拉西莫夫",en:"Gen. Gerasimov"}], focus:["ru_gen","ru_air","ua_gen"], side:"ru",
+      assets:["air","artillery"],
+      forces_zh:"俄軍約19萬人動員 · 導彈與空襲全境", forces_en:"~190k Russian troops · nationwide missile & air strikes" },
 
     { day:1, hold:8, cam:{lng:30.30,lat:50.58,dist:650,az:200,el:50,orbit:0.7},
       dateLabel:"2022年2月24日 清晨", title_zh:"空降霍斯托梅爾", title_en:"Assault on Hostomel",
       narration_zh:"俄空降軍突擊安東諾夫機場，意圖建立空中橋頭堡直撲基輔。",
       narration_en:"Russian airborne troops assault Antonov Airport, aiming for an airbridge to Kyiv.",
-      commanders:[{zh:"VDV",en:"Russian VDV"}], focus:["ru_vdv","ua_kyiv"], side:"both" },
+      commanders:[{zh:"VDV",en:"Russian VDV"}], focus:["ru_vdv","ua_kyiv"], side:"both",
+      assets:["air","landing"] },
 
     { day:7, hold:8, cam:{lng:30.45,lat:50.52,dist:900,az:180,el:44,orbit:0.7},
       dateLabel:"2022年3月初", title_zh:"基輔車隊", title_en:"The Kyiv Convoy",
@@ -310,13 +328,14 @@ window.BATTLE_DATA = (function () {
       dateLabel:"2022年11月11日", title_zh:"赫爾松解放", title_en:"Liberation of Kherson",
       narration_zh:"烏軍收復第聶伯河右岸赫爾松市。",
       narration_en:"Kherson is liberated on the right bank of the Dnieper.",
-      focus:["ua_kherson"], side:"ua" },
+      focus:["ua_kherson"], side:"ua", assets:["artillery"] },
 
     { day:430, hold:10, cam:{lng:37.99,lat:48.59,dist:580,az:200,el:48,orbit:0.7},
       dateLabel:"2023年5月", title_zh:"巴赫穆特煉獄", title_en:"The Battle of Bakhmut",
       narration_zh:"瓦格納集團以人海戰術圍攻巴赫穆特；成為二戰後最血腥城市戰之一。",
       narration_en:"Wagner's human-wave assaults on Bakhmut become one of the bloodiest urban battles since WWII.",
-      commanders:[{zh:"普里戈任",en:"Prigozhin"}], focus:["ru_wagner","ua_bakhmut"], side:"both" },
+      commanders:[{zh:"普里戈任",en:"Prigozhin"}], focus:["ru_wagner","ua_bakhmut"], side:"both",
+      assets:["artillery"], forces_zh:"雙方炮擊與巷戰持續數月", forces_en:"Months of artillery duels and urban combat" },
 
     { day:451, hold:8, cam:{lng:37.99,lat:48.59,dist:520,az:180,el:46,orbit:0.6},
       dateLabel:"2023年5月20日", title_zh:"巴赫穆特陷落", title_en:"Bakhmut Falls",
@@ -328,7 +347,7 @@ window.BATTLE_DATA = (function () {
       dateLabel:"2023年6月6日", title_zh:"卡霍夫卡水壩潰決", title_en:"Kakhovka Dam Destroyed",
       narration_zh:"卡霍夫卡水壩被毀，洪水淹沒下游社區，生態與人道災難。",
       narration_en:"The Kakhovka dam is destroyed — floods devastate downstream communities.",
-      focus:["ua_kherson"], side:"both" },
+      focus:["ua_kherson"], side:"both", assets:["explosion"] },
 
     { day:485, hold:8, cam:{lng:36.00,lat:48.20,dist:1100,az:0,el:44,orbit:0.6},
       dateLabel:"2023年夏", title_zh:"夏季反攻", title_en:"Summer 2023 Offensive",
@@ -346,7 +365,8 @@ window.BATTLE_DATA = (function () {
       dateLabel:"2024年8月", title_zh:"庫爾斯克突擊", title_en:"Incursion into Kursk",
       narration_zh:"烏軍突入俄庫爾斯克州，占領蘇賈等地；戰爭首次大規模燒入俄境。",
       narration_en:"Ukrainian forces cross into Russia's Kursk Oblast — the war burns into Russian territory at scale.",
-      commanders:[{zh:"瑟爾斯基",en:"Gen. Syrskyi"}], focus:["ua_kursk","ru_kursk"], side:"both" },
+      commanders:[{zh:"瑟爾斯基",en:"Gen. Syrskyi"}], focus:["ua_kursk","ru_kursk"], side:"both",
+      assets:["air","artillery"] },
 
     { day:1200, hold:8, cam:{lng:37.50,lat:48.30,dist:1000,az:0,el:44,orbit:0.6},
       dateLabel:"2025年", title_zh:"頓巴斯僵持", title_en:"Stalemate in the Donbas",
@@ -367,5 +387,5 @@ window.BATTLE_DATA = (function () {
     narration_en:"The war continues. Remember every soldier and civilian lost to this invasion.",
   };
 
-  return { geography, units, arrows, fronts, hotspots, weather, notes, storyboard, outro, END_DAY };
+  return { meta, geography, units, arrows, fronts, hotspots, weather, notes, analysis, storyboard, outro, END_DAY };
 })();

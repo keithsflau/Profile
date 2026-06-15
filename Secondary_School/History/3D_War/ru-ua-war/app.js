@@ -29,6 +29,7 @@ try {
 }catch(e){ fatal(e); return; }
 
 const D = window.BATTLE_DATA;
+const META = D.meta || {};
 const bootMsg = t => { const m=document.getElementById("boot-msg"); if(m) m.textContent=t; };
 
 /* ========================= CONFIG ================================== */
@@ -66,6 +67,7 @@ const CFG = {
   ZOOM: 0.45,           // multiplies each shot's camera distance → tighter framing on the action
   FOCUS:{ UNIT_DIM:0.12, PLACE_NEAR:350, PLACE_FAR:1200, MAX_PLACES:10 }, // show only the nearest few place names
   FLASH_K: 0.26,        // muzzle/explosion flash-light dampening (was blowing out the scene)
+  FX_DENSITY: 0.5,      // combat flash/particle rate (0.5 = half as dense)
   // entity scale (tuned to the ~2000-unit metric extent)
   FLAG_H: 30, FLAG_W: 26, FLAG_TH: 16,   // shorter staff + smaller cloth → less "stadium banner / km-pole" clash
   RING_IN: 5, RING_OUT: 8, TOKEN_R: 6.5, TOKEN_H: 7, POLE_R: 0.6, FINIAL_R: 1.2,   // TOKEN_R kept → wedge footprint unchanged
@@ -662,42 +664,82 @@ function flash(x,y,z,color,intensity){ for(const fl of flashes){ if(fl.life<=0){
 const hotTimers={}; const rnd=(a,b)=>a+Math.random()*(b-a);
 function updateEffects(day, dt){
   const G=CFG.EU;
+  const fxDen=CFG.FX_DENSITY!=null?CFG.FX_DENSITY:1;
+  const fxT=t=>t/fxDen, fxP=p=>p*fxDen, fxOk=()=>Math.random()<fxDen;
   for(let h=0;h<D.hotspots.length;h++){
     const hs=D.hotspots[h]; if(day<hs.a||day>hs.b) continue;
     const w=vec(hs.lng,hs.lat,0); const gx=w.x, gz=w.z, gy=w.y;
     hotTimers[h]=(hotTimers[h]||0)-dt; const fire=hotTimers[h]<=0;
     if(hs.kind==="firefight"){
-      if(Math.random()<hs.i*0.9){ const c=Math.random()<0.5?[1,0.8,0.3]:[1,0.5,0.2];
+      if(Math.random()<fxP(hs.i*0.9)){ const c=Math.random()<0.5?[1,0.8,0.3]:[1,0.5,0.2];
         emit(GLOW,gx+rnd(-3,3)*G,gy+rnd(0.5,3)*G,gz+rnd(-3,3)*G,rnd(-6,6)*G,rnd(4,12)*G,rnd(-6,6)*G,rnd(8,16),rnd(0.3,0.6),c[0],c[1],c[2],0,0); }
-      if(fire){ flash(gx,gy+2*G,gz,0xffcc66,rnd(120,260)); emit(SMOKE,gx,gy+G,gz,rnd(-1,1)*G,2*G,rnd(-1,1)*G,16,rnd(1.2,2),0.22,0.21,0.2,12,1); hotTimers[h]=rnd(0.12,0.28)/hs.i; }
+      if(fire){ flash(gx,gy+2*G,gz,0xffcc66,rnd(120,260)); emit(SMOKE,gx,gy+G,gz,rnd(-1,1)*G,2*G,rnd(-1,1)*G,16,rnd(1.2,2),0.22,0.21,0.2,12,1); hotTimers[h]=fxT(rnd(0.12,0.28)/hs.i); }
     } else if(hs.kind==="artillery"){
       if(fire){ flash(gx,gy+3*G,gz,0xffd27a,rnd(220,360));
-        for(let s=0;s<8;s++) emit(GLOW,gx,gy+2.5*G,gz,rnd(-10,10)*G,rnd(6,16)*G,rnd(-10,10)*G,rnd(10,18),0.4,1,0.75,0.35,0,0);
+        for(let s=0;s<8;s++){ if(!fxOk()) continue;
+          emit(GLOW,gx,gy+2.5*G,gz,rnd(-10,10)*G,rnd(6,16)*G,rnd(-10,10)*G,rnd(10,18),0.4,1,0.75,0.35,0,0); }
         emit(SMOKE,gx,gy+2*G,gz,rnd(-1,1)*G,2.5*G,rnd(-1,1)*G,22,2.2,0.26,0.25,0.23,16,1);
-        for(let t=0;t<6;t++) emit(GLOW,gx+rnd(-2,2)*G,gy+(5+t*4)*G,gz+(10+t*7)*G,rnd(-2,2)*G,3*G,18*G,9,0.5,1,0.9,0.5,0,0);
-        hotTimers[h]=rnd(0.4,0.9)/hs.i; }
+        for(let t=0;t<6;t++){ if(!fxOk()) continue;
+          emit(GLOW,gx+rnd(-2,2)*G,gy+(5+t*4)*G,gz+(10+t*7)*G,rnd(-2,2)*G,3*G,18*G,9,0.5,1,0.9,0.5,0,0); }
+        hotTimers[h]=fxT(rnd(0.4,0.9)/hs.i); }
     } else if(hs.kind==="explosion"){
       if(fire){ flash(gx,gy+2*G,gz,0xffaa44,rnd(300,520));
-        for(let s=0;s<14;s++){ const a=Math.random()*7,sp=rnd(6,20)*G;
+        for(let s=0;s<14;s++){ if(!fxOk()) continue; const a=Math.random()*7,sp=rnd(6,20)*G;
           emit(GLOW,gx,gy+1.5*G,gz,Math.cos(a)*sp,rnd(8,20)*G,Math.sin(a)*sp,rnd(10,22),rnd(0.3,0.6),1,0.6,0.2,0,3); }
         emit(SMOKE,gx,gy+2*G,gz,rnd(-2,2)*G,3*G,rnd(-2,2)*G,30,2.4,0.2,0.19,0.18,20,1);
-        hotTimers[h]=rnd(0.7,1.6)/hs.i; }
+        hotTimers[h]=fxT(rnd(0.7,1.6)/hs.i); }
     } else if(hs.kind==="landing"){
-      if(Math.random()<0.7) emit(GLOW,gx+rnd(-6,6)*G,gy+rnd(0,2)*G,gz+rnd(-4,4)*G,rnd(-4,4)*G,rnd(6,12)*G,rnd(-4,4)*G,rnd(8,14),0.4,0.7,0.85,1,0);
+      if(Math.random()<fxP(0.7)) emit(GLOW,gx+rnd(-6,6)*G,gy+rnd(0,2)*G,gz+rnd(-4,4)*G,rnd(-4,4)*G,rnd(6,12)*G,rnd(-4,4)*G,rnd(8,14),0.4,0.7,0.85,1,0);
       if(fire){ flash(gx,gy+1.5*G,gz,0xfff0c0,rnd(120,220));
-        for(let s=0;s<6;s++) emit(GLOW,gx+rnd(-8,8)*G,gy+0.5*G,gz+rnd(-6,6)*G,rnd(-3,3)*G,rnd(3,7)*G,rnd(-3,3)*G,11,0.4,0.6,0.8,1,0,0);
-        hotTimers[h]=rnd(0.3,0.6); }
+        for(let s=0;s<6;s++){ if(!fxOk()) continue;
+          emit(GLOW,gx+rnd(-8,8)*G,gy+0.5*G,gz+rnd(-6,6)*G,rnd(-3,3)*G,rnd(3,7)*G,rnd(-3,3)*G,11,0.4,0.6,0.8,1,0,0); }
+        hotTimers[h]=fxT(rnd(0.3,0.6)); }
     } else if(hs.kind==="oilfire"){
-      for(let s=0;s<3;s++) emit(GLOW,gx+rnd(-4,4)*G,gy+rnd(0,4)*G,gz+rnd(-4,4)*G,rnd(-2,2)*G,rnd(8,16)*G,rnd(-2,2)*G,rnd(18,30),rnd(0.4,0.8),1,rnd(0.35,0.6),0.12,-12,2);
-      if(fire){ for(let s=0;s<2;s++) emit(SMOKE,gx+rnd(-2,2)*G,gy+3*G,gz+rnd(-2,2)*G,rnd(0,2)*G,rnd(4,7)*G,rnd(-1,1)*G,rnd(22,34),rnd(2,3),0.15,0.14,0.13,16,1);
-        flash(gx,gy+3*G,gz,0xff7733,rnd(120,200)*hs.i); hotTimers[h]=rnd(0.2,0.34); }
+      for(let s=0;s<3;s++){ if(!fxOk()) continue;
+        emit(GLOW,gx+rnd(-4,4)*G,gy+rnd(0,4)*G,gz+rnd(-4,4)*G,rnd(-2,2)*G,rnd(8,16)*G,rnd(-2,2)*G,rnd(18,30),rnd(0.4,0.8),1,rnd(0.35,0.6),0.12,-12,2); }
+      if(fire){ for(let s=0;s<2;s++){ if(!fxOk()) continue;
+          emit(SMOKE,gx+rnd(-2,2)*G,gy+3*G,gz+rnd(-2,2)*G,rnd(0,2)*G,rnd(4,7)*G,rnd(-1,1)*G,rnd(22,34),rnd(2,3),0.15,0.14,0.13,16,1); }
+        flash(gx,gy+3*G,gz,0xff7733,rnd(120,200)*hs.i); hotTimers[h]=fxT(rnd(0.2,0.34)); }
     } else if(hs.kind==="air"){
       if(fire){ flash(gx,gy+2*G,gz,0xffcc66,300);
-        for(let s=0;s<10;s++){ const a=Math.random()*7,sp=rnd(8,16)*G;
+        for(let s=0;s<10;s++){ if(!fxOk()) continue; const a=Math.random()*7,sp=rnd(8,16)*G;
           emit(GLOW,gx,gy+1.5*G,gz,Math.cos(a)*sp,rnd(6,14)*G,Math.sin(a)*sp,rnd(10,18),0.5,1,0.7,0.3,0,3); }
         emit(SMOKE,gx,gy+2*G,gz,0,2.5*G,0,26,2.4,0.2,0.19,0.18,18,1);
-        for(let t=0;t<6;t++) emit(GLOW,gx+(rnd(-3,3)+(6-t)*4)*G,gy+(30-t*4)*G,gz+(-30+t*4)*G,rnd(-2,2)*G,-6*G,6*G,8,0.4,1,0.9,0.4,0,0);
-        hotTimers[h]=rnd(0.8,1.6); }
+        for(let t=0;t<6;t++){ if(!fxOk()) continue;
+          emit(GLOW,gx+(rnd(-3,3)+(6-t)*4)*G,gy+(30-t*4)*G,gz+(-30+t*4)*G,rnd(-2,2)*G,-6*G,6*G,8,0.4,1,0.9,0.4,0,0); }
+        hotTimers[h]=fxT(rnd(0.8,1.6)); }
+    } else if(hs.kind==="nuclear"){
+      if(fire){ flash(gx,gy+4*G,gz,0xfff4e0,rnd(520,900));
+        for(let s=0;s<24;s++){ if(!fxOk()) continue; const a=Math.random()*7,sp=rnd(10,32)*G;
+          emit(GLOW,gx,gy+2*G,gz,Math.cos(a)*sp,rnd(16,40)*G,Math.sin(a)*sp,rnd(18,36),rnd(0.4,0.8),1,0.85,0.45,0,4); }
+        emit(SMOKE,gx,gy+4*G,gz,rnd(-3,3)*G,5*G,rnd(-3,3)*G,42,3.2,0.18,0.17,0.16,24,1);
+        for(let t=0;t<8;t++){ if(!fxOk()) continue;
+          emit(GLOW,gx,gy+(8+t*6)*G,gz,rnd(-4,4)*G,8*G,rnd(-4,4)*G,rnd(28,40),0.6,1,0.7,0.35,-8,2); }
+        hotTimers[h]=fxT(rnd(1.2,2.4)/hs.i); }
+    } else if(hs.kind==="naval"){
+      if(fire){ flash(gx,gy+1.5*G,gz,0xaaccff,rnd(180,320));
+        for(let s=0;s<6;s++){ if(!fxOk()) continue;
+          emit(GLOW,gx+rnd(-5,5)*G,gy+rnd(0,2)*G,gz+rnd(-5,5)*G,rnd(-6,6)*G,rnd(4,10)*G,rnd(-6,6)*G,rnd(12,20),0.45,0.5,0.75,1,0,0); }
+        emit(SMOKE,gx,gy+2*G,gz,rnd(-2,2)*G,3*G,rnd(-2,2)*G,24,2,0.2,0.22,0.25,14,1);
+        hotTimers[h]=fxT(rnd(0.5,1.1)/hs.i); }
+    }
+  }
+  if(Director.sceneFx && Director.sceneFx.length && Director.mode==="play" && Director.capShown){
+    for(const sfx of Director.sceneFx){
+      sfx._t=(sfx._t||0)-dt; if(sfx._t>0) continue; sfx._t=fxT(rnd(0.35,0.9));
+      const w=vec(sfx.lng,sfx.lat,0), gx=w.x, gz=w.z, gy=w.y;
+      if(sfx.kind==="air"||sfx.kind==="nuclear"){
+        for(let t=0;t<3;t++){ if(!fxOk()) continue;
+          emit(GLOW,gx+(rnd(-2,2)+t*5)*G,gy+(20+t*8)*G,gz+(rnd(-2,2)-t*4)*G,rnd(-3,3)*G,-4*G,4*G,7,0.35,1,0.85,0.4,0,0); }
+      }
+      if(sfx.kind==="navy"||sfx.kind==="naval"){
+        flash(gx,gy+G,gz,0x88bbff,rnd(80,160)); emit(SMOKE,gx,gy+G,gz,rnd(-1,1)*G,2*G,rnd(-1,1)*G,14,1.4,0.22,0.24,0.28,10,1);
+      }
+      if(sfx.kind==="nuclear"){
+        flash(gx,gy+3*G,gz,0xfff0cc,rnd(400,700));
+        for(let s=0;s<8;s++){ if(!fxOk()) continue; const a=Math.random()*7,sp=rnd(8,22)*G;
+          emit(GLOW,gx,gy+2*G,gz,Math.cos(a)*sp,rnd(12,28)*G,Math.sin(a)*sp,rnd(16,28),0.5,1,0.8,0.4,0,3); }
+      }
     }
   }
   stepParticles(GLOW,dt); stepParticles(SMOKE,dt);
@@ -724,17 +766,19 @@ const cDay=new THREE.Color(0x6f9fd0), cDayB=new THREE.Color(0xcad9e2), cNight=ne
       cNightB=new THREE.Color(0x243349), cOver=new THREE.Color(0x5a6470), cOverB=new THREE.Color(0x808a92), cSmoke=new THREE.Color(0x4a3f3a);
 const _t=new THREE.Color(), _b=new THREE.Color();
 function applyWeather(day){
-  const w=curWeather(day), overcast=clamp(Math.max(w.rain,w.smoke*0.6),0,1);
-  _t.copy(cDay).lerp(cOver,overcast).lerp(cNight,w.night);
-  _b.copy(cDayB).lerp(cOverB,overcast).lerp(cNightB,w.night).lerp(cSmoke,w.smoke*0.4);
+  const w=curWeather(day), outro=Director.mode==="outro";
+  const night=outro?0:w.night, fogAmt=outro?w.fog*0.25:w.fog, smokeAmt=outro?w.smoke*0.2:w.smoke;
+  const overcast=clamp(Math.max(w.rain,smokeAmt*0.6),0,1);
+  _t.copy(cDay).lerp(cOver,overcast).lerp(cNight,night);
+  _b.copy(cDayB).lerp(cOverB,overcast).lerp(cNightB,night).lerp(cSmoke,smokeAmt*0.4);
   skyMat.uniforms.top.value.copy(_t); skyMat.uniforms.bot.value.copy(_b);
-  scene.fog.color.copy(_b); scene.fog.density=0.00012 + w.fog*0.00055 + w.smoke*0.00022;
-  sun.intensity=lerp(1.2,0.1,w.night)*(1-0.55*overcast);
-  sun.color.setHex(w.night>0.5?0x8ea6cf:0xfff1d6);
-  hemi.intensity=lerp(0.5,0.22,w.night)*(1-0.3*overcast);
-  amb.intensity=lerp(0.45,0.36,w.night); amb.color.setHex(w.night>0.5?0x1c2a44:0x404a55);
-  renderer.toneMappingExposure=lerp(1.08,0.78,w.night);
-  if(seaMesh) seaMesh.material.color.copy(new THREE.Color(0x14323f)).lerp(cNight,w.night*0.8);
+  scene.fog.color.copy(_b); scene.fog.density=0.00012 + fogAmt*0.00055 + smokeAmt*0.00022;
+  sun.intensity=lerp(1.2,0.1,night)*(1-0.55*overcast)*(outro?1.08:1);
+  sun.color.setHex(night>0.5?0x8ea6cf:0xfff1d6);
+  hemi.intensity=lerp(0.5,0.22,night)*(1-0.3*overcast)*(outro?1.1:1);
+  amb.intensity=lerp(0.45,0.36,night)*(outro?1.15:1); amb.color.setHex(night>0.5?0x1c2a44:0x404a55);
+  renderer.toneMappingExposure=lerp(1.08,0.78,night)*(outro?1.12:1);
+  if(seaMesh) seaMesh.material.color.copy(new THREE.Color(0x14323f)).lerp(cNight,night*0.8);
   if(rainMat){ rainMat.opacity=clamp(w.rain*0.6,0,0.6); rain.visible=w.rain>0.02; }
   return w;
 }
@@ -832,6 +876,25 @@ function card(zh,en,narrZh,narrEn){ $("cap-date").textContent=""; $("cap-title")
   setNarr(narrZh,narrEn); $("cap-meta").innerHTML=""; showCap(); }
 function sideStrength(sh,side){ let s=0; (sh.focus||[]).forEach(id=>{ const o=unitById[id];
   if(o&&o.u.cf&&o.u.faction===side) s+=sampleTrack(o.u.track,Clock.day).s; }); return s; }
+const ASSET_LABELS={ air:{zh:"✈ 空軍",en:"Air"}, navy:{zh:"🚢 海軍",en:"Navy"}, naval:{zh:"🚢 海軍",en:"Navy"},
+  nuclear:{zh:"☢ 核武",en:"Nuclear"}, artillery:{zh:"💥 炮擊",en:"Artillery"}, landing:{zh:"⛵ 兩棲",en:"Amphibious"},
+  explosion:{zh:"💥 潰壩／爆炸",en:"Explosion"} };
+function assetsFromShot(sh){
+  const list=sh.assets||[];
+  if(!list.length) return "";
+  return `<div class="assets">`+list.map(a=>{ const L=ASSET_LABELS[a]||{zh:a,en:a};
+    return `<span class="asset">${L.zh}${L.en?" · "+L.en:""}</span>`; }).join("")+`</div>`; }
+function sceneFxFromShot(sh){
+  const fx=[]; const kinds=new Set(sh.assets||[]);
+  (sh.effects||[]).forEach(e=>fx.push(e));
+  if(!kinds.size && !fx.length) return [];
+  let lng=sh.cam.lng, lat=sh.cam.lat;
+  if(sh.focus&&sh.focus.length){ const o=unitById[sh.focus[0]];
+    if(o){ const s=sampleTrack(o.u.track,sh.day); lng=s.lng; lat=s.lat; } }
+  kinds.forEach(k=>{ if(k==="artillery"||k==="landing") return;
+    const kind=k==="navy"?"naval":k; fx.push({ kind, lng, lat }); });
+  return fx;
+}
 function setCaption(sh){
   $("cap-date").textContent=sh.dateLabel;
   $("cap-title").innerHTML=sh.title_zh+`<span class="en">${sh.title_en}</span>`;
@@ -841,17 +904,27 @@ function setCaption(sh){
   (sh.side==="both"?["ru","ua"]:[sh.side]).forEach(sd=>{ const v=sideStrength(sh,sd); if(!v) return;
     const pct=clamp(v/MAXS[sd]*100,6,100), nm=sd==="ru"?"俄軍":"烏軍";
     meta+=`<span class="str ${sd}">${nm} ${v.toLocaleString()}人<span class="bar"><i style="width:${pct}%"></i></span></span>`; });
+  if(sh.forces_zh||sh.forces_en){
+    const ft=sh.forces_zh+(sh.forces_en?`<span class="ne">${sh.forces_en}</span>`:"");
+    meta+=`<div class="forces">${ft}</div>`; }
+  meta+=assetsFromShot(sh);
   $("cap-meta").innerHTML=meta; showCap();
+  Director.sceneFx=sceneFxFromShot(sh);
 }
 
 /* ---- the Director: plays the storyboard like a TV programme ---- */
+let playSpeed=1;
 const Director = {
-  shots:D.storyboard, i:-1, t:0, mode:"title", playing:true, userFree:false, capShown:false,
+  shots:D.storyboard, i:-1, t:0, mode:"title", playing:true, userFree:false, capShown:false, sceneFx:[],
   fromPos:new THREE.Vector3(), fromTgt:new THREE.Vector3(), tgt:new THREE.Vector3(), fromDay:8, toDay:8,
-  start(){ this.mode="title"; this.t=0; this.playing=true; this.userFree=false; setDay(this.shots[0].day);
-    const c=camFromShot({lng:31.50,lat:48.80,dist:3400,az:0,el:52}); camera.position.copy(c.pos); controls.target.copy(c.target);
+  outroHold:null,
+  start(){ this.mode="title"; this.t=0; this.playing=true; this.userFree=false; this.sceneFx=[]; this.outroHold=null; hideNextBattle(); setDay(this.shots[0].day);
+    const ic=META.introCam||{lng:31.50,lat:48.80,dist:3400,az:0,el:52};
+    const c=camFromShot(ic); camera.position.copy(c.pos); controls.target.copy(c.target);
     lookTarget.copy(controls.target);
-    card("俄烏戰爭","RUSSIA'S WAR ON UKRAINE · 2022–2026","2022年2月24日起 · 全面入侵與四年抵抗"); },
+    const tc=META.titleCard||{};
+    card(tc.zh||"俄烏戰爭", tc.en||"RUSSIA'S WAR ON UKRAINE · 2022–2026",
+      tc.narr_zh||"2022年2月24日起 · 全面入侵與四年抵抗", tc.narr_en||""); },
   enterShot(i){ this.i=i; this.t=0; this.capShown=false; const sh=this.shots[i];
     this.fromDay=Clock.day; this.toDay=sh.day;   // ease the day across the move → smooth day/night + weather
     focusSet=new Set(sh.focus||[]); this.tgt.copy(shotTarget(sh));
@@ -870,12 +943,13 @@ const Director = {
     if(!this.playing) return;
     this.t+=dt;
     if(this.mode==="title"){ if(this.t>=TITLE_DUR){ hideCap(); this.enterShot(0); this.mode="play"; } return; }
-    if(this.mode==="outro"){ const dist=OUTRO_CAM.dist*CFG.ZOOM;
-      if(this.t<OUTRO_CAM.tween){ const e=easeIO(this.t/OUTRO_CAM.tween);
-        camera.position.lerpVectors(this.fromPos,spherical(this.tgt,dist,OUTRO_CAM.az,OUTRO_CAM.el),e);
-        controls.target.lerpVectors(this.fromTgt,this.tgt,e); }
-      else { const ot=this.t-OUTRO_CAM.tween;
-        controls.target.copy(this.tgt); camera.position.copy(spherical(this.tgt,dist,OUTRO_CAM.az+OUTRO_CAM.orbit*ot,OUTRO_CAM.el)); }
+    if(this.mode==="outro"){
+      const hold=this.outroHold;
+      if(hold){
+        controls.target.copy(hold.tgt);
+        const az=hold.az+OUTRO_CAM.orbit*this.t, el=hold.el;
+        camera.position.copy(spherical(hold.tgt,hold.dist,az,el));
+      }
       lookTarget.copy(controls.target); updateProgress(); return; }
     const sh=this.shots[this.i], dur=CFG.TWEEN+sh.hold, dist=sh.cam.dist*CFG.ZOOM;
     if(this.t<CFG.TWEEN){ const e=easeIO(this.t/CFG.TWEEN);
@@ -888,10 +962,12 @@ const Director = {
     lookTarget.copy(controls.target);
     if(this.t>=dur){
       if(this.i+1<this.shots.length) this.enterShot(this.i+1);
-      else { this.mode="outro"; this.t=0; focusSet=new Set();
-        this.fromPos.copy(camera.position); this.fromTgt.copy(controls.target);
-        this.tgt.copy(vec(OUTRO_CAM.lng,OUTRO_CAM.lat,8));
-        card(D.outro.title_zh,D.outro.title_en,D.outro.narration_zh,D.outro.narration_en); updatePlayBtn(); } }
+      else { this.mode="outro"; this.t=0; this.sceneFx=[];
+        const tgt=controls.target.clone(), off=camera.position.clone().sub(tgt);
+        const dist=off.length()||sh.cam.dist*CFG.ZOOM;
+        const az=Math.atan2(off.x,off.z)/deg, el=Math.asin(clamp(off.y/dist,-1,1))/deg;
+        this.outroHold={ tgt, dist, az, el };
+        card(D.outro.title_zh,D.outro.title_en,D.outro.narration_zh,D.outro.narration_en); showNextBattle(); updatePlayBtn(); } }
     updateProgress();
   }
 };
@@ -904,11 +980,55 @@ function updateProgress(){ const N=Director.shots.length; let f=0;
   $("prog").firstChild.style.width=(f*100)+"%";
   $("scene-label").textContent = Director.mode==="outro" ? "完 · END"
     : (Director.mode==="play" ? dayToLabel(Clock.day) : ""); }
-let kickMusic=()=>{};   // assigned in wireUI to syncMusic → init() starts the MUTED, in-sync soundtrack timeline once audio is buffered + the tour has started (silent; audible only after a deliberate music-button click)
+function hideNextBattle(){ const nb=$("next-battle"); if(nb) nb.classList.remove("show"); }
+function showNextBattle(){
+  const nb=$("next-battle"); if(!nb) return;
+  const n=META.nextBattle;
+  if(!n || !n.href){ hideNextBattle(); return; }
+  nb.href=n.href;
+  nb.innerHTML=`${n.title_zh||"下一場"}<span style="display:block;font-family:var(--mono);font-size:10px;font-weight:400;margin-top:2px;opacity:.85">${n.title_en||""} →</span>`;
+  nb.classList.add("show");
+}
+const ANALYSIS_SECTIONS=[
+  { key:"military", zh:"軍事分析", en:"Military", sub:"戰術部署、攻防過程與勝負關鍵" },
+  { key:"leaders", zh:"領袖人物", en:"Leaders", sub:"決策者、將領及其在戰役中的角色" },
+  { key:"nationalPower", zh:"國力對比", en:"National Power", sub:"工業、人口、資源與後勤實力" },
+  { key:"impact", zh:"後續影響", en:"Impact", sub:"對本戰役結果及日後勢力格局的影響" },
+];
+function wireAnalysisPanel(){
+  const a=D.analysis||{}, dock=$("analysis-dock"), panes=$("analysis-panes"), btn=$("analysis-btn");
+  if(!dock||!panes) return;
+  const active=new Set(["military","leaders"]);
+  function render(){
+    const html=ANALYSIS_SECTIONS.filter(s=>active.has(s.key)&&a[s.key])
+      .map(s=>`<section class="apane" data-k="${s.key}"><h4>${s.zh} · ${s.en}</h4><div class="sub" style="font-family:var(--mono);font-size:9px;color:var(--accent);opacity:.85;margin-bottom:5px">${s.sub}</div><p>${a[s.key]}</p></section>`).join("");
+    panes.innerHTML=html||`<p class="ap-empty">點選上方標籤開啟各項分析<br><span style="opacity:.7">Toggle tabs above</span></p>`;
+    dock.querySelectorAll(".ad-tab").forEach(t=>{
+      const k=t.dataset.k;
+      t.classList.toggle("on",active.has(k));
+      t.disabled=!a[k];
+    });
+  }
+  dock.querySelectorAll(".ad-tab").forEach(t=>{
+    t.onclick=()=>{ const k=t.dataset.k; if(!a[k]) return;
+      if(active.has(k)) active.delete(k); else active.add(k); render(); };
+  });
+  const close=$("analysis-close");
+  if(btn) btn.onclick=()=>{ dock.classList.toggle("open"); if(dock.classList.contains("open")) render(); };
+  if(close) close.onclick=()=>dock.classList.remove("open");
+  render();
+}
+let kickMusic=()=>{};
 function wireUI(){
-  const n=D.notes;
-  $("notes-body").innerHTML=`<p>${n.summary}</p><h5>考據與呈現說明 · Caveats</h5><ul>`+
+  const n=D.notes, a=D.analysis||{};
+  let body=`<p>${n.summary}</p>`;
+  if(a.military||a.leaders||a.nationalPower||a.impact){
+    body+=`<h5>戰役分析 · WAR ANALYSIS</h5><p style="font-size:11px;margin-bottom:8px">請按左上角 <b>📊 戰役分析</b> 按鈕，以開關各項分析面板。</p>`;
+  }
+  body+=`<h5>考據與呈現說明 · Caveats</h5><ul>`+
     n.caveats.map(c=>`<li>${c}</li>`).join("")+`</ul><h5>主要來源 · Sources</h5><p>${n.sources}</p>`;
+  $("notes-body").innerHTML=body;
+  wireAnalysisPanel();
   const np=$("notes");
   $("notes-btn").onclick=()=>np.classList.toggle("open");
   $("notes-close").onclick=()=>np.classList.remove("open");
@@ -926,6 +1046,10 @@ function wireUI(){
   } else if(musicBtn) musicBtn.style.display="none";
   $("play").onclick=()=>{ Director.togglePlay(); syncMusic(); };
   $("resume").onclick=()=>{ Director.resume(); syncMusic(); };
+  document.querySelectorAll("#speed-btns .spd").forEach(btn=>{
+    btn.onclick=()=>{ playSpeed=+btn.dataset.spd||1;
+      document.querySelectorAll("#speed-btns .spd").forEach(b=>b.classList.toggle("active",b===btn)); };
+  });
   const beats=$("prog-beats"), N=D.storyboard.length;
   D.storyboard.forEach((sh,i)=>{ const b=document.createElement("b"); b.style.left=((i+0.5)/N*100)+"%";
     b.title=sh.dateLabel+" · "+sh.title_zh; beats.appendChild(b); });   // hover a tick to read the chapter
@@ -969,10 +1093,11 @@ function decollide(){
 }
 function renderScene(){ controls.update(); renderer.render(scene,camera); labelRenderer.render(scene,camera); decollide(); }
 function frame(dt){
-  Director.update(dt);                  // drives camera + clock + captions + focus
+  const spd=playSpeed;
+  Director.update(dt*spd);
   const w=applyWeather(Clock.day);
   updateFront(Clock.day); updateLines(Clock.day); updateUnits(Clock.day); updateArrows(Clock.day);
-  updateFlags(); updateEffects(Clock.day,dt); stepRain(dt,w); updateLabels();
+  updateFlags(); updateEffects(Clock.day,dt*spd); stepRain(dt*spd,w); updateLabels();
   renderScene();
 }
 function animate(){

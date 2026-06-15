@@ -202,6 +202,7 @@ function baseBattle(id, title_zh, title_en, subtitle, geo, factions, factionOrde
     weather: center.weather || [{ d: 1, night: 0.15, fog: 0.1, rain: 0.1, smoke: 0.2, zh: title_zh, en: title_en }],
     analysis: center.analysis || {
       military: center.analysisMilitary || (title_zh + "的軍事意義：雙方兵力部署、進攻與防禦行動，以及戰術成敗。"),
+      leaders: center.analysisLeaders || "本戰役主要決策者與將領的指揮風格、政治立場，如何影響部隊行動與士氣。",
       nationalPower: center.analysisPower || "參戰國的工業、人口、資源與後勤能力決定能否持久作戰。",
       impact: center.analysisImpact || "本戰役對戰爭走向、國際秩序與後世歷史記憶的長遠影響。",
     },
@@ -410,6 +411,7 @@ require("./battle-catalog-rest.js")(CATALOG, {
 });
 
 const ENRICH = require("./battle-enrichment.js")({ cam });
+const LEADERS = require("./battle-leaders.js");
 
 function mergeEnrichment(battle, warSlug) {
   const e = ENRICH[`${warSlug}/${battle.slug}`];
@@ -425,6 +427,13 @@ function mergeEnrichment(battle, warSlug) {
   if (e.hotspotsExtra) d.hotspots = [...d.hotspots, ...e.hotspotsExtra];
   const maxDay = Math.max(d.END_DAY || 100, ...(d.storyboard || []).map((s) => s.day || 1));
   d.END_DAY = maxDay;
+}
+
+function mergeLeaders(battle, warSlug) {
+  const key = `${warSlug}/${battle.slug}`;
+  const d = battle.data;
+  if (!d.analysis) d.analysis = {};
+  if (LEADERS[key]) d.analysis.leaders = LEADERS[key];
 }
 
 function wireNextBattles() {
@@ -457,6 +466,7 @@ for (const war of CATALOG) {
   fs.writeFileSync(path.join(warDir, "index.html"), hubHtml(war));
   for (const b of war.battles) {
     mergeEnrichment(b, war.slug);
+    mergeLeaders(b, war.slug);
     writeBattle(war.slug, b);
   }
   console.log(`✓ ${war.slug}: ${war.battles.length} battles`);

@@ -94,6 +94,7 @@ const CFG = {
   ZOOM: 0.45,           // multiplies each shot's camera distance → tighter framing on the action
   FOCUS:{ UNIT_DIM:0.12, PLACE_NEAR:350, PLACE_FAR:1200, MAX_PLACES:10 }, // show only the nearest few place names
   FLASH_K: 0.26,        // muzzle/explosion flash-light dampening (was blowing out the scene)
+  FX_DENSITY: 0.5,      // combat flash/particle rate (0.5 = half as dense)
   // entity scale (tuned to the ~2000-unit metric extent)
   FLAG_H: 30, FLAG_W: 26, FLAG_TH: 16,   // shorter staff + smaller cloth → less "stadium banner / km-pole" clash
   RING_IN: 5, RING_OUT: 8, TOKEN_R: 6.5, TOKEN_H: 7, POLE_R: 0.6, FINIAL_R: 1.2,   // TOKEN_R kept → wedge footprint unchanged
@@ -695,70 +696,81 @@ function flash(x,y,z,color,intensity){ for(const fl of flashes){ if(fl.life<=0){
 const hotTimers={}; const rnd=(a,b)=>a+Math.random()*(b-a);
 function updateEffects(day, dt){
   const G=CFG.EU;
+  const fxDen=CFG.FX_DENSITY!=null?CFG.FX_DENSITY:1;
+  const fxT=t=>t/fxDen, fxP=p=>p*fxDen, fxOk=()=>Math.random()<fxDen;
   for(let h=0;h<D.hotspots.length;h++){
     const hs=D.hotspots[h]; if(day<hs.a||day>hs.b) continue;
     const w=vec(hs.lng,hs.lat,0); const gx=w.x, gz=w.z, gy=w.y;
     hotTimers[h]=(hotTimers[h]||0)-dt; const fire=hotTimers[h]<=0;
     if(hs.kind==="firefight"){
-      if(Math.random()<hs.i*0.9){ const c=Math.random()<0.5?[1,0.8,0.3]:[1,0.5,0.2];
+      if(Math.random()<fxP(hs.i*0.9)){ const c=Math.random()<0.5?[1,0.8,0.3]:[1,0.5,0.2];
         emit(GLOW,gx+rnd(-3,3)*G,gy+rnd(0.5,3)*G,gz+rnd(-3,3)*G,rnd(-6,6)*G,rnd(4,12)*G,rnd(-6,6)*G,rnd(8,16),rnd(0.3,0.6),c[0],c[1],c[2],0,0); }
-      if(fire){ flash(gx,gy+2*G,gz,0xffcc66,rnd(120,260)); emit(SMOKE,gx,gy+G,gz,rnd(-1,1)*G,2*G,rnd(-1,1)*G,16,rnd(1.2,2),0.22,0.21,0.2,12,1); hotTimers[h]=rnd(0.12,0.28)/hs.i; }
+      if(fire){ flash(gx,gy+2*G,gz,0xffcc66,rnd(120,260)); emit(SMOKE,gx,gy+G,gz,rnd(-1,1)*G,2*G,rnd(-1,1)*G,16,rnd(1.2,2),0.22,0.21,0.2,12,1); hotTimers[h]=fxT(rnd(0.12,0.28)/hs.i); }
     } else if(hs.kind==="artillery"){
       if(fire){ flash(gx,gy+3*G,gz,0xffd27a,rnd(220,360));
-        for(let s=0;s<8;s++) emit(GLOW,gx,gy+2.5*G,gz,rnd(-10,10)*G,rnd(6,16)*G,rnd(-10,10)*G,rnd(10,18),0.4,1,0.75,0.35,0,0);
+        for(let s=0;s<8;s++){ if(!fxOk()) continue;
+          emit(GLOW,gx,gy+2.5*G,gz,rnd(-10,10)*G,rnd(6,16)*G,rnd(-10,10)*G,rnd(10,18),0.4,1,0.75,0.35,0,0); }
         emit(SMOKE,gx,gy+2*G,gz,rnd(-1,1)*G,2.5*G,rnd(-1,1)*G,22,2.2,0.26,0.25,0.23,16,1);
-        for(let t=0;t<6;t++) emit(GLOW,gx+rnd(-2,2)*G,gy+(5+t*4)*G,gz+(10+t*7)*G,rnd(-2,2)*G,3*G,18*G,9,0.5,1,0.9,0.5,0,0);
-        hotTimers[h]=rnd(0.4,0.9)/hs.i; }
+        for(let t=0;t<6;t++){ if(!fxOk()) continue;
+          emit(GLOW,gx+rnd(-2,2)*G,gy+(5+t*4)*G,gz+(10+t*7)*G,rnd(-2,2)*G,3*G,18*G,9,0.5,1,0.9,0.5,0,0); }
+        hotTimers[h]=fxT(rnd(0.4,0.9)/hs.i); }
     } else if(hs.kind==="explosion"){
       if(fire){ flash(gx,gy+2*G,gz,0xffaa44,rnd(300,520));
-        for(let s=0;s<14;s++){ const a=Math.random()*7,sp=rnd(6,20)*G;
+        for(let s=0;s<14;s++){ if(!fxOk()) continue; const a=Math.random()*7,sp=rnd(6,20)*G;
           emit(GLOW,gx,gy+1.5*G,gz,Math.cos(a)*sp,rnd(8,20)*G,Math.sin(a)*sp,rnd(10,22),rnd(0.3,0.6),1,0.6,0.2,0,3); }
         emit(SMOKE,gx,gy+2*G,gz,rnd(-2,2)*G,3*G,rnd(-2,2)*G,30,2.4,0.2,0.19,0.18,20,1);
-        hotTimers[h]=rnd(0.7,1.6)/hs.i; }
+        hotTimers[h]=fxT(rnd(0.7,1.6)/hs.i); }
     } else if(hs.kind==="landing"){
-      if(Math.random()<0.7) emit(GLOW,gx+rnd(-6,6)*G,gy+rnd(0,2)*G,gz+rnd(-4,4)*G,rnd(-4,4)*G,rnd(6,12)*G,rnd(-4,4)*G,rnd(8,14),0.4,0.7,0.85,1,0);
+      if(Math.random()<fxP(0.7)) emit(GLOW,gx+rnd(-6,6)*G,gy+rnd(0,2)*G,gz+rnd(-4,4)*G,rnd(-4,4)*G,rnd(6,12)*G,rnd(-4,4)*G,rnd(8,14),0.4,0.7,0.85,1,0);
       if(fire){ flash(gx,gy+1.5*G,gz,0xfff0c0,rnd(120,220));
-        for(let s=0;s<6;s++) emit(GLOW,gx+rnd(-8,8)*G,gy+0.5*G,gz+rnd(-6,6)*G,rnd(-3,3)*G,rnd(3,7)*G,rnd(-3,3)*G,11,0.4,0.6,0.8,1,0,0);
-        hotTimers[h]=rnd(0.3,0.6); }
+        for(let s=0;s<6;s++){ if(!fxOk()) continue;
+          emit(GLOW,gx+rnd(-8,8)*G,gy+0.5*G,gz+rnd(-6,6)*G,rnd(-3,3)*G,rnd(3,7)*G,rnd(-3,3)*G,11,0.4,0.6,0.8,1,0,0); }
+        hotTimers[h]=fxT(rnd(0.3,0.6)); }
     } else if(hs.kind==="oilfire"){
-      for(let s=0;s<3;s++) emit(GLOW,gx+rnd(-4,4)*G,gy+rnd(0,4)*G,gz+rnd(-4,4)*G,rnd(-2,2)*G,rnd(8,16)*G,rnd(-2,2)*G,rnd(18,30),rnd(0.4,0.8),1,rnd(0.35,0.6),0.12,-12,2);
-      if(fire){ for(let s=0;s<2;s++) emit(SMOKE,gx+rnd(-2,2)*G,gy+3*G,gz+rnd(-2,2)*G,rnd(0,2)*G,rnd(4,7)*G,rnd(-1,1)*G,rnd(22,34),rnd(2,3),0.15,0.14,0.13,16,1);
-        flash(gx,gy+3*G,gz,0xff7733,rnd(120,200)*hs.i); hotTimers[h]=rnd(0.2,0.34); }
+      for(let s=0;s<3;s++){ if(!fxOk()) continue;
+        emit(GLOW,gx+rnd(-4,4)*G,gy+rnd(0,4)*G,gz+rnd(-4,4)*G,rnd(-2,2)*G,rnd(8,16)*G,rnd(-2,2)*G,rnd(18,30),rnd(0.4,0.8),1,rnd(0.35,0.6),0.12,-12,2); }
+      if(fire){ for(let s=0;s<2;s++){ if(!fxOk()) continue;
+          emit(SMOKE,gx+rnd(-2,2)*G,gy+3*G,gz+rnd(-2,2)*G,rnd(0,2)*G,rnd(4,7)*G,rnd(-1,1)*G,rnd(22,34),rnd(2,3),0.15,0.14,0.13,16,1); }
+        flash(gx,gy+3*G,gz,0xff7733,rnd(120,200)*hs.i); hotTimers[h]=fxT(rnd(0.2,0.34)); }
     } else if(hs.kind==="air"){
       if(fire){ flash(gx,gy+2*G,gz,0xffcc66,300);
-        for(let s=0;s<10;s++){ const a=Math.random()*7,sp=rnd(8,16)*G;
+        for(let s=0;s<10;s++){ if(!fxOk()) continue; const a=Math.random()*7,sp=rnd(8,16)*G;
           emit(GLOW,gx,gy+1.5*G,gz,Math.cos(a)*sp,rnd(6,14)*G,Math.sin(a)*sp,rnd(10,18),0.5,1,0.7,0.3,0,3); }
         emit(SMOKE,gx,gy+2*G,gz,0,2.5*G,0,26,2.4,0.2,0.19,0.18,18,1);
-        for(let t=0;t<6;t++) emit(GLOW,gx+(rnd(-3,3)+(6-t)*4)*G,gy+(30-t*4)*G,gz+(-30+t*4)*G,rnd(-2,2)*G,-6*G,6*G,8,0.4,1,0.9,0.4,0,0);
-        hotTimers[h]=rnd(0.8,1.6); }
+        for(let t=0;t<6;t++){ if(!fxOk()) continue;
+          emit(GLOW,gx+(rnd(-3,3)+(6-t)*4)*G,gy+(30-t*4)*G,gz+(-30+t*4)*G,rnd(-2,2)*G,-6*G,6*G,8,0.4,1,0.9,0.4,0,0); }
+        hotTimers[h]=fxT(rnd(0.8,1.6)); }
     } else if(hs.kind==="nuclear"){
       if(fire){ flash(gx,gy+4*G,gz,0xfff4e0,rnd(520,900));
-        for(let s=0;s<24;s++){ const a=Math.random()*7,sp=rnd(10,32)*G;
+        for(let s=0;s<24;s++){ if(!fxOk()) continue; const a=Math.random()*7,sp=rnd(10,32)*G;
           emit(GLOW,gx,gy+2*G,gz,Math.cos(a)*sp,rnd(16,40)*G,Math.sin(a)*sp,rnd(18,36),rnd(0.4,0.8),1,0.85,0.45,0,4); }
         emit(SMOKE,gx,gy+4*G,gz,rnd(-3,3)*G,5*G,rnd(-3,3)*G,42,3.2,0.18,0.17,0.16,24,1);
-        for(let t=0;t<8;t++) emit(GLOW,gx,gy+(8+t*6)*G,gz,rnd(-4,4)*G,8*G,rnd(-4,4)*G,rnd(28,40),0.6,1,0.7,0.35,-8,2);
-        hotTimers[h]=rnd(1.2,2.4)/hs.i; }
+        for(let t=0;t<8;t++){ if(!fxOk()) continue;
+          emit(GLOW,gx,gy+(8+t*6)*G,gz,rnd(-4,4)*G,8*G,rnd(-4,4)*G,rnd(28,40),0.6,1,0.7,0.35,-8,2); }
+        hotTimers[h]=fxT(rnd(1.2,2.4)/hs.i); }
     } else if(hs.kind==="naval"){
       if(fire){ flash(gx,gy+1.5*G,gz,0xaaccff,rnd(180,320));
-        for(let s=0;s<6;s++) emit(GLOW,gx+rnd(-5,5)*G,gy+rnd(0,2)*G,gz+rnd(-5,5)*G,rnd(-6,6)*G,rnd(4,10)*G,rnd(-6,6)*G,rnd(12,20),0.45,0.5,0.75,1,0,0);
+        for(let s=0;s<6;s++){ if(!fxOk()) continue;
+          emit(GLOW,gx+rnd(-5,5)*G,gy+rnd(0,2)*G,gz+rnd(-5,5)*G,rnd(-6,6)*G,rnd(4,10)*G,rnd(-6,6)*G,rnd(12,20),0.45,0.5,0.75,1,0,0); }
         emit(SMOKE,gx,gy+2*G,gz,rnd(-2,2)*G,3*G,rnd(-2,2)*G,24,2,0.2,0.22,0.25,14,1);
-        hotTimers[h]=rnd(0.5,1.1)/hs.i; }
+        hotTimers[h]=fxT(rnd(0.5,1.1)/hs.i); }
     }
   }
   // per-scene asset effects (air/navy/nuclear badges on storyboard shots)
   if(Director.sceneFx && Director.sceneFx.length && Director.mode==="play" && Director.capShown){
-    for(const fx of Director.sceneFx){
-      fx._t=(fx._t||0)-dt; if(fx._t>0) continue; fx._t=rnd(0.35,0.9);
-      const w=vec(fx.lng,fx.lat,0), gx=w.x, gz=w.z, gy=w.y;
-      if(fx.kind==="air"||fx.kind==="nuclear"){
-        for(let t=0;t<3;t++) emit(GLOW,gx+(rnd(-2,2)+t*5)*G,gy+(20+t*8)*G,gz+(rnd(-2,2)-t*4)*G,rnd(-3,3)*G,-4*G,4*G,7,0.35,1,0.85,0.4,0,0);
+    for(const sfx of Director.sceneFx){
+      sfx._t=(sfx._t||0)-dt; if(sfx._t>0) continue; sfx._t=fxT(rnd(0.35,0.9));
+      const w=vec(sfx.lng,sfx.lat,0), gx=w.x, gz=w.z, gy=w.y;
+      if(sfx.kind==="air"||sfx.kind==="nuclear"){
+        for(let t=0;t<3;t++){ if(!fxOk()) continue;
+          emit(GLOW,gx+(rnd(-2,2)+t*5)*G,gy+(20+t*8)*G,gz+(rnd(-2,2)-t*4)*G,rnd(-3,3)*G,-4*G,4*G,7,0.35,1,0.85,0.4,0,0); }
       }
-      if(fx.kind==="navy"||fx.kind==="naval"){
+      if(sfx.kind==="navy"||sfx.kind==="naval"){
         flash(gx,gy+G,gz,0x88bbff,rnd(80,160)); emit(SMOKE,gx,gy+G,gz,rnd(-1,1)*G,2*G,rnd(-1,1)*G,14,1.4,0.22,0.24,0.28,10,1);
       }
-      if(fx.kind==="nuclear"){
+      if(sfx.kind==="nuclear"){
         flash(gx,gy+3*G,gz,0xfff0cc,rnd(400,700));
-        for(let s=0;s<8;s++){ const a=Math.random()*7,sp=rnd(8,22)*G;
+        for(let s=0;s<8;s++){ if(!fxOk()) continue; const a=Math.random()*7,sp=rnd(8,22)*G;
           emit(GLOW,gx,gy+2*G,gz,Math.cos(a)*sp,rnd(12,28)*G,Math.sin(a)*sp,rnd(16,28),0.5,1,0.8,0.4,0,3); }
       }
     }
@@ -900,7 +912,8 @@ function card(zh,en,narrZh,narrEn){ $("cap-date").textContent=""; $("cap-title")
 function sideStrength(sh,side){ let s=0; (sh.focus||[]).forEach(id=>{ const o=unitById[id];
   if(o&&o.u.cf&&o.u.faction===side) s+=sampleTrack(o.u.track,Clock.day).s; }); return s; }
 const ASSET_LABELS={ air:{zh:"✈ 空軍",en:"Air"}, navy:{zh:"🚢 海軍",en:"Navy"}, naval:{zh:"🚢 海軍",en:"Navy"},
-  nuclear:{zh:"☢ 核武",en:"Nuclear"}, artillery:{zh:"💥 炮擊",en:"Artillery"}, landing:{zh:"⛵ 兩棲",en:"Amphibious"} };
+  nuclear:{zh:"☢ 核武",en:"Nuclear"}, artillery:{zh:"💥 炮擊",en:"Artillery"}, landing:{zh:"⛵ 兩棲",en:"Amphibious"},
+  explosion:{zh:"💥 潰壩／爆炸",en:"Explosion"} };
 function assetsFromShot(sh){
   const list=sh.assets||[];
   if(!list.length) return "";
@@ -1011,19 +1024,46 @@ function showNextBattle(){
   nb.innerHTML=`下一場：${n.title_zh||""}<span style="display:block;font-family:var(--mono);font-size:10px;font-weight:400;margin-top:2px;opacity:.85">${n.title_en||""} →</span>`;
   nb.classList.add("show");
 }
+const ANALYSIS_SECTIONS=[
+  { key:"military", zh:"軍事分析", en:"Military", sub:"戰術部署、攻防過程與勝負關鍵" },
+  { key:"leaders", zh:"領袖人物", en:"Leaders", sub:"決策者、將領及其在戰役中的角色" },
+  { key:"nationalPower", zh:"國力對比", en:"National Power", sub:"工業、人口、資源與後勤實力" },
+  { key:"impact", zh:"後續影響", en:"Impact", sub:"對本戰役結果及日後勢力格局的影響" },
+];
+function wireAnalysisPanel(){
+  const a=D.analysis||{}, dock=$("analysis-dock"), panes=$("analysis-panes"), btn=$("analysis-btn");
+  if(!dock||!panes) return;
+  const active=new Set(["military","leaders"]);
+  function render(){
+    const html=ANALYSIS_SECTIONS.filter(s=>active.has(s.key)&&a[s.key])
+      .map(s=>`<section class="apane" data-k="${s.key}"><h4>${s.zh} · ${s.en}</h4><div class="sub" style="font-family:var(--mono);font-size:9px;color:var(--accent);opacity:.85;margin-bottom:5px">${s.sub}</div><p>${a[s.key]}</p></section>`).join("");
+    panes.innerHTML=html||`<p class="ap-empty">點選上方標籤開啟各項分析<br><span style="opacity:.7">Toggle tabs above</span></p>`;
+    dock.querySelectorAll(".ad-tab").forEach(t=>{
+      const k=t.dataset.k;
+      t.classList.toggle("on",active.has(k));
+      t.disabled=!a[k];
+    });
+  }
+  dock.querySelectorAll(".ad-tab").forEach(t=>{
+    t.onclick=()=>{ const k=t.dataset.k; if(!a[k]) return;
+      if(active.has(k)) active.delete(k); else active.add(k); render(); };
+  });
+  const close=$("analysis-close");
+  if(btn) btn.onclick=()=>{ dock.classList.toggle("open"); if(dock.classList.contains("open")) render(); };
+  if(close) close.onclick=()=>dock.classList.remove("open");
+  render();
+}
 let kickMusic=()=>{};
 function wireUI(){
   const n=D.notes, a=D.analysis||{};
   let body=`<p>${n.summary}</p>`;
-  if(a.military||a.nationalPower||a.impact){
-    body+=`<h5>戰役分析 · BATTLE ANALYSIS</h5>`;
-    if(a.military) body+=`<div class="analysis-block"><b>軍事 · Military</b><br>${a.military}</div>`;
-    if(a.nationalPower) body+=`<div class="analysis-block"><b>國力 · National Power</b><br>${a.nationalPower}</div>`;
-    if(a.impact) body+=`<div class="analysis-block"><b>影響 · Impact</b><br>${a.impact}</div>`;
+  if(a.military||a.leaders||a.nationalPower||a.impact){
+    body+=`<h5>戰役分析 · BATTLE ANALYSIS</h5><p style="font-size:11px;margin-bottom:8px">請按左上角 <b>📊 戰役分析</b> 按鈕，以開關各項分析面板。</p>`;
   }
   body+=`<h5>考據與呈現說明 · Caveats</h5><ul>`+
     n.caveats.map(c=>`<li>${c}</li>`).join("")+`</ul><h5>主要來源 · Sources</h5><p>${n.sources}</p>`;
   $("notes-body").innerHTML=body;
+  wireAnalysisPanel();
   const np=$("notes");
   $("notes-btn").onclick=()=>np.classList.toggle("open");
   $("notes-close").onclick=()=>np.classList.remove("open");
