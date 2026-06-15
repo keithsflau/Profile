@@ -359,22 +359,36 @@ function lineLabel(zh,en,color){ const d=document.createElement("div"); d.classN
   d.innerHTML=`<div class="zh" style="color:${color}">${zh}</div><div class="en">${en}</div>`;
   const o=new THREE.CSS2DObject(d); labelGroup.add(o); return {o,div:d}; }
 
-let gdlMesh=null, gdlLabel=null;
+let staticLines = [];
 function buildLine(){
-  const curve=geoCurve(D.geography.lines[0].path, 12);
-  gdlMesh=new THREE.Mesh(new THREE.TubeGeometry(curve,120,2.0,8,false),
-    new THREE.MeshBasicMaterial({color:0x6fa0d8, transparent:true, opacity:0}));
-  scene.add(gdlMesh);
-  gdlLabel=lineLabel("戰前接觸線","Pre-war Line of Contact","#6fa0d8");
-  const m=curve.getPoint(0.5); gdlLabel.o.position.set(m.x, m.y+CFG.LBL_FORT, m.z);
+  staticLines = [];
+  const lines = (D.geography && D.geography.lines) || [];
+  lines.forEach(line => {
+    if (!line || !line.path || !line.path.length) return;
+    const curve = geoCurve(line.path, 12);
+    const mesh = new THREE.Mesh(new THREE.TubeGeometry(curve, 120, 2.0, 8, false),
+      new THREE.MeshBasicMaterial({ color: 0x6fa0d8, transparent: true, opacity: 0 }));
+    scene.add(mesh);
+    const label = lineLabel(line.name_zh || "界線", line.name_en || "Boundary", "#6fa0d8");
+    const m = curve.getPoint(0.5);
+    label.o.position.set(m.x, m.y + CFG.LBL_FORT, m.z);
+    staticLines.push({ mesh, label, fade: line.fade || null });
+  });
 }
-// The Gin Drinkers Line matters only while the mainland is held (8–13 Dec);
-// fade it out as the line collapses so it doesn't linger over the island battle.
+function lineOpacity(day, fade){
+  if (!fade) return 0.55;
+  const until = fade.until != null ? fade.until : 55;
+  const end = fade.end != null ? fade.end : 90;
+  return day < until ? 0.55 : clamp((end - day) / (end - until), 0, 1) * 0.55;
+}
 function updateLines(day){
-  if(!gdlMesh) return;
-  const op = day<55 ? 0.55 : clamp((90-day)/35,0,1)*0.55;
-  gdlMesh.material.opacity=op; gdlMesh.visible=op>0.02;
-  gdlLabel.o.visible=op>0.05; gdlLabel.div.style.opacity=clamp(op/0.55,0,1);
+  staticLines.forEach(({ mesh, label, fade }) => {
+    const op = lineOpacity(day, fade);
+    mesh.material.opacity = op;
+    mesh.visible = op > 0.02;
+    label.o.visible = op > 0.05;
+    label.div.style.opacity = clamp(op / 0.55, 0, 1);
+  });
 }
 
 const frontGroup=new THREE.Group(); scene.add(frontGroup);
@@ -946,7 +960,9 @@ function decollide(){
   const items=[];
   for(const o of unitObjs) if(o.visible && o.lbl.visible && (+o.div.style.opacity||0)>0.05) items.push(o.div);
   for(const o of arrowObjs) if((+o.div.style.opacity||0)>0.05) items.push(o.div);
-  if(gdlLabel && gdlLabel.o.visible && (+gdlLabel.div.style.opacity||0)>0.05) items.push(gdlLabel.div);
+  staticLines.forEach(({ label }) => {
+    if (label.o.visible && (+label.div.style.opacity || 0) > 0.05) items.push(label.div);
+  });
   if(frontLabel && frontLabel.o.visible) items.push(frontLabel.div);
   for(const l of placeLabels) if(l.div.style.display!=="none" && (+l.div.style.opacity||0)>0.05) items.push(l.div);
   if(items.length<1) return;
