@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OIA 查經法 | Observation · Interpretation · Application</title>
+  <meta name="description" content="互動學習 OIA 查經法：觀察、解釋、應用 | Interactive OIA Bible study method">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .serif { font-family: 'Noto Serif TC', serif; }
+    .step-tab { transition: all 0.25s; cursor: pointer; }
+    .step-tab.active { background: linear-gradient(135deg, #4f46e5, #6366f1); color: #fff; border-color: transparent; }
+    .step-panel { display: none; }
+    .step-panel.active { display: block; animation: fadeIn 0.35s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    .prompt-card { border-left: 4px solid; }
+    .prompt-card.obs { border-color: #3b82f6; }
+    .prompt-card.int { border-color: #8b5cf6; }
+    .prompt-card.app { border-color: #10b981; }
+    .verse-line { padding: 0.35rem 0.75rem; border-radius: 0.5rem; cursor: pointer; transition: background 0.2s; }
+    .verse-line:hover, .verse-line.marked { background: rgba(99, 102, 241, 0.12); }
+    textarea { resize: vertical; min-height: 4.5rem; }
+  </style>
+  <link rel="stylesheet" href="../../../../visit-counter.css">
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen">
+  <header class="bg-gradient-to-r from-indigo-900 via-indigo-800 to-violet-900 text-white px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+      <a href="../index.html" class="text-indigo-200 text-sm hover:text-white">← 返回查經法</a>
+      <h1 class="text-3xl sm:text-4xl font-bold serif mt-4">OIA 查經法</h1>
+      <p class="text-indigo-200 mt-2">觀察 Observation · 解釋 Interpretation · 應用 Application</p>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-4 py-8 space-y-8">
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+      <h2 class="text-lg font-semibold mb-2">什麼是 OIA？</h2>
+      <p class="text-slate-700 text-sm leading-relaxed">
+        OIA 是華人教會廣泛採用的查經框架：<strong>先觀察經文客觀內容</strong>（不急於應用），
+        <strong>再解釋作者對原讀者的意思</strong>（考慮上下文與以經解經），
+        <strong>最後才應用於今日</strong>。順序很重要——跳過觀察與解釋，容易把個人想法強加於經文。
+      </p>
+      <div class="flex flex-wrap gap-2 mt-4">
+        <button type="button" class="step-tab active px-4 py-2 rounded-full border border-slate-300 text-sm font-medium" data-step="0">① 觀察 O</button>
+        <button type="button" class="step-tab px-4 py-2 rounded-full border border-slate-300 text-sm font-medium" data-step="1">② 解釋 I</button>
+        <button type="button" class="step-tab px-4 py-2 rounded-full border border-slate-300 text-sm font-medium" data-step="2">③ 應用 A</button>
+      </div>
+    </section>
+
+    <section class="bg-amber-50/80 border border-amber-200 rounded-2xl p-6">
+      <h2 class="text-lg font-semibold serif mb-3">示範經文：詩篇 23:1-6</h2>
+      <div id="sample-verses" class="serif text-slate-800 leading-relaxed space-y-1 text-sm sm:text-base">
+        <p class="verse-line" data-v="1">1 耶和華是我的牧者，我必不致缺乏。</p>
+        <p class="verse-line" data-v="2">2 他使我躺臥在青草地上，領我在可安歇的水旁。</p>
+        <p class="verse-line" data-v="3">3 他使我的靈魂甦醒，為自己的名引導我走義路。</p>
+        <p class="verse-line" data-v="4">4 我虽然行過死蔭的幽谷，也不怕遭害，因為你與我同在；你的杖，你的竿，都安慰我。</p>
+        <p class="verse-line" data-v="5">5 在我敵人面前，你為我擺設筵席；你用油膏了我的頭，使我的福杯滿溢。</p>
+        <p class="verse-line" data-v="6">6 我一生一世必有恩惠慈愛隨著我；我且要住在耶和華的殿中，直到永遠。</p>
+      </div>
+      <p class="text-xs text-amber-800 mt-3">提示：點選經文節可作標記，配合下方問題思考。</p>
+    </section>
+
+    <section id="step-panels">
+      <div class="step-panel active" data-panel="0">
+        <h3 class="text-xl font-semibold text-blue-700 mb-4">① 觀察：經文「說了什麼」？</h3>
+        <p class="text-sm text-slate-600 mb-4">只描述可見的事實，暫不作靈性發揮或應用。</p>
+        <div class="space-y-3">
+          <div class="prompt-card obs bg-white p-4 rounded-r-xl shadow-sm">
+            <p class="font-medium text-sm mb-2">關鍵詞與重複</p>
+            <p class="text-xs text-slate-600">「牧者」「我」「你／他」出現幾次？哪些意象重複（青草地、水、路、杖竿）？</p>
+          </div>
+          <div class="prompt-card obs bg-white p-4 rounded-r-xl shadow-sm">
+            <p class="font-medium text-sm mb-2">對比與轉折</p>
+            <p class="text-xs text-slate-600">第 4 節的「死蔭幽谷」與前後經文形成什麼對比？語氣從第 1 節到第 6 節如何發展？</p>
+          </div>
+          <div class="prompt-card obs bg-white p-4 rounded-r-xl shadow-sm">
+            <p class="font-medium text-sm mb-2">人物與動作</p>
+            <p class="text-xs text-slate-600">耶和華（牧者）做了什麼？「我」經歷了什麼？</p>
+          </div>
+        </div>
+        <label class="block mt-5 text-sm font-medium text-slate-700">你的觀察筆記</label>
+        <textarea class="w-full mt-1 p-3 border border-slate-300 rounded-xl text-sm" placeholder="例：全詩以第一人稱描述與耶和華的關係；第 4 節是低谷，但「與我同在」是轉折……"></textarea>
+      </div>
+
+      <div class="step-panel" data-panel="1">
+        <h3 class="text-xl font-semibold text-violet-700 mb-4">② 解釋：作者要原讀者明白什麼？</h3>
+        <p class="text-sm text-slate-600 mb-4">進入以色列牧羊文化、詩篇体裁，並以整本聖經光照（以經解經）。</p>
+        <div class="space-y-3">
+          <div class="prompt-card int bg-white p-4 rounded-r-xl shadow-sm">
+            <p class="font-medium text-sm mb-2">歷史與文化</p>
+            <p class="text-xs text-slate-600">在古代近東，「牧者」常喻指君王或神對子民的看顧（如以西結 34）。</p>
+          </div>
+          <div class="prompt-card int bg-white p-4 rounded-r-xl shadow-sm">
+            <p class="font-medium text-sm mb-2">文學與上下文</p>
+            <p class="text-xs text-slate-600">這是信靠詩；「杖、竿」是牧人保護羊的工具；「筵席、油膏」在敵人面前象徵尊榮與保護。</p>
+          </div>
+          <div class="prompt-card int bg-white p-4 rounded-r-xl shadow-sm">
+            <p class="font-medium text-sm mb-2">以經解經</p>
+            <p class="text-xs text-slate-600">約翰福音 10:11 耶穌自稱好牧人；啟示錄 7:17 羔羊作牧者——指向基督。</p>
+          </div>
+        </div>
+        <label class="block mt-5 text-sm font-medium text-slate-700">歸納經文主旨（一句話）</label>
+        <textarea class="w-full mt-1 p-3 border border-slate-300 rounded-xl text-sm" placeholder="例：信靠耶和華這位牧者的看顧，即使在危難中仍經歷同在與恩惠慈愛。"></textarea>
+      </div>
+
+      <div class="step-panel" data-panel="2">
+        <h3 class="text-xl font-semibold text-emerald-700 mb-4">③ 應用：今日生命如何回應？</h3>
+        <p class="text-sm text-slate-600 mb-4">應用必須扎根於觀察與解釋，可從「頭腦、情感、意志、群體」四方面具體化。</p>
+        <div class="space-y-3">
+          <div class="prompt-card app bg-white p-4 rounded-r-xl shadow-sm">
+            <p class="font-medium text-sm mb-2">禱告</p>
+            <p class="text-xs text-slate-600">你正在哪個「死蔭幽谷」？如何求主作牧者與你同在？</p>
+          </div>
+          <div class="prompt-card app bg-white p-4 rounded-r-xl shadow-sm">
+            <p class="font-medium text-sm mb-2">行動</p>
+            <p class="text-xs text-slate-600">本週如何具體信靠供應、順服引導、在團契中見證恩惠慈愛？</p>
+          </div>
+        </div>
+        <label class="block mt-5 text-sm font-medium text-slate-700">個人應用</label>
+        <textarea class="w-full mt-1 p-3 border border-slate-300 rounded-xl text-sm" placeholder="寫下一件本週可實踐的具體行動……"></textarea>
+      </div>
+    </section>
+
+    <section class="bg-white rounded-2xl border border-slate-200 p-6">
+      <h2 class="text-lg font-semibold mb-4">小測：OIA 順序</h2>
+      <p class="text-sm text-slate-600 mb-4">小組有人一讀經就說「我們要效法大衛」——最可能跳過了哪一步？</p>
+      <div class="space-y-2" id="quiz-oia">
+        <button type="button" class="quiz-opt w-full text-left p-3 rounded-lg border border-slate-200 text-sm hover:bg-slate-50" data-correct="0">只做了應用，觀察與解釋不足</button>
+        <button type="button" class="quiz-opt w-full text-left p-3 rounded-lg border border-slate-200 text-sm hover:bg-slate-50" data-correct="0">只做了觀察，沒有應用</button>
+        <button type="button" class="quiz-opt w-full text-left p-3 rounded-lg border border-slate-200 text-sm hover:bg-slate-50" data-correct="1">順序完全正確</button>
+      </div>
+      <p id="quiz-feedback" class="mt-3 text-sm hidden"></p>
+    </section>
+
+    <section class="text-center text-sm text-slate-500 pb-8">
+      <p>帶查經時可印出三欄紙：觀察｜解釋｜應用。也可參考 <a href="../上下文查經/index.html" class="text-indigo-600 underline">上下文查經</a> 與 <a href="../以經解經/index.html" class="text-indigo-600 underline">以經解經</a>。</p>
+    </section>
+  </main>
+  <div id="visit-counter-container"></div>
+
+  <script>
+    const panels = document.querySelectorAll('.step-panel');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const n = +tab.dataset.step;
+        tabs.forEach(t => t.classList.toggle('active', t === tab));
+        panels.forEach(p => p.classList.toggle('active', +p.dataset.panel === n));
+      });
+    });
+    document.querySelectorAll('.verse-line').forEach(el => {
+      el.addEventListener('click', () => el.classList.toggle('marked'));
+    });
+    document.querySelectorAll('.quiz-opt').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const fb = document.getElementById('quiz-feedback');
+        fb.classList.remove('hidden');
+        if (btn.dataset.correct === '0') {
+          fb.className = 'mt-3 text-sm text-emerald-700 font-medium';
+          fb.textContent = '✓ 正確！應用須建立在觀察與解釋之上，否則容易斷章取義或自我中心。';
+        } else {
+          fb.className = 'mt-3 text-sm text-red-600';
+          fb.textContent = '✗ 再想想：未弄清經文就急於應用，是常見的查經陷阱。';
+        }
+      });
+    });
+  </script>
+  <script src="../../../../visit-counter.js"></script>
+  <script>
+    VisitCounter.init('bible_study/查經/查經法/OIA/index', {
+      scriptUrl: 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec',
+      containerId: 'visit-counter-container'
+    });
+  </script>
+</body>
+</html>
