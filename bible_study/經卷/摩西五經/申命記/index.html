@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>申命記 | Deuteronomy - 摩西五經</title>
+  <meta name="description" content="申命記研讀：示瑪、立約重申、選擇生命 | Deuteronomy study">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body{font-family:'Inter',sans-serif}.serif{font-family:'Noto Serif TC',serif}
+    .sec-btn{cursor:pointer}.sec-body{max-height:0;overflow:hidden;transition:max-height .35s}.sec-body.show{max-height:320px}
+    .verse-card{cursor:pointer}.verse-text{display:none}.verse-card.open .verse-text{display:block}
+    .shema{background:linear-gradient(135deg,#064e3b,#065f46);color:#ecfdf5;border-radius:16px;padding:24px;text-align:center}
+    .shema .hebrew{font-size:1.5rem;letter-spacing:.15em;margin:12px 0}
+    .choice-btn{padding:12px;border-radius:12px;border:2px solid;text-align:center;cursor:pointer;font-size:14px;transition:.2s}
+    .choice-btn.life{border-color:#10b981}.choice-btn.death{border-color:#94a3b8}
+    .choice-btn.selected.life{background:#d1fae5}.choice-btn.selected.death{background:#f1f5f9}
+  </style>
+  <link rel="stylesheet" href="../../../../visit-counter.css">
+</head>
+<body class="bg-emerald-50/30 min-h-screen text-slate-900">
+  <header class="bg-gradient-to-br from-emerald-900 to-green-950 text-white px-4 py-10">
+    <div class="max-w-3xl mx-auto">
+      <a href="../index.html" class="text-emerald-200 text-sm">← 摩西五經</a>
+      <p class="text-xs tracking-widest text-emerald-300 mt-4">דְּבָרִים · Deuteronomy</p>
+      <h1 class="text-4xl font-bold serif mt-1">申命記</h1>
+      <p class="text-emerald-100 mt-2 text-sm">「申命」即重述律法。摩西在摩押臨別，向新一代重申約、回顧曠野、呼籲專愛耶和華、選擇生命。</p>
+    </div>
+  </header>
+  <main class="max-w-3xl mx-auto px-4 py-8 space-y-8">
+    <div class="flex flex-wrap gap-2">
+      <a href="../../../舊約聖經人物/摩西/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-emerald-900">摩西</a>
+      <a href="../../../舊約聖經人物/約書亞/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-emerald-900">約書亞</a>
+    </div>
+
+    <section class="shema">
+      <p class="text-xs uppercase tracking-widest text-emerald-300">Shema · 示瑪</p>
+      <div class="hebrew serif">שְׁמַע יִשְׂרָאֵל</div>
+      <p class="serif text-lg leading-relaxed">「以色列啊，你要聽！耶和華我們神是獨一的主。你要盡心、盡性、盡力愛耶和華你的神。」</p>
+      <p class="text-xs text-emerald-300 mt-2">申命記 6:4–5</p>
+    </section>
+
+    <section class="bg-white rounded-2xl border p-6 shadow-sm">
+      <h2 class="font-semibold serif mb-4">結構大綱</h2>
+      <div class="space-y-2 text-sm">
+        <div class="border rounded-xl"><button type="button" class="sec-btn w-full text-left px-4 py-3 font-medium flex justify-between">一、第一講（1–4）<span>＋</span></button><div class="sec-body px-4 text-slate-600"><div class="pb-4">回顧曠野歷史，勸勉不要忘記神的作為。</div></div></div>
+        <div class="border rounded-xl"><button type="button" class="sec-btn w-full text-left px-4 py-3 font-medium flex justify-between">二、第二講（5–26）<span>＋</span></button><div class="sec-body px-4 text-slate-600"><div class="pb-4">十誡重申、示瑪（6）、愛與順服、各樣條例與公義。</div></div></div>
+        <div class="border rounded-xl"><button type="button" class="sec-btn w-full text-left px-4 py-3 font-medium flex justify-between">三、第三講（27–30）<span>＋</span></button><div class="sec-body px-4 text-slate-600"><div class="pb-4">祝福與咒詛、立約儀式、選擇生命（30:19-20）。</div></div></div>
+        <div class="border rounded-xl"><button type="button" class="sec-btn w-full text-left px-4 py-3 font-medium flex justify-between">四、尾聲（31–34）<span>＋</span></button><div class="sec-body px-4 text-slate-600"><div class="pb-4">約書亞承接、摩西之歌、摩西之死、神親自埋葬僕人。</div></div></div>
+      </div>
+    </section>
+
+    <section class="bg-white rounded-2xl border p-6">
+      <h2 class="font-semibold serif mb-3">互動：申 30:19 你選擇什麼？</h2>
+      <p class="text-sm text-slate-600 mb-4">「我今日呼天喚地向你作見證；我將生死、禍福陳明在你面前，所以你要揀選生命！」</p>
+      <div class="grid grid-cols-2 gap-3">
+        <button type="button" class="choice-btn life" data-choice="life">🌿 揀選生命<br><span class="text-xs opacity-80">愛神、聽從、歸向祂</span></button>
+        <button type="button" class="choice-btn death" data-choice="death">🌫️ 偏離道路<br><span class="text-xs opacity-80">忘記、拜偶像、硬心</span></button>
+      </div>
+      <p id="choice-fb" class="mt-4 text-sm hidden"></p>
+    </section>
+
+    <section class="bg-white rounded-2xl border p-6">
+      <h2 class="font-semibold serif mb-3">重點經文</h2>
+      <div class="space-y-2 text-sm">
+        <div class="verse-card border rounded-lg p-3"><div class="font-medium">申 6:6–9 · 教導儿女</div><div class="verse-text mt-2 serif border-t pt-2">「這些話你們要放在心上…也要談論…繫在手上為記號…寫在門框上。」</div></div>
+        <div class="verse-card border rounded-lg p-3"><div class="font-medium">申 18:15 · 先知像摩西</div><div class="verse-text mt-2 serif border-t pt-2">「耶和華你的神要從你弟兄中間給你興起一位先知像我。」（徒 3:22；基督應驗）</div></div>
+        <div class="verse-card border rounded-lg p-3"><div class="font-medium">申 34:10</div><div class="verse-text mt-2 serif border-t pt-2">「以後在以色列中沒有興起先知像摩西的…」</div></div>
+      </div>
+    </section>
+  </main>
+  <script>
+    document.querySelectorAll('.sec-btn').forEach(btn=>{btn.onclick=()=>{const b=btn.nextElementSibling;b.classList.toggle('show');btn.querySelector('span').textContent=b.classList.contains('show')?'−':'＋';};});
+    document.querySelectorAll('.verse-card').forEach(c=>c.onclick=()=>c.classList.toggle('open'));
+    document.querySelectorAll('.choice-btn').forEach(btn=>{
+      btn.onclick=()=>{
+        document.querySelectorAll('.choice-btn').forEach(b=>b.classList.remove('selected'));
+        btn.classList.add('selected');
+        const fb=document.getElementById('choice-fb');
+        fb.classList.remove('hidden');
+        fb.className='mt-4 text-sm font-medium '+(btn.dataset.choice==='life'?'text-emerald-700':'text-slate-600');
+        fb.textContent=btn.dataset.choice==='life'?'✓ 申命記呼籲我們日日選擇愛神、聽從祂的話，這就是生命。':'申命記警戒：離棄約的結局是咒詛與死亡；願我們回轉，仍選生命。';
+      };
+    });
+  </script>
+  <div id="visit-counter-container"></div>
+  <script src="../../../../visit-counter.js"></script>
+  <script>VisitCounter.init('bible_study/經卷/摩西五經/申命記/index',{scriptUrl:'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec',containerId:'visit-counter-container'});</script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>摩西五經 | Torah · Pentateuch</title>
+  <meta name="description" content="摩西五經研讀：創世記、出埃及記、利未記、民數記、申命記 | Study the Torah / Pentateuch">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .serif { font-family: 'Noto Serif TC', serif; }
+    .gradient-bg {
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at 15% 20%, rgba(180, 83, 9, 0.18), transparent 40%),
+                  radial-gradient(circle at 85% 10%, rgba(217, 119, 6, 0.14), transparent 35%),
+                  radial-gradient(circle at 50% 90%, rgba(120, 53, 15, 0.12), transparent 40%);
+      filter: blur(50px);
+    }
+    .glass-card {
+      backdrop-filter: blur(12px);
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(180, 83, 9, 0.22);
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 24px rgba(120, 53, 15, 0.08);
+    }
+    .glass-card:hover { transform: translateY(-4px); border-color: rgba(180, 83, 9, 0.4); }
+    .torah-card { opacity: 0; animation: fadeUp 0.7s ease forwards; }
+    .torah-card:nth-child(1){animation-delay:.05s}
+    .torah-card:nth-child(2){animation-delay:.1s}
+    .torah-card:nth-child(3){animation-delay:.15s}
+    .torah-card:nth-child(4){animation-delay:.2s}
+    .torah-card:nth-child(5){animation-delay:.25s}
+    @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
+    .scroll-deco {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 40%, #f59e0b 100%);
+      box-shadow: inset 0 0 0 1px rgba(120,53,15,.15);
+    }
+  </style>
+  <link rel="stylesheet" href="../../../visit-counter.css">
+</head>
+<body class="antialiased text-slate-900 bg-gradient-to-br from-amber-50/80 via-white to-orange-50/50 min-h-screen">
+  <div class="relative min-h-screen overflow-hidden">
+    <div class="gradient-bg pointer-events-none" aria-hidden="true"></div>
+    <div class="relative z-10">
+      <header class="px-6 py-12 max-w-6xl mx-auto">
+        <a href="../index.html" class="text-sm text-amber-800/80 hover:text-amber-950">← 返回經卷目錄</a>
+        <div class="mt-6 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+          <div>
+            <p class="text-xs tracking-[0.25em] uppercase text-amber-700 font-semibold mb-2">Torah · 妥拉</p>
+            <h1 class="text-4xl sm:text-5xl font-bold serif">摩西五經</h1>
+            <p class="text-slate-600 mt-3 max-w-xl leading-relaxed">
+              舊約開端的五卷書，記載創造、救贖、會幕與立約，是以色列信仰與整本聖經救贖歷史的根基。
+              傳統歸於摩西，亦稱<strong>律法書</strong>（希伯來文 <em>Torah</em> 有「教導」之意，不單指規條）。
+            </p>
+          </div>
+          <div class="scroll-deco rounded-2xl px-5 py-4 text-center min-w-[140px]">
+            <div class="text-3xl font-bold text-amber-900 serif">תּוֹרָה</div>
+            <div class="text-xs text-amber-800 mt-1">5 Books · 187 章</div>
+          </div>
+        </div>
+      </header>
+
+      <main class="px-6 pb-16 max-w-6xl mx-auto space-y-10">
+        <section class="glass-card rounded-2xl p-6 sm:p-8">
+          <h2 class="text-lg font-semibold serif mb-3">五經在聖經中的位置</h2>
+          <p class="text-sm text-slate-700 leading-relaxed mb-4">
+            五經鋪陳「創造 → 墮落 → 揀選 → 出埃及 → 西奈立約 → 會幕 → 曠野 → 立約重申」的救贖軌跡。
+            新約多次引用（如申命記 6:4 示瑪、利未記 19:18），耶穌亦從「摩西和眾先知」講解自己（路 24:27）。
+          </p>
+          <div class="flex flex-wrap gap-2 text-xs">
+            <a href="../../查經/查經法/OIA/index.html" class="px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-200 hover:bg-amber-200">OIA 查經法</a>
+            <a href="../../查經/查經法/以經解經/index.html" class="px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-200 hover:bg-amber-200">以經解經</a>
+            <a href="../../地圖/bible-maps/maps/abraham/index.html" class="px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-200 hover:bg-amber-200">亞伯拉罕地圖</a>
+            <a href="../../地圖/bible-maps/maps/exodus-canaan/index.html" class="px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-200 hover:bg-amber-200">出埃及地圖</a>
+            <a href="../../舊約聖經人物/摩西/index.html" class="px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-200 hover:bg-amber-200">摩西人物研讀</a>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-semibold serif text-center mb-6">五卷書研讀入口</h2>
+          <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <a href="創世記/index.html" class="torah-card glass-card rounded-2xl p-6 block group">
+              <span class="text-xs font-bold text-amber-600">01 · בְּרֵאשִׁית</span>
+              <h3 class="text-xl font-bold serif mt-1 group-hover:text-amber-700">創世記</h3>
+              <p class="text-xs text-slate-500 mb-2">Genesis · 50 章</p>
+              <p class="text-sm text-slate-700">起源與列祖：從創造、墮落到亞伯拉罕之約與约瑟。</p>
+            </a>
+            <a href="出埃及記/index.html" class="torah-card glass-card rounded-2xl p-6 block group">
+              <span class="text-xs font-bold text-red-700">02 · שְׁמוֹת</span>
+              <h3 class="text-xl font-bold serif mt-1 group-hover:text-red-800">出埃及記</h3>
+              <p class="text-xs text-slate-500 mb-2">Exodus · 40 章</p>
+              <p class="text-sm text-slate-700">救贖與會幕：十災、逾越節、西奈律法、神與人同住。</p>
+            </a>
+            <a href="利未記/index.html" class="torah-card glass-card rounded-2xl p-6 block group">
+              <span class="text-xs font-bold text-violet-700">03 · וַיִּקְרָא</span>
+              <h3 class="text-xl font-bold serif mt-1 group-hover:text-violet-800">利未記</h3>
+              <p class="text-xs text-slate-500 mb-2">Leviticus · 27 章</p>
+              <p class="text-sm text-slate-700">聖潔與敬拜：獻祭、贖罪日、祭司條例、「要聖潔」。</p>
+            </a>
+            <a href="民數記/index.html" class="torah-card glass-card rounded-2xl p-6 block group">
+              <span class="text-xs font-bold text-teal-700">04 · בְּמִדְבַּר</span>
+              <h3 class="text-xl font-bold serif mt-1 group-hover:text-teal-800">民數記</h3>
+              <p class="text-xs text-slate-500 mb-2">Numbers · 36 章</p>
+              <p class="text-sm text-slate-700">曠野旅程：普查、叛逆、銅蛇、巴蘭，信靠與審判並陳。</p>
+            </a>
+            <a href="申命記/index.html" class="torah-card glass-card rounded-2xl p-6 block group sm:col-span-2 lg:col-span-1">
+              <span class="text-xs font-bold text-emerald-800">05 · דְּבָרִים</span>
+              <h3 class="text-xl font-bold serif mt-1 group-hover:text-emerald-900">申命記</h3>
+              <p class="text-xs text-slate-500 mb-2">Deuteronomy · 34 章</p>
+              <p class="text-sm text-slate-700">立約重申：摩西臨別訓誨、示瑪、祝福與詛咒、選擇生命。</p>
+            </a>
+          </div>
+        </section>
+
+        <section class="glass-card rounded-2xl p-6">
+          <h2 class="font-semibold serif mb-3">建議研讀路線</h2>
+          <ol class="text-sm text-slate-700 space-y-2 list-decimal list-inside">
+            <li><strong>入門：</strong>創世記 1–3、12、15、22 → 出埃及記 1–15、20 → 申命記 6、30</li>
+            <li><strong>按卷通讀：</strong>每卷配合本站的結構大綱與 <a href="../../查經/查經法/OIA/index.html" class="text-amber-800 underline">OIA</a> 筆記</li>
+            <li><strong>主題串連：</strong>立約（創 15、出 19–24、申 29）· 會幕（出 25–40）· 逾越／羔羊（出 12；林前 5:7）</li>
+          </ol>
+        </section>
+      </main>
+      <footer class="text-center py-6 text-xs text-slate-500 border-t border-amber-200/60">
+        <p class="serif italic">「摩西因著信，長大以後，就不稱自己是法老女兒之子。」希伯來書 11:24</p>
+      </footer>
+      <div id="visit-counter-container"></div>
+    </div>
+  </div>
+  <script src="../../../visit-counter.js"></script>
+  <script>
+    VisitCounter.init('bible_study/經卷/摩西五經/index', {
+      scriptUrl: 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec',
+      containerId: 'visit-counter-container'
+    });
+  </script>
+</body>
+</html>
