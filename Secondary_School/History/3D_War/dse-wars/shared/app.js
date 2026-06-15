@@ -171,7 +171,6 @@ function syncControlModes(){
   controls.enablePan=free;
   controls.enableZoom=free;
 }
-const MAP_NORTH = new THREE.Vector3(0, 0, -1);
 const _cmpFwd = new THREE.Vector3();
 function updateCompass(){
   const rose = document.getElementById("compass-rose");
@@ -419,6 +418,32 @@ function buildLabels(){
     const off=p.h>0?CFG.LBL_PEAK:(cls==="fort"?CFG.LBL_FORT:CFG.LBL_TOWN);
     addPlaceLabel(p,cls,off);
   });
+}
+
+const mapCompassGroup=new THREE.Group(); scene.add(mapCompassGroup);
+function buildMapCompass(){
+  const g=CFG.GEO;
+  const padLng=(g.maxLng-g.minLng)*0.06, padLat=(g.maxLat-g.minLat)*0.06;
+  const lng=g.minLng+padLng, lat=g.minLat+padLat;
+  const y=groundY(lng,lat)+12;
+  const p=project(lng,lat);
+  const arm=Math.min(MAPW,MAPD)*0.065;
+  const mat=new THREE.LineBasicMaterial({color:0xd8c08a,transparent:true,opacity:0.9});
+  const mkLine=(x0,z0,x1,z1)=>{
+    const geo=new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(x0,y,z0), new THREE.Vector3(x1,y,z1),
+    ]);
+    mapCompassGroup.add(new THREE.Line(geo,mat));
+  };
+  mkLine(p.X,p.Z-arm, p.X,p.Z+arm);   // 南北
+  mkLine(p.X-arm,p.Z, p.X+arm,p.Z);   // 東西
+  const tips=[{zh:"北",dx:0,dz:-arm},{zh:"東",dx:arm,dz:0},{zh:"南",dx:0,dz:arm},{zh:"西",dx:-arm,dz:0}];
+  for(const t of tips){
+    const d=document.createElement("div"); d.className="compass-lbl"; d.textContent=t.zh;
+    const o=new THREE.CSS2DObject(d);
+    o.position.set(p.X+t.dx, y+4, p.Z+t.dz);
+    mapCompassGroup.add(o);
+  }
 }
 
 /* ---- defensive line (Gin Drinkers) + moving front line ---------- *
@@ -1168,7 +1193,7 @@ function decollide(){
   const R=items.map(el=>el.getBoundingClientRect());   // batched reads (one reflow)
   const placed=[];
   // fixed HUD panels are immovable obstacles — a map label must never hide under them
-  for(const hudId of ["hud-tl","key"]){ const el=document.getElementById(hudId);
+  for(const hudId of ["hud-tl","key","compass"]){ const el=document.getElementById(hudId);
     if(el){ const hb=el.getBoundingClientRect(); if(hb.width>0) placed.push({top:hb.top,bottom:hb.bottom,left:hb.left,right:hb.right}); } }
   for(let i=0;i<items.length;i++){
     const r={top:R[i].top,bottom:R[i].bottom,left:R[i].left,right:R[i].right}; let dy=0, guard=0, moved=true;
@@ -1209,7 +1234,7 @@ function awaitAudio(){   // hold boot until the background mp3 is buffered (10s 
 (async function init(){
   try{
     await loadTiles();
-    buildTerrain(); buildLabels(); buildLine(); buildRain();
+    buildTerrain(); buildLabels(); buildMapCompass(); buildLine(); buildRain();
     D.units.forEach(buildUnit); D.arrows.forEach(buildArrow);
     unitObjs.forEach(o=>{ unitById[o.u.id]=o; });
     applyTheme(); wireUI(); applyWeather(D.storyboard[0].day);
