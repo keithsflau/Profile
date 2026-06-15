@@ -370,6 +370,32 @@ function buildLabels(){
   });
 }
 
+const mapCompassGroup=new THREE.Group(); scene.add(mapCompassGroup);
+function buildMapCompass(){
+  const g=CFG.GEO;
+  const padLng=(g.maxLng-g.minLng)*0.06, padLat=(g.maxLat-g.minLat)*0.06;
+  const lng=g.minLng+padLng, lat=g.minLat+padLat;
+  const y=groundY(lng,lat)+12;
+  const p=project(lng,lat);
+  const arm=Math.min(MAPW,MAPD)*0.065;
+  const mat=new THREE.LineBasicMaterial({color:0xd8c08a,transparent:true,opacity:0.9});
+  const mkLine=(x0,z0,x1,z1)=>{
+    const geo=new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(x0,y,z0), new THREE.Vector3(x1,y,z1),
+    ]);
+    mapCompassGroup.add(new THREE.Line(geo,mat));
+  };
+  mkLine(p.X,p.Z-arm, p.X,p.Z+arm);
+  mkLine(p.X-arm,p.Z, p.X+arm,p.Z);
+  const tips=[{zh:"北",dx:0,dz:-arm},{zh:"東",dx:arm,dz:0},{zh:"南",dx:0,dz:arm},{zh:"西",dx:-arm,dz:0}];
+  for(const t of tips){
+    const d=document.createElement("div"); d.className="compass-lbl"; d.textContent=t.zh;
+    const o=new THREE.CSS2DObject(d);
+    o.position.set(p.X+t.dx, y+4, p.Z+t.dz);
+    mapCompassGroup.add(o);
+  }
+}
+
 /* ---- defensive line (Gin Drinkers) + moving front line ---------- *
  *  Both are explained in the on-screen legend (#key) AND carry an
  *  on-map label, so the audience knows what each line means.
@@ -1167,7 +1193,7 @@ function awaitAudio(){   // hold boot until the background mp3 is buffered (10s 
 (async function init(){
   try{
     await loadTiles();
-    buildTerrain(); buildLabels(); buildLine(); buildRain();
+    buildTerrain(); buildLabels(); buildMapCompass(); buildLine(); buildRain();
     D.units.forEach(buildUnit); D.arrows.forEach(buildArrow);
     unitObjs.forEach(o=>{ unitById[o.u.id]=o; });
     applyTheme(); wireUI(); applyWeather(D.storyboard[0].day);
