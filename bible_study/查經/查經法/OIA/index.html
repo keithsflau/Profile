@@ -55,7 +55,7 @@
         <p class="verse-line" data-v="1">1 耶和華是我的牧者，我必不致缺乏。</p>
         <p class="verse-line" data-v="2">2 他使我躺臥在青草地上，領我在可安歇的水旁。</p>
         <p class="verse-line" data-v="3">3 他使我的靈魂甦醒，為自己的名引導我走義路。</p>
-        <p class="verse-line" data-v="4">4 我虽然行過死蔭的幽谷，也不怕遭害，因為你與我同在；你的杖，你的竿，都安慰我。</p>
+        <p class="verse-line" data-v="4">4 我雖然行過死蔭的幽谷，也不怕遭害，因為你與我同在；你的杖，你的竿，都安慰我。</p>
         <p class="verse-line" data-v="5">5 在我敵人面前，你為我擺設筵席；你用油膏了我的頭，使我的福杯滿溢。</p>
         <p class="verse-line" data-v="6">6 我一生一世必有恩惠慈愛隨著我；我且要住在耶和華的殿中，直到永遠。</p>
       </div>
@@ -127,9 +127,9 @@
       <h2 class="text-lg font-semibold mb-4">小測：OIA 順序</h2>
       <p class="text-sm text-slate-600 mb-4">小組有人一讀經就說「我們要效法大衛」——最可能跳過了哪一步？</p>
       <div class="space-y-2" id="quiz-oia">
-        <button type="button" class="quiz-opt w-full text-left p-3 rounded-lg border border-slate-200 text-sm hover:bg-slate-50" data-correct="0">只做了應用，觀察與解釋不足</button>
+        <button type="button" class="quiz-opt w-full text-left p-3 rounded-lg border border-slate-200 text-sm hover:bg-slate-50" data-correct="1">只做了應用，觀察與解釋不足</button>
         <button type="button" class="quiz-opt w-full text-left p-3 rounded-lg border border-slate-200 text-sm hover:bg-slate-50" data-correct="0">只做了觀察，沒有應用</button>
-        <button type="button" class="quiz-opt w-full text-left p-3 rounded-lg border border-slate-200 text-sm hover:bg-slate-50" data-correct="1">順序完全正確</button>
+        <button type="button" class="quiz-opt w-full text-left p-3 rounded-lg border border-slate-200 text-sm hover:bg-slate-50" data-correct="0">順序完全正確</button>
       </div>
       <p id="quiz-feedback" class="mt-3 text-sm hidden"></p>
     </section>
@@ -141,27 +141,41 @@
   <div id="visit-counter-container"></div>
 
   <script>
+    const tabs = document.querySelectorAll('.step-tab');
     const panels = document.querySelectorAll('.step-panel');
+    const stepSection = document.getElementById('step-panels');
+
     tabs.forEach(tab => {
       tab.addEventListener('click', () => {
         const n = +tab.dataset.step;
         tabs.forEach(t => t.classList.toggle('active', t === tab));
         panels.forEach(p => p.classList.toggle('active', +p.dataset.panel === n));
+        stepSection?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       });
     });
+
     document.querySelectorAll('.verse-line').forEach(el => {
       el.addEventListener('click', () => el.classList.toggle('marked'));
     });
+
     document.querySelectorAll('.quiz-opt').forEach(btn => {
       btn.addEventListener('click', () => {
         const fb = document.getElementById('quiz-feedback');
+        const quiz = document.getElementById('quiz-oia');
         fb.classList.remove('hidden');
-        if (btn.dataset.correct === '0') {
+        document.querySelectorAll('.quiz-opt').forEach(b => {
+          b.disabled = true;
+          b.classList.remove('ring-2', 'ring-emerald-400', 'ring-red-300', 'bg-emerald-50', 'bg-red-50');
+        });
+        if (btn.dataset.correct === '1') {
+          btn.classList.add('ring-2', 'ring-emerald-400', 'bg-emerald-50');
           fb.className = 'mt-3 text-sm text-emerald-700 font-medium';
-          fb.textContent = '✓ 正確！應用須建立在觀察與解釋之上，否則容易斷章取義或自我中心。';
+          fb.textContent = '✓ 正確！一讀經就「效法」往往是跳過觀察與解釋，直接把個人想法當作應用。';
         } else {
+          btn.classList.add('ring-2', 'ring-red-300', 'bg-red-50');
+          quiz.querySelector('[data-correct="1"]')?.classList.add('ring-2', 'ring-emerald-400', 'bg-emerald-50');
           fb.className = 'mt-3 text-sm text-red-600';
-          fb.textContent = '✗ 再想想：未弄清經文就急於應用，是常見的查經陷阱。';
+          fb.textContent = '✗ 再想想：未先觀察、解釋經文就急於應用，是 OIA 最常見的陷阱。';
         }
       });
     });
