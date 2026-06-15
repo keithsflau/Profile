@@ -146,6 +146,30 @@ controls.minDistance=120; controls.maxDistance=6500;
 controls.maxPolarAngle=Math.PI*0.42;   // block horizon-hugging views that hide the theatre
 controls.minPolarAngle=Math.PI*0.12;
 
+const ZOOM_STEP = 0.82;
+function zoomCamera(dir){
+  if(typeof Director!=="undefined" && Director.mode!=="title") Director.pauseForUser();
+  const off=camera.position.clone().sub(controls.target);
+  const dist=off.length();
+  if(dist<1) return;
+  const scale=dir>0 ? ZOOM_STEP : 1/ZOOM_STEP;
+  off.normalize().multiplyScalar(clamp(dist*scale,controls.minDistance,controls.maxDistance));
+  camera.position.copy(controls.target).add(off);
+  lookTarget.copy(controls.target);
+}
+controls.enableZoom=true;
+controls.zoomSpeed=1.1;
+function wireZoomUI(){
+  const zIn=$("zoom-in"), zOut=$("zoom-out");
+  if(zIn) zIn.onclick=()=>zoomCamera(1);
+  if(zOut) zOut.onclick=()=>zoomCamera(-1);
+  addEventListener("keydown",e=>{
+    if(e.target&&(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA")) return;
+    if(e.key==="+"||e.key==="=") zoomCamera(1);
+    else if(e.key==="-"||e.key==="_") zoomCamera(-1);
+  });
+}
+
 const sun = new THREE.DirectionalLight(0xfff1d6, 1.1);
 sun.position.set(900, 1500, 700); scene.add(sun);
 const hemi = new THREE.HemisphereLight(0xbfd4ea, 0x35422f, 0.55); scene.add(hemi);
@@ -1091,6 +1115,10 @@ function wireUI(){
   $("prog").addEventListener("click",e=>{ const r=$("prog").getBoundingClientRect();   // click the time axis to jump to a chapter
     const frac=clamp((e.clientX-r.left)/r.width,0,1); Director.goToShot(Math.round(frac*N-0.5)); });
   controls.addEventListener("start",()=>Director.pauseForUser());   // a user drag pauses the tour
+  renderer.domElement.addEventListener("wheel",()=>{
+    if(Director.mode!=="title") Director.pauseForUser();
+  },{passive:true});
+  wireZoomUI();
   // auto-hide transport + hint on inactivity
   let idle; const ui=[$("controls"),$("hint")];
   const wake=()=>{ ui.forEach(e=>e.classList.remove("hide")); clearTimeout(idle);

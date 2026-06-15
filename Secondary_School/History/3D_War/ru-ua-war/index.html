@@ -86,6 +86,10 @@
   #speed-btns .spd{font-family:var(--mono);font-size:9px;color:var(--ink-dim);background:var(--panel);
     border:1px solid var(--panel-edge);border-radius:6px;padding:4px 8px;cursor:pointer;min-width:32px}
   #speed-btns .spd.active{color:var(--accent);border-color:var(--accent);background:rgba(216,192,138,.12)}
+  #zoom-ctrl{position:fixed;z-index:5;right:18px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:5px;padding:5px;pointer-events:auto}
+  #zoom-ctrl button{width:36px;height:36px;border-radius:8px;border:1px solid var(--panel-edge);background:var(--panel);
+    color:var(--accent);font-size:18px;line-height:1;cursor:pointer;backdrop-filter:blur(7px);transition:.15s}
+  #zoom-ctrl button:hover{background:rgba(216,192,138,.22)}
   #next-battle{position:fixed;z-index:8;left:50%;bottom:118px;transform:translateX(-50%) translateY(12px);
     display:none;font-family:var(--cjk);font-size:14px;font-weight:700;color:#f6efda;text-decoration:none;
     background:linear-gradient(135deg,rgba(21,101,192,.92),rgba(198,40,40,.88));border:1px solid var(--accent);
@@ -174,7 +178,7 @@
       <button id="music-btn" class="off" title="背景音樂 · Music" style="display:none">🔇</button>
     </div>
     <div id="disclaimer">現代衛星影像 · 戰區控制線隨時間變化 · 僅作示意<br>Present-day imagery — front lines illustrative · not live<br>影像 Sentinel-2 cloudless © EOX IT Services · s2maps.eu · 高程 SRTM courtesy USGS</div>
-    <div id="hint" class="panel"><b>節目自動播放</b><br>拖曳可自由運鏡（會暫停導覽）</div>
+    <div id="hint" class="panel"><b>節目自動播放</b><br>拖曳／縮放可暫停（會暫停導覽）<br>滾輪亦可縮放</div>
   </div>
 
   <div id="key" class="panel">
@@ -193,6 +197,11 @@
       <div class="row"><span class="gl" style="color:#ff8a3a">✦</span><span>戰火 Combat / fire</span></div>
       <div class="row"><span class="gl" style="color:#9aa6b2">⚑</span><span>覆滅／投降 Lost / surrendered</span></div>
     </details>
+  </div>
+
+  <div id="zoom-ctrl" class="panel" title="縮放 · Zoom">
+    <button id="zoom-in" type="button" title="放大 · Zoom in">＋</button>
+    <button id="zoom-out" type="button" title="縮小 · Zoom out">－</button>
   </div>
 
   <div id="analysis-dock" class="panel">

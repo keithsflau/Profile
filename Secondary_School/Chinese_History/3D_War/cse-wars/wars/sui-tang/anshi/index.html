@@ -61,6 +61,10 @@
   #speed-btns .spd{font-family:var(--mono);font-size:9px;color:var(--ink-dim);background:var(--panel);
     border:1px solid var(--panel-edge);border-radius:6px;padding:4px 8px;cursor:pointer;min-width:32px}
   #speed-btns .spd.active{color:var(--accent);border-color:var(--accent);background:rgba(216,192,138,.12)}
+  #zoom-btns{display:flex;gap:4px}
+  #zoom-btns button{width:32px;height:32px;border-radius:6px;border:1px solid var(--panel-edge);background:var(--panel);
+    color:var(--accent);font-size:16px;line-height:1;cursor:pointer;backdrop-filter:blur(6px);transition:.15s}
+  #zoom-btns button:hover{background:rgba(216,192,138,.18)}
   #next-battle{position:fixed;z-index:8;left:50%;bottom:118px;transform:translateX(-50%) translateY(12px);
     display:none;font-family:var(--cjk);font-size:14px;font-weight:700;color:#f6efda;text-decoration:none;
     background:linear-gradient(135deg,rgba(139,69,19,.92),rgba(30,90,138,.88));border:1px solid var(--accent);
@@ -129,7 +133,7 @@
       <button id="lang-btn">中／EN</button>
     </div>
     <div id="disclaimer">DSE 中史 · 衛星地形 · 戰線示意 · 教學用途<br>HKDSE Chinese History · illustrative battle map</div>
-    <div id="hint" class="panel"><b>自動導覽</b><br>拖曳可暫停</div>
+    <div id="hint" class="panel"><b>自動導覽</b><br>拖曳／縮放可暫停 · 滾輪亦可縮放</div>
   </div>
   <div id="key" class="panel">
     <div class="sep-factions"></div>
@@ -159,6 +163,10 @@
       <button class="spd active" data-spd="1">1×</button>
       <button class="spd" data-spd="2">2×</button>
       <button class="spd" data-spd="3">3×</button>
+    </div>
+    <div id="zoom-btns" title="縮放 · Zoom">
+      <button id="zoom-out" type="button" title="縮小 · Zoom out">−</button>
+      <button id="zoom-in" type="button" title="放大 · Zoom in">+</button>
     </div>
     <div id="prog"><i></i><div class="beats" id="prog-beats"></div></div>
     <div id="scene-label"></div>
