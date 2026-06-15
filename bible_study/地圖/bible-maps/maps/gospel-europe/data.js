@@ -11,16 +11,16 @@ window.BATTLE_DATA = (function () {
           "empire"
       ],
       "geo": {
-          "minLng": 7.5,
-          "maxLng": 42.5,
-          "minLat": 35.5,
-          "maxLat": 60.5,
+          "minLng": 4.23,
+          "maxLng": 40.19,
+          "minLat": 27.53,
+          "maxLat": 54.12,
           "Z": 5
       },
       "startDate": "教會史",
       "introCam": {
-          "lng": 28,
-          "lat": 45,
+          "lng": 22.2125,
+          "lat": 40.8265,
           "dist": 700,
           "az": 200,
           "el": 46,
@@ -33,8 +33,8 @@ window.BATTLE_DATA = (function () {
           "narr_en": "The gospel spread from Jerusalem to Rome and into Eastern Europe."
       },
       "outroCam": {
-          "lng": 28,
-          "lat": 45,
+          "lng": 22.2125,
+          "lat": 40.8265,
           "dist": 840,
           "az": 200,
           "el": 48,
@@ -62,25 +62,60 @@ window.BATTLE_DATA = (function () {
       "regions": [],
       "points": [
           {
+              "name_zh": "耶路撒冷",
+              "name_en": "Jerusalem",
+              "type": "city",
+              "lng": 35.235,
+              "lat": 31.778,
+              "ref": "撒下 5:7"
+          },
+          {
               "name_zh": "羅馬",
               "name_en": "Rome",
               "type": "city",
-              "lng": 12.5,
-              "lat": 41.9
+              "lng": 12.453,
+              "lat": 41.902,
+              "ref": "徒 28:16"
+          },
+          {
+              "name_zh": "亞歷山大",
+              "name_en": "Alexandria",
+              "type": "city",
+              "lng": 29.919,
+              "lat": 31.2,
+              "ref": "教會史"
+          },
+          {
+              "name_zh": "米蘭",
+              "name_en": "Milan",
+              "type": "city",
+              "lng": 9.19,
+              "lat": 45.464,
+              "ref": "313 米蘭詔"
           },
           {
               "name_zh": "君士坦丁堡",
               "name_en": "Constantinople",
               "type": "city",
-              "lng": 28.98,
-              "lat": 41.01
+              "lng": 28.979,
+              "lat": 41.008,
+              "ref": "教會史 330"
+          },
+          {
+              "name_zh": "摩拉維亞",
+              "name_en": "Moravia",
+              "type": "region",
+              "lng": 17,
+              "lat": 48.75,
+              "ref": "863 斯拉夫宣教"
           },
           {
               "name_zh": "基輔",
               "name_en": "Kiev",
               "type": "city",
-              "lng": 30.52,
-              "lat": 50.45
+              "lng": 30.514,
+              "lat": 50.453,
+              "ref": "988 羅斯歸主"
           }
       ],
       "lines": []
@@ -97,22 +132,43 @@ window.BATTLE_DATA = (function () {
           "track": [
               {
                   "d": 1,
-                  "lng": 12.5,
-                  "lat": 41.9,
+                  "lng": 35.235,
+                  "lat": 31.778,
                   "s": 0,
                   "st": "hold"
               },
               {
-                  "d": 50,
-                  "lng": 28.98,
-                  "lat": 41.01,
+                  "d": 25,
+                  "lng": 12.453,
+                  "lat": 41.902,
+                  "s": 0,
+                  "st": "hold"
+              },
+              {
+                  "d": 45,
+                  "lng": 29.919,
+                  "lat": 31.2,
+                  "s": 0,
+                  "st": "hold"
+              },
+              {
+                  "d": 60,
+                  "lng": 28.979,
+                  "lat": 41.008,
+                  "s": 0,
+                  "st": "hold"
+              },
+              {
+                  "d": 78,
+                  "lng": 17,
+                  "lat": 48.75,
                   "s": 0,
                   "st": "hold"
               },
               {
                   "d": 100,
-                  "lng": 30.52,
-                  "lat": 50.45,
+                  "lng": 30.514,
+                  "lat": 50.453,
                   "s": 0,
                   "st": "hold"
               }
@@ -142,28 +198,28 @@ window.BATTLE_DATA = (function () {
       "sources": "和合本、聖經地圖、教會史資料（交叉查證）。"
   };
   const analysis =   {
-      "military": "使徒時代後，福音經羅馬大道與商路傳播；君士坦丁合法化後教會擴展；東羅馬與傳教士將信仰帶至斯拉夫與基輔羅斯。",
-      "leaders": "初期教父、波利卡普、愛任紐；君士坦丁大帝；西里爾與美多德兄弟；弗拉基米爾大公。",
-      "nationalPower": "教會承接大使命，在帝國與蠻族世界中見證基督；正教傳統在東歐扎根，與拉丁西教並行發展。",
-      "impact": "福音塑造歐洲文明；俄羅斯正教成為該地區文化與信仰核心。"
+      "military": "福音自耶路撒冷傳開（徒1:8），羅馬教會興起；313年米蘭詔；君士坦丁堡為東教中心；863年西里爾美多德在摩拉維亞；988年基輔羅斯受洗。",
+      "leaders": "初期教父、君士坦丁、西里爾與美多德、弗拉基米爾大公。",
+      "nationalPower": "教會承接大使命；正教在東歐扎根。",
+      "impact": "福音塑造歐洲文明。"
   };
   const storyboard =   [
       {
           "day": 1,
           "hold": 8,
           "cam": {
-              "lng": 12.5,
-              "lat": 41.9,
-              "dist": 680,
+              "lng": 35.235,
+              "lat": 31.778,
+              "dist": 650,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
-          "dateLabel": "1–3世紀",
-          "title_zh": "羅馬帝國傳播",
-          "title_en": "Gospel in the Empire",
-          "narration_zh": "保羅及眾使徒在羅馬帝國各城建立教會；逼迫中信仰仍擴展。",
-          "narration_en": "Apostles and missionaries planted churches across the Roman Empire despite persecution.",
+          "dateLabel": "1世紀",
+          "title_zh": "耶路撒冷",
+          "title_en": "Jerusalem",
+          "narration_zh": "徒1:8 要為我作見證，直到地極；五旬節聖靈降臨。",
+          "narration_en": "Acts 1:8 — Witnesses from Jerusalem to the ends of the earth.",
           "focus": [
               "church"
           ],
@@ -177,18 +233,18 @@ window.BATTLE_DATA = (function () {
           "day": 25,
           "hold": 8,
           "cam": {
-              "lng": 12.5,
-              "lat": 41.9,
-              "dist": 640,
+              "lng": 12.453,
+              "lat": 41.902,
+              "dist": 680,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
-          "dateLabel": "313年",
-          "title_zh": "合法化",
-          "title_en": "Legalization",
-          "narration_zh": "君士坦丁頒《米蘭詔書》，基督教獲合法地位，公開傳播加速。",
-          "narration_en": "The Edict of Milan legalized Christianity — public proclamation accelerated.",
+          "dateLabel": "1–3世紀",
+          "title_zh": "羅馬",
+          "title_en": "Rome",
+          "narration_zh": "徒28 保羅在羅馬見證；彼得傳統亦與此城有關；教會在逼迫中擴展。",
+          "narration_en": "The church took root in Rome despite persecution.",
           "focus": [
               "church"
           ],
@@ -202,18 +258,43 @@ window.BATTLE_DATA = (function () {
           "day": 45,
           "hold": 8,
           "cam": {
-              "lng": 28.98,
-              "lat": 41.01,
+              "lng": 29.919,
+              "lat": 31.2,
               "dist": 620,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
-          "dateLabel": "4世紀",
-          "title_zh": "君士坦丁堡",
-          "title_en": "Constantinople",
-          "narration_zh": "君士坦丁堡成為東羅馬帝國與東方教會中心，神學與禮儀傳統發展。",
-          "narration_en": "Constantinople became the center of Eastern Christianity and theology.",
+          "dateLabel": "2–4世紀",
+          "title_zh": "亞歷山大",
+          "title_en": "Alexandria",
+          "narration_zh": "亞歷山大成為重要教父中心，游斯丁、俄利根等在此事奉。",
+          "narration_en": "Alexandria became a major center of early Christian theology.",
+          "focus": [
+              "church"
+          ],
+          "side": "both",
+          "commanders": [],
+          "assets": [],
+          "forces_zh": "",
+          "forces_en": ""
+      },
+      {
+          "day": 55,
+          "hold": 8,
+          "cam": {
+              "lng": 9.19,
+              "lat": 45.464,
+              "dist": 640,
+              "az": 200,
+              "el": 46,
+              "orbit": 0.65
+          },
+          "dateLabel": "313年",
+          "title_zh": "米蘭詔",
+          "title_en": "Milan",
+          "narration_zh": "313年《米蘭詔書》使基督教在羅馬帝國獲合法地位。",
+          "narration_en": "The Edict of Milan (313) legalized Christianity.",
           "focus": [
               "church"
           ],
@@ -227,18 +308,18 @@ window.BATTLE_DATA = (function () {
           "day": 65,
           "hold": 8,
           "cam": {
-              "lng": 24,
-              "lat": 42.7,
-              "dist": 600,
+              "lng": 28.979,
+              "lat": 41.008,
+              "dist": 620,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
-          "dateLabel": "9世紀",
-          "title_zh": "斯拉夫宣教",
-          "title_en": "Mission to the Slavs",
-          "narration_zh": "西里爾與美多德兄弟向斯拉夫民族傳福音，創制斯拉夫文字。",
-          "narration_en": "Cyril and Methodius evangelized the Slavs and created the Slavic alphabet.",
+          "dateLabel": "4世紀",
+          "title_zh": "君士坦丁堡",
+          "title_en": "Constantinople",
+          "narration_zh": "330年君士坦丁堡成為帝國首都，東方教會神學中心。",
+          "narration_en": "Constantinople became the capital and center of Eastern Christianity.",
           "focus": [
               "church"
           ],
@@ -249,21 +330,46 @@ window.BATTLE_DATA = (function () {
           "forces_en": ""
       },
       {
-          "day": 88,
+          "day": 78,
           "hold": 8,
           "cam": {
-              "lng": 30.52,
-              "lat": 50.45,
+              "lng": 17,
+              "lat": 48.75,
+              "dist": 600,
+              "az": 200,
+              "el": 46,
+              "orbit": 0.65
+          },
+          "dateLabel": "863年",
+          "title_zh": "摩拉維亞",
+          "title_en": "Moravia",
+          "narration_zh": "西里爾與美多德兄弟在摩拉維亞向斯拉夫民族傳福音，創制斯拉夫文字。",
+          "narration_en": "Cyril and Methodius evangelized the Slavs in Moravia.",
+          "focus": [
+              "church"
+          ],
+          "side": "both",
+          "commanders": [],
+          "assets": [],
+          "forces_zh": "",
+          "forces_en": ""
+      },
+      {
+          "day": 100,
+          "hold": 8,
+          "cam": {
+              "lng": 30.514,
+              "lat": 50.453,
               "dist": 720,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
-          "dateLabel": "10世紀",
-          "title_zh": "基輔羅斯歸主",
-          "title_en": "Christianization of Rus",
-          "narration_zh": "弗拉基米爾大公受洗，基輔羅斯正式皈依正教，福音深入東歐。",
-          "narration_en": "Prince Vladimir's baptism brought Kievan Rus into Orthodox Christianity.",
+          "dateLabel": "988年",
+          "title_zh": "基輔受洗",
+          "title_en": "Kiev",
+          "narration_zh": "988年弗拉基米爾大公在基輔受洗，基輔羅斯皈依正教。",
+          "narration_en": "Prince Vladimir's baptism at Kiev Christianized Rus.",
           "focus": [
               "church"
           ],
@@ -280,8 +386,8 @@ window.BATTLE_DATA = (function () {
       "narration_zh": "本段為聖經與教會史重要考點。",
       "narration_en": "A key Bible and church history topic.",
       "cam": {
-          "lng": 28,
-          "lat": 45,
+          "lng": 22.2125,
+          "lat": 40.8265,
           "dist": 840,
           "az": 200,
           "el": 48,

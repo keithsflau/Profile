@@ -44,6 +44,9 @@ window.BATTLE_DATA = (function () {
           "el": 48,
           "orbit": 0.65
       },
+      "terrainMode": "plain",
+      "floodRelief": 0.14,
+      "reliefScale": 0.68,
       "nextBattle": {
           "href": "../mobei/",
           "title_zh": "漠北之戰",
@@ -87,7 +90,31 @@ window.BATTLE_DATA = (function () {
               "lat": 33.55
           }
       ],
-      "lines": []
+      "lines": [],
+      "water": [
+          {
+              "kind": "corridor",
+              "halfWidth": 0.14,
+              "path": [
+                  [
+                      116.5,
+                      33.9
+                  ],
+                  [
+                      117,
+                      33.75
+                  ],
+                  [
+                      117.35,
+                      33.55
+                  ],
+                  [
+                      117.8,
+                      33.45
+                  ]
+              ]
+          }
+      ]
   };
   const units =   [
       {
@@ -211,7 +238,8 @@ window.BATTLE_DATA = (function () {
       "summary": "垓下之戰 — DSE 中史互動戰役地圖（教學示意）。",
       "caveats": [
           "本圖僅覆蓋該戰役核心區域；戰線與兵力為教學示意。",
-          "衛星影像為現代地形，非歷史時期地貌。"
+          "衛星影像為現代地形，非歷史時期地貌。",
+          "河川、海域水面為教學示意，按史實位置裁切顯示。"
       ],
       "sources": "DSE 中史課程、中國通史、維基百科（交叉查證）。"
   };
@@ -239,8 +267,8 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "項羽分封天下後東返彭城，劉邦據關中蓄勢，楚漢戰爭全面爆發。",
           "narration_en": "After enfeoffing the realm, Xiang Yu returns east while Liu Bang holds Guanzhong — the Chu–Han war begins.",
           "focus": [
-              "han_main",
-              "chu_main"
+              "han_gaixia",
+              "chu_gaixia"
           ],
           "side": "both",
           "commanders": [
@@ -274,7 +302,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "韓信、彭越、英布等合圍垓下，切斷楚軍退路與補給。",
           "narration_en": "Han Xin, Peng Yue and Ying Bu encircle Gaixia, cutting Chu supply lines.",
           "focus": [
-              "han_main"
+              "han_gaixia"
           ],
           "side": "han",
           "commanders": [
@@ -283,9 +311,7 @@ window.BATTLE_DATA = (function () {
                   "en": "Han Xin"
               }
           ],
-          "assets": [
-              "artillery"
-          ],
+          "assets": [],
           "forces_zh": "",
           "forces_en": ""
       },
@@ -306,7 +332,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "漢軍夜唱楚歌，楚軍士卒思鄉，軍心動搖。",
           "narration_en": "Han troops sing Chu songs at night — Chu soldiers lose heart.",
           "focus": [
-              "chu_main"
+              "chu_gaixia"
           ],
           "side": "chu",
           "commanders": [
@@ -336,7 +362,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "項羽率八百騎突圍，至烏江自刎，楚軍瓦解。",
           "narration_en": "Xiang Yu breaks out with 800 cavalry, then takes his life at the Wu River.",
           "focus": [
-              "chu_main"
+              "chu_gaixia"
           ],
           "side": "chu",
           "commanders": [],
@@ -361,7 +387,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "劉邦稱帝，定都長安，開創四百年漢業。",
           "narration_en": "Liu Bang becomes emperor, establishes Chang'an as capital — four centuries of Han rule begin.",
           "focus": [
-              "han_main"
+              "han_gaixia"
           ],
           "side": "han",
           "commanders": [

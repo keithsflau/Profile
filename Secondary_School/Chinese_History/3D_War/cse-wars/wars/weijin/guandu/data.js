@@ -44,6 +44,9 @@ window.BATTLE_DATA = (function () {
           "el": 48,
           "orbit": 0.65
       },
+      "terrainMode": "plain",
+      "floodRelief": 0.1,
+      "reliefScale": 0.72,
       "nextBattle": {
           "href": "../chibi/",
           "title_zh": "赤壁之戰",
@@ -87,7 +90,31 @@ window.BATTLE_DATA = (function () {
               "lat": 34.04
           }
       ],
-      "lines": []
+      "lines": [],
+      "water": [
+          {
+              "kind": "corridor",
+              "halfWidth": 0.12,
+              "path": [
+                  [
+                      113.2,
+                      35.2
+                  ],
+                  [
+                      113.5,
+                      34.95
+                  ],
+                  [
+                      113.85,
+                      34.7
+                  ],
+                  [
+                      114.2,
+                      34.5
+                  ]
+              ]
+          }
+      ]
   };
   const units =   [
       {
@@ -211,7 +238,8 @@ window.BATTLE_DATA = (function () {
       "summary": "官渡之戰 — DSE 中史互動戰役地圖（教學示意）。",
       "caveats": [
           "本圖僅覆蓋該戰役核心區域；戰線與兵力為教學示意。",
-          "衛星影像為現代地形，非歷史時期地貌。"
+          "衛星影像為現代地形，非歷史時期地貌。",
+          "河川、海域水面為教學示意，按史實位置裁切顯示。"
       ],
       "sources": "DSE 中史課程、中國通史、維基百科（交叉查證）。"
   };
@@ -239,7 +267,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "袁紹率大軍渡河南下，曹操以官渡為屏障迎戰。",
           "narration_en": "Yuan Shao crosses the Yellow River south — Cao Cao holds the line at Guandu.",
           "focus": [
-              "yuan_main"
+              "yuan_guandu"
           ],
           "side": "yuan",
           "commanders": [
@@ -269,8 +297,8 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "兩軍相持數月，曹操兵少糧絀，形勢危急。",
           "narration_en": "Months of stalemate — Cao Cao is outnumbered and short of supplies.",
           "focus": [
-              "cao_main",
-              "yuan_main"
+              "cao_guandu",
+              "yuan_guandu"
           ],
           "side": "both",
           "commanders": [
@@ -279,9 +307,7 @@ window.BATTLE_DATA = (function () {
                   "en": "Cao Cao"
               }
           ],
-          "assets": [
-              "artillery"
-          ],
+          "assets": [],
           "forces_zh": "",
           "forces_en": ""
       },
@@ -302,7 +328,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "袁紹謀士許攸投曹操，獻計偷襲烏巢糧屯。",
           "narration_en": "Yuan Shao's adviser Xu You defects and reveals the Wuchao granary.",
           "focus": [
-              "cao_main"
+              "cao_guandu"
           ],
           "side": "cao",
           "commanders": [
@@ -332,13 +358,11 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "曹操親率精銳夜襲烏巢，焚燒袁軍糧草，袁軍士氣崩潰。",
           "narration_en": "Cao Cao raids Wuchao by night and burns Yuan's supplies — Yuan's army collapses.",
           "focus": [
-              "cao_main"
+              "cao_guandu"
           ],
           "side": "cao",
           "commanders": [],
-          "assets": [
-              "artillery"
-          ],
+          "assets": [],
           "forces_zh": "袁軍糧盡潰散",
           "forces_en": "Yuan army routs without food"
       },
@@ -359,7 +383,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "官渡之勝使曹操統一河北，奠定曹魏基業。",
           "narration_en": "Guandu opens the path to unifying the north — the foundation of Cao Wei.",
           "focus": [
-              "cao_main"
+              "cao_guandu"
           ],
           "side": "cao",
           "commanders": [

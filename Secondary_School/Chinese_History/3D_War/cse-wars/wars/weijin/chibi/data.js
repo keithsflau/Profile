@@ -44,6 +44,7 @@ window.BATTLE_DATA = (function () {
           "el": 48,
           "orbit": 0.65
       },
+      "terrainMode": "river",
       "nextBattle": {
           "href": "../feishui/",
           "title_zh": "淝水之戰",
@@ -87,7 +88,39 @@ window.BATTLE_DATA = (function () {
               "lat": 30.58
           }
       ],
-      "lines": []
+      "lines": [],
+      "water": [
+          {
+              "kind": "corridor",
+              "halfWidth": 0.24,
+              "path": [
+                  [
+                      114.65,
+                      30.08
+                  ],
+                  [
+                      114.15,
+                      29.9
+                  ],
+                  [
+                      113.9,
+                      29.72
+                  ],
+                  [
+                      113.5,
+                      29.58
+                  ],
+                  [
+                      113.1,
+                      29.48
+                  ],
+                  [
+                      112.7,
+                      29.4
+                  ]
+              ]
+          }
+      ]
   };
   const units =   [
       {
@@ -197,7 +230,8 @@ window.BATTLE_DATA = (function () {
       "summary": "赤壁之戰 — DSE 中史互動戰役地圖（教學示意）。",
       "caveats": [
           "本圖僅覆蓋該戰役核心區域；戰線與兵力為教學示意。",
-          "衛星影像為現代地形，非歷史時期地貌。"
+          "衛星影像為現代地形，非歷史時期地貌。",
+          "河川、海域水面為教學示意，按史實位置裁切顯示。"
       ],
       "sources": "DSE 中史課程、中國通史、維基百科（交叉查證）。"
   };
@@ -225,7 +259,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "曹操降劉琮、得荊州，率二十餘萬大軍東進，威脅江東。",
           "narration_en": "After taking Jing Province, Cao Cao advances east with 200,000+ men.",
           "focus": [
-              "cao_main"
+              "cao_chibi"
           ],
           "side": "cao",
           "commanders": [
@@ -257,9 +291,9 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "諸葛亮聯絡孫權，魯肅、周瑜主戰，孫劉結盟抗曹。",
           "narration_en": "Zhuge Liang and Lu Su forge the Sun–Liu alliance against Cao Cao.",
           "focus": [
-              "allied_main"
+              "sunliu_chibi"
           ],
-          "side": "allied",
+          "side": "sun_liu",
           "commanders": [
               {
                   "zh": "周瑜",
@@ -291,8 +325,8 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "黃蓋詐降，以火船趁東風焚燒曹軍連環艦。",
           "narration_en": "Huang Gai's feigned surrender — fire ships burn Cao's chained fleet in the east wind.",
           "focus": [
-              "allied_main",
-              "cao_main"
+              "sunliu_chibi",
+              "cao_chibi"
           ],
           "side": "both",
           "commanders": [
@@ -302,8 +336,7 @@ window.BATTLE_DATA = (function () {
               }
           ],
           "assets": [
-              "navy",
-              "artillery"
+              "navy"
           ],
           "forces_zh": "",
           "forces_en": ""
@@ -325,7 +358,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "火攻後曹軍大潰，沿華容道北撤，損失慘重。",
           "narration_en": "Cao's army routs and retreats north via Huarong Road with heavy losses.",
           "focus": [
-              "cao_main"
+              "cao_chibi"
           ],
           "side": "cao",
           "commanders": [],

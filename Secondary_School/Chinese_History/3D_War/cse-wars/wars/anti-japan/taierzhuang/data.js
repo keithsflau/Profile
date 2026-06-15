@@ -44,6 +44,9 @@ window.BATTLE_DATA = (function () {
           "el": 48,
           "orbit": 0.65
       },
+      "terrainMode": "plain",
+      "floodRelief": 0.1,
+      "reliefScale": 0.75,
       "nextBattle": {
           "href": "../hundred-regiments/",
           "title_zh": "百團大戰",
@@ -87,7 +90,8 @@ window.BATTLE_DATA = (function () {
               "lat": 34.5
           }
       ],
-      "lines": []
+      "lines": [],
+      "water": []
   };
   const units =   [
       {
@@ -190,7 +194,8 @@ window.BATTLE_DATA = (function () {
       "summary": "台兒莊戰役 — DSE 中史互動戰役地圖（教學示意）。",
       "caveats": [
           "本圖僅覆蓋該戰役核心區域；戰線與兵力為教學示意。",
-          "衛星影像為現代地形，非歷史時期地貌。"
+          "衛星影像為現代地形，非歷史時期地貌。",
+          "河川、海域水面為教學示意，按史實位置裁切顯示。"
       ],
       "sources": "DSE 中史課程、中國通史、維基百科（交叉查證）。"
   };
@@ -218,7 +223,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "日军矶谷师团沿津浦路南进，企图打通南北战线。",
           "narration_en": "Japanese forces advance south on the Tianjin–Pukou railway.",
           "focus": [
-              "japan_main"
+              "japan_tezz"
           ],
           "side": "japan",
           "commanders": [
@@ -248,9 +253,9 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "孙连仲第二集团军固守台儿庄，与日军逐屋巷战。",
           "narration_en": "Sun Lianzhong's army holds Taierzhuang in brutal street fighting.",
           "focus": [
-              "gmd_main"
+              "kmt_tezz"
           ],
-          "side": "gmd",
+          "side": "kmt",
           "commanders": [
               {
                   "zh": "李宗仁",
@@ -261,9 +266,7 @@ window.BATTLE_DATA = (function () {
                   "en": "Sun Lianzhong"
               }
           ],
-          "assets": [
-              "artillery"
-          ],
+          "assets": [],
           "forces_zh": "",
           "forces_en": ""
       },
@@ -284,8 +287,8 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "汤恩伯军团自侧翼出击，日军陷入前后夹击。",
           "narration_en": "Tang Enbo strikes the Japanese flank — the enemy is caught in a pincer.",
           "focus": [
-              "gmd_main",
-              "japan_main"
+              "kmt_tezz",
+              "japan_tezz"
           ],
           "side": "both",
           "commanders": [
@@ -294,9 +297,7 @@ window.BATTLE_DATA = (function () {
                   "en": "Tang Enbo"
               }
           ],
-          "assets": [
-              "artillery"
-          ],
+          "assets": [],
           "forces_zh": "",
           "forces_en": ""
       },
@@ -317,9 +318,9 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "国军合围歼敌万余，缴获大批装备，日军溃退。",
           "narration_en": "Nationalist forces encircle and kill 10,000+ — the Japanese retreat.",
           "focus": [
-              "gmd_main"
+              "kmt_tezz"
           ],
-          "side": "gmd",
+          "side": "kmt",
           "commanders": [],
           "assets": [],
           "forces_zh": "歼敌万余",
@@ -342,7 +343,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "台儿庄为抗战初期正面战场最大规模胜利，极大振奋人心。",
           "narration_en": "Taierzhuang is the largest Nationalist victory on the main front in early war.",
           "focus": [],
-          "side": "gmd",
+          "side": "kmt",
           "commanders": [],
           "assets": [],
           "forces_zh": "",

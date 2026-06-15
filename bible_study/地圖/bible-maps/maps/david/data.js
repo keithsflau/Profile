@@ -11,16 +11,16 @@ window.BATTLE_DATA = (function () {
           "nations"
       ],
       "geo": {
-          "minLng": 33.7,
-          "maxLng": 36.7,
-          "minLat": 30.45,
-          "maxLat": 32.95,
+          "minLng": 33.79,
+          "maxLng": 36.29,
+          "minLat": 30.58,
+          "maxLat": 32.58,
           "Z": 10
       },
       "startDate": "撒上–撒下",
       "introCam": {
-          "lng": 35.23,
-          "lat": 31.78,
+          "lng": 35.235,
+          "lat": 31.778,
           "dist": 700,
           "az": 200,
           "el": 46,
@@ -33,8 +33,8 @@ window.BATTLE_DATA = (function () {
           "narr_en": "David reigned over all Israel and Judah."
       },
       "outroCam": {
-          "lng": 35.23,
-          "lat": 31.78,
+          "lng": 35.235,
+          "lat": 31.778,
           "dist": 840,
           "az": 200,
           "el": 48,
@@ -65,22 +65,57 @@ window.BATTLE_DATA = (function () {
               "name_zh": "伯利恆",
               "name_en": "Bethlehem",
               "type": "town",
-              "lng": 35.2,
-              "lat": 31.7
+              "lng": 35.202,
+              "lat": 31.705,
+              "ref": "撒上 16:1"
           },
           {
               "name_zh": "以拉谷",
               "name_en": "Valley of Elah",
               "type": "town",
-              "lng": 34.98,
-              "lat": 31.7
+              "lng": 34.948,
+              "lat": 31.695,
+              "ref": "撒上 17:2"
+          },
+          {
+              "name_zh": "基伊拉",
+              "name_en": "Keilah",
+              "type": "town",
+              "lng": 34.948,
+              "lat": 31.616,
+              "ref": "撒上 23:1"
+          },
+          {
+              "name_zh": "隱基遍",
+              "name_en": "En-gedi",
+              "type": "town",
+              "lng": 35.388,
+              "lat": 31.453,
+              "ref": "撒上 24:1"
+          },
+          {
+              "name_zh": "洗革拉",
+              "name_en": "Ziklag",
+              "type": "town",
+              "lng": 34.683,
+              "lat": 31.383,
+              "ref": "撒上 27:6"
+          },
+          {
+              "name_zh": "希伯崙",
+              "name_en": "Hebron",
+              "type": "town",
+              "lng": 35.099,
+              "lat": 31.524,
+              "ref": "創 13:18"
           },
           {
               "name_zh": "耶路撒冷",
               "name_en": "Jerusalem",
               "type": "city",
-              "lng": 35.23,
-              "lat": 31.78
+              "lng": 35.235,
+              "lat": 31.778,
+              "ref": "撒下 5:7"
           }
       ],
       "lines": []
@@ -92,27 +127,41 @@ window.BATTLE_DATA = (function () {
           "kind": "infantry",
           "crest": "shield",
           "cf": true,
-          "name_zh": "大衛軍隊",
-          "name_en": "David's forces",
+          "name_zh": "大衛",
+          "name_en": "David",
           "track": [
               {
                   "d": 1,
-                  "lng": 35.2,
-                  "lat": 31.7,
+                  "lng": 35.202,
+                  "lat": 31.705,
                   "s": 1000,
                   "st": "hold"
               },
               {
-                  "d": 40,
-                  "lng": 34.98,
-                  "lat": 31.7,
+                  "d": 25,
+                  "lng": 34.948,
+                  "lat": 31.695,
                   "s": 3000,
                   "st": "attack"
               },
               {
-                  "d": 80,
-                  "lng": 35.23,
-                  "lat": 31.78,
+                  "d": 45,
+                  "lng": 35.388,
+                  "lat": 31.453,
+                  "s": 600,
+                  "st": "hold"
+              },
+              {
+                  "d": 65,
+                  "lng": 35.099,
+                  "lat": 31.524,
+                  "s": 20000,
+                  "st": "hold"
+              },
+              {
+                  "d": 100,
+                  "lng": 35.235,
+                  "lat": 31.778,
                   "s": 50000,
                   "st": "hold"
               }
@@ -128,16 +177,16 @@ window.BATTLE_DATA = (function () {
           "name_en": "Philistines",
           "track": [
               {
-                  "d": 35,
-                  "lng": 34.95,
-                  "lat": 31.72,
+                  "d": 20,
+                  "lng": 34.948,
+                  "lat": 31.695,
                   "s": 20000,
                   "st": "attack"
               },
               {
-                  "d": 50,
-                  "lng": 34.9,
-                  "lat": 31.65,
+                  "d": 32,
+                  "lng": 34.948,
+                  "lat": 31.655,
                   "s": 5000,
                   "st": "retreat"
               }
@@ -148,12 +197,12 @@ window.BATTLE_DATA = (function () {
   const fronts =   [];
   const hotspots =   [
       {
-          "a": 35,
-          "b": 55,
-          "lng": 34.98,
-          "lat": 31.7,
+          "a": 22,
+          "b": 35,
+          "lng": 34.948,
+          "lat": 31.695,
           "kind": "firefight",
-          "i": 0.8
+          "i": 0.85
       }
   ];
   const weather =   [
@@ -176,28 +225,28 @@ window.BATTLE_DATA = (function () {
       "sources": "和合本、聖經地圖、教會史資料（交叉查證）。"
   };
   const analysis =   {
-      "military": "大衛從伯利恆牧童被膏；在以拉谷擊殺歌利亞；躲避掃羅多年後作猶大王，再統一全以色列，建都耶路撒冷。",
-      "leaders": "大衛、約拿單、掃羅、撒母耳、押沙龍為主要人物；非利士為主要外敵。",
-      "nationalPower": "大衛為合神心意的人；神與他立約，應許彌賽亞出自大衛家；其詩篇見證敬拜與悔改。",
-      "impact": "大衛王朝成為彌賽亞盼望的載體；耶路撒冷成為聖城與聖殿中心。"
+      "military": "撒母耳在伯利恆膏大衛（撒上16）；以拉谷擊歌利亞（撒上17）；躲避掃羅時至隱基遍（撒上24）；掃羅死後在希伯崙作猶大王（撒下2），後攻取耶路撒冷建都（撒下5）。",
+      "leaders": "大衛、掃羅、約拿單、撒母耳。",
+      "nationalPower": "合神心意的人；神與大衛立約，應許彌賽亞出自大衛家。",
+      "impact": "大衛王朝成為彌賽亞盼望載體。"
   };
   const storyboard =   [
       {
           "day": 1,
           "hold": 8,
           "cam": {
-              "lng": 35.2,
-              "lat": 31.7,
+              "lng": 35.202,
+              "lat": 31.705,
               "dist": 620,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
           "dateLabel": "約前1020年",
-          "title_zh": "伯利恆牧童",
-          "title_en": "Shepherd of Bethlehem",
-          "narration_zh": "撒母耳在伯利恆膏大衛；耶和華說：我尋得合我心意的人。",
-          "narration_en": "Samuel anointed David at Bethlehem — 'A man after God's own heart.'",
+          "title_zh": "伯利恆受膏",
+          "title_en": "Bethlehem",
+          "narration_zh": "撒上16:1 耶和華打發撒母耳往伯利恆耶西家膏立大衛。",
+          "narration_en": "1 Sam 16:1 — Samuel anointed David at Bethlehem.",
           "focus": [
               "david_army"
           ],
@@ -216,18 +265,18 @@ window.BATTLE_DATA = (function () {
           "day": 25,
           "hold": 8,
           "cam": {
-              "lng": 34.98,
-              "lat": 31.7,
+              "lng": 34.948,
+              "lat": 31.695,
               "dist": 580,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
           "dateLabel": "約前1010年",
-          "title_zh": "擊殺歌利亞",
-          "title_en": "David and Goliath",
-          "narration_zh": "大衛在以拉谷用機弦石擊倒非利士巨人歌利亞，耶和華得勝。",
-          "narration_en": "David struck down Goliath in the Valley of Elah — victory belonged to the LORD.",
+          "title_zh": "以拉谷",
+          "title_en": "Valley of Elah",
+          "narration_zh": "撒上17:2 非利士人聚集在以拉谷；大衛擊殺歌利亞。",
+          "narration_en": "1 Sam 17:2 — David struck down Goliath in the Valley of Elah.",
           "focus": [
               "david_army",
               "philistines"
@@ -244,18 +293,18 @@ window.BATTLE_DATA = (function () {
           "day": 45,
           "hold": 8,
           "cam": {
-              "lng": 35.1,
-              "lat": 31.75,
+              "lng": 35.388,
+              "lat": 31.453,
               "dist": 560,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
-          "dateLabel": "約前1010–1003年",
-          "title_zh": "躲避掃羅",
-          "title_en": "Fleeing Saul",
-          "narration_zh": "大衛被掃羅追逼，卻兩次不害受膏者，等候神時候。",
-          "narration_en": "David fled Saul yet twice spared the LORD's anointed.",
+          "dateLabel": "約前1010年",
+          "title_zh": "隱基遍",
+          "title_en": "En-gedi",
+          "narration_zh": "撒上24:1 掃羅在隱基遍追趕大衛；大衛割下王袍卻不害受膏者。",
+          "narration_en": "1 Sam 24:1 — David spared Saul in the caves of En-gedi.",
           "focus": [
               "david_army"
           ],
@@ -269,18 +318,18 @@ window.BATTLE_DATA = (function () {
           "day": 65,
           "hold": 8,
           "cam": {
-              "lng": 35.23,
-              "lat": 31.78,
+              "lng": 35.099,
+              "lat": 31.524,
               "dist": 600,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
           "dateLabel": "約前1003年",
-          "title_zh": "作猶大王",
-          "title_en": "King of Judah",
-          "narration_zh": "掃羅陣亡後，大衛先在希伯崙作猶大王七年半。",
-          "narration_en": "After Saul's death David reigned over Judah at Hebron for seven and a half years.",
+          "title_zh": "希伯崙作王",
+          "title_en": "Hebron",
+          "narration_zh": "撒下2:4 猶大人來到希伯崙膏大衛作猶大王。",
+          "narration_en": "2 Sam 2:4 — David was anointed king over Judah at Hebron.",
           "focus": [
               "david_army"
           ],
@@ -291,21 +340,21 @@ window.BATTLE_DATA = (function () {
           "forces_en": ""
       },
       {
-          "day": 88,
+          "day": 100,
           "hold": 8,
           "cam": {
-              "lng": 35.23,
-              "lat": 31.78,
+              "lng": 35.235,
+              "lat": 31.778,
               "dist": 680,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
           "dateLabel": "約前1000年",
-          "title_zh": "統一建都",
-          "title_en": "United Kingdom",
-          "narration_zh": "大衛攻取耶路撒冷作京城，迎約櫃入城，籌建聖殿。",
-          "narration_en": "David captured Jerusalem as capital and brought the ark — planning the temple.",
+          "title_zh": "耶路撒冷建都",
+          "title_en": "Jerusalem",
+          "narration_zh": "撒下5:7 大衛攻取錫安寨，定名大衛城，作以色列京城。",
+          "narration_en": "2 Sam 5:7 — David captured Jerusalem and made it his capital.",
           "focus": [
               "david_army"
           ],
@@ -327,8 +376,8 @@ window.BATTLE_DATA = (function () {
       "narration_zh": "本段為聖經與教會史重要考點。",
       "narration_en": "A key Bible and church history topic.",
       "cam": {
-          "lng": 35.23,
-          "lat": 31.78,
+          "lng": 35.235,
+          "lat": 31.778,
           "dist": 840,
           "az": 200,
           "el": 48,

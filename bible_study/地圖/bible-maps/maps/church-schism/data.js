@@ -11,16 +11,16 @@ window.BATTLE_DATA = (function () {
           "empire"
       ],
       "geo": {
-          "minLng": 7.5,
-          "maxLng": 32.5,
-          "minLat": 35,
-          "maxLat": 55,
+          "minLng": 7.9,
+          "maxLng": 40.71,
+          "minLat": 29.03,
+          "maxLat": 44.07,
           "Z": 5
       },
       "startDate": "1054 AD",
       "introCam": {
-          "lng": 20,
-          "lat": 42,
+          "lng": 24.305500000000002,
+          "lat": 36.551,
           "dist": 700,
           "az": 200,
           "el": 46,
@@ -33,8 +33,8 @@ window.BATTLE_DATA = (function () {
           "narr_en": "In 1054 Rome and Constantinople excommunicated each other."
       },
       "outroCam": {
-          "lng": 20,
-          "lat": 42,
+          "lng": 24.305500000000002,
+          "lat": 36.551,
           "dist": 840,
           "az": 200,
           "el": 48,
@@ -60,15 +60,33 @@ window.BATTLE_DATA = (function () {
               "name_zh": "羅馬",
               "name_en": "Rome",
               "type": "city",
-              "lng": 12.5,
-              "lat": 41.9
+              "lng": 12.453,
+              "lat": 41.902,
+              "ref": "徒 28:16"
           },
           {
               "name_zh": "君士坦丁堡",
               "name_en": "Constantinople",
               "type": "city",
-              "lng": 28.98,
-              "lat": 41.01
+              "lng": 28.979,
+              "lat": 41.008,
+              "ref": "教會史 330"
+          },
+          {
+              "name_zh": "亞歷山大",
+              "name_en": "Alexandria",
+              "type": "city",
+              "lng": 29.919,
+              "lat": 31.2,
+              "ref": "教會史"
+          },
+          {
+              "name_zh": "安條克",
+              "name_en": "Antioch",
+              "type": "city",
+              "lng": 36.158,
+              "lat": 36.202,
+              "ref": "1098 圍城"
           }
       ],
       "lines": []
@@ -85,15 +103,15 @@ window.BATTLE_DATA = (function () {
           "track": [
               {
                   "d": 1,
-                  "lng": 12.5,
-                  "lat": 41.9,
+                  "lng": 12.453,
+                  "lat": 41.902,
                   "s": 0,
                   "st": "hold"
               },
               {
                   "d": 100,
-                  "lng": 12.5,
-                  "lat": 41.9,
+                  "lng": 12.453,
+                  "lat": 41.902,
                   "s": 0,
                   "st": "hold"
               }
@@ -110,15 +128,15 @@ window.BATTLE_DATA = (function () {
           "track": [
               {
                   "d": 1,
-                  "lng": 28.98,
-                  "lat": 41.01,
+                  "lng": 28.979,
+                  "lat": 41.008,
                   "s": 0,
                   "st": "hold"
               },
               {
                   "d": 100,
-                  "lng": 28.98,
-                  "lat": 41.01,
+                  "lng": 28.979,
+                  "lat": 41.008,
                   "s": 0,
                   "st": "hold"
               }
@@ -148,28 +166,28 @@ window.BATTLE_DATA = (function () {
       "sources": "和合本、聖經地圖、教會史資料（交叉查證）。"
   };
   const analysis =   {
-      "military": "東羅馬與羅馬教會在教宗權柄、和子句、禮儀等問題上長期分歧；1054年雙方互相開除教籍，東西教會正式分裂。",
-      "leaders": "羅馬教宗利奧九世、君士坦丁堡牧首米海尔一世；後續東正教與羅馬天主教各自發展。",
-      "nationalPower": "分裂反映文化、語言與教會政治差異；雙方均宣稱使徒傳承，神學與禮儀傳統逐漸分化。",
-      "impact": "1054年分裂影響至今；宗教改革後西方基督教進一步分化；當代有對話與修復關係的努力。"
+      "military": "1054年7月16日羅馬與君士坦丁堡互相開除教籍；此前已有和子句、教宗權柄、禮儀等分歧；五大宗主教座包括羅馬、君士坦丁堡、亞歷山大、安條克。",
+      "leaders": "利奧九世、君士坦丁堡牧首塞魯拉留斯。",
+      "nationalPower": "反映文化、語言與教會政治差異。",
+      "impact": "1054年分裂影響至今。"
   };
   const storyboard =   [
       {
           "day": 1,
           "hold": 8,
           "cam": {
-              "lng": 12.5,
-              "lat": 41.9,
+              "lng": 12.453,
+              "lat": 41.902,
               "dist": 650,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
           "dateLabel": "4–10世紀",
-          "title_zh": "分歧累積",
-          "title_en": "Growing Division",
-          "narration_zh": "羅馬與君士坦丁堡在教宗權柄、教義與禮儀上漸生分歧。",
-          "narration_en": "Rome and Constantinople diverged over papal authority, doctrine, and liturgy.",
+          "title_zh": "羅馬",
+          "title_en": "Rome",
+          "narration_zh": "羅馬教會強調教宗首席權柄與拉丁禮儀傳統。",
+          "narration_en": "Rome emphasized papal primacy and Latin liturgy.",
           "focus": [
               "rome_ch"
           ],
@@ -183,18 +201,18 @@ window.BATTLE_DATA = (function () {
           "day": 25,
           "hold": 8,
           "cam": {
-              "lng": 28.98,
-              "lat": 41.01,
+              "lng": 28.979,
+              "lat": 41.008,
               "dist": 620,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
           "dateLabel": "11世紀",
-          "title_zh": "和子句爭議",
-          "title_en": "Filioque Controversy",
-          "narration_zh": "西方加入「和子」條文，東方認為違反大公會議決議，矛盾加劇。",
-          "narration_en": "The Western Filioque clause deepened Eastern opposition.",
+          "title_zh": "君士坦丁堡",
+          "title_en": "Constantinople",
+          "narration_zh": "東方教會堅持大公會議權威，反對和子句加入信經。",
+          "narration_en": "Constantinople upheld conciliar authority and opposed the Filioque.",
           "focus": [
               "constantinople"
           ],
@@ -208,18 +226,18 @@ window.BATTLE_DATA = (function () {
           "day": 45,
           "hold": 8,
           "cam": {
-              "lng": 28.98,
-              "lat": 41.01,
+              "lng": 28.979,
+              "lat": 41.008,
               "dist": 600,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
-          "dateLabel": "1054年7月",
+          "dateLabel": "1054年7月16日",
           "title_zh": "互相開除教籍",
           "title_en": "Mutual Excommunication",
-          "narration_zh": "利奧九世使者與君士坦丁堡牧首互相開除教籍，東西分裂公開化。",
-          "narration_en": "Legates of Leo IX and Patriarch Michael excommunicated each other — the schism was formalized.",
+          "narration_zh": "1054年7月16日雙方代表互相開除教籍，東西教會正式分裂。",
+          "narration_en": "16 July 1054 — Mutual excommunication formalized the schism.",
           "focus": [
               "rome_ch",
               "constantinople"
@@ -234,20 +252,20 @@ window.BATTLE_DATA = (function () {
           "day": 65,
           "hold": 8,
           "cam": {
-              "lng": 12.5,
-              "lat": 41.9,
+              "lng": 29.919,
+              "lat": 31.2,
               "dist": 580,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
-          "dateLabel": "1054年後",
-          "title_zh": "天主教發展",
-          "title_en": "Roman Catholic Path",
-          "narration_zh": "羅馬教會在中世紀強化教宗權威，發展拉丁禮儀與經院神學。",
-          "narration_en": "Rome strengthened papal authority and developed Latin scholastic theology.",
+          "dateLabel": "分裂後",
+          "title_zh": "亞歷山大",
+          "title_en": "Alexandria",
+          "narration_zh": "東方正教傳統下，亞歷山大、安條克等古老宗座繼續發展。",
+          "narration_en": "Alexandria remained a historic patriarchal see in the East.",
           "focus": [
-              "rome_ch"
+              "constantinople"
           ],
           "side": "both",
           "commanders": [],
@@ -259,18 +277,18 @@ window.BATTLE_DATA = (function () {
           "day": 88,
           "hold": 8,
           "cam": {
-              "lng": 28.98,
-              "lat": 41.01,
-              "dist": 680,
+              "lng": 36.158,
+              "lat": 36.202,
+              "dist": 600,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
-          "dateLabel": "1054年後",
-          "title_zh": "東正教傳統",
-          "title_en": "Eastern Orthodox Path",
-          "narration_zh": "君士坦丁堡為首的東正教保留希臘禮儀，強調大公會議與教父傳統。",
-          "narration_en": "Constantinople-led Orthodoxy preserved Greek liturgy and conciliar tradition.",
+          "dateLabel": "分裂後",
+          "title_zh": "安條克",
+          "title_en": "Antioch",
+          "narration_zh": "安條克宗座代表古老近東教會傳統，與羅馬分道揚鑣。",
+          "narration_en": "Antioch represented ancient Semitic Christianity in the Eastern communion.",
           "focus": [
               "constantinople"
           ],
@@ -287,8 +305,8 @@ window.BATTLE_DATA = (function () {
       "narration_zh": "本段為聖經與教會史重要考點。",
       "narration_en": "A key Bible and church history topic.",
       "cam": {
-          "lng": 20,
-          "lat": 42,
+          "lng": 24.305500000000002,
+          "lat": 36.551,
           "dist": 840,
           "az": 200,
           "el": 48,

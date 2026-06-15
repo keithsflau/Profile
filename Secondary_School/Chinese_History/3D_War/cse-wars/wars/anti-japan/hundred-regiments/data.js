@@ -44,6 +44,8 @@ window.BATTLE_DATA = (function () {
           "el": 48,
           "orbit": 0.65
       },
+      "terrainMode": "plain",
+      "reliefScale": 0.78,
       "nextBattle": {
           "href": "../../civil-war/liaoshen/",
           "title_zh": "遼瀋戰役",
@@ -87,7 +89,8 @@ window.BATTLE_DATA = (function () {
               "lat": 37.86
           }
       ],
-      "lines": []
+      "lines": [],
+      "water": []
   };
   const units =   [
       {
@@ -192,7 +195,7 @@ window.BATTLE_DATA = (function () {
           "b": 90,
           "lng": 113.58,
           "lat": 37.87,
-          "kind": "explosion",
+          "kind": "firefight",
           "i": 0.9
       }
   ];
@@ -211,7 +214,8 @@ window.BATTLE_DATA = (function () {
       "summary": "百團大戰 — DSE 中史互動戰役地圖（教學示意）。",
       "caveats": [
           "本圖僅覆蓋該戰役核心區域；戰線與兵力為教學示意。",
-          "衛星影像為現代地形，非歷史時期地貌。"
+          "衛星影像為現代地形，非歷史時期地貌。",
+          "河川、海域水面為教學示意，按史實位置裁切顯示。"
       ],
       "sources": "DSE 中史課程、中國通史、維基百科（交叉查證）。"
   };
@@ -239,9 +243,9 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "彭德怀下令发动百团大战，破袭华北日占区交通线。",
           "narration_en": "Peng Dehuai orders the Hundred Regiments Offensive against North China rail lines.",
           "focus": [
-              "eighth_main"
+              "era_hr"
           ],
-          "side": "eighth",
+          "side": "eighth_route",
           "commanders": [
               {
                   "zh": "彭德怀",
@@ -269,13 +273,11 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "八路军同时破袭正太铁路，摧毁桥梁、隧道与车站。",
           "narration_en": "Forces simultaneously strike the Zhengding–Taiyuan railway.",
           "focus": [
-              "eighth_main"
+              "era_hr"
           ],
-          "side": "eighth",
+          "side": "eighth_route",
           "commanders": [],
-          "assets": [
-              "artillery"
-          ],
+          "assets": [],
           "forces_zh": "",
           "forces_en": ""
       },
@@ -296,14 +298,12 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "八路军攻克日军据点，破坏公路，缴获大批物资。",
           "narration_en": "Japanese strongpoints fall — roads are cut, supplies captured.",
           "focus": [
-              "eighth_main",
-              "japan_main"
+              "era_hr",
+              "japan_hr"
           ],
           "side": "both",
           "commanders": [],
-          "assets": [
-              "artillery"
-          ],
+          "assets": [],
           "forces_zh": "",
           "forces_en": ""
       },
@@ -324,13 +324,11 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "日军集中兵力反扫荡，八路军转入反“扫荡”作战。",
           "narration_en": "Japan launches counter-sweeps — the Eighth Route Army shifts to defence.",
           "focus": [
-              "japan_main"
+              "japan_hr"
           ],
           "side": "japan",
           "commanders": [],
-          "assets": [
-              "artillery"
-          ],
+          "assets": [],
           "forces_zh": "",
           "forces_en": ""
       },
@@ -351,7 +349,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "百团大战为八路军在敌后发动的最大规模破袭攻势，沉重打击日占交通。",
           "narration_en": "The largest CCP offensive in the rear — Japanese supply lines are badly hurt.",
           "focus": [],
-          "side": "eighth",
+          "side": "eighth_route",
           "commanders": [],
           "assets": [],
           "forces_zh": "",

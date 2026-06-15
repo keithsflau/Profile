@@ -147,18 +147,30 @@ controls.maxPolarAngle=Math.PI*0.42;   // block horizon-hugging views that hide 
 controls.minPolarAngle=Math.PI*0.12;
 
 const ZOOM_STEP = 0.82;
+const CAM_ZOOM_MIN = 0.25, CAM_ZOOM_MAX = 4;
+let camZoomMul = 1;
 function zoomCamera(dir){
-  if(typeof Director!=="undefined" && Director.mode!=="title") Director.pauseForUser();
-  const off=camera.position.clone().sub(controls.target);
-  const dist=off.length();
-  if(dist<1) return;
   const scale=dir>0 ? ZOOM_STEP : 1/ZOOM_STEP;
-  off.normalize().multiplyScalar(clamp(dist*scale,controls.minDistance,controls.maxDistance));
-  camera.position.copy(controls.target).add(off);
-  lookTarget.copy(controls.target);
+  if(typeof Director!=="undefined" && Director.userFree){
+    const off=camera.position.clone().sub(controls.target);
+    const dist=off.length();
+    if(dist<1) return;
+    off.normalize().multiplyScalar(clamp(dist*scale,controls.minDistance,controls.maxDistance));
+    camera.position.copy(controls.target).add(off);
+    lookTarget.copy(controls.target);
+  } else {
+    camZoomMul=clamp(camZoomMul*scale, CAM_ZOOM_MIN, CAM_ZOOM_MAX);
+  }
 }
 controls.enableZoom=true;
 controls.zoomSpeed=1.1;
+function syncControlModes(){
+  if(typeof Director==="undefined") return;
+  const free=Director.userFree;
+  controls.enableRotate=free;
+  controls.enablePan=free;
+  controls.enableZoom=free;
+}
 function wireZoomUI(){
   const zIn=$("zoom-in"), zOut=$("zoom-out");
   if(zIn) zIn.onclick=()=>zoomCamera(1);
@@ -168,6 +180,11 @@ function wireZoomUI(){
     if(e.key==="+"||e.key==="=") zoomCamera(1);
     else if(e.key==="-"||e.key==="_") zoomCamera(-1);
   });
+  renderer.domElement.addEventListener("wheel",e=>{
+    if(Director.userFree) return;
+    e.preventDefault();
+    zoomCamera(e.deltaY<0?1:-1);
+  },{passive:false});
 }
 
 const sun = new THREE.DirectionalLight(0xfff1d6, 1.1);
@@ -977,7 +994,7 @@ const Director = {
   shots:D.storyboard, i:-1, t:0, mode:"title", playing:true, userFree:false, capShown:false, sceneFx:[],
   fromPos:new THREE.Vector3(), fromTgt:new THREE.Vector3(), tgt:new THREE.Vector3(), fromDay:8, toDay:8,
   outroHold:null, outroAz:0, outroEl:46,
-  start(){ this.mode="title"; this.t=0; this.playing=true; this.userFree=false; this.sceneFx=[]; this.outroHold=null; hideNextBattle(); setDay(this.shots[0].day);
+  start(){ this.mode="title"; this.t=0; this.playing=true; this.userFree=false; this.sceneFx=[]; this.outroHold=null; camZoomMul=1; hideNextBattle(); setDay(this.shots[0].day);
     const ic=META.introCam||this.shots[0].cam;
     const c=camFromShot(ic); camera.position.copy(c.pos); controls.target.copy(c.target);
     lookTarget.copy(controls.target);
@@ -1010,7 +1027,7 @@ const Director = {
         camera.position.copy(spherical(hold.tgt,hold.dist,az,el));
       }
       lookTarget.copy(controls.target); updateProgress(); return; }
-    const sh=this.shots[this.i], dur=CFG.TWEEN+sh.hold, dist=sh.cam.dist*CFG.ZOOM;
+    const sh=this.shots[this.i], dur=CFG.TWEEN+sh.hold, dist=sh.cam.dist*CFG.ZOOM*camZoomMul;
     if(this.t<CFG.TWEEN){ const e=easeIO(this.t/CFG.TWEEN);
       setDay(lerp(this.fromDay,this.toDay,e));   // day/night + weather glide as the camera moves
       camera.position.lerpVectors(this.fromPos,spherical(this.tgt,dist,sh.cam.az,sh.cam.el),e);
@@ -1115,9 +1132,6 @@ function wireUI(){
   $("prog").addEventListener("click",e=>{ const r=$("prog").getBoundingClientRect();   // click the time axis to jump to a chapter
     const frac=clamp((e.clientX-r.left)/r.width,0,1); Director.goToShot(Math.round(frac*N-0.5)); });
   controls.addEventListener("start",()=>Director.pauseForUser());   // a user drag pauses the tour
-  renderer.domElement.addEventListener("wheel",()=>{
-    if(Director.mode!=="title") Director.pauseForUser();
-  },{passive:true});
   wireZoomUI();
   // auto-hide transport + hint on inactivity
   let idle; const ui=[$("controls"),$("hint")];
@@ -1154,7 +1168,7 @@ function decollide(){
     placed.push(r);
   }
 }
-function renderScene(){ controls.update(); renderer.render(scene,camera); labelRenderer.render(scene,camera); decollide(); }
+function renderScene(){ syncControlModes(); controls.update(); renderer.render(scene,camera); labelRenderer.render(scene,camera); decollide(); }
 function frame(dt){
   const spd=playSpeed;
   Director.update(dt*spd);

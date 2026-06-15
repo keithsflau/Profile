@@ -11,16 +11,16 @@ window.BATTLE_DATA = (function () {
           "nations"
       ],
       "geo": {
-          "minLng": 33.98,
-          "maxLng": 36.48,
-          "minLat": 30.78,
-          "maxLat": 32.78,
-          "Z": 11
+          "minLng": 33.09,
+          "maxLng": 37.09,
+          "minLat": 28.61,
+          "maxLat": 34.22,
+          "Z": 9
       },
       "startDate": "王上1–11",
       "introCam": {
-          "lng": 35.23,
-          "lat": 31.78,
+          "lng": 35.235,
+          "lat": 31.778,
           "dist": 700,
           "az": 200,
           "el": 46,
@@ -33,8 +33,8 @@ window.BATTLE_DATA = (function () {
           "narr_en": "Solomon reigned in Jerusalem over all Israel forty years."
       },
       "outroCam": {
-          "lng": 35.23,
-          "lat": 31.78,
+          "lng": 35.235,
+          "lat": 31.778,
           "dist": 840,
           "az": 200,
           "el": 48,
@@ -62,18 +62,36 @@ window.BATTLE_DATA = (function () {
       "regions": [],
       "points": [
           {
+              "name_zh": "基遍",
+              "name_en": "Gibeon",
+              "type": "town",
+              "lng": 35.185,
+              "lat": 31.847,
+              "ref": "王上 3:4"
+          },
+          {
               "name_zh": "聖殿山",
               "name_en": "Temple Mount",
               "type": "fort",
               "lng": 35.235,
-              "lat": 31.778
+              "lat": 31.778,
+              "ref": "王上 6:1"
           },
           {
               "name_zh": "推羅",
               "name_en": "Tyre",
               "type": "city",
-              "lng": 35.2,
-              "lat": 33.27
+              "lng": 35.194,
+              "lat": 33.271,
+              "ref": "王上 5:1"
+          },
+          {
+              "name_zh": "以旬迦別",
+              "name_en": "Ezion-geber",
+              "type": "city",
+              "lng": 34.948,
+              "lat": 29.556,
+              "ref": "王上 9:26"
           }
       ],
       "lines": []
@@ -90,22 +108,58 @@ window.BATTLE_DATA = (function () {
           "track": [
               {
                   "d": 1,
-                  "lng": 35.23,
-                  "lat": 31.78,
+                  "lng": 35.185,
+                  "lat": 31.847,
+                  "s": 0,
+                  "st": "hold"
+              },
+              {
+                  "d": 35,
+                  "lng": 35.235,
+                  "lat": 31.778,
                   "s": 80000,
                   "st": "hold"
               },
               {
+                  "d": 60,
+                  "lng": 35.194,
+                  "lat": 33.271,
+                  "s": 0,
+                  "st": "hold"
+              },
+              {
+                  "d": 80,
+                  "lng": 34.948,
+                  "lat": 29.556,
+                  "s": 0,
+                  "st": "hold"
+              },
+              {
                   "d": 100,
-                  "lng": 35.23,
-                  "lat": 31.78,
+                  "lng": 35.235,
+                  "lat": 31.778,
                   "s": 90000,
                   "st": "hold"
               }
           ]
       }
   ];
-  const arrows =   [];
+  const arrows =   [
+      {
+          "d": 55,
+          "f": "covenant",
+          "from": [
+              35.235,
+              31.778
+          ],
+          "to": [
+              35.194,
+              33.271
+          ],
+          "label": "與推羅合作 王上5:1",
+          "kind": "attack"
+      }
+  ];
   const fronts =   [];
   const hotspots =   [];
   const weather =   [
@@ -128,28 +182,28 @@ window.BATTLE_DATA = (function () {
       "sources": "和合本、聖經地圖、教會史資料（交叉查證）。"
   };
   const analysis =   {
-      "military": "所羅門繼承大衛王位；在耶路撒冷建聖殿，國力達頂峰；與推羅合作，示巴女王來朝；晚年離棄耶和華，國勢埋下分裂種子。",
-      "leaders": "所羅門、大衛、推羅希蘭、示巴女王；先知拿單與亞希雅預言分裂。",
-      "nationalPower": "所羅門求智慧治理；聖殿為耶和華名居住之地，預表基督與教會；箴言與傳道書見證智慧與虛空。",
-      "impact": "所羅門的繁榮與敗壞成為後世警戒；聖殿成為敬拜中心直至被毀。"
+      "military": "所羅門在基遍夢中求智慧（王上3）；在耶路撒冷聖殿山建殿（王上6）；與推羅希蘭合作（王上5）；在以旬迦別（埃拉特）建船隊（王上9:26）。",
+      "leaders": "所羅門、希蘭、示巴女王。",
+      "nationalPower": "聖殿為耶和華名居住之地，預表基督與教會。",
+      "impact": "繁榮與晚年離棄成為後世警戒。"
   };
   const storyboard =   [
       {
           "day": 1,
           "hold": 8,
           "cam": {
-              "lng": 35.23,
-              "lat": 31.78,
+              "lng": 35.185,
+              "lat": 31.847,
               "dist": 650,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
           "dateLabel": "約前970年",
-          "title_zh": "繼位求智慧",
-          "title_en": "Wisdom Requested",
-          "narration_zh": "所羅門在基遍獻祭，求智慧治理百姓；神賜他智慧、尊榮與財富。",
-          "narration_en": "Solomon asked for wisdom to govern; God gave wisdom, honor, and riches.",
+          "title_zh": "基遍求智慧",
+          "title_en": "Gibeon",
+          "narration_zh": "王上3:4-5 所羅門在基遍獻祭；夢中神賜他智慧。",
+          "narration_en": "1 Kgs 3:4-5 — Solomon asked for wisdom at Gibeon.",
           "focus": [
               "solomon"
           ],
@@ -165,7 +219,7 @@ window.BATTLE_DATA = (function () {
           "forces_en": ""
       },
       {
-          "day": 25,
+          "day": 35,
           "hold": 8,
           "cam": {
               "lng": 35.235,
@@ -177,9 +231,9 @@ window.BATTLE_DATA = (function () {
           },
           "dateLabel": "約前966年",
           "title_zh": "建造聖殿",
-          "title_en": "Building the Temple",
-          "narration_zh": "大衛預備材料，所羅門在聖殿山建耶和華殿，七年建成。",
-          "narration_en": "Solomon built the LORD's temple on Mount Moriah over seven years.",
+          "title_en": "Temple Mount",
+          "narration_zh": "王上6:1 所羅門作王第四年，在耶路撒冷開始建殿，七年建成。",
+          "narration_en": "1 Kgs 6:1 — Solomon built the temple on Mount Moriah.",
           "focus": [
               "solomon"
           ],
@@ -190,21 +244,21 @@ window.BATTLE_DATA = (function () {
           "forces_en": ""
       },
       {
-          "day": 45,
+          "day": 60,
           "hold": 8,
           "cam": {
-              "lng": 35.2,
-              "lat": 33.27,
+              "lng": 35.194,
+              "lat": 33.271,
               "dist": 620,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
           "dateLabel": "所羅門年間",
-          "title_zh": "與推羅合作",
-          "title_en": "Alliance with Tyre",
-          "narration_zh": "所羅門與推羅王希蘭合作，建殿並發展海上貿易。",
-          "narration_en": "Solomon partnered with Hiram of Tyre for the temple and maritime trade.",
+          "title_zh": "推羅",
+          "title_en": "Tyre",
+          "narration_zh": "王上5:1 推羅王希蘭與所羅門合作，運香柏木建殿。",
+          "narration_en": "1 Kgs 5:1 — Hiram of Tyre supplied cedar for the temple.",
           "focus": [
               "solomon"
           ],
@@ -215,21 +269,21 @@ window.BATTLE_DATA = (function () {
           "forces_en": ""
       },
       {
-          "day": 65,
+          "day": 80,
           "hold": 8,
           "cam": {
-              "lng": 35.23,
-              "lat": 31.78,
-              "dist": 560,
+              "lng": 34.948,
+              "lat": 29.556,
+              "dist": 600,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
           "dateLabel": "所羅門年間",
-          "title_zh": "示巴女王",
-          "title_en": "Queen of Sheba",
-          "narration_zh": "示巴女王聽聞所羅門的智慧，前來觀看，稱頌耶和華。",
-          "narration_en": "The Queen of Sheba came to test Solomon's wisdom and praised the LORD.",
+          "title_zh": "以旬迦別",
+          "title_en": "Ezion-geber",
+          "narration_zh": "王上9:26 所羅門在以旬迦別（以東海邊）與以拉他旁邊建船隊。",
+          "narration_en": "1 Kgs 9:26 — Solomon built a fleet at Ezion-geber on the Red Sea.",
           "focus": [
               "solomon"
           ],
@@ -240,11 +294,11 @@ window.BATTLE_DATA = (function () {
           "forces_en": ""
       },
       {
-          "day": 88,
+          "day": 100,
           "hold": 8,
           "cam": {
-              "lng": 35.23,
-              "lat": 31.78,
+              "lng": 35.235,
+              "lat": 31.778,
               "dist": 700,
               "az": 200,
               "el": 46,
@@ -253,8 +307,8 @@ window.BATTLE_DATA = (function () {
           "dateLabel": "約前931年",
           "title_zh": "晚年離棄",
           "title_en": "Turning Away",
-          "narration_zh": "所羅門為外邦妃嬪建丘壇，心偏離耶和華；神預告國度將分裂。",
-          "narration_en": "Solomon's heart turned; God foretold the kingdom would be torn away.",
+          "narration_zh": "王上11:4 所羅門年老，妃嬪誘惑他的心偏離耶和華。",
+          "narration_en": "1 Kgs 11:4 — Solomon's heart turned away in his old age.",
           "focus": [
               "solomon"
           ],
@@ -271,8 +325,8 @@ window.BATTLE_DATA = (function () {
       "narration_zh": "本段為聖經與教會史重要考點。",
       "narration_en": "A key Bible and church history topic.",
       "cam": {
-          "lng": 35.23,
-          "lat": 31.78,
+          "lng": 35.235,
+          "lat": 31.778,
           "dist": 840,
           "az": 200,
           "el": 48,

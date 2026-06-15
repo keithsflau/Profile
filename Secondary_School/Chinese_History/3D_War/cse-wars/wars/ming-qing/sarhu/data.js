@@ -44,6 +44,8 @@ window.BATTLE_DATA = (function () {
           "el": 48,
           "orbit": 0.65
       },
+      "terrainMode": "plain",
+      "reliefScale": 0.78,
       "nextBattle": {
           "href": "../../late-qing/yellow-sea/",
           "title_zh": "黃海海戰",
@@ -87,7 +89,8 @@ window.BATTLE_DATA = (function () {
               "lat": 41.42
           }
       ],
-      "lines": []
+      "lines": [],
+      "water": []
   };
   const units =   [
       {
@@ -197,7 +200,8 @@ window.BATTLE_DATA = (function () {
       "summary": "薩爾滸之戰 — DSE 中史互動戰役地圖（教學示意）。",
       "caveats": [
           "本圖僅覆蓋該戰役核心區域；戰線與兵力為教學示意。",
-          "衛星影像為現代地形，非歷史時期地貌。"
+          "衛星影像為現代地形，非歷史時期地貌。",
+          "河川、海域水面為教學示意，按史實位置裁切顯示。"
       ],
       "sources": "DSE 中史課程、中國通史、維基百科（交叉查證）。"
   };
@@ -225,7 +229,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "明廷集全國精銳，分四路進擊後金，意圖一舉蕩平遼東。",
           "narration_en": "The Ming dispatches four columns to crush the Later Jin in Liaodong.",
           "focus": [
-              "ming_main"
+              "ming_sarhu"
           ],
           "side": "ming",
           "commanders": [
@@ -255,18 +259,16 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "後金努爾哈赤以「憑幾而戰」分路反擊，先破明軍西路。",
           "narration_en": "Nurhaci counter-attacks in detail — the western Ming column is destroyed.",
           "focus": [
-              "jin_main"
+              "jin_sarhu"
           ],
-          "side": "jin",
+          "side": "eastern_jin",
           "commanders": [
               {
                   "zh": "努爾哈赤",
                   "en": "Nurhaci"
               }
           ],
-          "assets": [
-              "artillery"
-          ],
+          "assets": [],
           "forces_zh": "",
           "forces_en": ""
       },
@@ -287,14 +289,12 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "後金連續擊破明軍三路，明軍損失殆盡，僅一路倖免。",
           "narration_en": "Three Ming columns are annihilated in two days — only one escapes.",
           "focus": [
-              "ming_main",
-              "jin_main"
+              "ming_sarhu",
+              "jin_sarhu"
           ],
           "side": "both",
           "commanders": [],
-          "assets": [
-              "artillery"
-          ],
+          "assets": [],
           "forces_zh": "",
           "forces_en": ""
       },
@@ -315,9 +315,9 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "後金完全掌握遼東戰略主動，明朝喪失進攻能力。",
           "narration_en": "The Later Jin holds the strategic initiative — Ming goes on the defensive.",
           "focus": [
-              "jin_main"
+              "jin_sarhu"
           ],
-          "side": "jin",
+          "side": "eastern_jin",
           "commanders": [
               {
                   "zh": "努爾哈赤",
@@ -345,7 +345,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "薩爾滸之戰敲響明亡喪鐘，後金（清）勢力迅速擴張。",
           "narration_en": "Sarhu sounds the knell of the Ming — the Later Jin expands rapidly.",
           "focus": [],
-          "side": "jin",
+          "side": "eastern_jin",
           "commanders": [],
           "assets": [],
           "forces_zh": "",

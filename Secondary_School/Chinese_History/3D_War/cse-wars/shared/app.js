@@ -80,7 +80,8 @@ const CFG = {
   VEXAG: 1.0,           // true scale: metres × M2U (no extra vertical exaggeration)
   VEXAG_TARGET: 0,
   VEXAG_MIN: 1, VEXAG_MAX: 1,
-  RELIEF_BLUR: 0,       // use absolute elevation, not detrended local bumps
+  RELIEF_SPAN: 0,       // metres (max relief in tile); set in loadTiles
+  WATER_Y: 1.2,         // world units — river / flooded sea surface
   NORMAL_GAIN: 1.8,     // subtle shading for natural relief
   EDGE_FRAC: 0.14,       // soft rim width (fraction of map); wider on large theatres
   TERR_SEG: 480,        // terrain mesh resolution
@@ -147,18 +148,30 @@ controls.maxPolarAngle=Math.PI*0.42;   // block horizon-hugging views that hide 
 controls.minPolarAngle=Math.PI*0.12;
 
 const ZOOM_STEP = 0.82;
+const CAM_ZOOM_MIN = 0.25, CAM_ZOOM_MAX = 4;
+let camZoomMul = 1;
 function zoomCamera(dir){
-  if(typeof Director!=="undefined" && Director.mode!=="title") Director.pauseForUser();
-  const off=camera.position.clone().sub(controls.target);
-  const dist=off.length();
-  if(dist<1) return;
   const scale=dir>0 ? ZOOM_STEP : 1/ZOOM_STEP;
-  off.normalize().multiplyScalar(clamp(dist*scale,controls.minDistance,controls.maxDistance));
-  camera.position.copy(controls.target).add(off);
-  lookTarget.copy(controls.target);
+  if(typeof Director!=="undefined" && Director.userFree){
+    const off=camera.position.clone().sub(controls.target);
+    const dist=off.length();
+    if(dist<1) return;
+    off.normalize().multiplyScalar(clamp(dist*scale,controls.minDistance,controls.maxDistance));
+    camera.position.copy(controls.target).add(off);
+    lookTarget.copy(controls.target);
+  } else {
+    camZoomMul=clamp(camZoomMul*scale, CAM_ZOOM_MIN, CAM_ZOOM_MAX);
+  }
 }
 controls.enableZoom=true;
 controls.zoomSpeed=1.1;
+function syncControlModes(){
+  if(typeof Director==="undefined") return;
+  const free=Director.userFree;
+  controls.enableRotate=free;
+  controls.enablePan=free;
+  controls.enableZoom=free;
+}
 function wireZoomUI(){
   const zIn=$("zoom-in"), zOut=$("zoom-out");
   if(zIn) zIn.onclick=()=>zoomCamera(1);
@@ -168,6 +181,11 @@ function wireZoomUI(){
     if(e.key==="+"||e.key==="=") zoomCamera(1);
     else if(e.key==="-"||e.key==="_") zoomCamera(-1);
   });
+  renderer.domElement.addEventListener("wheel",e=>{
+    if(Director.userFree) return;
+    e.preventDefault();
+    zoomCamera(e.deltaY<0?1:-1);
+  },{passive:false});
 }
 
 const sun = new THREE.DirectionalLight(0xfff1d6, 1.1);
@@ -206,6 +224,68 @@ function sampleReliefPx(u,v){
 }
 function terrainY(u,v){ return sampleReliefPx(u,v)*M2U*CFG.VEXAG; }
 
+function lngLatFromUV(u,vS){
+  const mx=MX0+u*(MX1-MX0), my=MYN-vS*(MYN-MYS);
+  return { lng: mx/RE/deg, lat: (2*Math.atan(Math.exp(my/RE))-Math.PI/2)/deg };
+}
+function distToSegmentDeg(px,py,ax,ay,bx,by){
+  const abx=bx-ax, aby=by-ay, apx=px-ax, apy=py-ay;
+  const ab2=abx*abx+aby*aby||1e-12;
+  let t=(apx*abx+apy*aby)/ab2; t=clamp(t,0,1);
+  const cx=ax+t*abx, cy=ay+t*aby;
+  const dx=px-cx, dy=py-cy;
+  return Math.sqrt(dx*dx+dy*dy);
+}
+function pointInRing(lng,lat,ring){
+  let inside=false;
+  for(let i=0,j=ring.length-1;i<ring.length;j=i++){
+    const [xi,yi]=ring[i], [xj,yj]=ring[j];
+    if(((yi>lat)!==(yj>lat)) && lng<(xj-xi)*(lat-yi)/(yj-yi)+xi) inside=!inside;
+  }
+  return inside;
+}
+function waterWeightAt(lng,lat){
+  let w=0;
+  for(const f of (D.geography.water||[])){
+    if(f.kind==="corridor" && f.path){
+      let minD=Infinity;
+      for(let i=0;i<f.path.length-1;i++){
+        const a=f.path[i], b=f.path[i+1];
+        minD=Math.min(minD, distToSegmentDeg(lng,lat,a[0],a[1],b[0],b[1]));
+      }
+      const hw=f.halfWidth||0.12;
+      if(minD<hw) w=Math.max(w, 1-smoothstep(0,hw,minD));
+    } else if(f.kind==="polygon" && f.ring){
+      if(pointInRing(lng,lat,f.ring)) w=1;
+    } else if(f.kind==="disc"){
+      const dLng=(lng-f.lng)*Math.cos(lat*deg), dLat=lat-f.lat;
+      const d=Math.sqrt(dLng*dLng+dLat*dLat);
+      const r=f.radius||0.15;
+      if(d<r) w=Math.max(w, 1-smoothstep(0,r,d));
+    }
+  }
+  return w;
+}
+function surfaceYAt(lng,lat){
+  const u=(lng2mx(lng)-MX0)/(MX1-MX0), vS=(MYN-lat2my(lat))/(MYN-MYS);
+  let y=terrainY(u,vS);
+  const mode=META.terrainMode||"land";
+  if(mode==="ocean"||mode==="bay"){
+    const flood=META.floodRelief!=null?META.floodRelief:(mode==="ocean"?0.42:0.3);
+    const thresh=CFG.RELIEF_SPAN*M2U*CFG.VEXAG*flood;
+    if(y<thresh) y=CFG.WATER_Y;
+  } else if(mode==="plain"||mode==="steppe"||mode==="river"){
+    const flood=META.floodRelief||0;
+    if(flood>0){
+      const thresh=CFG.RELIEF_SPAN*M2U*CFG.VEXAG*flood;
+      if(y<thresh) y=CFG.WATER_Y;
+    }
+  }
+  const ww=waterWeightAt(lng,lat);
+  if(ww>0) y=lerp(y,CFG.WATER_Y,ww);
+  return y;
+}
+
 function project(lng,lat){ return { X:(lng2mx(lng)-MX0)*M2U-MAPW/2, Z:(MYN-lat2my(lat))*M2U-MAPD/2 }; }
 function sampleHeightPx(u,v){
   const fx=clamp(u,0,1)*(demW-1), fy=clamp(v,0,1)*(demH-1);
@@ -218,8 +298,7 @@ function sampleHeight(lng,lat){
   return sampleHeightPx((lng2mx(lng)-MX0)/(MX1-MX0), (MYN-lat2my(lat))/(MYN-MYS));
 }
 function groundY(lng,lat){
-  const u=(lng2mx(lng)-MX0)/(MX1-MX0), vS=(MYN-lat2my(lat))/(MYN-MYS);
-  return Math.max(terrainY(u,vS), 0);
+  return Math.max(surfaceYAt(lng,lat), 0);
 }
 function vec(lng,lat,yOff){ const p=project(lng,lat); return new THREE.Vector3(p.X, groundY(lng,lat)+(yOff||0), p.Z); }
 
@@ -267,6 +346,12 @@ async function loadTiles(){
     reliefData[i]=r;
     if(r>rMax) rMax=r;
   }
+  if(META.reliefScale!=null){
+    const rs=META.reliefScale;
+    for(let i=0;i<reliefData.length;i++) reliefData[i]*=rs;
+    rMax*=rs;
+  }
+  CFG.RELIEF_SPAN=rMax;
   CFG.VEXAG=1.0;
   console.log(`DEM base ${baseElev.toFixed(0)} m · relief span ${rMax.toFixed(0)} m · true-scale VEXAG ${CFG.VEXAG}`);
 
@@ -326,7 +411,8 @@ function buildTerrain(){
   for(let i=0;i<n;i++){
     const wx=pos.getX(i), wz=pos.getZ(i);
     const u=(wx+MAPW/2)/MAPW, vS=(wz+MAPD/2)/MAPD;
-    const y=terrainY(u,vS);
+    const {lng,lat}=lngLatFromUV(u,vS);
+    const y=surfaceYAt(lng,lat);
     rawY[i]=y; if(y>yMax) yMax=y;
   }
   const sink=Math.min(-8,-yMax*0.15-MAPW*0.012);   // rim dips just below sea — no vertical cliff wall
@@ -334,8 +420,10 @@ function buildTerrain(){
   for(let i=0;i<n;i++){
     const wx=pos.getX(i), wz=pos.getZ(i);
     const u=(wx+MAPW/2)/MAPW, vS=(wz+MAPD/2)/MAPD;
+    const {lng,lat}=lngLatFromUV(u,vS);
     const edge=smooth(edgeW,0,Math.min(u,1-u,vS,1-vS));
-    const y=rawY[i]*(1-edge)+sink*edge;
+    const ww=waterWeightAt(lng,lat);
+    let y=ww>0.35 ? rawY[i] : rawY[i]*(1-edge)+sink*edge;
     pos.setY(i, y);
     uv.setXY(i, u, 1-vS);
   }
@@ -344,6 +432,7 @@ function buildTerrain(){
     map:imageryTex, normalMap:normalTex,
     normalScale:new THREE.Vector2(1.1,1.1),
     roughness:0.9, metalness:0.0 }));
+  if(META.terrainMode==="steppe") terrain.material.color.setHex(0xc8bea0);
   scene.add(terrain);
   // static cast-shadows for relief form — the sun direction is FIXED (no arc) so shadows never move;
   // day/night stays intensity/colour-driven (honours the standing "no moving shadows" directive).
@@ -362,7 +451,84 @@ function buildTerrain(){
   // MATTE (roughness 0.88, low metalness). A glossy sheen sweeps a moving specular highlight as the camera
   // orbits → the "sea flicker". Reverted to matte (the HKBattleSeaShimmer known-good); deeper tone +
   // opacity 0.88 kept (continuous open water; helps the waterline rim).
-  seaMesh.position.y=Math.min(-2,sink*0.5); scene.add(seaMesh);
+  seaMesh.position.y=(META.terrainMode==="ocean"||META.terrainMode==="bay"||META.terrainMode==="river")
+    ? CFG.WATER_Y-0.35 : Math.min(-2,sink*0.5);
+  scene.add(seaMesh);
+}
+
+const riverWaterGroup=new THREE.Group(); scene.add(riverWaterGroup);
+function buildWaterMeshFromRing(ring){
+  if(!ring||ring.length<3) return null;
+  const y=CFG.WATER_Y;
+  let cx=0, cz=0;
+  const pts=ring.map(([lng,lat])=>project(lng,lat));
+  pts.forEach(p=>{ cx+=p.X; cz+=p.Z; });
+  cx/=pts.length; cz/=pts.length;
+  const pos=[cx,y,cz];
+  for(const p of pts) pos.push(p.X,y,p.Z);
+  const idx=[];
+  for(let i=0;i<pts.length;i++){
+    const a=i+1, b=((i+1)%pts.length)+1;
+    idx.push(0,a,b);
+  }
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(pos),3));
+  geo.setIndex(idx);
+  geo.computeVertexNormals();
+  return geo;
+}
+function buildDiscWaterMesh(f){
+  const p=project(f.lng,f.lat);
+  const r=(f.radius||0.15)*RE*deg*M2U*Math.cos(f.lat*deg);
+  const y=CFG.WATER_Y;
+  const seg=24;
+  const pos=[p.X,y,p.Z];
+  const idx=[];
+  for(let i=0;i<seg;i++){
+    const a=2*Math.PI*i/seg;
+    pos.push(p.X+Math.cos(a)*r, y, p.Z+Math.sin(a)*r);
+    const n=i+1, m=((i+1)%seg)+1;
+    idx.push(0,n,m);
+  }
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(pos),3));
+  geo.setIndex(idx);
+  geo.computeVertexNormals();
+  return geo;
+}
+function buildRiverMeshes(){
+  const mat=new THREE.MeshStandardMaterial({
+    color:0x14323f, roughness:0.88, metalness:0.04, transparent:true, opacity:0.9, depthWrite:false });
+  for(const f of (D.geography.water||[])){
+    if(f.kind==="polygon" && f.ring){
+      const geo=buildWaterMeshFromRing(f.ring);
+      if(geo) riverWaterGroup.add(new THREE.Mesh(geo,mat));
+    } else if(f.kind==="disc"){
+      riverWaterGroup.add(new THREE.Mesh(buildDiscWaterMesh(f),mat));
+    } else if(f.kind!=="corridor"||!f.path||f.path.length<2) continue;
+    else {
+    const hwDeg=f.halfWidth||0.12;
+    for(let i=0;i<f.path.length-1;i++){
+      const [lng0,lat0]=f.path[i], [lng1,lat1]=f.path[i+1];
+      const p0=project(lng0,lat0), p1=project(lng1,lat1);
+      const mx=(lng0+lng1)*0.5;
+      const hw=hwDeg*RE*deg*M2U*Math.cos(mx*deg);
+      const dx=p1.X-p0.X, dz=p1.Z-p0.Z;
+      const len=Math.sqrt(dx*dx+dz*dz)||1;
+      const px=-dz/len*hw, pz=dx/len*hw;
+      const y=CFG.WATER_Y;
+      const geo=new THREE.BufferGeometry();
+      const pos=new Float32Array([
+        p0.X+px,y,p0.Z+pz,  p0.X-px,y,p0.Z-pz,
+        p1.X-px,y,p1.Z-pz,  p1.X+px,y,p1.Z+pz,
+      ]);
+      geo.setAttribute("position", new THREE.BufferAttribute(pos,3));
+      geo.setIndex([0,1,2, 0,2,3]);
+      geo.computeVertexNormals();
+      riverWaterGroup.add(new THREE.Mesh(geo,mat));
+    }
+    }
+  }
 }
 
 const skyMat = new THREE.ShaderMaterial({
@@ -731,13 +897,10 @@ function updateEffects(day, dt){
         emit(GLOW,gx+rnd(-3,3)*G,gy+rnd(0.5,3)*G,gz+rnd(-3,3)*G,rnd(-6,6)*G,rnd(4,12)*G,rnd(-6,6)*G,rnd(8,16),rnd(0.3,0.6),c[0],c[1],c[2],0,0); }
       if(fire){ flash(gx,gy+2*G,gz,0xffcc66,rnd(120,260)); emit(SMOKE,gx,gy+G,gz,rnd(-1,1)*G,2*G,rnd(-1,1)*G,16,rnd(1.2,2),0.22,0.21,0.2,12,1); hotTimers[h]=fxT(rnd(0.12,0.28)/hs.i); }
     } else if(hs.kind==="artillery"){
-      if(fire){ flash(gx,gy+3*G,gz,0xffd27a,rnd(220,360));
-        for(let s=0;s<8;s++){ if(!fxOk()) continue;
-          emit(GLOW,gx,gy+2.5*G,gz,rnd(-10,10)*G,rnd(6,16)*G,rnd(-10,10)*G,rnd(10,18),0.4,1,0.75,0.35,0,0); }
-        emit(SMOKE,gx,gy+2*G,gz,rnd(-1,1)*G,2.5*G,rnd(-1,1)*G,22,2.2,0.26,0.25,0.23,16,1);
-        for(let t=0;t<6;t++){ if(!fxOk()) continue;
-          emit(GLOW,gx+rnd(-2,2)*G,gy+(5+t*4)*G,gz+(10+t*7)*G,rnd(-2,2)*G,3*G,18*G,9,0.5,1,0.9,0.5,0,0); }
-        hotTimers[h]=fxT(rnd(0.4,0.9)/hs.i); }
+      // 中史戰役不呈現西式炮擊；殘留 artillery 標記一律降級為近戰火花
+      if(Math.random()<fxP(hs.i*0.9)){ const c=Math.random()<0.5?[1,0.8,0.3]:[1,0.5,0.2];
+        emit(GLOW,gx+rnd(-3,3)*G,gy+rnd(0.5,3)*G,gz+rnd(-3,3)*G,rnd(-6,6)*G,rnd(4,12)*G,rnd(-6,6)*G,rnd(8,16),rnd(0.3,0.6),c[0],c[1],c[2],0,0); }
+      if(fire){ flash(gx,gy+2*G,gz,0xffcc66,rnd(120,260)); emit(SMOKE,gx,gy+G,gz,rnd(-1,1)*G,2*G,rnd(-1,1)*G,16,rnd(1.2,2),0.22,0.21,0.2,12,1); hotTimers[h]=fxT(rnd(0.12,0.28)/hs.i); }
     } else if(hs.kind==="explosion"){
       if(fire){ flash(gx,gy+2*G,gz,0xffaa44,rnd(300,520));
         for(let s=0;s<14;s++){ if(!fxOk()) continue; const a=Math.random()*7,sp=rnd(6,20)*G;
@@ -937,9 +1100,9 @@ function sideStrength(sh,side){ let s=0; (sh.focus||[]).forEach(id=>{ const o=un
   if(o&&o.u.cf&&o.u.faction===side) s+=sampleTrack(o.u.track,Clock.day).s; }); return s; }
 const ASSET_LABELS={ air:{zh:"✈ 空軍",en:"Air"}, navy:{zh:"🚢 海軍",en:"Navy"}, naval:{zh:"🚢 海軍",en:"Navy"},
   nuclear:{zh:"☢ 核武",en:"Nuclear"}, artillery:{zh:"💥 炮擊",en:"Artillery"}, landing:{zh:"⛵ 兩棲",en:"Amphibious"},
-  explosion:{zh:"💥 潰壩／爆炸",en:"Explosion"} };
+  explosion:{zh:"💥 潰壩／爆炸",en:"Explosion"}, fire:{zh:"🔥 火攻",en:"Fire attack"} };
 function assetsFromShot(sh){
-  const list=sh.assets||[];
+  const list=(sh.assets||[]).filter(a=>a!=="artillery");
   if(!list.length) return "";
   return `<div class="assets">`+list.map(a=>{ const L=ASSET_LABELS[a]||{zh:a,en:a};
     return `<span class="asset">${L.zh}${L.en?" · "+L.en:""}</span>`; }).join("")+`</div>`; }
@@ -977,7 +1140,7 @@ const Director = {
   shots:D.storyboard, i:-1, t:0, mode:"title", playing:true, userFree:false, capShown:false, sceneFx:[],
   fromPos:new THREE.Vector3(), fromTgt:new THREE.Vector3(), tgt:new THREE.Vector3(), fromDay:8, toDay:8,
   outroHold:null, outroAz:0, outroEl:46,
-  start(){ this.mode="title"; this.t=0; this.playing=true; this.userFree=false; this.sceneFx=[]; this.outroHold=null; hideNextBattle(); setDay(this.shots[0].day);
+  start(){ this.mode="title"; this.t=0; this.playing=true; this.userFree=false; this.sceneFx=[]; this.outroHold=null; camZoomMul=1; hideNextBattle(); setDay(this.shots[0].day);
     const ic=META.introCam||this.shots[0].cam;
     const c=camFromShot(ic); camera.position.copy(c.pos); controls.target.copy(c.target);
     lookTarget.copy(controls.target);
@@ -1010,7 +1173,7 @@ const Director = {
         camera.position.copy(spherical(hold.tgt,hold.dist,az,el));
       }
       lookTarget.copy(controls.target); updateProgress(); return; }
-    const sh=this.shots[this.i], dur=CFG.TWEEN+sh.hold, dist=sh.cam.dist*CFG.ZOOM;
+    const sh=this.shots[this.i], dur=CFG.TWEEN+sh.hold, dist=sh.cam.dist*CFG.ZOOM*camZoomMul;
     if(this.t<CFG.TWEEN){ const e=easeIO(this.t/CFG.TWEEN);
       setDay(lerp(this.fromDay,this.toDay,e));   // day/night + weather glide as the camera moves
       camera.position.lerpVectors(this.fromPos,spherical(this.tgt,dist,sh.cam.az,sh.cam.el),e);
@@ -1115,9 +1278,6 @@ function wireUI(){
   $("prog").addEventListener("click",e=>{ const r=$("prog").getBoundingClientRect();   // click the time axis to jump to a chapter
     const frac=clamp((e.clientX-r.left)/r.width,0,1); Director.goToShot(Math.round(frac*N-0.5)); });
   controls.addEventListener("start",()=>Director.pauseForUser());   // a user drag pauses the tour
-  renderer.domElement.addEventListener("wheel",()=>{
-    if(Director.mode!=="title") Director.pauseForUser();
-  },{passive:true});
   wireZoomUI();
   // auto-hide transport + hint on inactivity
   let idle; const ui=[$("controls"),$("hint")];
@@ -1154,7 +1314,7 @@ function decollide(){
     placed.push(r);
   }
 }
-function renderScene(){ controls.update(); renderer.render(scene,camera); labelRenderer.render(scene,camera); decollide(); }
+function renderScene(){ syncControlModes(); controls.update(); renderer.render(scene,camera); labelRenderer.render(scene,camera); decollide(); }
 function frame(dt){
   const spd=playSpeed;
   Director.update(dt*spd);
@@ -1184,7 +1344,7 @@ function awaitAudio(){   // hold boot until the background mp3 is buffered (10s 
 (async function init(){
   try{
     await loadTiles();
-    buildTerrain(); buildLabels(); buildLine(); buildRain();
+    buildTerrain(); buildRiverMeshes(); buildLabels(); buildLine(); buildRain();
     D.units.forEach(buildUnit); D.arrows.forEach(buildArrow);
     unitObjs.forEach(o=>{ unitById[o.u.id]=o; });
     applyTheme(); wireUI(); applyWeather(D.storyboard[0].day);

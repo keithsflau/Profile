@@ -11,10 +11,10 @@ window.BATTLE_DATA = (function () {
           "yuan"
       ],
       "geo": {
-          "minLng": 112.05,
-          "maxLng": 114.05,
-          "minLat": 21.48,
-          "maxLat": 23.08,
+          "minLng": 112.35,
+          "maxLng": 113.75,
+          "minLat": 21.6,
+          "maxLat": 22.7,
           "Z": 11
       },
       "startDate": [
@@ -44,6 +44,8 @@ window.BATTLE_DATA = (function () {
           "el": 48,
           "orbit": 0.65
       },
+      "terrainMode": "ocean",
+      "floodRelief": 0.58,
       "nextBattle": {
           "href": "../../ming-qing/tumu/",
           "title_zh": "土木堡之變",
@@ -87,7 +89,38 @@ window.BATTLE_DATA = (function () {
               "lat": 22.45
           }
       ],
-      "lines": []
+      "lines": [],
+      "water": [
+          {
+              "kind": "polygon",
+              "ring": [
+                  [
+                      112.55,
+                      22.48
+                  ],
+                  [
+                      113.55,
+                      22.55
+                  ],
+                  [
+                      113.65,
+                      22.05
+                  ],
+                  [
+                      113.4,
+                      21.82
+                  ],
+                  [
+                      112.75,
+                      21.88
+                  ],
+                  [
+                      112.5,
+                      22.18
+                  ]
+              ]
+          }
+      ]
   };
   const units =   [
       {
@@ -197,7 +230,8 @@ window.BATTLE_DATA = (function () {
       "summary": "崖山海戰 — DSE 中史互動戰役地圖（教學示意）。",
       "caveats": [
           "本圖僅覆蓋該戰役核心區域；戰線與兵力為教學示意。",
-          "衛星影像為現代地形，非歷史時期地貌。"
+          "衛星影像為現代地形，非歷史時期地貌。",
+          "河川、海域水面為教學示意，按史實位置裁切顯示。"
       ],
       "sources": "DSE 中史課程、中國通史、維基百科（交叉查證）。"
   };
@@ -225,8 +259,8 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "元將張弘範率水師圍困崖山，南宋張世傑率艦隊護衛少帝趙昺。",
           "narration_en": "Yuan admiral Zhang Hongfan blockades Yamen — Song admiral Zhang Shijie guards Emperor Bing.",
           "focus": [
-              "yuan_main",
-              "song_main"
+              "yuan_yamen",
+              "song_yamen"
           ],
           "side": "both",
           "commanders": [
@@ -262,7 +296,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "元軍切断宋军淡水与补给，宋军以海为家，形势日蹙。",
           "narration_en": "Yuan forces cut fresh water and supplies — the Song fleet weakens daily.",
           "focus": [
-              "song_main"
+              "song_yamen"
           ],
           "side": "song",
           "commanders": [],
@@ -289,14 +323,13 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "元军以小船火攻，宋大舰相连难以转向，全军溃败。",
           "narration_en": "Yuan fire-ships attack chained Song vessels — the Song fleet is destroyed.",
           "focus": [
-              "yuan_main",
-              "song_main"
+              "yuan_yamen",
+              "song_yamen"
           ],
           "side": "both",
           "commanders": [],
           "assets": [
-              "navy",
-              "artillery"
+              "navy"
           ],
           "forces_zh": "",
           "forces_en": ""
@@ -318,7 +351,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "陸秀夫背負八歲帝昺投海殉國，楊太后亦投海，南宋滅亡。",
           "narration_en": "Lu Xiufu carries the eight-year-old emperor into the sea — the Song dynasty ends.",
           "focus": [
-              "song_main"
+              "song_yamen"
           ],
           "side": "song",
           "commanders": [

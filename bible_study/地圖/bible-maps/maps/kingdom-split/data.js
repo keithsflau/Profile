@@ -11,16 +11,16 @@ window.BATTLE_DATA = (function () {
           "south"
       ],
       "geo": {
-          "minLng": 33.2,
-          "maxLng": 37.2,
-          "minLat": 30,
-          "maxLat": 34,
+          "minLng": 33.92,
+          "maxLng": 36.92,
+          "minLat": 31.01,
+          "maxLat": 34.01,
           "Z": 9
       },
       "startDate": "王上12",
       "introCam": {
-          "lng": 35.2,
-          "lat": 32,
+          "lng": 35.421,
+          "lat": 32.5095,
           "dist": 700,
           "az": 200,
           "el": 46,
@@ -33,8 +33,8 @@ window.BATTLE_DATA = (function () {
           "narr_en": "Israel rebelled against the house of David; Jeroboam became king of the north."
       },
       "outroCam": {
-          "lng": 35.2,
-          "lat": 32,
+          "lng": 35.421,
+          "lat": 32.5095,
           "dist": 840,
           "az": 200,
           "el": 48,
@@ -62,25 +62,52 @@ window.BATTLE_DATA = (function () {
       "regions": [],
       "points": [
           {
-              "name_zh": "耶路撒冷",
-              "name_en": "Jerusalem",
-              "type": "city",
-              "lng": 35.23,
-              "lat": 31.78
-          },
-          {
               "name_zh": "示劍",
               "name_en": "Shechem",
               "type": "town",
-              "lng": 35.28,
-              "lat": 32.21
+              "lng": 35.289,
+              "lat": 32.213,
+              "ref": "創 12:6"
+          },
+          {
+              "name_zh": "耶路撒冷",
+              "name_en": "Jerusalem",
+              "type": "city",
+              "lng": 35.235,
+              "lat": 31.778,
+              "ref": "撒下 5:7"
+          },
+          {
+              "name_zh": "得撒",
+              "name_en": "Tirzah",
+              "type": "city",
+              "lng": 35.289,
+              "lat": 32.252,
+              "ref": "王上 14:17"
           },
           {
               "name_zh": "撒瑪利亞",
               "name_en": "Samaria",
               "type": "city",
-              "lng": 35.19,
-              "lat": 32.27
+              "lng": 35.193,
+              "lat": 32.276,
+              "ref": "王上 16:24"
+          },
+          {
+              "name_zh": "伯特利",
+              "name_en": "Bethel",
+              "type": "town",
+              "lng": 35.222,
+              "lat": 31.927,
+              "ref": "創 12:8"
+          },
+          {
+              "name_zh": "但",
+              "name_en": "Dan",
+              "type": "town",
+              "lng": 35.649,
+              "lat": 33.241,
+              "ref": "王上 12:29"
           }
       ],
       "lines": []
@@ -97,15 +124,15 @@ window.BATTLE_DATA = (function () {
           "track": [
               {
                   "d": 1,
-                  "lng": 35.23,
-                  "lat": 31.78,
+                  "lng": 35.235,
+                  "lat": 31.778,
                   "s": 40000,
                   "st": "hold"
               },
               {
                   "d": 100,
-                  "lng": 35.23,
-                  "lat": 31.78,
+                  "lng": 35.235,
+                  "lat": 31.778,
                   "s": 35000,
                   "st": "hold"
               }
@@ -122,15 +149,22 @@ window.BATTLE_DATA = (function () {
           "track": [
               {
                   "d": 1,
-                  "lng": 35.28,
-                  "lat": 32.21,
+                  "lng": 35.289,
+                  "lat": 32.213,
                   "s": 50000,
                   "st": "hold"
               },
               {
-                  "d": 50,
-                  "lng": 35.19,
-                  "lat": 32.27,
+                  "d": 40,
+                  "lng": 35.289,
+                  "lat": 32.252,
+                  "s": 52000,
+                  "st": "hold"
+              },
+              {
+                  "d": 70,
+                  "lng": 35.193,
+                  "lat": 32.276,
                   "s": 55000,
                   "st": "hold"
               }
@@ -160,18 +194,18 @@ window.BATTLE_DATA = (function () {
       "sources": "和合本、聖經地圖、教會史資料（交叉查證）。"
   };
   const analysis =   {
-      "military": "羅波安拒納老臣忠告，加重百姓轕軛；北方十支派在示劍叛變，立耶羅波安為王；耶羅波安設但與伯特利金牛犢，陷北國於罪。",
-      "leaders": "羅波安、耶羅波安、先知亞希雅；南國猶大仍守大衛家，北國以色列十九王朝更迭。",
-      "nationalPower": "分裂反映人心悖逆與敬拜中心被扭曲；耶羅波安罪惡成為北國敗壞的標誌。",
-      "impact": "南北分裂直至被擄；猶大線保存彌賽亞譜系。"
+      "military": "羅波安在示劍拒減軛（王上12）；北方立耶羅波安；北國早期都城得撒（王上14:17），後暗利建撒瑪利亞（王上16:24）；耶羅波安在但與伯特利設金牛犢（王上12:28-29）。",
+      "leaders": "羅波安、耶羅波安、暗利。",
+      "nationalPower": "分裂與偶像敬拜扭曲真敬拜。",
+      "impact": "猶大線保存大衛譜系。"
   };
   const storyboard =   [
       {
           "day": 1,
           "hold": 8,
           "cam": {
-              "lng": 35.28,
-              "lat": 32.21,
+              "lng": 35.289,
+              "lat": 32.213,
               "dist": 640,
               "az": 200,
               "el": 46,
@@ -179,9 +213,9 @@ window.BATTLE_DATA = (function () {
           },
           "dateLabel": "公元前931年",
           "title_zh": "示劍會議",
-          "title_en": "Assembly at Shechem",
-          "narration_zh": "以色列眾人請羅波安減輕父親所加的重軛。",
-          "narration_en": "Israel asked Rehoboam to lighten the heavy yoke of Solomon.",
+          "title_en": "Shechem",
+          "narration_zh": "王上12:1 羅波安往示劍，以色列眾人來立他為王。",
+          "narration_en": "1 Kgs 12:1 — All Israel assembled at Shechem for Rehoboam.",
           "focus": [
               "judah",
               "israel_n"
@@ -201,8 +235,8 @@ window.BATTLE_DATA = (function () {
           "day": 25,
           "hold": 8,
           "cam": {
-              "lng": 35.28,
-              "lat": 32.21,
+              "lng": 35.289,
+              "lat": 32.213,
               "dist": 600,
               "az": 200,
               "el": 46,
@@ -210,9 +244,9 @@ window.BATTLE_DATA = (function () {
           },
           "dateLabel": "公元前931年",
           "title_zh": "十支派叛變",
-          "title_en": "Ten Tribes Rebel",
-          "narration_zh": "羅波安聽少年人建議，宣告加重責打；北方說：我們與大衛有什麼分兒！",
-          "narration_en": "Rehoboam refused wisely; the north cried: 'What share have we in David?'",
+          "title_en": "Rebellion",
+          "narration_zh": "王上12:16 以色列人說：我們與大衛有什麼分兒？就叛變立耶羅波安。",
+          "narration_en": "1 Kgs 12:16 — Israel rebelled and made Jeroboam king.",
           "focus": [
               "israel_n"
           ],
@@ -231,8 +265,8 @@ window.BATTLE_DATA = (function () {
           "day": 45,
           "hold": 8,
           "cam": {
-              "lng": 35.23,
-              "lat": 31.78,
+              "lng": 35.235,
+              "lat": 31.778,
               "dist": 580,
               "az": 200,
               "el": 46,
@@ -240,9 +274,9 @@ window.BATTLE_DATA = (function () {
           },
           "dateLabel": "公元前931年",
           "title_zh": "猶大留守",
-          "title_en": "Judah Remains",
-          "narration_zh": "只有猶大支派與便雅憫仍歸大衛家，羅波安作耶路撒冷王。",
-          "narration_en": "Only Judah and Benjamin stayed with the house of David in Jerusalem.",
+          "title_en": "Judah",
+          "narration_zh": "王上12:20 只有猶大支派歸羅波安，以耶路撒冷為都。",
+          "narration_en": "1 Kgs 12:20 — Only Judah remained loyal to Rehoboam in Jerusalem.",
           "focus": [
               "judah"
           ],
@@ -256,18 +290,18 @@ window.BATTLE_DATA = (function () {
           "day": 65,
           "hold": 8,
           "cam": {
-              "lng": 35.19,
-              "lat": 32.27,
+              "lng": 35.289,
+              "lat": 32.252,
               "dist": 560,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
-          "dateLabel": "分裂後",
-          "title_zh": "撒瑪利亞為都",
-          "title_en": "Samaria as Capital",
-          "narration_zh": "耶羅波安定都撒瑪利亞，北國以色列歷史由此展開。",
-          "narration_en": "Jeroboam established Samaria — northern Israel's history unfolded.",
+          "dateLabel": "分裂初期",
+          "title_zh": "得撒",
+          "title_en": "Tirzah",
+          "narration_zh": "王上14:17 耶羅波安兒子死後，北國早期都城得撒。",
+          "narration_en": "1 Kgs 14:17 — Tirzah served as an early northern capital.",
           "focus": [
               "israel_n"
           ],
@@ -278,21 +312,46 @@ window.BATTLE_DATA = (function () {
           "forces_en": ""
       },
       {
-          "day": 88,
+          "day": 80,
           "hold": 8,
           "cam": {
-              "lng": 35.2,
-              "lat": 32,
-              "dist": 680,
+              "lng": 35.193,
+              "lat": 32.276,
+              "dist": 560,
+              "az": 200,
+              "el": 46,
+              "orbit": 0.65
+          },
+          "dateLabel": "約前880年",
+          "title_zh": "撒瑪利亞",
+          "title_en": "Samaria",
+          "narration_zh": "王上16:24 暗利買撒瑪利亞山建城，作北國都城。",
+          "narration_en": "1 Kgs 16:24 — Omri built Samaria as Israel's capital.",
+          "focus": [
+              "israel_n"
+          ],
+          "side": "both",
+          "commanders": [],
+          "assets": [],
+          "forces_zh": "",
+          "forces_en": ""
+      },
+      {
+          "day": 95,
+          "hold": 8,
+          "cam": {
+              "lng": 35.222,
+              "lat": 31.927,
+              "dist": 600,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
           "dateLabel": "分裂後",
-          "title_zh": "金牛犢之罪",
-          "title_en": "Calves of Bethel",
-          "narration_zh": "耶羅波安在但和伯特利設金牛犢，使百姓陷於偶像敬拜。",
-          "narration_en": "Jeroboam set up golden calves at Dan and Bethel — idolatry gripped the north.",
+          "title_zh": "伯特利金牛犢",
+          "title_en": "Bethel",
+          "narration_zh": "王上12:29 耶羅波安在伯特利與但設金牛犢，陷民於罪。",
+          "narration_en": "1 Kgs 12:29 — Jeroboam set up golden calves at Bethel and Dan.",
           "focus": [
               "israel_n"
           ],
@@ -309,8 +368,8 @@ window.BATTLE_DATA = (function () {
       "narration_zh": "本段為聖經與教會史重要考點。",
       "narration_en": "A key Bible and church history topic.",
       "cam": {
-          "lng": 35.2,
-          "lat": 32,
+          "lng": 35.421,
+          "lat": 32.5095,
           "dist": 840,
           "az": 200,
           "el": 48,

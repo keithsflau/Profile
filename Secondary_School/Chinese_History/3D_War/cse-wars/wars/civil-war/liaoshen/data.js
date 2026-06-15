@@ -44,6 +44,9 @@ window.BATTLE_DATA = (function () {
           "el": 48,
           "orbit": 0.65
       },
+      "terrainMode": "plain",
+      "floodRelief": 0.1,
+      "reliefScale": 0.78,
       "nextBattle": {
           "href": "../huaihai/",
           "title_zh": "淮海戰役",
@@ -87,7 +90,8 @@ window.BATTLE_DATA = (function () {
               "lat": 43.9
           }
       ],
-      "lines": []
+      "lines": [],
+      "water": []
   };
   const units =   [
       {
@@ -178,7 +182,7 @@ window.BATTLE_DATA = (function () {
           "b": 90,
           "lng": 121.13,
           "lat": 41.1,
-          "kind": "artillery",
+          "kind": "firefight",
           "i": 1
       }
   ];
@@ -197,7 +201,8 @@ window.BATTLE_DATA = (function () {
       "summary": "遼瀋戰役 — DSE 中史互動戰役地圖（教學示意）。",
       "caveats": [
           "本圖僅覆蓋該戰役核心區域；戰線與兵力為教學示意。",
-          "衛星影像為現代地形，非歷史時期地貌。"
+          "衛星影像為現代地形，非歷史時期地貌。",
+          "河川、海域水面為教學示意，按史實位置裁切顯示。"
       ],
       "sources": "DSE 中史課程、中國通史、維基百科（交叉查證）。"
   };
@@ -225,7 +230,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "东北野战军包围锦州，切断国军关内退路。",
           "narration_en": "Northeast Field Army besieges Jinzhou — the Nationalist escape route south is severed.",
           "focus": [
-              "pla_main"
+              "pla_liaoshen"
           ],
           "side": "pla",
           "commanders": [
@@ -259,13 +264,11 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "经31小时激战，锦州陷落，范汉杰被俘。",
           "narration_en": "After 31 hours of fighting, Jinzhou falls — Fan Hanjie is captured.",
           "focus": [
-              "pla_main"
+              "pla_liaoshen"
           ],
           "side": "pla",
           "commanders": [],
-          "assets": [
-              "artillery"
-          ],
+          "assets": [],
           "forces_zh": "",
           "forces_en": ""
       },
@@ -286,8 +289,8 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "廖耀湘兵团自沈阳西援，在黑山、大虎山被围歼。",
           "narration_en": "Liao Yaoxiang's army is encircled and destroyed at Heishan.",
           "focus": [
-              "pla_main",
-              "gmd_main"
+              "pla_liaoshen",
+              "kmt_liaoshen"
           ],
           "side": "both",
           "commanders": [
@@ -296,9 +299,7 @@ window.BATTLE_DATA = (function () {
                   "en": "Liao Yaoxiang"
               }
           ],
-          "assets": [
-              "artillery"
-          ],
+          "assets": [],
           "forces_zh": "",
           "forces_en": ""
       },
@@ -319,9 +320,9 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "曾泽生率六十军起义，长春和平解放。",
           "narration_en": "Zeng Zesheng's 60th Army mutinies — Changchun is liberated.",
           "focus": [
-              "gmd_main"
+              "kmt_liaoshen"
           ],
-          "side": "gmd",
+          "side": "kmt",
           "commanders": [
               {
                   "zh": "曾泽生",

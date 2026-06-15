@@ -44,6 +44,9 @@ window.BATTLE_DATA = (function () {
           "el": 48,
           "orbit": 0.65
       },
+      "terrainMode": "plain",
+      "floodRelief": 0.1,
+      "reliefScale": 0.75,
       "nextBattle": {
           "href": "../../song-yuan/yamen/",
           "title_zh": "崖山海戰",
@@ -87,7 +90,8 @@ window.BATTLE_DATA = (function () {
               "lat": 34.62
           }
       ],
-      "lines": []
+      "lines": [],
+      "water": []
   };
   const units =   [
       {
@@ -211,7 +215,8 @@ window.BATTLE_DATA = (function () {
       "summary": "安史之亂 — DSE 中史互動戰役地圖（教學示意）。",
       "caveats": [
           "本圖僅覆蓋該戰役核心區域；戰線與兵力為教學示意。",
-          "衛星影像為現代地形，非歷史時期地貌。"
+          "衛星影像為現代地形，非歷史時期地貌。",
+          "河川、海域水面為教學示意，按史實位置裁切顯示。"
       ],
       "sources": "DSE 中史課程、中國通史、維基百科（交叉查證）。"
   };
@@ -239,7 +244,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "安祿山以討楊貴妃之兄楊國忠為名，率三鎮十五萬兵反唐。",
           "narration_en": "An Lushan rebels with 150,000 troops from three frontier commands.",
           "focus": [
-              "rebel_main"
+              "rebel_anshi"
           ],
           "side": "rebel",
           "commanders": [
@@ -269,13 +274,11 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "叛軍攻占東都洛陽，安祿山稱大燕皇帝。",
           "narration_en": "Rebels capture Luoyang — An Lushan declares himself emperor of Yan.",
           "focus": [
-              "rebel_main"
+              "rebel_anshi"
           ],
           "side": "rebel",
           "commanders": [],
-          "assets": [
-              "artillery"
-          ],
+          "assets": [],
           "forces_zh": "",
           "forces_en": ""
       },
@@ -296,7 +299,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "唐玄宗西逃，禁軍譁變，楊國忠、楊貴妃被殺，玄宗入蜀。",
           "narration_en": "Emperor Xuanzong flees west — troops mutiny, Yang Guozhong and Consort Yang die.",
           "focus": [
-              "tang_main"
+              "tang_anshi"
           ],
           "side": "tang",
           "commanders": [
@@ -326,8 +329,8 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "叛軍占領長安，太子李亨即位于靈武，號肅宗，組織平叛。",
           "narration_en": "Rebels take Chang'an — Crown Prince Li Heng becomes Emperor Suzong at Lingwu.",
           "focus": [
-              "rebel_main",
-              "tang_main"
+              "rebel_anshi",
+              "tang_anshi"
           ],
           "side": "both",
           "commanders": [
@@ -336,9 +339,7 @@ window.BATTLE_DATA = (function () {
                   "en": "Emperor Suzong"
               }
           ],
-          "assets": [
-              "artillery"
-          ],
+          "assets": [],
           "forces_zh": "",
           "forces_en": ""
       },
@@ -359,7 +360,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "郭子儀、李光弼等率唐軍與回紇聯兵，收復兩京，史思明繼叛後亦被誅。",
           "narration_en": "Guo Ziyi and Li Guangbi, with Uighur allies, recapture the capitals.",
           "focus": [
-              "tang_main"
+              "tang_anshi"
           ],
           "side": "tang",
           "commanders": [

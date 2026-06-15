@@ -11,16 +11,16 @@ window.BATTLE_DATA = (function () {
           "empire"
       ],
       "geo": {
-          "minLng": 17.5,
-          "maxLng": 42.5,
-          "minLat": 27.5,
-          "maxLat": 42.5,
+          "minLng": -3.11,
+          "maxLng": 42.35,
+          "minLat": 29.03,
+          "maxLat": 48.53,
           "Z": 6
       },
       "startDate": "1095–1291",
       "introCam": {
-          "lng": 35.23,
-          "lat": 31.78,
+          "lng": 35.235,
+          "lat": 31.778,
           "dist": 700,
           "az": 200,
           "el": 46,
@@ -29,12 +29,12 @@ window.BATTLE_DATA = (function () {
       "titleCard": {
           "zh": "十字軍東征",
           "en": "THE CRUSADES · 1095–1291",
-          "narr_zh": "教皇烏爾班二世號召收復聖地；十字軍多次遠征耶路撒冷。",
-          "narr_en": "Pope Urban II called for the recovery of the Holy Land."
+          "narr_zh": "教皇烏爾班二世在克萊蒙號召收復聖地；十字軍多次遠征耶路撒冷。",
+          "narr_en": "Pope Urban II called for the recovery of the Holy Land at Clermont."
       },
       "outroCam": {
-          "lng": 35.23,
-          "lat": 31.78,
+          "lng": 35.235,
+          "lat": 31.778,
           "dist": 840,
           "az": 200,
           "el": 48,
@@ -62,25 +62,52 @@ window.BATTLE_DATA = (function () {
       "regions": [],
       "points": [
           {
-              "name_zh": "耶路撒冷",
-              "name_en": "Jerusalem",
+              "name_zh": "克萊蒙",
+              "name_en": "Clermont",
               "type": "city",
-              "lng": 35.23,
-              "lat": 31.78
+              "lng": 3.083,
+              "lat": 45.779,
+              "ref": "1095 教皇號召"
+          },
+          {
+              "name_zh": "尼西亞",
+              "name_en": "Nicaea",
+              "type": "city",
+              "lng": 29.721,
+              "lat": 40.429,
+              "ref": "1097 圍城"
           },
           {
               "name_zh": "安條克",
               "name_en": "Antioch",
               "type": "city",
-              "lng": 36.2,
-              "lat": 36.2
+              "lng": 36.158,
+              "lat": 36.202,
+              "ref": "1098 圍城"
+          },
+          {
+              "name_zh": "耶路撒冷",
+              "name_en": "Jerusalem",
+              "type": "city",
+              "lng": 35.235,
+              "lat": 31.778,
+              "ref": "撒下 5:7"
+          },
+          {
+              "name_zh": "哈丁",
+              "name_en": "Hattin",
+              "type": "fort",
+              "lng": 35.505,
+              "lat": 32.806,
+              "ref": "1187 戰役"
           },
           {
               "name_zh": "阿卡",
               "name_en": "Acre",
               "type": "fort",
-              "lng": 35.08,
-              "lat": 32.93
+              "lng": 35.084,
+              "lat": 32.926,
+              "ref": "1291 陷落"
           }
       ],
       "lines": []
@@ -97,15 +124,29 @@ window.BATTLE_DATA = (function () {
           "track": [
               {
                   "d": 1,
-                  "lng": 12,
-                  "lat": 43,
+                  "lng": 3.083,
+                  "lat": 45.779,
                   "s": 50000,
+                  "st": "hold"
+              },
+              {
+                  "d": 25,
+                  "lng": 29.721,
+                  "lat": 40.429,
+                  "s": 45000,
                   "st": "attack"
               },
               {
-                  "d": 60,
-                  "lng": 35.23,
-                  "lat": 31.78,
+                  "d": 45,
+                  "lng": 36.158,
+                  "lat": 36.202,
+                  "s": 42000,
+                  "st": "attack"
+              },
+              {
+                  "d": 65,
+                  "lng": 35.235,
+                  "lat": 31.778,
                   "s": 40000,
                   "st": "hold"
               }
@@ -122,15 +163,29 @@ window.BATTLE_DATA = (function () {
           "track": [
               {
                   "d": 1,
-                  "lng": 35.5,
-                  "lat": 32,
+                  "lng": 35.235,
+                  "lat": 31.778,
                   "s": 60000,
                   "st": "hold"
               },
               {
-                  "d": 80,
-                  "lng": 35.23,
-                  "lat": 31.78,
+                  "d": 75,
+                  "lng": 35.505,
+                  "lat": 32.806,
+                  "s": 65000,
+                  "st": "attack"
+              },
+              {
+                  "d": 90,
+                  "lng": 35.235,
+                  "lat": 31.778,
+                  "s": 60000,
+                  "st": "hold"
+              },
+              {
+                  "d": 100,
+                  "lng": 35.084,
+                  "lat": 32.926,
                   "s": 55000,
                   "st": "attack"
               }
@@ -142,11 +197,19 @@ window.BATTLE_DATA = (function () {
   const hotspots =   [
       {
           "a": 40,
-          "b": 90,
-          "lng": 35.2,
-          "lat": 31.8,
+          "b": 55,
+          "lng": 36.158,
+          "lat": 36.202,
           "kind": "firefight",
           "i": 0.8
+      },
+      {
+          "a": 72,
+          "b": 88,
+          "lng": 35.505,
+          "lat": 32.806,
+          "kind": "firefight",
+          "i": 0.9
       }
   ];
   const weather =   [
@@ -169,28 +232,28 @@ window.BATTLE_DATA = (function () {
       "sources": "和合本、聖經地圖、教會史資料（交叉查證）。"
   };
   const analysis =   {
-      "military": "1095年烏爾班二世在克萊蒙號召收復聖地；第一次十字軍1099年攻陷耶路撒冷；此後兩百年間多次遠征，阿卡陷落（1291）標誌結束。",
-      "leaders": "烏爾班二世、理查一世、薩拉丁、鮑德溫一世；十字軍諸侯與阿尤布王朝穆斯林領袖。",
-      "nationalPower": "十字軍混合宗教熱忱與政治利益；對猶太人與穆斯林造成慘痛傷害，亦加深東西方教會裂痕。",
-      "impact": "聖地戰爭塑造中世紀歐洲與中東關係；留下複雜的歷史與信仰反思。"
+      "military": "1095年烏爾班二世在克萊蒙（法國）號召；1097年攻尼西亞；1098年圍安條克；1099年陷耶路撒冷；1187年哈丁戰敗；1291年阿卡陷落。",
+      "leaders": "烏爾班二世、薩拉丁、鮑德溫一世。",
+      "nationalPower": "混合宗教熱忱與政治利益；加深東西方裂痕。",
+      "impact": "塑造中世紀聖戰記憶。"
   };
   const storyboard =   [
       {
           "day": 1,
           "hold": 8,
           "cam": {
-              "lng": 12.5,
-              "lat": 41.9,
+              "lng": 3.083,
+              "lat": 45.779,
               "dist": 700,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
-          "dateLabel": "1095年",
-          "title_zh": "克萊蒙號召",
-          "title_en": "Council of Clermont",
-          "narration_zh": "教皇烏爾班二世號召收復被穆斯林佔據的聖地耶路撒冷。",
-          "narration_en": "Pope Urban II called for the recovery of Jerusalem from Muslim rule.",
+          "dateLabel": "1095年11月",
+          "title_zh": "克萊蒙",
+          "title_en": "Clermont",
+          "narration_zh": "1095年教皇烏爾班二世在克萊蒙議會號召收復聖地。",
+          "narration_en": "1095 — Urban II's sermon at the Council of Clermont.",
           "focus": [
               "crusaders"
           ],
@@ -201,21 +264,46 @@ window.BATTLE_DATA = (function () {
           "forces_en": ""
       },
       {
-          "day": 22,
+          "day": 25,
           "hold": 8,
           "cam": {
-              "lng": 36.2,
-              "lat": 36.2,
+              "lng": 29.721,
+              "lat": 40.429,
               "dist": 640,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
-          "dateLabel": "1097–1098年",
-          "title_zh": "安條克圍城",
-          "title_en": "Siege of Antioch",
-          "narration_zh": "十字軍圍攻安條克，經艱苦戰役奪取，繼續南下。",
-          "narration_en": "Crusaders besieged and captured Antioch, then marched south.",
+          "dateLabel": "1097年",
+          "title_zh": "尼西亞",
+          "title_en": "Nicaea",
+          "narration_zh": "1097年第一次十字軍圍攻尼西亞（今伊茲尼克）。",
+          "narration_en": "1097 — Siege of Nicaea.",
+          "focus": [
+              "crusaders"
+          ],
+          "side": "both",
+          "commanders": [],
+          "assets": [],
+          "forces_zh": "",
+          "forces_en": ""
+      },
+      {
+          "day": 45,
+          "hold": 8,
+          "cam": {
+              "lng": 36.158,
+              "lat": 36.202,
+              "dist": 620,
+              "az": 200,
+              "el": 46,
+              "orbit": 0.65
+          },
+          "dateLabel": "1098年",
+          "title_zh": "安條克",
+          "title_en": "Antioch",
+          "narration_zh": "1098年十字軍經艱苦圍城奪取安條克，後繼續南下。",
+          "narration_en": "1098 — Crusaders captured Antioch after a long siege.",
           "focus": [
               "crusaders",
               "ayyubids"
@@ -229,21 +317,21 @@ window.BATTLE_DATA = (function () {
           "forces_en": ""
       },
       {
-          "day": 45,
+          "day": 65,
           "hold": 8,
           "cam": {
-              "lng": 35.23,
-              "lat": 31.78,
+              "lng": 35.235,
+              "lat": 31.778,
               "dist": 600,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
-          "dateLabel": "1099年",
-          "title_zh": "攻陷耶路撒冷",
-          "title_en": "Jerusalem Captured",
-          "narration_zh": "第一次十字軍攻陷耶路撒冷，建立耶路撒冷王國。",
-          "narration_en": "The First Crusade captured Jerusalem — the Latin Kingdom was established.",
+          "dateLabel": "1099年7月",
+          "title_zh": "耶路撒冷",
+          "title_en": "Jerusalem",
+          "narration_zh": "1099年7月第一次十字軍攻陷耶路撒冷，建立拉丁王國。",
+          "narration_en": "July 1099 — Jerusalem fell to the First Crusade.",
           "focus": [
               "crusaders"
           ],
@@ -256,21 +344,21 @@ window.BATTLE_DATA = (function () {
           "forces_en": ""
       },
       {
-          "day": 65,
+          "day": 80,
           "hold": 8,
           "cam": {
-              "lng": 35.23,
-              "lat": 31.78,
+              "lng": 35.505,
+              "lat": 32.806,
               "dist": 580,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
-          "dateLabel": "1187年",
-          "title_zh": "哈丁與薩拉丁",
-          "title_en": "Hattin and Saladin",
-          "narration_zh": "薩拉丁在哈丁大敗十字軍，同年收復耶路撒冷。",
-          "narration_en": "Saladin defeated the crusaders at Hattin and recaptured Jerusalem.",
+          "dateLabel": "1187年7月",
+          "title_zh": "哈丁",
+          "title_en": "Hattin",
+          "narration_zh": "1187年7月4日薩拉丁在哈丁山丘大敗十字軍。",
+          "narration_en": "4 July 1187 — Saladin's victory at the Horns of Hattin.",
           "focus": [
               "ayyubids"
           ],
@@ -281,26 +369,28 @@ window.BATTLE_DATA = (function () {
                   "en": "Saladin"
               }
           ],
-          "assets": [],
+          "assets": [
+              "firefight"
+          ],
           "forces_zh": "",
           "forces_en": ""
       },
       {
-          "day": 88,
+          "day": 100,
           "hold": 8,
           "cam": {
-              "lng": 35.08,
-              "lat": 32.93,
+              "lng": 35.084,
+              "lat": 32.926,
               "dist": 650,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
-          "dateLabel": "1291年",
-          "title_zh": "阿卡陷落",
-          "title_en": "Fall of Acre",
-          "narration_zh": "阿卡城陷落，十字軍在聖地的據點終告瓦解。",
-          "narration_en": "Acre fell — the last major crusader stronghold in the Holy Land was lost.",
+          "dateLabel": "1291年5月",
+          "title_zh": "阿卡",
+          "title_en": "Acre",
+          "narration_zh": "1291年5月阿卡陷落，十字軍在聖地最後據點失守。",
+          "narration_en": "May 1291 — Fall of Acre ended the Crusader states.",
           "focus": [
               "ayyubids"
           ],
@@ -317,8 +407,8 @@ window.BATTLE_DATA = (function () {
       "narration_zh": "本段為聖經與教會史重要考點。",
       "narration_en": "A key Bible and church history topic.",
       "cam": {
-          "lng": 35.23,
-          "lat": 31.78,
+          "lng": 35.235,
+          "lat": 31.778,
           "dist": 840,
           "az": 200,
           "el": 48,

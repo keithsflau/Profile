@@ -158,9 +158,17 @@ function baseBattle(id, title_zh, title_en, subtitle, geo, factions, factionOrde
         narr_en: center.narr_en,
       },
       outroCam: cam(center.lng, center.lat, (center.dist || 700) * 1.2, 48),
+      terrainMode: center.terrainMode || "land",
+      floodRelief: center.floodRelief,
+      reliefScale: center.reliefScale,
     },
     factions,
-    geography: { regions: center.regions || [], points: center.points || [], lines: center.lines || [] },
+    geography: {
+      regions: center.regions || [],
+      points: center.points || [],
+      lines: center.lines || [],
+      water: center.water || [],
+    },
     units: center.units || [],
     arrows: center.arrows || [],
     fronts: center.fronts || [],
@@ -174,7 +182,11 @@ function baseBattle(id, title_zh, title_en, subtitle, geo, factions, factionOrde
     },
     notes: {
       summary: center.noteSummary || title_zh + " — DSE 中史互動戰役地圖。",
-      caveats: ["本圖僅覆蓋該戰役核心區域；戰線與兵力為教學示意。", "衛星影像為現代地形，非歷史時期地貌。"],
+      caveats: [
+        "本圖僅覆蓋該戰役核心區域；戰線與兵力為教學示意。",
+        "衛星影像為現代地形，非歷史時期地貌。",
+        "河川、海域水面為教學示意，按史實位置裁切顯示。",
+      ],
       sources: "DSE 中史課程、中國通史、維基百科（交叉查證）。",
     },
     storyboard: center.storyboard || [],
@@ -193,6 +205,40 @@ const CATALOG = buildCatalog({ geoBox, cam, baseBattle, FAC: { redBlue: null } }
 
 const ENRICH = require("./battle-enrichment-cse.js")({ cam });
 const LEADERS = require("./battle-leaders-cse.js");
+const TERRAIN = require("./battle-terrain-cse.js");
+const FOCUS_MAP = require("./battle-focus-map-cse.js");
+
+function mergeFocusIds(battle, warSlug) {
+  const fm = FOCUS_MAP.focus[`${warSlug}/${battle.slug}`];
+  const sm = FOCUS_MAP.side;
+  const sb = battle.data.storyboard;
+  if (!sb) return;
+  for (const sh of sb) {
+    if (fm && sh.focus) sh.focus = sh.focus.map((id) => fm[id] || id);
+    if (sh.side && sm[sh.side]) sh.side = sm[sh.side];
+  }
+}
+
+function mergeTerrain(battle, warSlug) {
+  const t = TERRAIN[`${warSlug}/${battle.slug}`];
+  if (!t) return;
+  const d = battle.data;
+  const m = d.meta;
+  if (t.terrainMode) m.terrainMode = t.terrainMode;
+  if (t.floodRelief != null) m.floodRelief = t.floodRelief;
+  if (t.reliefScale != null) m.reliefScale = t.reliefScale;
+  if (t.water) d.geography.water = t.water;
+  if (t.geoShift) {
+    const g = m.geo;
+    const s = t.geoShift;
+    const dLng = s.dLng != null ? s.dLng : (g.maxLng - g.minLng);
+    const dLat = s.dLat != null ? s.dLat : (g.maxLat - g.minLat);
+    g.minLng = +(s.lng - dLng / 2).toFixed(2);
+    g.maxLng = +(s.lng + dLng / 2).toFixed(2);
+    g.minLat = +(s.lat - dLat / 2).toFixed(2);
+    g.maxLat = +(s.lat + dLat / 2).toFixed(2);
+  }
+}
 
 function mergeEnrichment(battle, warSlug) {
   const e = ENRICH[`${warSlug}/${battle.slug}`];
@@ -237,7 +283,9 @@ for (const war of CATALOG) {
   fs.mkdirSync(warDir, { recursive: true });
   fs.writeFileSync(path.join(warDir, "index.html"), hubHtml(war));
   for (const b of war.battles) {
+    mergeTerrain(b, war.slug);
     mergeEnrichment(b, war.slug);
+    mergeFocusIds(b, war.slug);
     mergeLeaders(b, war.slug);
     writeBattle(war.slug, b);
   }

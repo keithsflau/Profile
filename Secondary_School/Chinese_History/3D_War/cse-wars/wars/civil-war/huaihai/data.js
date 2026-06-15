@@ -44,6 +44,9 @@ window.BATTLE_DATA = (function () {
           "el": 48,
           "orbit": 0.65
       },
+      "terrainMode": "plain",
+      "floodRelief": 0.12,
+      "reliefScale": 0.72,
       "nextBattle": {
           "href": "../pingjin/",
           "title_zh": "平津戰役",
@@ -87,7 +90,8 @@ window.BATTLE_DATA = (function () {
               "lat": 34.35
           }
       ],
-      "lines": []
+      "lines": [],
+      "water": []
   };
   const units =   [
       {
@@ -178,7 +182,7 @@ window.BATTLE_DATA = (function () {
           "b": 95,
           "lng": 117.2,
           "lat": 34.25,
-          "kind": "artillery",
+          "kind": "firefight",
           "i": 1.2
       }
   ];
@@ -197,7 +201,8 @@ window.BATTLE_DATA = (function () {
       "summary": "淮海戰役 — DSE 中史互動戰役地圖（教學示意）。",
       "caveats": [
           "本圖僅覆蓋該戰役核心區域；戰線與兵力為教學示意。",
-          "衛星影像為現代地形，非歷史時期地貌。"
+          "衛星影像為現代地形，非歷史時期地貌。",
+          "河川、海域水面為教學示意，按史實位置裁切顯示。"
       ],
       "sources": "DSE 中史課程、中國通史、維基百科（交叉查證）。"
   };
@@ -225,7 +230,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "华东、中原野战军发起淮海战役，以徐州为中心展开大规模会战。",
           "narration_en": "East China and Central Plains armies open the Huaihai Campaign centred on Xuzhou.",
           "focus": [
-              "pla_main"
+              "pla_huaihai"
           ],
           "side": "pla",
           "commanders": [
@@ -259,14 +264,12 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "黄百韬第七兵团被围于碾庄圩，徐蚌线切断。",
           "narration_en": "Huang Baitao's 7th army is trapped at Nianzhuang — the Xuzhou–Bengbu line is cut.",
           "focus": [
-              "pla_main",
-              "gmd_main"
+              "pla_huaihai",
+              "kmt_huaihai"
           ],
           "side": "both",
           "commanders": [],
-          "assets": [
-              "artillery"
-          ],
+          "assets": [],
           "forces_zh": "",
           "forces_en": ""
       },
@@ -287,7 +290,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "中原野战军围歼黄维第十二兵团于双堆集。",
           "narration_en": "Huang Wei's 12th army is annihilated at Shuangduiji.",
           "focus": [
-              "pla_main"
+              "pla_huaihai"
           ],
           "side": "pla",
           "commanders": [
@@ -296,9 +299,7 @@ window.BATTLE_DATA = (function () {
                   "en": "Deng Xiaoping"
               }
           ],
-          "assets": [
-              "artillery"
-          ],
+          "assets": [],
           "forces_zh": "",
           "forces_en": ""
       },
@@ -319,9 +320,9 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "杜聿明率邱清泉等部自徐州南撤，被围于陈官庄，全军覆没。",
           "narration_en": "Du Yuming's retreating force is encircled at Chenguanzhuang and destroyed.",
           "focus": [
-              "gmd_main"
+              "kmt_huaihai"
           ],
-          "side": "gmd",
+          "side": "kmt",
           "commanders": [
               {
                   "zh": "杜聿明",

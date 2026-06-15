@@ -5,22 +5,22 @@ window.BATTLE_DATA = (function () {
       "id": "israel-fall",
       "title_zh": "以色列亡國",
       "title_en": "FALL OF ISRAEL",
-      "subtitle": "722 BC",
+      "subtitle": "王下17",
       "factionOrder": [
           "covenant",
           "nations"
       ],
       "geo": {
-          "minLng": 33.69,
-          "maxLng": 36.69,
-          "minLat": 31.02,
-          "maxLat": 33.52,
-          "Z": 10
+          "minLng": 33.4,
+          "maxLng": 44.94,
+          "minLat": 31.26,
+          "maxLat": 37.37,
+          "Z": 8
       },
-      "startDate": "722 BC",
+      "startDate": "王下17",
       "introCam": {
-          "lng": 35.19,
-          "lat": 32.27,
+          "lng": 35.193,
+          "lat": 32.276,
           "dist": 700,
           "az": 200,
           "el": 46,
@@ -28,13 +28,13 @@ window.BATTLE_DATA = (function () {
       },
       "titleCard": {
           "zh": "以色列亡國",
-          "en": "FALL OF ISRAEL · 722 BC",
+          "en": "FALL OF ISRAEL · 王下17",
           "narr_zh": "亞述王攻陷撒瑪利亞，將以色列人擄去亞述。",
           "narr_en": "The king of Assyria captured Samaria and deported Israel."
       },
       "outroCam": {
-          "lng": 35.19,
-          "lat": 32.27,
+          "lng": 35.193,
+          "lat": 32.276,
           "dist": 840,
           "az": 200,
           "el": 48,
@@ -62,11 +62,20 @@ window.BATTLE_DATA = (function () {
       "regions": [],
       "points": [
           {
+              "name_zh": "尼尼微",
+              "name_en": "Nineveh",
+              "type": "city",
+              "lng": 43.152,
+              "lat": 36.357,
+              "ref": "拿 1:2"
+          },
+          {
               "name_zh": "撒瑪利亞",
               "name_en": "Samaria",
-              "type": "fort",
-              "lng": 35.19,
-              "lat": 32.27
+              "type": "city",
+              "lng": 35.193,
+              "lat": 32.276,
+              "ref": "王上 16:24"
           }
       ],
       "lines": []
@@ -83,15 +92,15 @@ window.BATTLE_DATA = (function () {
           "track": [
               {
                   "d": 1,
-                  "lng": 35.19,
-                  "lat": 32.27,
+                  "lng": 35.193,
+                  "lat": 32.276,
                   "s": 30000,
                   "st": "hold"
               },
               {
                   "d": 80,
-                  "lng": 35.19,
-                  "lat": 32.27,
+                  "lng": 35.193,
+                  "lat": 32.276,
                   "s": 5000,
                   "st": "dead"
               }
@@ -108,15 +117,22 @@ window.BATTLE_DATA = (function () {
           "track": [
               {
                   "d": 1,
-                  "lng": 35.5,
-                  "lat": 33,
+                  "lng": 43.152,
+                  "lat": 36.357,
                   "s": 80000,
                   "st": "attack"
               },
               {
+                  "d": 50,
+                  "lng": 35.193,
+                  "lat": 32.276,
+                  "s": 75000,
+                  "st": "attack"
+              },
+              {
                   "d": 100,
-                  "lng": 35.19,
-                  "lat": 32.27,
+                  "lng": 35.193,
+                  "lat": 32.276,
                   "s": 70000,
                   "st": "hold"
               }
@@ -129,8 +145,8 @@ window.BATTLE_DATA = (function () {
       {
           "a": 40,
           "b": 100,
-          "lng": 35.19,
-          "lat": 32.27,
+          "lng": 35.193,
+          "lat": 32.276,
           "kind": "firefight",
           "i": 1
       }
@@ -155,30 +171,29 @@ window.BATTLE_DATA = (function () {
       "sources": "和合本、聖經地圖、教會史資料（交叉查證）。"
   };
   const analysis =   {
-      "military": "北國以色列經十九王朝更迭，終於亞述王撒珥根二世圍攻撒瑪利亞三年，城陷後百姓被擄散至亞述各城。",
-      "leaders": "何細亞為末代以色列王；亞述諸王為征服者；先知何西亞、阿摩司曾預告審判。",
-      "nationalPower": "亡國是長期偶像與背約的後果；「我必追趕他們，卻追不上」顯明神的離棄。",
-      "impact": "北國十支派被擄後融入外邦；猶大仍保存大衛譜系與敬拜中心。"
+      "military": "亞述王撒爾根二世圍攻撒瑪利亞三年（王下17:5-6），城陷於公元前722年；百姓被擄至亞述。",
+      "leaders": "何細亞、亞述諸王；何西亞、阿摩司曾預告。",
+      "nationalPower": "長期偶像與背約的後果。",
+      "impact": "北國滅亡，猶大仍存。"
   };
   const storyboard =   [
       {
           "day": 1,
           "hold": 8,
           "cam": {
-              "lng": 35.19,
-              "lat": 32.27,
-              "dist": 620,
+              "lng": 43.152,
+              "lat": 36.357,
+              "dist": 700,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
-          "dateLabel": "約前722年前",
-          "title_zh": "北國末期",
-          "title_en": "Final Years of Israel",
-          "narration_zh": "北國罪惡滿盈，何細亞背叛亞述，引來大軍圍攻。",
-          "narration_en": "Israel's sin was full; Hoshea's revolt brought Assyrian invasion.",
+          "dateLabel": "約前724年",
+          "title_zh": "亞述出兵",
+          "title_en": "Nineveh",
+          "narration_zh": "王下17:3 何細亞背叛亞述王，亞述大軍自尼尼微南下。",
+          "narration_en": "2 Kgs 17:3 — Assyria marched from Nineveh against Israel.",
           "focus": [
-              "samaria",
               "assyria"
           ],
           "side": "both",
@@ -188,22 +203,23 @@ window.BATTLE_DATA = (function () {
           "forces_en": ""
       },
       {
-          "day": 25,
+          "day": 30,
           "hold": 8,
           "cam": {
-              "lng": 35.19,
-              "lat": 32.27,
-              "dist": 580,
+              "lng": 35.193,
+              "lat": 32.276,
+              "dist": 620,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
           "dateLabel": "約前724年",
           "title_zh": "圍攻撒瑪利亞",
-          "title_en": "Siege of Samaria",
-          "narration_zh": "亞述王圍困撒瑪利亞三年，城內饑荒極甚。",
-          "narration_en": "Assyria besieged Samaria for three years — famine ravaged the city.",
+          "title_en": "Siege",
+          "narration_zh": "王下17:5 亞述王上來圍困撒瑪利亞，三年之久。",
+          "narration_en": "2 Kgs 17:5 — Samaria was besieged for three years.",
           "focus": [
+              "samaria",
               "assyria"
           ],
           "side": "both",
@@ -215,21 +231,21 @@ window.BATTLE_DATA = (function () {
           "forces_en": ""
       },
       {
-          "day": 50,
+          "day": 60,
           "hold": 8,
           "cam": {
-              "lng": 35.19,
-              "lat": 32.27,
-              "dist": 560,
+              "lng": 35.193,
+              "lat": 32.276,
+              "dist": 580,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
           "dateLabel": "公元前722年",
           "title_zh": "城陷",
-          "title_en": "City Falls",
-          "narration_zh": "撒瑪利亞城被攻取，以色列王何細亞被囚。",
-          "narration_en": "Samaria fell; King Hoshea was imprisoned.",
+          "title_en": "Fall",
+          "narration_zh": "王下17:6 撒瑪利亞被攻取，以色列王何細亞被囚。",
+          "narration_en": "2 Kgs 17:6 — Samaria fell; King Hoshea was imprisoned.",
           "focus": [
               "samaria"
           ],
@@ -242,21 +258,21 @@ window.BATTLE_DATA = (function () {
           "forces_en": ""
       },
       {
-          "day": 72,
+          "day": 85,
           "hold": 8,
           "cam": {
-              "lng": 35.5,
-              "lat": 33.5,
-              "dist": 700,
+              "lng": 43.152,
+              "lat": 36.357,
+              "dist": 720,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
           "dateLabel": "公元前722年",
-          "title_zh": "被擄分散",
+          "title_zh": "擄至亞述",
           "title_en": "Deportation",
-          "narration_zh": "亞述王將以色列人擄到亞述各地，又從外邦遷人入撒瑪利亞。",
-          "narration_en": "Israelites were deported across Assyria; foreigners settled Samaria.",
+          "narration_zh": "王下17:6 以色列人被擄到亞述的哈臘、歌散等地。",
+          "narration_en": "2 Kgs 17:6 — Israel was deported to Assyria.",
           "focus": [
               "assyria"
           ],
@@ -267,21 +283,21 @@ window.BATTLE_DATA = (function () {
           "forces_en": ""
       },
       {
-          "day": 92,
+          "day": 100,
           "hold": 8,
           "cam": {
-              "lng": 35.19,
-              "lat": 32.27,
-              "dist": 680,
+              "lng": 35.193,
+              "lat": 32.276,
+              "dist": 650,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
           "dateLabel": "公元前722年",
           "title_zh": "北國終結",
-          "title_en": "End of Northern Kingdom",
-          "narration_zh": "以色列國滅亡，只剩南國猶大；先知預言的審判應驗。",
-          "narration_en": "The northern kingdom ended — only Judah remained; prophetic judgment was fulfilled.",
+          "title_en": "End of Israel",
+          "narration_zh": "王下17:18 耶和華向以色列人發怒，把他們從自己面前趕出。",
+          "narration_en": "2 Kgs 17:18 — The LORD removed Israel from His presence.",
           "focus": [
               "samaria"
           ],
@@ -298,8 +314,8 @@ window.BATTLE_DATA = (function () {
       "narration_zh": "本段為聖經與教會史重要考點。",
       "narration_en": "A key Bible and church history topic.",
       "cam": {
-          "lng": 35.19,
-          "lat": 32.27,
+          "lng": 35.193,
+          "lat": 32.276,
           "dist": 840,
           "az": 200,
           "el": 48,

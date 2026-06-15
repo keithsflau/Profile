@@ -44,6 +44,7 @@ window.BATTLE_DATA = (function () {
           "el": 48,
           "orbit": 0.65
       },
+      "terrainMode": "river",
       "nextBattle": {
           "href": "../../sui-tang/anshi/",
           "title_zh": "安史之亂",
@@ -87,7 +88,35 @@ window.BATTLE_DATA = (function () {
               "lat": 32.06
           }
       ],
-      "lines": []
+      "lines": [],
+      "water": [
+          {
+              "kind": "corridor",
+              "halfWidth": 0.11,
+              "path": [
+                  [
+                      116.75,
+                      32.02
+                  ],
+                  [
+                      117.05,
+                      31.92
+                  ],
+                  [
+                      117.28,
+                      31.86
+                  ],
+                  [
+                      117.55,
+                      31.8
+                  ],
+                  [
+                      117.85,
+                      31.74
+                  ]
+              ]
+          }
+      ]
   };
   const units =   [
       {
@@ -197,7 +226,8 @@ window.BATTLE_DATA = (function () {
       "summary": "淝水之戰 — DSE 中史互動戰役地圖（教學示意）。",
       "caveats": [
           "本圖僅覆蓋該戰役核心區域；戰線與兵力為教學示意。",
-          "衛星影像為現代地形，非歷史時期地貌。"
+          "衛星影像為現代地形，非歷史時期地貌。",
+          "河川、海域水面為教學示意，按史實位置裁切顯示。"
       ],
       "sources": "DSE 中史課程、中國通史、維基百科（交叉查證）。"
   };
@@ -225,9 +255,9 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "前秦苻堅自長安率百萬大軍南下，號稱投鞭斷流。",
           "narration_en": "Former Qin ruler Fu Jian advances south with a vast army from Chang'an.",
           "focus": [
-              "qin_main"
+              "qin_feishui"
           ],
-          "side": "qin",
+          "side": "former_qin",
           "commanders": [
               {
                   "zh": "苻堅",
@@ -255,8 +285,8 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "晉軍北府兵在淝水列陣，與前秦隔河對峙。",
           "narration_en": "Eastern Jin Beifu troops face Former Qin across the Fei River.",
           "focus": [
-              "jin_main",
-              "qin_main"
+              "jin_feishui",
+              "qin_feishui"
           ],
           "side": "both",
           "commanders": [
@@ -265,9 +295,7 @@ window.BATTLE_DATA = (function () {
                   "en": "Xie Xuan"
               }
           ],
-          "assets": [
-              "artillery"
-          ],
+          "assets": [],
           "forces_zh": "",
           "forces_en": ""
       },
@@ -288,9 +316,9 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "前秦後退時陣腳大亂，風吹草動皆被視為晉軍追兵，全軍潰散。",
           "narration_en": "Former Qin retreat turns to rout — every rustle seems an ambush.",
           "focus": [
-              "qin_main"
+              "qin_feishui"
           ],
-          "side": "qin",
+          "side": "former_qin",
           "commanders": [],
           "assets": [],
           "forces_zh": "",
@@ -313,9 +341,9 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "謝玄、謝石率北府兵追擊，前秦名將張淵陣亡，北方統一夢碎。",
           "narration_en": "Xie Xuan's Beifu army pursues — Former Qin's dream of unification shatters.",
           "focus": [
-              "jin_main"
+              "jin_feishui"
           ],
-          "side": "jin",
+          "side": "eastern_jin",
           "commanders": [
               {
                   "zh": "謝石",
@@ -343,7 +371,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "前秦迅速瓦解，東晉國祚延續，南北對峙局面再定。",
           "narration_en": "Former Qin collapses; the Jin survives — north and south remain divided.",
           "focus": [],
-          "side": "jin",
+          "side": "eastern_jin",
           "commanders": [],
           "assets": [],
           "forces_zh": "",

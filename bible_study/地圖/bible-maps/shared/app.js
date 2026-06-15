@@ -356,7 +356,8 @@ const labelGroup=new THREE.Group(); scene.add(labelGroup);
 const placeLabels=[];
 function addPlaceLabel(p, cls, off){
   const d=document.createElement("div"); d.className="lbl "+cls;
-  d.innerHTML=`<div class="zh">${p.name_zh}</div><div class="en">${p.name_en}</div>`;
+  const refLine = p.ref ? `<div class="ref">${p.ref}</div>` : "";
+  d.innerHTML=`<div class="zh">${p.name_zh}</div><div class="en">${p.name_en}</div>${refLine}`;
   const o=new THREE.CSS2DObject(d); o.position.copy(vec(p.lng,p.lat,off));
   labelGroup.add(o); placeLabels.push({o,div:d,cls});
 }

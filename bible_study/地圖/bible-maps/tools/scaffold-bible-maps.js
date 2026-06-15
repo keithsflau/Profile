@@ -78,6 +78,8 @@ function baseMap(id, title_zh, title_en, subtitle, geo, facA, facB, centerArr, e
   const [clng, clat] = centerArr;
   const factions = extra.factions || { covenant: facA, nations: facB };
   const factionOrder = extra.factionOrder || Object.keys(factions);
+  const { center: _c, ...geoClean } = geo && geo.center ? geo : { ...geo };
+  const geoMeta = geo && geo.center ? geoClean : geo;
   return {
     END_DAY: 100,
     meta: {
@@ -86,7 +88,7 @@ function baseMap(id, title_zh, title_en, subtitle, geo, facA, facB, centerArr, e
       title_en,
       subtitle,
       factionOrder,
-      geo,
+      geo: geoMeta,
       startDate: extra.period || subtitle,
       introCam: cam(clng, clat, extra.dist || 700, extra.el || 46),
       titleCard: {

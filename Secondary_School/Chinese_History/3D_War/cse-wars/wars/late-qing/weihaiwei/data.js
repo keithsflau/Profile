@@ -44,6 +44,8 @@ window.BATTLE_DATA = (function () {
           "el": 48,
           "orbit": 0.65
       },
+      "terrainMode": "bay",
+      "floodRelief": 0.42,
       "nextBattle": {
           "href": "../../anti-japan/songhu/",
           "title_zh": "淞滬會戰",
@@ -87,7 +89,40 @@ window.BATTLE_DATA = (function () {
               "lat": 37.39
           }
       ],
-      "lines": []
+      "lines": [],
+      "water": [
+          {
+              "kind": "polygon",
+              "ring": [
+                  [
+                      121.88,
+                      37.64
+                  ],
+                  [
+                      122.45,
+                      37.74
+                  ],
+                  [
+                      122.4,
+                      37.36
+                  ],
+                  [
+                      122.05,
+                      37.3
+                  ],
+                  [
+                      121.85,
+                      37.46
+                  ]
+              ]
+          },
+          {
+              "kind": "disc",
+              "lng": 122.18,
+              "lat": 37.5,
+              "radius": 0.07
+          }
+      ]
   };
   const units =   [
       {
@@ -190,7 +225,8 @@ window.BATTLE_DATA = (function () {
       "summary": "威海衛淪陷 — DSE 中史互動戰役地圖（教學示意）。",
       "caveats": [
           "本圖僅覆蓋該戰役核心區域；戰線與兵力為教學示意。",
-          "衛星影像為現代地形，非歷史時期地貌。"
+          "衛星影像為現代地形，非歷史時期地貌。",
+          "河川、海域水面為教學示意，按史實位置裁切顯示。"
       ],
       "sources": "DSE 中史課程、中國通史、維基百科（交叉查證）。"
   };
@@ -218,7 +254,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "日軍占領威海灣南北炮台，海陸合圍北洋水師泊地劉公島。",
           "narration_en": "Japan seizes forts on both sides of Weihai Bay — the Beiyang Fleet is trapped.",
           "focus": [
-              "japan_main"
+              "japan_wh"
           ],
           "side": "japan",
           "commanders": [
@@ -228,8 +264,7 @@ window.BATTLE_DATA = (function () {
               }
           ],
           "assets": [
-              "navy",
-              "artillery"
+              "navy"
           ],
           "forces_zh": "",
           "forces_en": ""
@@ -251,7 +286,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "日軍魚雷艇夜襲北洋泊地，來遠、威遠等艦被擊沉或重創。",
           "narration_en": "Japanese torpedo boats strike at night — several Beiyang ships are sunk.",
           "focus": [
-              "beiyang_main"
+              "beiyang_wh"
           ],
           "side": "beiyang",
           "commanders": [],
@@ -278,7 +313,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "北洋困守劉公島，陸路斷絕，士兵譁變，丁汝昌拒絕投降。",
           "narration_en": "Trapped on Liugong Island with mutiny ashore — Ding Ruchang refuses surrender.",
           "focus": [
-              "beiyang_main"
+              "beiyang_wh"
           ],
           "side": "beiyang",
           "commanders": [
@@ -308,7 +343,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "丁汝昌服毒自盡，北洋水師向日軍投降，全軍覆沒。",
           "narration_en": "Ding Ruchang takes poison — the Beiyang Fleet surrenders, ending as a force.",
           "focus": [
-              "beiyang_main"
+              "beiyang_wh"
           ],
           "side": "beiyang",
           "commanders": [

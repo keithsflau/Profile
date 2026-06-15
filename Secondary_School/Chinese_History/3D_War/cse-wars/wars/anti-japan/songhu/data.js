@@ -11,10 +11,10 @@ window.BATTLE_DATA = (function () {
           "japan"
       ],
       "geo": {
-          "minLng": 120.47,
-          "maxLng": 122.47,
-          "minLat": 30.43,
-          "maxLat": 32.03,
+          "minLng": 120.9,
+          "maxLng": 122.1,
+          "minLat": 30.75,
+          "maxLat": 31.65,
           "Z": 11
       },
       "startDate": [
@@ -44,6 +44,9 @@ window.BATTLE_DATA = (function () {
           "el": 48,
           "orbit": 0.65
       },
+      "terrainMode": "bay",
+      "floodRelief": 0.22,
+      "reliefScale": 0.82,
       "nextBattle": {
           "href": "../pingxingguan/",
           "title_zh": "平型關大捷",
@@ -87,7 +90,52 @@ window.BATTLE_DATA = (function () {
               "lat": 31.24
           }
       ],
-      "lines": []
+      "lines": [],
+      "water": [
+          {
+              "kind": "corridor",
+              "halfWidth": 0.08,
+              "path": [
+                  [
+                      121.35,
+                      31.45
+                  ],
+                  [
+                      121.45,
+                      31.32
+                  ],
+                  [
+                      121.52,
+                      31.22
+                  ],
+                  [
+                      121.58,
+                      31.12
+                  ]
+              ]
+          },
+          {
+              "kind": "polygon",
+              "ring": [
+                  [
+                      121.65,
+                      31.42
+                  ],
+                  [
+                      121.95,
+                      31.38
+                  ],
+                  [
+                      121.92,
+                      31.05
+                  ],
+                  [
+                      121.62,
+                      31.08
+                  ]
+              ]
+          }
+      ]
   };
   const units =   [
       {
@@ -197,7 +245,8 @@ window.BATTLE_DATA = (function () {
       "summary": "淞滬會戰 — DSE 中史互動戰役地圖（教學示意）。",
       "caveats": [
           "本圖僅覆蓋該戰役核心區域；戰線與兵力為教學示意。",
-          "衛星影像為現代地形，非歷史時期地貌。"
+          "衛星影像為現代地形，非歷史時期地貌。",
+          "河川、海域水面為教學示意，按史實位置裁切顯示。"
       ],
       "sources": "DSE 中史課程、中國通史、維基百科（交叉查證）。"
   };
@@ -225,9 +274,9 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "日军进攻上海，国军第八十七、八十八师在闸北反击，淞沪会战爆发。",
           "narration_en": "Japan attacks Shanghai — Nationalist divisions counter-attack in Zhabei.",
           "focus": [
-              "gmd_main"
+              "kmt_songhu"
           ],
-          "side": "gmd",
+          "side": "kmt",
           "commanders": [
               {
                   "zh": "张治中",
@@ -259,13 +308,12 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "双方逐屋争夺，国军反复冲锋，伤亡极大。",
           "narration_en": "House-to-house fighting — both sides suffer enormous casualties.",
           "focus": [
-              "gmd_main",
-              "japan_main"
+              "kmt_songhu",
+              "japan_songhu"
           ],
           "side": "both",
           "commanders": [],
           "assets": [
-              "artillery",
               "air"
           ],
           "forces_zh": "",
@@ -288,18 +336,16 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "谢晋元率八百壮士坚守四行仓库，振奋全国士气。",
           "narration_en": "Xie Jinyuan's '800 Heroes' hold Sihang Warehouse — a morale boost nationwide.",
           "focus": [
-              "gmd_main"
+              "kmt_songhu"
           ],
-          "side": "gmd",
+          "side": "kmt",
           "commanders": [
               {
                   "zh": "谢晋元",
                   "en": "Xie Jinyuan"
               }
           ],
-          "assets": [
-              "artillery"
-          ],
+          "assets": [],
           "forces_zh": "",
           "forces_en": ""
       },
@@ -320,7 +366,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "日军自杭州湾登陆，国军侧翼受威胁，被迫后撤。",
           "narration_en": "Japanese land at Hangzhou Bay — the Nationalist flank is turned.",
           "focus": [
-              "japan_main"
+              "japan_songhu"
           ],
           "side": "japan",
           "commanders": [],

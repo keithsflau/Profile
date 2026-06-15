@@ -5,22 +5,22 @@ window.BATTLE_DATA = (function () {
       "id": "judah-fall",
       "title_zh": "猶大亡國",
       "title_en": "FALL OF JUDAH",
-      "subtitle": "586 BC",
+      "subtitle": "王下25",
       "factionOrder": [
           "covenant",
           "nations"
       ],
       "geo": {
-          "minLng": 33.73,
-          "maxLng": 36.73,
-          "minLat": 30.53,
-          "maxLat": 33.03,
-          "Z": 11
+          "minLng": 32.77,
+          "maxLng": 46.5,
+          "minLat": 30.05,
+          "maxLat": 34.05,
+          "Z": 10
       },
-      "startDate": "586 BC",
+      "startDate": "王下25",
       "introCam": {
-          "lng": 35.23,
-          "lat": 31.78,
+          "lng": 35.235,
+          "lat": 31.778,
           "dist": 700,
           "az": 200,
           "el": 46,
@@ -28,13 +28,13 @@ window.BATTLE_DATA = (function () {
       },
       "titleCard": {
           "zh": "猶大亡國",
-          "en": "FALL OF JUDAH · 586 BC",
+          "en": "FALL OF JUDAH · 王下25",
           "narr_zh": "巴比倫王尼布甲尼撒攻破耶路撒冷，焚燒聖殿。",
           "narr_en": "Nebuchadnezzar destroyed Jerusalem and burned the temple."
       },
       "outroCam": {
-          "lng": 35.23,
-          "lat": 31.78,
+          "lng": 35.235,
+          "lat": 31.778,
           "dist": 840,
           "az": 200,
           "el": 48,
@@ -62,11 +62,28 @@ window.BATTLE_DATA = (function () {
       "regions": [],
       "points": [
           {
+              "name_zh": "拉吉",
+              "name_en": "Lachish",
+              "type": "fort",
+              "lng": 34.848,
+              "lat": 31.565,
+              "ref": "耶 34:7"
+          },
+          {
               "name_zh": "耶路撒冷",
               "name_en": "Jerusalem",
-              "type": "fort",
-              "lng": 35.23,
-              "lat": 31.78
+              "type": "city",
+              "lng": 35.235,
+              "lat": 31.778,
+              "ref": "撒下 5:7"
+          },
+          {
+              "name_zh": "巴比倫",
+              "name_en": "Babylon",
+              "type": "city",
+              "lng": 44.42,
+              "lat": 32.536,
+              "ref": "耶 25:9"
           }
       ],
       "lines": []
@@ -83,22 +100,22 @@ window.BATTLE_DATA = (function () {
           "track": [
               {
                   "d": 1,
-                  "lng": 35.23,
-                  "lat": 31.78,
+                  "lng": 35.235,
+                  "lat": 31.778,
                   "s": 25000,
                   "st": "hold"
               },
               {
                   "d": 90,
-                  "lng": 35.23,
-                  "lat": 31.78,
+                  "lng": 35.235,
+                  "lat": 31.778,
                   "s": 0,
                   "st": "dead"
               }
           ]
       },
       {
-          "id": "babylon",
+          "id": "babylon_army",
           "faction": "nations",
           "kind": "infantry",
           "crest": "circle",
@@ -108,15 +125,22 @@ window.BATTLE_DATA = (function () {
           "track": [
               {
                   "d": 1,
-                  "lng": 35.5,
-                  "lat": 32,
+                  "lng": 44.42,
+                  "lat": 32.536,
                   "s": 100000,
                   "st": "attack"
               },
               {
+                  "d": 40,
+                  "lng": 34.848,
+                  "lat": 31.565,
+                  "s": 90000,
+                  "st": "attack"
+              },
+              {
                   "d": 100,
-                  "lng": 35.23,
-                  "lat": 31.78,
+                  "lng": 35.235,
+                  "lat": 31.778,
                   "s": 80000,
                   "st": "hold"
               }
@@ -129,8 +153,8 @@ window.BATTLE_DATA = (function () {
       {
           "a": 50,
           "b": 100,
-          "lng": 35.23,
-          "lat": 31.78,
+          "lng": 35.235,
+          "lat": 31.778,
           "kind": "artillery",
           "i": 0.9
       }
@@ -155,31 +179,30 @@ window.BATTLE_DATA = (function () {
       "sources": "和合本、聖經地圖、教會史資料（交叉查證）。"
   };
   const analysis =   {
-      "military": "猶大屢次背叛，尼布甲尼撒多次攻耶路撒冷；最終城陷、聖殿被焚、百姓被擄巴比倫，開始七十年被擄期。",
-      "leaders": "約雅敬、西底家為末代猶大王；尼布甲尼撒、巴比倫軍；耶利米、以西結預言審判與盼望。",
-      "nationalPower": "聖殿被毀顯明神離開因罪玷污的敬拜；新約指向基督作真正的殿；被擄促使悔改與新約應許。",
-      "impact": "被擄結束以斯拉、尼希米歸回重建；為彌賽亞降生時的猶太地景奠定基礎。"
+      "military": "尼布甲尼撒自巴比倫南下，先攻拉吉（耶34:7），公元前586年攻陷耶路撒冷，焚燒聖殿（王下25:8-9）。",
+      "leaders": "西底家、尼布甲尼撒、耶利米。",
+      "nationalPower": "聖殿被毀，被擄七十年；新約應許新約與真殿基督。",
+      "impact": "以斯拉、尼希米歸回重建。"
   };
   const storyboard =   [
       {
           "day": 1,
           "hold": 8,
           "cam": {
-              "lng": 35.23,
-              "lat": 31.78,
-              "dist": 620,
+              "lng": 44.42,
+              "lat": 32.536,
+              "dist": 720,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
           "dateLabel": "約前597年",
-          "title_zh": "首次被擄",
-          "title_en": "First Deportation",
-          "narration_zh": "尼布甲尼撒攻耶路撒冷，擄去約雅敬與貴胄。",
-          "narration_en": "Nebuchadnezzar took Jehoiachin and nobles to Babylon.",
+          "title_zh": "巴比倫興兵",
+          "title_en": "Babylon",
+          "narration_zh": "王下24:10 巴比倫王尼布甲尼撒上來攻耶路撒冷。",
+          "narration_en": "2 Kgs 24:10 — Nebuchadnezzar came against Jerusalem.",
           "focus": [
-              "jerusalem",
-              "babylon"
+              "babylon_army"
           ],
           "side": "both",
           "commanders": [],
@@ -191,48 +214,70 @@ window.BATTLE_DATA = (function () {
           "day": 25,
           "hold": 8,
           "cam": {
-              "lng": 35.23,
-              "lat": 31.78,
-              "dist": 580,
+              "lng": 35.235,
+              "lat": 31.778,
+              "dist": 620,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
-          "dateLabel": "約前586年前",
-          "title_zh": "西底家叛變",
-          "title_en": "Zedekiah's Revolt",
-          "narration_zh": "西底家背約投靠埃及，巴比倫大軍再圍耶路撒冷。",
-          "narration_en": "Zedekiah rebelled; Babylon's army returned to besiege Jerusalem.",
+          "dateLabel": "約前597年",
+          "title_zh": "首次被擄",
+          "title_en": "First Deportation",
+          "narration_zh": "王下24:12 約雅敬王與臣僕向巴比倫王投降，被擄。",
+          "narration_en": "2 Kgs 24:12 — Jehoiachin surrendered and was taken to Babylon.",
           "focus": [
-              "babylon"
+              "jerusalem"
           ],
           "side": "both",
-          "commanders": [
-              {
-                  "zh": "西底家",
-                  "en": "Zedekiah"
-              }
-          ],
+          "commanders": [],
           "assets": [],
           "forces_zh": "",
           "forces_en": ""
       },
       {
-          "day": 50,
+          "day": 45,
           "hold": 8,
           "cam": {
-              "lng": 35.23,
-              "lat": 31.78,
+              "lng": 34.848,
+              "lat": 31.565,
+              "dist": 580,
+              "az": 200,
+              "el": 46,
+              "orbit": 0.65
+          },
+          "dateLabel": "約前588年",
+          "title_zh": "拉吉",
+          "title_en": "Lachish",
+          "narration_zh": "耶34:7 巴比倫軍隊攻擊猶大一切城邑，拉吉、亞西加已經攻取。",
+          "narration_en": "Jer 34:7 — Lachish and Azekah fell to Babylon.",
+          "focus": [
+              "babylon_army"
+          ],
+          "side": "both",
+          "commanders": [],
+          "assets": [
+              "artillery"
+          ],
+          "forces_zh": "",
+          "forces_en": ""
+      },
+      {
+          "day": 65,
+          "hold": 8,
+          "cam": {
+              "lng": 35.235,
+              "lat": 31.778,
               "dist": 560,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
           "dateLabel": "公元前586年",
-          "title_zh": "城牆被破",
-          "title_en": "Walls Breached",
-          "narration_zh": "城圍一年半，饑荒極甚，城被攻陷；西底家眾子被殺，他被剜眼。",
-          "narration_en": "After eighteen months the city fell; Zedekiah's sons were killed, his eyes put out.",
+          "title_zh": "城陷",
+          "title_en": "Jerusalem Falls",
+          "narration_zh": "王下25:4 城被攻破；西底家眾子被殺，他被剜眼。",
+          "narration_en": "2 Kgs 25:4 — The city was broken up; Zedekiah was captured.",
           "focus": [
               "jerusalem"
           ],
@@ -245,7 +290,7 @@ window.BATTLE_DATA = (function () {
           "forces_en": ""
       },
       {
-          "day": 72,
+          "day": 82,
           "hold": 8,
           "cam": {
               "lng": 35.235,
@@ -257,9 +302,9 @@ window.BATTLE_DATA = (function () {
           },
           "dateLabel": "公元前586年",
           "title_zh": "聖殿被焚",
-          "title_en": "Temple Destroyed",
-          "narration_zh": "尼布甲尼撒焚燒耶和華殿與城內大戶房屋，拆毀城牆。",
-          "narration_en": "Nebuchadnezzar burned the LORD's temple and tore down the walls.",
+          "title_en": "Temple Burned",
+          "narration_zh": "王下25:9 巴比倫王焚燒耶和華的殿與王宮，拆毀耶路撒冷城牆。",
+          "narration_en": "2 Kgs 25:9 — They burned the house of the LORD.",
           "focus": [
               "jerusalem"
           ],
@@ -272,23 +317,23 @@ window.BATTLE_DATA = (function () {
           "forces_en": ""
       },
       {
-          "day": 92,
+          "day": 100,
           "hold": 8,
           "cam": {
               "lng": 44.42,
-              "lat": 32.54,
-              "dist": 720,
+              "lat": 32.536,
+              "dist": 700,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
           "dateLabel": "公元前586年",
           "title_zh": "被擄巴比倫",
-          "title_en": "Exile to Babylon",
-          "narration_zh": "百姓被擄至巴比倫，「我們曾在錫安琴旁懸掛琴瑟」；七十年為期。",
-          "narration_en": "The people were exiled to Babylon — seventy years as Jeremiah had foretold.",
+          "title_en": "Exile",
+          "narration_zh": "王下25:11 巴比倫王將百姓擄到巴比倫；耶25:11 七十年為期。",
+          "narration_en": "2 Kgs 25:11 — The people were carried to Babylon for seventy years.",
           "focus": [
-              "babylon"
+              "babylon_army"
           ],
           "side": "both",
           "commanders": [],
@@ -303,8 +348,8 @@ window.BATTLE_DATA = (function () {
       "narration_zh": "本段為聖經與教會史重要考點。",
       "narration_en": "A key Bible and church history topic.",
       "cam": {
-          "lng": 35.23,
-          "lat": 31.78,
+          "lng": 35.235,
+          "lat": 31.778,
           "dist": 840,
           "az": 200,
           "el": 48,

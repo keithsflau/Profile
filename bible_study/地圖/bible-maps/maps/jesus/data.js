@@ -11,16 +11,16 @@ window.BATTLE_DATA = (function () {
           "nations"
       ],
       "geo": {
-          "minLng": 33.2,
-          "maxLng": 37.2,
-          "minLat": 30.5,
-          "maxLat": 33.5,
+          "minLng": 33.78,
+          "maxLng": 36.78,
+          "minLat": 31.04,
+          "maxLat": 33.54,
           "Z": 10
       },
       "startDate": "四福音",
       "introCam": {
-          "lng": 35.23,
-          "lat": 31.78,
+          "lng": 35.235,
+          "lat": 31.778,
           "dist": 700,
           "az": 200,
           "el": 46,
@@ -33,8 +33,8 @@ window.BATTLE_DATA = (function () {
           "narr_en": "The Word became flesh and dwelt among us."
       },
       "outroCam": {
-          "lng": 35.23,
-          "lat": 31.78,
+          "lng": 35.235,
+          "lat": 31.778,
           "dist": 840,
           "az": 200,
           "el": 48,
@@ -65,29 +65,81 @@ window.BATTLE_DATA = (function () {
               "name_zh": "伯利恆",
               "name_en": "Bethlehem",
               "type": "town",
-              "lng": 35.2,
-              "lat": 31.7
+              "lng": 35.202,
+              "lat": 31.705,
+              "ref": "撒上 16:1"
           },
           {
               "name_zh": "拿撒勒",
               "name_en": "Nazareth",
               "type": "town",
-              "lng": 35.3,
-              "lat": 32.7
+              "lng": 35.297,
+              "lat": 32.702,
+              "ref": "路 2:39"
+          },
+          {
+              "name_zh": "迦拿",
+              "name_en": "Cana",
+              "type": "town",
+              "lng": 35.348,
+              "lat": 32.746,
+              "ref": "約 2:1"
           },
           {
               "name_zh": "迦百農",
               "name_en": "Capernaum",
               "type": "town",
-              "lng": 35.58,
-              "lat": 32.88
+              "lng": 35.575,
+              "lat": 32.881,
+              "ref": "太 4:13"
+          },
+          {
+              "name_zh": "加利利海",
+              "name_en": "Sea of Galilee",
+              "type": "bay",
+              "lng": 35.5,
+              "lat": 32.833,
+              "ref": "太 4:18"
+          },
+          {
+              "name_zh": "耶利哥",
+              "name_en": "Jericho",
+              "type": "fort",
+              "lng": 35.444,
+              "lat": 31.872,
+              "ref": "書 6:1"
+          },
+          {
+              "name_zh": "伯大尼",
+              "name_en": "Bethany",
+              "type": "town",
+              "lng": 35.263,
+              "lat": 31.771,
+              "ref": "約 11:1"
+          },
+          {
+              "name_zh": "客西馬尼",
+              "name_en": "Gethsemane",
+              "type": "peak",
+              "lng": 35.24,
+              "lat": 31.78,
+              "ref": "太 26:36"
           },
           {
               "name_zh": "耶路撒冷",
               "name_en": "Jerusalem",
               "type": "city",
-              "lng": 35.23,
-              "lat": 31.78
+              "lng": 35.235,
+              "lat": 31.778,
+              "ref": "撒下 5:7"
+          },
+          {
+              "name_zh": "以馬忤斯",
+              "name_en": "Emmaus",
+              "type": "town",
+              "lng": 34.99,
+              "lat": 31.838,
+              "ref": "路 24:13"
           }
       ],
       "lines": []
@@ -99,34 +151,84 @@ window.BATTLE_DATA = (function () {
           "kind": "command",
           "crest": "shield",
           "cf": true,
-          "name_zh": "耶穌與門徒",
-          "name_en": "Jesus & disciples",
+          "name_zh": "耶穌",
+          "name_en": "Jesus",
           "track": [
               {
                   "d": 1,
-                  "lng": 35.2,
-                  "lat": 31.7,
+                  "lng": 35.202,
+                  "lat": 31.705,
                   "s": 0,
                   "st": "hold"
               },
               {
-                  "d": 30,
-                  "lng": 35.58,
-                  "lat": 32.88,
+                  "d": 18,
+                  "lng": 35.297,
+                  "lat": 32.702,
                   "s": 0,
                   "st": "hold"
               },
               {
-                  "d": 80,
-                  "lng": 35.23,
+                  "d": 35,
+                  "lng": 35.348,
+                  "lat": 32.746,
+                  "s": 0,
+                  "st": "hold"
+              },
+              {
+                  "d": 50,
+                  "lng": 35.575,
+                  "lat": 32.881,
+                  "s": 0,
+                  "st": "hold"
+              },
+              {
+                  "d": 65,
+                  "lng": 35.5,
+                  "lat": 32.833,
+                  "s": 0,
+                  "st": "hold"
+              },
+              {
+                  "d": 78,
+                  "lng": 35.444,
+                  "lat": 31.872,
+                  "s": 0,
+                  "st": "hold"
+              },
+              {
+                  "d": 88,
+                  "lng": 35.24,
                   "lat": 31.78,
+                  "s": 0,
+                  "st": "hold"
+              },
+              {
+                  "d": 100,
+                  "lng": 34.99,
+                  "lat": 31.838,
                   "s": 0,
                   "st": "hold"
               }
           ]
       }
   ];
-  const arrows =   [];
+  const arrows =   [
+      {
+          "d": 82,
+          "f": "covenant",
+          "from": [
+              35.263,
+              31.771
+          ],
+          "to": [
+              35.235,
+              31.778
+          ],
+          "label": "進耶路撒冷 太21:9",
+          "kind": "attack"
+      }
+  ];
   const fronts =   [];
   const hotspots =   [];
   const weather =   [
@@ -149,18 +251,18 @@ window.BATTLE_DATA = (function () {
       "sources": "和合本、聖經地圖、教會史資料（交叉查證）。"
   };
   const analysis =   {
-      "military": "耶穌在伯利恆降生，在拿撒勒成長；在加利利開始公開事工，呼召門徒；在耶路撒冷受難、埋葬、第三日復活。",
-      "leaders": "耶穌、馬利亞、約瑟、施洗約翰、十二門徒、彼拉多、猶太領袖。",
-      "nationalPower": "道成肉身；耶穌宣告天國近了；十字架成就救贖；復活戰勝死亡，顯明祂是神的兒子。",
-      "impact": "基督生平是救恩歷史的中心；教會建立在復活見證之上；大使命差遣門徒往普天下去。"
+      "military": "耶穌生於伯利恆（路2），在拿撒勒成長（路2:39），在迦拿行首個神蹟（約2），以迦百農為事工中心（太4:13），在加利利海呼召門徒，最後一周經伯大尼、客西馬尼至耶路撒冷受難復活（路24 以馬忤斯）。",
+      "leaders": "耶穌、門徒、馬利亞、彼拉多。",
+      "nationalPower": "道成肉身；十字架成就救贖；復活戰勝死亡。",
+      "impact": "救恩歷史中心；大使命差遣門徒。"
   };
   const storyboard =   [
       {
           "day": 1,
           "hold": 8,
           "cam": {
-              "lng": 35.2,
-              "lat": 31.7,
+              "lng": 35.202,
+              "lat": 31.705,
               "dist": 620,
               "az": 200,
               "el": 46,
@@ -168,9 +270,9 @@ window.BATTLE_DATA = (function () {
           },
           "dateLabel": "約公元前4年",
           "title_zh": "伯利恆降生",
-          "title_en": "Birth at Bethlehem",
-          "narration_zh": "馬利亞在伯利恆生下耶穌；天使報喜，牧羊人來拜。",
-          "narration_en": "Jesus was born in Bethlehem — angels announced good news to shepherds.",
+          "title_en": "Bethlehem",
+          "narration_zh": "路2:4-7 馬利亞在伯利恆生下頭胎兒子，用布包起來放在馬槽裡。",
+          "narration_en": "Luke 2:4-7 — Jesus was born in Bethlehem.",
           "focus": [
               "jesus"
           ],
@@ -181,21 +283,21 @@ window.BATTLE_DATA = (function () {
           "forces_en": ""
       },
       {
-          "day": 22,
+          "day": 18,
           "hold": 8,
           "cam": {
-              "lng": 35.3,
-              "lat": 32.7,
+              "lng": 35.297,
+              "lat": 32.702,
               "dist": 600,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
           "dateLabel": "成長",
-          "title_zh": "拿撒勒成長",
-          "title_en": "Growing in Nazareth",
-          "narration_zh": "耶穌在拿撒勒長大，智慧與身量一齊增長，神和人喜愛祂。",
-          "narration_en": "Jesus grew in wisdom and stature in Nazareth, favored by God and man.",
+          "title_zh": "拿撒勒",
+          "title_en": "Nazareth",
+          "narration_zh": "路2:39-40 耶穌在拿撒勒長大，智慧與身量一齊增長。",
+          "narration_en": "Luke 2:39-40 — Jesus grew up in Nazareth.",
           "focus": [
               "jesus"
           ],
@@ -206,21 +308,46 @@ window.BATTLE_DATA = (function () {
           "forces_en": ""
       },
       {
-          "day": 42,
+          "day": 35,
           "hold": 8,
           "cam": {
-              "lng": 35.58,
-              "lat": 32.88,
+              "lng": 35.348,
+              "lat": 32.746,
               "dist": 580,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
+          "dateLabel": "約公元27年",
+          "title_zh": "迦拿婚筵",
+          "title_en": "Cana",
+          "narration_zh": "約2:1-11 在迦拿婚筵耶穌以水變酒，顯出榮耀。",
+          "narration_en": "John 2:1-11 — The first sign at Cana in Galilee.",
+          "focus": [
+              "jesus"
+          ],
+          "side": "both",
+          "commanders": [],
+          "assets": [],
+          "forces_zh": "",
+          "forces_en": ""
+      },
+      {
+          "day": 50,
+          "hold": 8,
+          "cam": {
+              "lng": 35.575,
+              "lat": 32.881,
+              "dist": 560,
+              "az": 200,
+              "el": 46,
+              "orbit": 0.65
+          },
           "dateLabel": "約公元27–30年",
-          "title_zh": "加利利事工",
-          "title_en": "Ministry in Galilee",
-          "narration_zh": "耶穌在迦百農呼召門徒，醫病、趕鬼、講道，天國的福音傳開。",
-          "narration_en": "At Capernaum Jesus called disciples, healed, taught — the gospel of the kingdom spread.",
+          "title_zh": "迦百農",
+          "title_en": "Capernaum",
+          "narration_zh": "太4:13 耶穌離開拿撒勒，往迦百農居住，那裡靠海。",
+          "narration_en": "Matt 4:13 — Jesus made Capernaum his base by the sea.",
           "focus": [
               "jesus"
           ],
@@ -239,18 +366,43 @@ window.BATTLE_DATA = (function () {
           "day": 65,
           "hold": 8,
           "cam": {
-              "lng": 35.23,
-              "lat": 31.78,
+              "lng": 35.5,
+              "lat": 32.833,
+              "dist": 540,
+              "az": 200,
+              "el": 46,
+              "orbit": 0.65
+          },
+          "dateLabel": "事工期",
+          "title_zh": "加利利海",
+          "title_en": "Sea of Galilee",
+          "narration_zh": "太4:18 在加利利海邊呼召彼得、安得烈、雅各、約翰。",
+          "narration_en": "Matt 4:18 — Calling the first disciples by the Sea of Galilee.",
+          "focus": [
+              "jesus"
+          ],
+          "side": "both",
+          "commanders": [],
+          "assets": [],
+          "forces_zh": "",
+          "forces_en": ""
+      },
+      {
+          "day": 78,
+          "hold": 8,
+          "cam": {
+              "lng": 35.444,
+              "lat": 31.872,
               "dist": 560,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
-          "dateLabel": "公元30年",
-          "title_zh": "耶路撒冷受難",
-          "title_en": "Passion Week",
-          "narration_zh": "耶穌騎驢進城，最後晚餐，客西馬尼禱告，被釘十字架。",
-          "narration_en": "Triumphal entry, Last Supper, Gethsemane — then the cross.",
+          "dateLabel": "末後旅程",
+          "title_zh": "耶利哥",
+          "title_en": "Jericho",
+          "narration_zh": "路19:1 耶穌進耶利哥，遇撒該；隨後上耶路撒冷。",
+          "narration_en": "Luke 19:1 — Jesus passed through Jericho toward Jerusalem.",
           "focus": [
               "jesus"
           ],
@@ -264,18 +416,43 @@ window.BATTLE_DATA = (function () {
           "day": 88,
           "hold": 8,
           "cam": {
-              "lng": 35.23,
+              "lng": 35.24,
               "lat": 31.78,
-              "dist": 650,
+              "dist": 540,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
           "dateLabel": "公元30年",
-          "title_zh": "復活",
-          "title_en": "Resurrection",
-          "narration_zh": "第三日從死裡復活，向門徒顯現，吩咐他們作祂見證直到地極。",
-          "narration_en": "On the third day He rose, appeared to disciples, and commissioned them to the ends of the earth.",
+          "title_zh": "客西馬尼",
+          "title_en": "Gethsemane",
+          "narration_zh": "太26:36 耶穌帶門徒到客西馬尼，禱告說：我父啊，若不能免去，就願你的意旨成全。",
+          "narration_en": "Matt 26:36 — Gethsemane: 'Not my will, but yours be done.'",
+          "focus": [
+              "jesus"
+          ],
+          "side": "both",
+          "commanders": [],
+          "assets": [],
+          "forces_zh": "",
+          "forces_en": ""
+      },
+      {
+          "day": 100,
+          "hold": 8,
+          "cam": {
+              "lng": 34.99,
+              "lat": 31.838,
+              "dist": 620,
+              "az": 200,
+              "el": 46,
+              "orbit": 0.65
+          },
+          "dateLabel": "公元30年",
+          "title_zh": "以馬忤斯",
+          "title_en": "Emmaus",
+          "narration_zh": "路24:13-31 復活主在往以馬忤斯的路上向門徒顯現，開他們的心竅。",
+          "narration_en": "Luke 24:13-31 — The risen Lord appeared on the road to Emmaus.",
           "focus": [
               "jesus"
           ],
@@ -292,8 +469,8 @@ window.BATTLE_DATA = (function () {
       "narration_zh": "本段為聖經與教會史重要考點。",
       "narration_en": "A key Bible and church history topic.",
       "cam": {
-          "lng": 35.23,
-          "lat": 31.78,
+          "lng": 35.235,
+          "lat": 31.778,
           "dist": 840,
           "az": 200,
           "el": 48,

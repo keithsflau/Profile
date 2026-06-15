@@ -44,6 +44,9 @@ window.BATTLE_DATA = (function () {
           "el": 48,
           "orbit": 0.65
       },
+      "terrainMode": "plain",
+      "floodRelief": 0.1,
+      "reliefScale": 0.75,
       "nextBattle": {
           "href": "../crossing/",
           "title_zh": "渡江戰役",
@@ -87,7 +90,8 @@ window.BATTLE_DATA = (function () {
               "lat": 40.82
           }
       ],
-      "lines": []
+      "lines": [],
+      "water": []
   };
   const units =   [
       {
@@ -192,7 +196,7 @@ window.BATTLE_DATA = (function () {
           "b": 85,
           "lng": 117.2,
           "lat": 39.08,
-          "kind": "artillery",
+          "kind": "firefight",
           "i": 1
       }
   ];
@@ -211,7 +215,8 @@ window.BATTLE_DATA = (function () {
       "summary": "平津戰役 — DSE 中史互動戰役地圖（教學示意）。",
       "caveats": [
           "本圖僅覆蓋該戰役核心區域；戰線與兵力為教學示意。",
-          "衛星影像為現代地形，非歷史時期地貌。"
+          "衛星影像為現代地形，非歷史時期地貌。",
+          "河川、海域水面為教學示意，按史實位置裁切顯示。"
       ],
       "sources": "DSE 中史課程、中國通史、維基百科（交叉查證）。"
   };
@@ -239,7 +244,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "东北野战军入关，与华北部队合力分割包围平津地区。",
           "narration_en": "Northeast Field Army enters the pass — Pingjin is encircled.",
           "focus": [
-              "pla_main"
+              "pla_pingjin"
           ],
           "side": "pla",
           "commanders": [
@@ -273,13 +278,11 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "解放军先攻新保安，歼灭郭景云三十五军，张家口守军突围被歼。",
           "narration_en": "Guo Jingyun's 35th Army is destroyed at Xinbao'an — Zhangjiakou falls.",
           "focus": [
-              "pla_main"
+              "pla_pingjin"
           ],
           "side": "pla",
           "commanders": [],
-          "assets": [
-              "artillery"
-          ],
+          "assets": [],
           "forces_zh": "",
           "forces_en": ""
       },
@@ -300,8 +303,8 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "解放军对天津发动总攻，陈长捷部被歼，傅作义退路断绝。",
           "narration_en": "PLA storm Tianjin — Chen Changjie's garrison is wiped out.",
           "focus": [
-              "pla_main",
-              "gmd_main"
+              "pla_pingjin",
+              "kmt_pingjin"
           ],
           "side": "both",
           "commanders": [
@@ -310,9 +313,7 @@ window.BATTLE_DATA = (function () {
                   "en": "Fu Zuoyi"
               }
           ],
-          "assets": [
-              "artillery"
-          ],
+          "assets": [],
           "forces_zh": "",
           "forces_en": ""
       },
@@ -333,9 +334,9 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "解放军围而不攻北平，与傅作义谈判，保护古城文物。",
           "narration_en": "Beiping is besieged but not stormed — talks with Fu Zuoyi protect the ancient capital.",
           "focus": [
-              "gmd_main"
+              "kmt_pingjin"
           ],
-          "side": "gmd",
+          "side": "kmt",
           "commanders": [
               {
                   "zh": "傅作义",

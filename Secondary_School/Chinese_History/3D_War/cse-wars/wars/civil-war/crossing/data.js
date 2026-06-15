@@ -43,7 +43,8 @@ window.BATTLE_DATA = (function () {
           "az": 200,
           "el": 48,
           "orbit": 0.65
-      }
+      },
+      "terrainMode": "river"
   };
   const factions = {
     "pla": {
@@ -82,7 +83,39 @@ window.BATTLE_DATA = (function () {
               "lat": 31.23
           }
       ],
-      "lines": []
+      "lines": [],
+      "water": [
+          {
+              "kind": "corridor",
+              "halfWidth": 0.3,
+              "path": [
+                  [
+                      117.85,
+                      32.42
+                  ],
+                  [
+                      118.25,
+                      32.22
+                  ],
+                  [
+                      118.78,
+                      32.06
+                  ],
+                  [
+                      119.25,
+                      31.92
+                  ],
+                  [
+                      119.75,
+                      31.82
+                  ],
+                  [
+                      120.2,
+                      31.75
+                  ]
+              ]
+          }
+      ]
   };
   const units =   [
       {
@@ -192,7 +225,8 @@ window.BATTLE_DATA = (function () {
       "summary": "渡江戰役 — DSE 中史互動戰役地圖（教學示意）。",
       "caveats": [
           "本圖僅覆蓋該戰役核心區域；戰線與兵力為教學示意。",
-          "衛星影像為現代地形，非歷史時期地貌。"
+          "衛星影像為現代地形，非歷史時期地貌。",
+          "河川、海域水面為教學示意，按史實位置裁切顯示。"
       ],
       "sources": "DSE 中史課程、中國通史、維基百科（交叉查證）。"
   };
@@ -220,7 +254,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "第二、第三野战军在西起湖口、东至江阴的战线上强渡长江。",
           "narration_en": "Second and Third Field Armies cross the Yangtze on a thousand-li front.",
           "focus": [
-              "pla_main"
+              "pla_crossing"
           ],
           "side": "pla",
           "commanders": [
@@ -257,14 +291,13 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "解放军在中下游多处突破国民党长江防线，向纵深挺进。",
           "narration_en": "PLA breaches the Nationalist Yangtze line at multiple points.",
           "focus": [
-              "pla_main",
-              "gmd_main"
+              "pla_crossing",
+              "kmt_crossing"
           ],
           "side": "both",
           "commanders": [],
           "assets": [
-              "landing",
-              "artillery"
+              "landing"
           ],
           "forces_zh": "",
           "forces_en": ""
@@ -286,7 +319,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "第三野战军占领南京，总统府升起红旗。",
           "narration_en": "Third Field Army enters Nanjing — the red flag rises over the presidential palace.",
           "focus": [
-              "pla_main"
+              "pla_crossing"
           ],
           "side": "pla",
           "commanders": [
@@ -316,13 +349,11 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "第三野战军发起沪战役，上海宣告解放。",
           "narration_en": "The Shanghai campaign ends — China's largest city is liberated.",
           "focus": [
-              "pla_main"
+              "pla_crossing"
           ],
           "side": "pla",
           "commanders": [],
-          "assets": [
-              "artillery"
-          ],
+          "assets": [],
           "forces_zh": "",
           "forces_en": ""
       },

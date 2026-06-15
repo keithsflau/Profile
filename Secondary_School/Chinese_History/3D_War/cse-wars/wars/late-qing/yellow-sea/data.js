@@ -11,10 +11,10 @@ window.BATTLE_DATA = (function () {
           "japan"
       ],
       "geo": {
-          "minLng": 121,
-          "maxLng": 124,
-          "minLat": 37.25,
-          "maxLat": 39.75,
+          "minLng": 122.4,
+          "maxLng": 123.9,
+          "minLat": 37.45,
+          "maxLat": 38.75,
           "Z": 9
       },
       "startDate": [
@@ -44,6 +44,8 @@ window.BATTLE_DATA = (function () {
           "el": 48,
           "orbit": 0.65
       },
+      "terrainMode": "ocean",
+      "floodRelief": 0.62,
       "nextBattle": {
           "href": "../weihaiwei/",
           "title_zh": "威海衛淪陷",
@@ -87,7 +89,8 @@ window.BATTLE_DATA = (function () {
               "lat": 37.51
           }
       ],
-      "lines": []
+      "lines": [],
+      "water": []
   };
   const units =   [
       {
@@ -197,7 +200,8 @@ window.BATTLE_DATA = (function () {
       "summary": "黃海海戰 — DSE 中史互動戰役地圖（教學示意）。",
       "caveats": [
           "本圖僅覆蓋該戰役核心區域；戰線與兵力為教學示意。",
-          "衛星影像為現代地形，非歷史時期地貌。"
+          "衛星影像為現代地形，非歷史時期地貌。",
+          "河川、海域水面為教學示意，按史實位置裁切顯示。"
       ],
       "sources": "DSE 中史課程、中國通史、維基百科（交叉查證）。"
   };
@@ -225,8 +229,8 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "北洋水師護送運兵船返航，與日本聯合艦隊在大東溝遭遇。",
           "narration_en": "Beiyang Fleet meets the Japanese Combined Fleet off the Yalu estuary.",
           "focus": [
-              "beiyang_main",
-              "japan_main"
+              "beiyang_ys",
+              "japan_ys"
           ],
           "side": "both",
           "commanders": [
@@ -262,14 +266,13 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "雙方以艦炮對射，定遠、鎮遠居中，日本艦隊以速射炮側擊。",
           "narration_en": "Battleships exchange broadsides — Japanese rapid-fire guns rake the Chinese line.",
           "focus": [
-              "beiyang_main",
-              "japan_main"
+              "beiyang_ys",
+              "japan_ys"
           ],
           "side": "both",
           "commanders": [],
           "assets": [
-              "navy",
-              "artillery"
+              "navy"
           ],
           "forces_zh": "",
           "forces_en": ""
@@ -291,7 +294,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "鄧世昌率致遠艦衝擊吉野，艦中炮彈殉國；經遠等艦亦沉沒。",
           "narration_en": "Deng Shichang rams the enemy in Zhiyuan and dies — Jingyuan is also lost.",
           "focus": [
-              "beiyang_main"
+              "beiyang_ys"
           ],
           "side": "beiyang",
           "commanders": [
@@ -323,7 +326,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "北洋水師損失五艦，餘艦退至威海衛，喪失黃海制海權。",
           "narration_en": "Five ships lost — the Beiyang Fleet withdraws to Weihaiwei, losing sea control.",
           "focus": [
-              "beiyang_main"
+              "beiyang_ys"
           ],
           "side": "beiyang",
           "commanders": [],

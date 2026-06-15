@@ -5,22 +5,22 @@ window.BATTLE_DATA = (function () {
       "id": "exodus",
       "title_zh": "出埃及與進迦南",
       "title_en": "EXODUS & CONQUEST",
-      "subtitle": "出–申–書",
+      "subtitle": "出–書",
       "factionOrder": [
           "covenant",
           "nations"
       ],
       "geo": {
-          "minLng": 28,
-          "maxLng": 40,
-          "minLat": 24,
-          "maxLat": 34,
+          "minLng": 31.12,
+          "maxLng": 36.47,
+          "minLat": 27.66,
+          "maxLat": 32.76,
           "Z": 8
       },
-      "startDate": "出–申–書",
+      "startDate": "出–書",
       "introCam": {
-          "lng": 34.5,
-          "lat": 28.5,
+          "lng": 33.798,
+          "lat": 30.2055,
           "dist": 700,
           "az": 200,
           "el": 46,
@@ -28,13 +28,13 @@ window.BATTLE_DATA = (function () {
       },
       "titleCard": {
           "zh": "出埃及與進迦南",
-          "en": "EXODUS & CONQUEST · 出–申–書",
+          "en": "EXODUS & CONQUEST · 出–書",
           "narr_zh": "我必救你脫離埃及人的苦難，領你進入美好寬闊流奶與蜜之地。",
           "narr_en": "I will bring you up out of Egypt to a land flowing with milk and honey."
       },
       "outroCam": {
-          "lng": 34.5,
-          "lat": 28.5,
+          "lng": 33.798,
+          "lat": 30.2055,
           "dist": 840,
           "az": 200,
           "el": 48,
@@ -63,38 +63,83 @@ window.BATTLE_DATA = (function () {
       "points": [
           {
               "name_zh": "蘭塞",
-              "name_en": "Rameses",
+              "name_en": "Pi-Ramesses",
               "type": "city",
-              "lng": 31.87,
-              "lat": 30.8
+              "lng": 32.113,
+              "lat": 30.794,
+              "ref": "出 1:11"
+          },
+          {
+              "name_zh": "疏割",
+              "name_en": "Succoth",
+              "type": "town",
+              "lng": 32.183,
+              "lat": 30.558,
+              "ref": "出 12:37"
+          },
+          {
+              "name_zh": "比哈洗烈",
+              "name_en": "Pi-hahiroth",
+              "type": "bay",
+              "lng": 32.45,
+              "lat": 29.95,
+              "ref": "出 14:2"
           },
           {
               "name_zh": "紅海",
               "name_en": "Red Sea",
               "type": "bay",
-              "lng": 33,
-              "lat": 28.5
+              "lng": 32.35,
+              "lat": 29,
+              "ref": "出 14:21"
           },
           {
               "name_zh": "西奈山",
               "name_en": "Mount Sinai",
               "type": "peak",
-              "lng": 33.97,
-              "lat": 28.54
+              "lng": 33.975,
+              "lat": 28.539,
+              "ref": "出 19:1"
+          },
+          {
+              "name_zh": "利非訂",
+              "name_en": "Rephidim",
+              "type": "town",
+              "lng": 33.98,
+              "lat": 28.75,
+              "ref": "出 17:1"
           },
           {
               "name_zh": "加低斯",
-              "name_en": "Kadesh",
+              "name_en": "Kadesh-barnea",
               "type": "town",
-              "lng": 34.45,
-              "lat": 30.6
+              "lng": 34.451,
+              "lat": 30.601,
+              "ref": "民 13:26"
           },
           {
               "name_zh": "耶利哥",
               "name_en": "Jericho",
               "type": "fort",
-              "lng": 35.46,
-              "lat": 31.87
+              "lng": 35.444,
+              "lat": 31.872,
+              "ref": "書 6:1"
+          },
+          {
+              "name_zh": "吉甲",
+              "name_en": "Gilgal",
+              "type": "town",
+              "lng": 35.483,
+              "lat": 31.867,
+              "ref": "書 4:19"
+          },
+          {
+              "name_zh": "艾城",
+              "name_en": "Ai",
+              "type": "fort",
+              "lng": 35.262,
+              "lat": 31.916,
+              "ref": "書 7:2"
           }
       ],
       "lines": []
@@ -111,36 +156,64 @@ window.BATTLE_DATA = (function () {
           "track": [
               {
                   "d": 1,
-                  "lng": 31.87,
-                  "lat": 30.8,
+                  "lng": 32.113,
+                  "lat": 30.794,
+                  "s": 600000,
+                  "st": "hold"
+              },
+              {
+                  "d": 12,
+                  "lng": 32.183,
+                  "lat": 30.558,
                   "s": 600000,
                   "st": "retreat"
               },
               {
-                  "d": 25,
-                  "lng": 33,
-                  "lat": 28.5,
+                  "d": 22,
+                  "lng": 32.45,
+                  "lat": 29.95,
                   "s": 600000,
                   "st": "hold"
               },
               {
-                  "d": 50,
-                  "lng": 33.97,
-                  "lat": 28.54,
+                  "d": 30,
+                  "lng": 32.35,
+                  "lat": 29,
                   "s": 600000,
                   "st": "hold"
               },
               {
-                  "d": 80,
-                  "lng": 34.45,
-                  "lat": 30.6,
+                  "d": 45,
+                  "lng": 33.975,
+                  "lat": 28.539,
                   "s": 500000,
                   "st": "hold"
               },
               {
+                  "d": 55,
+                  "lng": 33.98,
+                  "lat": 28.75,
+                  "s": 500000,
+                  "st": "hold"
+              },
+              {
+                  "d": 70,
+                  "lng": 34.451,
+                  "lat": 30.601,
+                  "s": 450000,
+                  "st": "hold"
+              },
+              {
+                  "d": 88,
+                  "lng": 35.483,
+                  "lat": 31.867,
+                  "s": 400000,
+                  "st": "hold"
+              },
+              {
                   "d": 100,
-                  "lng": 35.46,
-                  "lat": 31.87,
+                  "lng": 35.444,
+                  "lat": 31.872,
                   "s": 400000,
                   "st": "attack"
               }
@@ -156,16 +229,16 @@ window.BATTLE_DATA = (function () {
           "name_en": "Egyptian army",
           "track": [
               {
-                  "d": 20,
-                  "lng": 32.5,
-                  "lat": 29.5,
+                  "d": 24,
+                  "lng": 32.45,
+                  "lat": 29.95,
                   "s": 80000,
                   "st": "attack"
               },
               {
-                  "d": 30,
-                  "lng": 33,
-                  "lat": 28.5,
+                  "d": 32,
+                  "lng": 32.35,
+                  "lat": 29,
                   "s": 0,
                   "st": "dead"
               }
@@ -174,49 +247,63 @@ window.BATTLE_DATA = (function () {
   ];
   const arrows =   [
       {
-          "d": 15,
+          "d": 8,
           "f": "covenant",
           "from": [
-              31.87,
-              30.8
+              32.113,
+              30.794
           ],
           "to": [
-              33,
-              28.5
+              32.183,
+              30.558
           ],
-          "label": "出埃及",
+          "label": "出埃及 出12:37",
           "kind": "retreat"
       },
       {
-          "d": 90,
+          "d": 28,
           "f": "covenant",
           "from": [
-              34.45,
-              30.6
+              32.45,
+              29.95
           ],
           "to": [
-              35.46,
-              31.87
+              32.35,
+              29
           ],
-          "label": "過約旦",
+          "label": "過紅海 出14:22",
+          "kind": "retreat"
+      },
+      {
+          "d": 85,
+          "f": "covenant",
+          "from": [
+              35.483,
+              31.867
+          ],
+          "to": [
+              35.444,
+              31.872
+          ],
+          "label": "攻耶利哥 書6:20",
           "kind": "attack"
       }
   ];
   const fronts =   [];
   const hotspots =   [
       {
-          "a": 20,
-          "b": 35,
-          "lng": 33,
-          "lat": 28.5,
+          "a": 26,
+          "b": 36,
+          "lng": 32.35,
+          "lat": 29,
           "kind": "landing",
-          "i": 0.8
+          "i": 0.85
       },
       {
-          "a": 85,
+          "a": 92,
           "b": 100,
-          "lng": 35.46,
-          "lat": 31.87,
+          "lng": 35.444,
+          "lat": 31.872,
           "kind": "firefight",
           "i": 0.9
       }
@@ -241,31 +328,30 @@ window.BATTLE_DATA = (function () {
       "sources": "和合本、聖經地圖、教會史資料（交叉查證）。"
   };
   const analysis =   {
-      "military": "以色列人在埃及受奴役；摩西領百姓出埃及，過紅海，在西奈領律法，曠野漂流四十年；約書亞率民過約旦，攻取耶利哥，開始征服迦南。",
-      "leaders": "摩西、亞倫、約書亞、迦勒為核心領袖；法老與亞瑪力王為主要敵對勢力。",
-      "nationalPower": "出埃及預表救贖；逾越羔羊指向上十字架的基督；律法顯明罪，引到基督；進迦南預表信徒進入屬靈安息。",
-      "impact": "出埃及成為以色列國族認同的根基；新約將救恩比作從罪權勢中得釋放。"
+      "military": "以色列人自蘭塞（Pi-Ramesses／Qantir）出發，經疏割、比哈洗烈，過紅海（蘇伊士灣傳統路線），至西奈山（Jebel Musa）立約，加低斯巴尼亞漂流，約書亞攻耶利哥（Tell es-Sultan）。",
+      "leaders": "摩西、亞倫、約書亞、迦勒；法老軍追擊紅海。",
+      "nationalPower": "逾越羔羊預表基督；律法引到基督；進迦南預表屬靈安息。",
+      "impact": "出埃及為以色列國族認同根基。"
   };
   const storyboard =   [
       {
           "day": 1,
           "hold": 8,
           "cam": {
-              "lng": 31.87,
-              "lat": 30.8,
+              "lng": 32.113,
+              "lat": 30.794,
               "dist": 680,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
           "dateLabel": "約前1446年",
-          "title_zh": "埃及為奴",
-          "title_en": "Slavery in Egypt",
-          "narration_zh": "以色列人在蘭塞地作苦工，哀聲達到神面前。",
-          "narration_en": "Israel groaned under bondage in the land of Rameses.",
+          "title_zh": "蘭塞為奴",
+          "title_en": "Rameses",
+          "narration_zh": "出1:11 在蘭塞地為法老建積貨城；以色列人作苦工。",
+          "narration_en": "Exod 1:11 — Israel labored at Rameses for Pharaoh.",
           "focus": [
-              "israel_ex",
-              "egypt_ex"
+              "israel_ex"
           ],
           "side": "both",
           "commanders": [
@@ -279,11 +365,36 @@ window.BATTLE_DATA = (function () {
           "forces_en": ""
       },
       {
-          "day": 22,
+          "day": 12,
           "hold": 8,
           "cam": {
-              "lng": 33,
-              "lat": 28.5,
+              "lng": 32.183,
+              "lat": 30.558,
+              "dist": 640,
+              "az": 200,
+              "el": 46,
+              "orbit": 0.65
+          },
+          "dateLabel": "約前1446年",
+          "title_zh": "到疏割",
+          "title_en": "Succoth",
+          "narration_zh": "出12:37 以色列人從蘭塞起行，到疏割。",
+          "narration_en": "Exod 12:37 — They journeyed from Rameses to Succoth.",
+          "focus": [
+              "israel_ex"
+          ],
+          "side": "both",
+          "commanders": [],
+          "assets": [],
+          "forces_zh": "",
+          "forces_en": ""
+      },
+      {
+          "day": 30,
+          "hold": 8,
+          "cam": {
+              "lng": 32.35,
+              "lat": 29,
               "dist": 620,
               "az": 200,
               "el": 46,
@@ -291,9 +402,9 @@ window.BATTLE_DATA = (function () {
           },
           "dateLabel": "約前1446年",
           "title_zh": "過紅海",
-          "title_en": "Crossing the Red Sea",
-          "narration_zh": "摩西伸杖分海，以色列人走乾地過海；埃及軍追趕，海水回流淹沒軍兵。",
-          "narration_en": "The sea parted for Israel; Egypt's army was swallowed by the returning waters.",
+          "title_en": "Red Sea",
+          "narration_zh": "出14:21-22 摩西伸杖過紅海，以色列人走乾地過海，埃及軍被淹沒。",
+          "narration_en": "Exod 14:21-22 — Israel crossed the sea on dry ground.",
           "focus": [
               "israel_ex"
           ],
@@ -306,11 +417,11 @@ window.BATTLE_DATA = (function () {
           "forces_en": ""
       },
       {
-          "day": 42,
+          "day": 45,
           "hold": 8,
           "cam": {
-              "lng": 33.97,
-              "lat": 28.54,
+              "lng": 33.975,
+              "lat": 28.539,
               "dist": 600,
               "az": 200,
               "el": 46,
@@ -318,9 +429,9 @@ window.BATTLE_DATA = (function () {
           },
           "dateLabel": "約前1446年",
           "title_zh": "西奈立約",
-          "title_en": "Covenant at Sinai",
-          "narration_zh": "在西奈山頒布十誡與律法，立以色列為祭司國度、聖潔的國民。",
-          "narration_en": "At Sinai God gave the Law and made Israel a kingdom of priests.",
+          "title_en": "Sinai",
+          "narration_zh": "出19:1-2 以色列人到了西奈山；出20 頒布十誡。",
+          "narration_en": "Exod 19-20 — At Sinai God gave the Law.",
           "focus": [
               "israel_ex"
           ],
@@ -331,21 +442,21 @@ window.BATTLE_DATA = (function () {
           "forces_en": ""
       },
       {
-          "day": 62,
+          "day": 55,
           "hold": 8,
           "cam": {
-              "lng": 34.45,
-              "lat": 30.6,
+              "lng": 33.98,
+              "lat": 28.75,
               "dist": 580,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
-          "dateLabel": "曠野四十年",
-          "title_zh": "加低斯漂流",
-          "title_en": "Wilderness Years",
-          "narration_zh": "因不信，一代人在曠野倒斃；只有約書亞、迦勒進入應許地。",
-          "narration_en": "An unbelieving generation perished; only Joshua and Caleb would enter the land.",
+          "dateLabel": "曠野",
+          "title_zh": "利非訂",
+          "title_en": "Rephidim",
+          "narration_zh": "出17:1-6 在利非訂沒有水，摩西擊石出水；與亞瑪力人爭戰。",
+          "narration_en": "Exod 17 — Water from the rock; battle with Amalek at Rephidim.",
           "focus": [
               "israel_ex"
           ],
@@ -356,21 +467,71 @@ window.BATTLE_DATA = (function () {
           "forces_en": ""
       },
       {
-          "day": 85,
+          "day": 70,
           "hold": 8,
           "cam": {
-              "lng": 35.46,
-              "lat": 31.87,
+              "lng": 34.451,
+              "lat": 30.601,
+              "dist": 560,
+              "az": 200,
+              "el": 46,
+              "orbit": 0.65
+          },
+          "dateLabel": "曠野四十年",
+          "title_zh": "加低斯",
+          "title_en": "Kadesh-barnea",
+          "narration_zh": "民13:26 探子從加低斯巴尼亞回來；因不信，一代人倒在曠野。",
+          "narration_en": "Num 13:26 — The spies returned to Kadesh; unbelief brought forty years in the wilderness.",
+          "focus": [
+              "israel_ex"
+          ],
+          "side": "both",
+          "commanders": [],
+          "assets": [],
+          "forces_zh": "",
+          "forces_en": ""
+      },
+      {
+          "day": 88,
+          "hold": 8,
+          "cam": {
+              "lng": 35.483,
+              "lat": 31.867,
+              "dist": 600,
+              "az": 200,
+              "el": 46,
+              "orbit": 0.65
+          },
+          "dateLabel": "約前1406年",
+          "title_zh": "吉甲安營",
+          "title_en": "Gilgal",
+          "narration_zh": "書4:19 百姓從約旦河上来，在吉甲、耶利哥東邊安營。",
+          "narration_en": "Josh 4:19 — Israel camped at Gilgal east of Jericho.",
+          "focus": [
+              "israel_ex"
+          ],
+          "side": "both",
+          "commanders": [],
+          "assets": [],
+          "forces_zh": "",
+          "forces_en": ""
+      },
+      {
+          "day": 100,
+          "hold": 8,
+          "cam": {
+              "lng": 35.444,
+              "lat": 31.872,
               "dist": 650,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
-          "dateLabel": "約前1400年",
-          "title_zh": "攻取耶利哥",
-          "title_en": "Fall of Jericho",
-          "narration_zh": "約書亞率民過約旦，繞城七日，耶利哥城牆倒塌，開始征服迦南。",
-          "narration_en": "Joshua led Israel across the Jordan; Jericho's walls fell — the conquest began.",
+          "dateLabel": "約前1406年",
+          "title_zh": "耶利哥陷落",
+          "title_en": "Jericho",
+          "narration_zh": "書6:20 百姓呼喊，城牆塌陷，攻取耶利哥。",
+          "narration_en": "Josh 6:20 — The walls of Jericho fell.",
           "focus": [
               "israel_ex"
           ],
@@ -394,8 +555,8 @@ window.BATTLE_DATA = (function () {
       "narration_zh": "本段為聖經與教會史重要考點。",
       "narration_en": "A key Bible and church history topic.",
       "cam": {
-          "lng": 34.5,
-          "lat": 28.5,
+          "lng": 33.798,
+          "lat": 30.2055,
           "dist": 840,
           "az": 200,
           "el": 48,

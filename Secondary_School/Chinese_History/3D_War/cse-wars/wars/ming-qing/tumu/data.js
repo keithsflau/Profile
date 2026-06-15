@@ -44,6 +44,8 @@ window.BATTLE_DATA = (function () {
           "el": 48,
           "orbit": 0.65
       },
+      "terrainMode": "plain",
+      "reliefScale": 0.7,
       "nextBattle": {
           "href": "../sarhu/",
           "title_zh": "薩爾滸之戰",
@@ -87,7 +89,8 @@ window.BATTLE_DATA = (function () {
               "lat": 40.61
           }
       ],
-      "lines": []
+      "lines": [],
+      "water": []
   };
   const units =   [
       {
@@ -197,7 +200,8 @@ window.BATTLE_DATA = (function () {
       "summary": "土木堡之變 — DSE 中史互動戰役地圖（教學示意）。",
       "caveats": [
           "本圖僅覆蓋該戰役核心區域；戰線與兵力為教學示意。",
-          "衛星影像為現代地形，非歷史時期地貌。"
+          "衛星影像為現代地形，非歷史時期地貌。",
+          "河川、海域水面為教學示意，按史實位置裁切顯示。"
       ],
       "sources": "DSE 中史課程、中國通史、維基百科（交叉查證）。"
   };
@@ -225,7 +229,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "明英宗在王振慫恿下率五十萬大軍親征瓦剌。",
           "narration_en": "Emperor Yingzong leads 500,000 troops north against the Oirats.",
           "focus": [
-              "ming_main"
+              "ming_tumu"
           ],
           "side": "ming",
           "commanders": [
@@ -259,7 +263,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "明軍倉促北進，糧草不繼，士氣低落。",
           "narration_en": "The Ming army advances hastily — supplies run short, morale falls.",
           "focus": [
-              "ming_main"
+              "ming_tumu"
           ],
           "side": "ming",
           "commanders": [],
@@ -284,8 +288,8 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "也先率瓦剌騎兵伏擊土木堡，明軍大潰，英宗被俘。",
           "narration_en": "Esen's Oirat cavalry ambushes Tumu — the Ming routs, the emperor is captured.",
           "focus": [
-              "oirat_main",
-              "ming_main"
+              "oirat_tumu",
+              "ming_tumu"
           ],
           "side": "both",
           "commanders": [
@@ -294,9 +298,7 @@ window.BATTLE_DATA = (function () {
                   "en": "Esen"
               }
           ],
-          "assets": [
-              "artillery"
-          ],
+          "assets": [],
           "forces_zh": "",
           "forces_en": ""
       },
@@ -317,7 +319,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "郕王即位為景帝，于謙組織北京保衛戰，擊退也先。",
           "narration_en": "The Prince of Cheng becomes Emperor Jingtai — Yu Qian repels Esen from Beijing.",
           "focus": [
-              "ming_main"
+              "ming_tumu"
           ],
           "side": "ming",
           "commanders": [

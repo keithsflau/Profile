@@ -44,6 +44,8 @@ window.BATTLE_DATA = (function () {
           "el": 48,
           "orbit": 0.65
       },
+      "terrainMode": "land",
+      "reliefScale": 0.82,
       "nextBattle": {
           "href": "../taierzhuang/",
           "title_zh": "台兒莊戰役",
@@ -87,7 +89,8 @@ window.BATTLE_DATA = (function () {
               "lat": 39.19
           }
       ],
-      "lines": []
+      "lines": [],
+      "water": []
   };
   const units =   [
       {
@@ -190,7 +193,8 @@ window.BATTLE_DATA = (function () {
       "summary": "平型關大捷 — DSE 中史互動戰役地圖（教學示意）。",
       "caveats": [
           "本圖僅覆蓋該戰役核心區域；戰線與兵力為教學示意。",
-          "衛星影像為現代地形，非歷史時期地貌。"
+          "衛星影像為現代地形，非歷史時期地貌。",
+          "河川、海域水面為教學示意，按史實位置裁切顯示。"
       ],
       "sources": "DSE 中史課程、中國通史、維基百科（交叉查證）。"
   };
@@ -218,7 +222,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "日军第五师团沿平绥路西进，威胁山西。",
           "narration_en": "Japanese 5th Division advances west on the Peiping–Suiyuan railway.",
           "focus": [
-              "japan_main"
+              "japan_pxg"
           ],
           "side": "japan",
           "commanders": [
@@ -248,9 +252,9 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "林彪率一一五师在平型关乔沟设伏，待敌辎重部队进入。",
           "narration_en": "Lin Biao's 115th Division sets an ambush at Pingxingguan Pass.",
           "focus": [
-              "eighth_main"
+              "era_pxg"
           ],
-          "side": "eighth",
+          "side": "eighth_route",
           "commanders": [
               {
                   "zh": "林彪",
@@ -282,14 +286,12 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "八路军伏击日军辎重部队，击毁车辆数百，歼敌一千余人。",
           "narration_en": "Ambush destroys hundreds of vehicles — over 1,000 Japanese killed.",
           "focus": [
-              "eighth_main",
-              "japan_main"
+              "era_pxg",
+              "japan_pxg"
           ],
           "side": "both",
           "commanders": [],
-          "assets": [
-              "artillery"
-          ],
+          "assets": [],
           "forces_zh": "歼敌千余人",
           "forces_en": "1,000+ enemy killed"
       },
@@ -310,9 +312,9 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "平型关大捷消息传开，打破日军不可战胜神话，鼓舞抗战士气。",
           "narration_en": "News of victory shatters the myth of Japanese invincibility.",
           "focus": [
-              "eighth_main"
+              "era_pxg"
           ],
-          "side": "eighth",
+          "side": "eighth_route",
           "commanders": [],
           "assets": [],
           "forces_zh": "",
@@ -335,7 +337,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "平型关为国共合作抗日首场大胜，具有重要政治与军事意义。",
           "narration_en": "Pingxingguan is the first major victory of the United Front against Japan.",
           "focus": [],
-          "side": "eighth",
+          "side": "eighth_route",
           "commanders": [],
           "assets": [],
           "forces_zh": "",

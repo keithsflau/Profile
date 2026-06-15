@@ -11,16 +11,16 @@ window.BATTLE_DATA = (function () {
           "nations"
       ],
       "geo": {
-          "minLng": 33.2,
-          "maxLng": 37.2,
-          "minLat": 30.7,
-          "maxLat": 33.7,
+          "minLng": 33.93,
+          "maxLng": 36.43,
+          "minLat": 31.22,
+          "maxLat": 33.22,
           "Z": 9
       },
       "startDate": "士師記",
       "introCam": {
-          "lng": 35.2,
-          "lat": 32.2,
+          "lng": 35.1845,
+          "lat": 32.2225,
           "dist": 700,
           "az": 200,
           "el": 46,
@@ -33,8 +33,8 @@ window.BATTLE_DATA = (function () {
           "narr_en": "Israel did evil again; the LORD gave them into the hand of their enemies."
       },
       "outroCam": {
-          "lng": 35.2,
-          "lat": 32.2,
+          "lng": 35.1845,
+          "lat": 32.2225,
           "dist": 840,
           "az": 200,
           "el": 48,
@@ -62,25 +62,68 @@ window.BATTLE_DATA = (function () {
       "regions": [],
       "points": [
           {
+              "name_zh": "示羅",
+              "name_en": "Shiloh",
+              "type": "town",
+              "lng": 35.29,
+              "lat": 32.057,
+              "ref": "士 21:19"
+          },
+          {
               "name_zh": "米吉多",
               "name_en": "Megiddo",
               "type": "fort",
-              "lng": 35.18,
-              "lat": 32.58
+              "lng": 35.185,
+              "lat": 32.585,
+              "ref": "士 5:19"
           },
           {
-              "name_zh": "基列",
-              "name_en": "Gilead",
-              "type": "region",
-              "lng": 35.7,
-              "lat": 32.4
+              "name_zh": "他泊山",
+              "name_en": "Mount Tabor",
+              "type": "peak",
+              "lng": 35.391,
+              "lat": 32.687,
+              "ref": "士 4:6"
           },
           {
-              "name_zh": "以法蓮山",
-              "name_en": "Ephraim",
+              "name_zh": "基順河",
+              "name_en": "Kishon",
+              "type": "bay",
+              "lng": 35.12,
+              "lat": 32.55,
+              "ref": "士 4:7"
+          },
+          {
+              "name_zh": "俄弗拉",
+              "name_en": "Ophrah",
+              "type": "town",
+              "lng": 35.203,
+              "lat": 32.189,
+              "ref": "士 6:11"
+          },
+          {
+              "name_zh": "耶斯列",
+              "name_en": "Jezreel",
               "type": "region",
-              "lng": 35.2,
-              "lat": 32.2
+              "lng": 35.329,
+              "lat": 32.557,
+              "ref": "士 6:33"
+          },
+          {
+              "name_zh": "瑣拉",
+              "name_en": "Zorah",
+              "type": "town",
+              "lng": 34.978,
+              "lat": 31.758,
+              "ref": "士 13:2"
+          },
+          {
+              "name_zh": "基比亞",
+              "name_en": "Gibeah",
+              "type": "town",
+              "lng": 35.239,
+              "lat": 31.823,
+              "ref": "士 19:12"
           }
       ],
       "lines": []
@@ -92,27 +135,41 @@ window.BATTLE_DATA = (function () {
           "kind": "infantry",
           "crest": "shield",
           "cf": true,
-          "name_zh": "以色列支派",
-          "name_en": "Tribes of Israel",
+          "name_zh": "以色列",
+          "name_en": "Israel",
           "track": [
               {
                   "d": 1,
-                  "lng": 35.2,
-                  "lat": 32.2,
+                  "lng": 35.29,
+                  "lat": 32.057,
                   "s": 40000,
                   "st": "hold"
               },
               {
-                  "d": 50,
-                  "lng": 35.18,
-                  "lat": 32.58,
-                  "s": 60000,
+                  "d": 30,
+                  "lng": 35.391,
+                  "lat": 32.687,
+                  "s": 10000,
                   "st": "attack"
               },
               {
+                  "d": 50,
+                  "lng": 35.203,
+                  "lat": 32.189,
+                  "s": 300,
+                  "st": "attack"
+              },
+              {
+                  "d": 75,
+                  "lng": 34.978,
+                  "lat": 31.758,
+                  "s": 1,
+                  "st": "hold"
+              },
+              {
                   "d": 100,
-                  "lng": 35.2,
-                  "lat": 32.2,
+                  "lng": 35.29,
+                  "lat": 32.057,
                   "s": 50000,
                   "st": "hold"
               }
@@ -128,17 +185,31 @@ window.BATTLE_DATA = (function () {
           "name_en": "Midian / Philistines",
           "track": [
               {
-                  "d": 1,
-                  "lng": 35.5,
-                  "lat": 31.8,
-                  "s": 50000,
+                  "d": 25,
+                  "lng": 35.12,
+                  "lat": 32.55,
+                  "s": 90000,
                   "st": "attack"
               },
               {
-                  "d": 60,
-                  "lng": 35.3,
-                  "lat": 32,
+                  "d": 40,
+                  "lng": 35.329,
+                  "lat": 32.557,
+                  "s": 0,
+                  "st": "dead"
+              },
+              {
+                  "d": 70,
+                  "lng": 34.978,
+                  "lat": 31.758,
                   "s": 30000,
+                  "st": "attack"
+              },
+              {
+                  "d": 85,
+                  "lng": 34.978,
+                  "lat": 31.758,
+                  "s": 5000,
                   "st": "retreat"
               }
           ]
@@ -148,10 +219,18 @@ window.BATTLE_DATA = (function () {
   const fronts =   [];
   const hotspots =   [
       {
-          "a": 30,
-          "b": 80,
-          "lng": 35.2,
-          "lat": 32.3,
+          "a": 28,
+          "b": 45,
+          "lng": 35.12,
+          "lat": 32.55,
+          "kind": "firefight",
+          "i": 0.85
+      },
+      {
+          "a": 48,
+          "b": 58,
+          "lng": 35.203,
+          "lat": 32.189,
           "kind": "firefight",
           "i": 0.7
       }
@@ -176,31 +255,30 @@ window.BATTLE_DATA = (function () {
       "sources": "和合本、聖經地圖、教會史資料（交叉查證）。"
   };
   const analysis =   {
-      "military": "士師時代呈現「犯罪—受壓—呼求—興起士師—太平—再犯罪」的循環；主要戰役包括底波拉抗西西拉、基甸擊米甸、參孫對非利士等。",
-      "leaders": "俄陀聶、以笏、底波拉、基甸、參孫、撒母耳等士師；敵軍包括米甸人、摩押人、迦南王、非利士人。",
-      "nationalPower": "士師顯明人心偏離與神恩典的介入；「各人任意而行」反映沒有王時的混亂，預示需要合神心意的君王。",
-      "impact": "為大衛王朝與王國興起鋪路；新約將士師時期視為救恩歷史中管教與等候的階段。"
+      "military": "士師記呈現犯罪—壓制—興起士師循環：底波拉在他泊召巴拉，基順河潰敗西西拉（士4-5）；基甸在俄弗拉率三百人擊米甸（士6-7）；參孫出自瑣拉，對抗非利士（士13-16）。",
+      "leaders": "底波拉、巴拉、基甸、參孫、撒母耳。",
+      "nationalPower": "「各人任意而行」顯明需要合神心意的君王。",
+      "impact": "為大衛王朝興起鋪路。"
   };
   const storyboard =   [
       {
           "day": 1,
           "hold": 8,
           "cam": {
-              "lng": 35.2,
-              "lat": 32.2,
+              "lng": 35.29,
+              "lat": 32.057,
               "dist": 650,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
-          "dateLabel": "約前1400–1050年",
-          "title_zh": "循環開始",
-          "title_en": "Cycle of Apostasy",
-          "narration_zh": "以色列人行耶和華眼中看為惡的事，耶和華就把他們交在仇敵手中。",
-          "narration_en": "Israel did evil and the LORD gave them into enemy hands.",
+          "dateLabel": "士師時代",
+          "title_zh": "示羅",
+          "title_en": "Shiloh",
+          "narration_zh": "士21:19 以色列人在示羅有耶和華的節期；士師時代宗教中心。",
+          "narration_en": "Judg 21:19 — Shiloh was a central sanctuary in the judges era.",
           "focus": [
-              "judges_is",
-              "judges_en"
+              "judges_is"
           ],
           "side": "both",
           "commanders": [],
@@ -209,21 +287,21 @@ window.BATTLE_DATA = (function () {
           "forces_en": ""
       },
       {
-          "day": 25,
+          "day": 30,
           "hold": 8,
           "cam": {
-              "lng": 35.18,
-              "lat": 32.58,
+              "lng": 35.391,
+              "lat": 32.687,
               "dist": 600,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
           "dateLabel": "約前1200年",
-          "title_zh": "底波拉與巴拉",
-          "title_en": "Deborah and Barak",
-          "narration_zh": "底波拉召巴拉在他納河邊攻擊西西拉，耶和華使敵軍潰敗。",
-          "narration_en": "Deborah and Barak defeated Sisera at the Kishon — the LORD routed the enemy.",
+          "title_zh": "他泊山",
+          "title_en": "Mount Tabor",
+          "narration_zh": "士4:6 底波拉打發人去基拿他山，從拿弗他利、西布倫支派招巴拉。",
+          "narration_en": "Judg 4:6 — Deborah summoned Barak to Mount Tabor.",
           "focus": [
               "judges_is"
           ],
@@ -239,21 +317,49 @@ window.BATTLE_DATA = (function () {
           "forces_en": ""
       },
       {
-          "day": 45,
+          "day": 38,
           "hold": 8,
           "cam": {
-              "lng": 35.5,
-              "lat": 32,
+              "lng": 35.12,
+              "lat": 32.55,
               "dist": 580,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
+          "dateLabel": "約前1200年",
+          "title_zh": "基順河",
+          "title_en": "Kishon",
+          "narration_zh": "士4:7 耶和華必使西西拉與全軍敗亡在基順河邊。",
+          "narration_en": "Judg 4:7 — The LORD routed Sisera at the Kishon.",
+          "focus": [
+              "judges_is",
+              "judges_en"
+          ],
+          "side": "both",
+          "commanders": [],
+          "assets": [
+              "firefight"
+          ],
+          "forces_zh": "",
+          "forces_en": ""
+      },
+      {
+          "day": 50,
+          "hold": 8,
+          "cam": {
+              "lng": 35.203,
+              "lat": 32.189,
+              "dist": 560,
+              "az": 200,
+              "el": 46,
+              "orbit": 0.65
+          },
           "dateLabel": "約前1160年",
-          "title_zh": "基甸擊米甸",
-          "title_en": "Gideon vs Midian",
-          "narration_zh": "基甸率三百人吹角擊破米甸大軍，「耶和華為你們爭戰」。",
-          "narration_en": "Gideon's three hundred routed Midian — 'The LORD fought for you.'",
+          "title_zh": "俄弗拉",
+          "title_en": "Ophrah",
+          "narration_zh": "士6:11 耶和華的使者向基甸顯現；士7 三百人擊破米甸營。",
+          "narration_en": "Judg 6-7 — Gideon at Ophrah; three hundred routed Midian.",
           "focus": [
               "judges_is"
           ],
@@ -269,21 +375,21 @@ window.BATTLE_DATA = (function () {
           "forces_en": ""
       },
       {
-          "day": 65,
+          "day": 75,
           "hold": 8,
           "cam": {
-              "lng": 35,
-              "lat": 31.8,
-              "dist": 560,
+              "lng": 34.978,
+              "lat": 31.758,
+              "dist": 540,
               "az": 200,
               "el": 46,
               "orbit": 0.65
           },
           "dateLabel": "士師末期",
-          "title_zh": "參孫與非利士",
-          "title_en": "Samson and Philistia",
-          "narration_zh": "參孫作以色列士師，與非利士人周旋；最終在神裡同歸於盡。",
-          "narration_en": "Samson judged Israel and clashed with the Philistines until his final act of faith.",
+          "title_zh": "瑣拉",
+          "title_en": "Zorah",
+          "narration_zh": "士13:2 參孫生在瑣拉，屬但支派；與非利士人周旋。",
+          "narration_en": "Judg 13:2 — Samson of Zorah judged Israel against the Philistines.",
           "focus": [
               "judges_en"
           ],
@@ -299,11 +405,11 @@ window.BATTLE_DATA = (function () {
           "forces_en": ""
       },
       {
-          "day": 88,
+          "day": 100,
           "hold": 8,
           "cam": {
-              "lng": 35.2,
-              "lat": 32.2,
+              "lng": 35.29,
+              "lat": 32.057,
               "dist": 680,
               "az": 200,
               "el": 46,
@@ -312,8 +418,8 @@ window.BATTLE_DATA = (function () {
           "dateLabel": "約前1050年",
           "title_zh": "求立王",
           "title_en": "Demand for a King",
-          "narration_zh": "士師時代末期，百姓求撒母耳立王，預示掃羅與大衛時代來臨。",
-          "narration_en": "At the end of the judges era Israel demanded a king — the monarchy was near.",
+          "narration_zh": "士21:25 那時沒有王，各人任意而行；撒母耳時代人求立王。",
+          "narration_en": "Judg 21:25 — Everyone did as they saw fit; Israel later demanded a king.",
           "focus": [
               "judges_is"
           ],
@@ -330,8 +436,8 @@ window.BATTLE_DATA = (function () {
       "narration_zh": "本段為聖經與教會史重要考點。",
       "narration_en": "A key Bible and church history topic.",
       "cam": {
-          "lng": 35.2,
-          "lat": 32.2,
+          "lng": 35.1845,
+          "lat": 32.2225,
           "dist": 840,
           "az": 200,
           "el": 48,

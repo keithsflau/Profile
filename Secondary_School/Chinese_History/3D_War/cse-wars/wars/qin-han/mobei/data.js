@@ -44,6 +44,8 @@ window.BATTLE_DATA = (function () {
           "el": 48,
           "orbit": 0.65
       },
+      "terrainMode": "steppe",
+      "reliefScale": 0.4,
       "nextBattle": {
           "href": "../../weijin/guandu/",
           "title_zh": "官渡之戰",
@@ -88,7 +90,8 @@ window.BATTLE_DATA = (function () {
               "lat": 42.5
           }
       ],
-      "lines": []
+      "lines": [],
+      "water": []
   };
   const units =   [
       {
@@ -198,7 +201,8 @@ window.BATTLE_DATA = (function () {
       "summary": "漠北之戰 — DSE 中史互動戰役地圖（教學示意）。",
       "caveats": [
           "本圖僅覆蓋該戰役核心區域；戰線與兵力為教學示意。",
-          "衛星影像為現代地形，非歷史時期地貌。"
+          "衛星影像為現代地形，非歷史時期地貌。",
+          "河川、海域水面為教學示意，按史實位置裁切顯示。"
       ],
       "sources": "DSE 中史課程、中國通史、維基百科（交叉查證）。"
   };
@@ -226,7 +230,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "衛青、霍去病各率五萬騎出擊，直搗漠北匈奴腹地。",
           "narration_en": "Wei Qing and Huo Qubing each lead 50,000 cavalry deep into the northern steppe.",
           "focus": [
-              "han_main"
+              "han_mobei"
           ],
           "side": "han",
           "commanders": [
@@ -260,14 +264,12 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "漢軍與匈奴主力在漠北遭遇，以快騎衝鋒與迂回包抄破敵。",
           "narration_en": "Han and Xiongnu clash in the Gobi — swift cavalry charges decide the day.",
           "focus": [
-              "han_main",
-              "xiongnu_main"
+              "han_mobei",
+              "xiongnu_mobei"
           ],
           "side": "both",
           "commanders": [],
-          "assets": [
-              "artillery"
-          ],
+          "assets": [],
           "forces_zh": "",
           "forces_en": ""
       },
@@ -288,7 +290,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "霍去病追擊至狼居胥山，祭天告成，匈奴遠遁。",
           "narration_en": "Huo Qubing reaches Langjuxu Mountain, performs the rite of victory — the Xiongnu flee far north.",
           "focus": [
-              "han_main"
+              "han_mobei"
           ],
           "side": "han",
           "commanders": [
@@ -318,7 +320,7 @@ window.BATTLE_DATA = (function () {
           "narration_zh": "匈奴單于率部遠徙，漠南無王庭，邊患大減。",
           "narration_en": "The Chanyu withdraws far north — the southern steppe is cleared of the royal court.",
           "focus": [
-              "xiongnu_main"
+              "xiongnu_mobei"
           ],
           "side": "xiongnu",
           "commanders": [],

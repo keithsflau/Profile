@@ -603,7 +603,7 @@ function buildCatalog(ctx) {
                 { d: 25, f: "eighth_route", from: [113.2, 38.2], to: [113.58, 37.87], label: "破壞交通線", kind: "attack" },
                 { d: 70, f: "japan", from: [114.2, 37.3], to: [113.58, 37.87], label: "報復掃蕩", kind: "attack" },
               ],
-              hotspots: [{ a: 20, b: 90, lng: 113.58, lat: 37.87, kind: "explosion", i: 0.9 }],
+              hotspots: [{ a: 20, b: 90, lng: 113.58, lat: 37.87, kind: "firefight", i: 0.9 }],
               storyboard: [
                 { day: 25, hold: 9, cam: cam(113.4, 38.0, 680), dateLabel: "1940年8月20日", title_zh: "破襲交通線", title_en: "Railway offensive", narration_zh: "八路軍同時破壞正太、同浦等鐵路。", narration_en: "Coordinated attacks on railways across North China.", focus: ["era_hr"], side: "eighth_route" },
                 { day: 80, hold: 10, cam: cam(113.58, 37.87, 640), dateLabel: "1940年冬", title_zh: "敵後最大攻勢", title_en: "Largest guerrilla offensive", narration_zh: "破壞日軍交通，鼓舞敵後民心，亦引日軍報復掃蕩。", narration_en: "Massive sabotage — Japan responds with brutal reprisals.", focus: ["era_hr", "japan_hr"], side: "both" },
@@ -648,7 +648,7 @@ function buildCatalog(ctx) {
                 { id: "kmt_liaoshen", faction: "kmt", kind: "infantry", crest: "eagle", cf: true, name_zh: "國軍東北集團軍", name_en: "KMT Northeast Group", track: [{ d: 1, lng: 123.43, lat: 41.8, s: 550000, st: "hold" }, { d: 70, lng: 121.13, lat: 41.1, s: 200000, st: "retreat" }, { d: 100, lng: 123.43, lat: 41.8, s: 50000, st: "dead" }] },
               ],
               arrows: [{ d: 40, f: "pla", from: [122.5, 42.5], to: [121.13, 41.1], label: "攻取錦州", kind: "attack" }],
-              hotspots: [{ a: 30, b: 90, lng: 121.13, lat: 41.1, kind: "artillery", i: 1 }],
+              hotspots: [{ a: 30, b: 90, lng: 121.13, lat: 41.1, kind: "firefight", i: 1 }],
               storyboard: [
                 { day: 25, hold: 9, cam: cam(122.0, 41.8, 680), dateLabel: "1948年9月", title_zh: "圍城打援", title_en: "Siege and encirclement", narration_zh: "解放軍圍錦州，斷國軍東北退路。", narration_en: "PLA besieges Jinzhou — cutting off the Northeast.", focus: ["pla_liaoshen"], side: "pla" },
                 { day: 85, hold: 10, cam: cam(123.43, 41.8, 640), dateLabel: "1948年11月", title_zh: "東北解放", title_en: "Northeast liberated", narration_zh: "遼瀋戰役結束，東北全境解放，兵力對比逆轉。", narration_en: "The Northeast falls — the balance of power shifts.", focus: ["pla_liaoshen", "kmt_liaoshen"], side: "both" },
@@ -679,7 +679,7 @@ function buildCatalog(ctx) {
                 { id: "kmt_huaihai", faction: "kmt", kind: "infantry", crest: "eagle", cf: true, name_zh: "國軍徐蚌集團", name_en: "KMT Xuzhou-Bengbu Group", track: [{ d: 1, lng: 117.2, lat: 34.25, s: 800000, st: "hold" }, { d: 60, lng: 117.12, lat: 34.35, s: 300000, st: "retreat" }, { d: 100, lng: 117.2, lat: 34.25, s: 50000, st: "dead" }] },
               ],
               arrows: [{ d: 35, f: "pla", from: [116.5, 34.5], to: [117.2, 34.25], label: "合圍徐州", kind: "attack" }],
-              hotspots: [{ a: 25, b: 95, lng: 117.2, lat: 34.25, kind: "artillery", i: 1.2 }],
+              hotspots: [{ a: 25, b: 95, lng: 117.2, lat: 34.25, kind: "firefight", i: 1.2 }],
               storyboard: [
                 { day: 20, hold: 9, cam: cam(117.2, 34.35, 660), dateLabel: "1948年11月", title_zh: "徐蚌大戰", title_en: "Battle for Xuzhou", narration_zh: "國軍黃維、杜聿明集團被圍。", narration_en: "KMT army groups are encircled.", focus: ["kmt_huaihai"], side: "kmt" },
                 { day: 90, hold: 10, cam: cam(117.2, 34.25, 620), dateLabel: "1949年1月", title_zh: "淮海勝利", title_en: "Huaihai victory", narration_zh: "國軍主力被殲，長江以北盡歸解放軍。", narration_en: "KMT main forces destroyed — north of the Yangtze falls.", focus: ["pla_huaihai", "kmt_huaihai"], side: "both" },
@@ -713,7 +713,7 @@ function buildCatalog(ctx) {
                 { d: 30, f: "pla", from: [115.5, 40.2], to: [117.2, 39.08], label: "攻克天津", kind: "attack" },
                 { d: 90, f: "kmt", from: [116.4, 39.9], to: [116.4, 39.9], label: "接受改編", kind: "march" },
               ],
-              hotspots: [{ a: 40, b: 85, lng: 117.2, lat: 39.08, kind: "artillery", i: 1 }],
+              hotspots: [{ a: 40, b: 85, lng: 117.2, lat: 39.08, kind: "firefight", i: 1 }],
               storyboard: [
                 { day: 30, hold: 9, cam: cam(117.2, 39.08, 600), dateLabel: "1949年1月", title_zh: "攻克天津", title_en: "Tianjin captured", narration_zh: "解放軍29小時攻克天津，震懾北平守軍。", narration_en: "Tianjin falls in 29 hours.", focus: ["pla_pingjin"], side: "pla" },
                 { day: 95, hold: 10, cam: cam(116.4, 39.9, 560), dateLabel: "1949年1月31日", title_zh: "和平解放北平", title_en: "Peaceful liberation", narration_zh: "傅作義接受改編，北平和平解放，文物古蹟得以保全。", narration_en: "Fu Zuoyi surrenders — Beiping is liberated without destruction.", focus: ["pla_pingjin", "kmt_pingjin"], side: "both" },
