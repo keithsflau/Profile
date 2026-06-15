@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -455,7 +455,7 @@
         // --- Logic: Frequency Distribution ---
         function updateAnalysis() {
             const slider = document.getElementById('binSlider');
-            const binWidth = parseInt(slider.value);
+            const binWidth = parseInt(slider.value, 10);
             document.getElementById('binDisplay').innerText = binWidth + " cm";
 
             // 1. Create Bins

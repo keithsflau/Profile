@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>小三數學：約數（四捨五入至十位） | Rounding (Tens)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="../../common/i18n.js"></script>
     <link
@@ -212,7 +212,7 @@
                       setNum(
                         Math.max(
                           0,
-                          Math.min(100, parseInt(e.target.value) || 0)
+                          Math.min(100, parseInt(e.target.value, 10) || 0)
                         )
                       )
                     }
@@ -225,7 +225,7 @@
                   max="100"
                   step="1"
                   value={num}
-                  onChange={(e) => setNum(parseInt(e.target.value))}
+                  onChange={(e) => setNum(parseInt(e.target.value, 10))}
                   className="w-full h-4 bg-pink-200 rounded-lg appearance-none cursor-pointer accent-pink-600"
                 />
               </div>

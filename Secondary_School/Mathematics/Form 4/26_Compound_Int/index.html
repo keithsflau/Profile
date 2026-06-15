@@ -136,7 +136,7 @@
                           <div>
                               <label className="text-sm font-bold text-slate-500 block mb-2">{t.time}</label>
                               <input type="range" min="1" max="30" value={time} onChange={e => setTime(Number(e.target.value))} className="w-full accent-emerald-500" />
-                              <div className="text-right font-mono text-emerald-600 font-bold">{time} yrs</div>
+                              <div className="text-right font-mono text-emerald-600 font-bold">{`${time} yrs`}</div>
                           </div>
                           <div>
                               <label className="text-sm font-bold text-slate-500 block mb-2">{t.compound}</label>
@@ -170,7 +170,9 @@
                       {/* Formula */}
                       <div className="bg-emerald-50 p-4 rounded-xl mb-6 text-center border border-emerald-100">
                           <div className="text-sm font-bold text-emerald-400 uppercase mb-2">{t.formula}</div>
-                          <div className="text-xl font-mono">\[ A = P\left(1 + \frac{r}{n}\right)^{nt} = {P.toLocaleString()}\left(1 + \frac{ {(r/100).toFixed(4)} }{ {n} }\right)^{ {n} \times {time} } \]</div>
+                          <div className="text-xl font-mono">
+                            {`\\\\[ A = P\\\\left(1 + \\\\frac{r}{n}\\\\right)^{nt} = ${P.toLocaleString()}\\\\left(1 + \\\\frac{ ${(r / 100).toFixed(4)} }{ ${n} }\\\\right)^{ ${n} \\\\times ${time} } \\\\]`}
+                          </div>
                       </div>
 
                       {/* Results */}

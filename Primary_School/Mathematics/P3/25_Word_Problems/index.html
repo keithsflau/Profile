@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <title>小三數學：應用題訓練 | Word Problems</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="../../common/i18n.js"></script>
     <link
@@ -185,7 +185,7 @@
         const p = t.problems[current]; // Using translated structure directly
 
         const check = () => {
-          if (parseInt(answer) === p.a) {
+          if (parseInt(answer, 10) === p.a) {
             setFeedback("correct");
             setScore((s) => s + 10);
             setTimeout(() => {

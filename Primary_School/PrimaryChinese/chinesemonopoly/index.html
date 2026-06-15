@@ -421,7 +421,7 @@
 
         // Initialize Game
         function initGame(numPlayers = 2) {
-            gameState.numPlayers = Math.min(Math.max(parseInt(numPlayers) || 2, 2), 4);
+            gameState.numPlayers = Math.min(Math.max(parseInt(numPlayers, 10) || 2, 2), 4);
             
             // Create players
             gameState.players = [];
@@ -806,7 +806,7 @@
             // Add event listeners to options
             document.querySelectorAll('.option-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
-                    const selectedAnswer = parseInt(this.dataset.answer);
+                    const selectedAnswer = parseInt(this.dataset.answer, 10);
                     checkPurchaseAnswer(question, selectedAnswer, property);
                 });
             });
@@ -1060,7 +1060,7 @@
         // Setup modal - player count buttons
         document.querySelectorAll('.player-count-btn').forEach(btn => {
             btn.addEventListener('click', function() {
-                const numPlayers = parseInt(this.dataset.count);
+                const numPlayers = parseInt(this.dataset.count, 10);
                 initGame(numPlayers);
             });
         });

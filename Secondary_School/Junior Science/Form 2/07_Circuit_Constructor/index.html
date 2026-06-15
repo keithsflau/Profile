@@ -100,32 +100,45 @@
           setGrid(newGrid);
         };
 
-        // Circuit Logic (Very simplified for 3x3)
-        // Check if we have a loop involving Battery -> Wire/Switch/Load -> Battery
-        // For 3x3, just check if we have enough components and if all switches are closed?
-        // Let's implement a rigid "Series Circuit Checker":
-        // Needs at least 1 Battery, 1 Bulb. If switch exists, must be closed.
-        // If path connects? (Too hard for simple grid logic without graph traversal).
-        // Approximation: If grid contains Battery AND Bulb, AND (no Switch OR Switch is closed), light up.
+        // Circuit: battery must connect to bulb through adjacent conducting cells (wires, closed switch, etc.)
         useEffect(() => {
-          const hasBattery = grid.some((c) => c && c.id === "battery");
-          const hasBulb = grid.some((c) => c && c.id === "bulb");
-          const switches = grid.filter((c) => c && c.id === "switch");
-          const allSwitchesClosed = switches.every((s) => s.state === true);
-
-          // Also check connectivity crudely: do we have > 3 components placed?
-          const componentCount = grid.filter((c) => c).length;
-
-          if (
-            hasBattery &&
-            hasBulb &&
-            allSwitchesClosed &&
-            componentCount >= 4
-          ) {
-            setIsClosed(true);
-          } else {
+          const conducts = (c) => {
+            if (!c) return false;
+            if (c.id === "switch") return c.state === true;
+            return true;
+          };
+          const neighbors = (i) => {
+            const row = Math.floor(i / 3);
+            const col = i % 3;
+            const out = [];
+            if (row > 0) out.push(i - 3);
+            if (row < 2) out.push(i + 3);
+            if (col > 0) out.push(i - 1);
+            if (col < 2) out.push(i + 1);
+            return out;
+          };
+          const start = grid.findIndex((c) => c && c.id === "battery");
+          const goal = grid.findIndex((c) => c && c.id === "bulb");
+          if (start === -1 || goal === -1) {
             setIsClosed(false);
+            return;
           }
+          const q = [start];
+          const seen = new Set([start]);
+          while (q.length) {
+            const i = q.shift();
+            if (i === goal) {
+              setIsClosed(true);
+              return;
+            }
+            for (const j of neighbors(i)) {
+              if (seen.has(j)) continue;
+              if (!conducts(grid[j])) continue;
+              seen.add(j);
+              q.push(j);
+            }
+          }
+          setIsClosed(false);
         }, [grid]);
 
         return (

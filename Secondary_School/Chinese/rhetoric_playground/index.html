@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-HK">
 
 <head>
@@ -16,6 +16,16 @@
             font-family: 'Noto Sans TC', sans-serif;
             overflow: hidden;
             user-select: none;
+            touch-action: manipulation; /* reduce double-tap zoom delay on phones */
+        }
+
+        /* Small screens: allow scroll so HUD / cards are not clipped */
+        @media (max-width: 768px) {
+            body {
+                overflow-y: auto;
+                overflow-x: hidden;
+                user-select: text;
+            }
         }
 
         /* Neon Glow Texts */
@@ -485,7 +495,7 @@
     <script src="../../../visit-counter.js"></script>
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
-        VisitCounter.init('seconardychinese/rhetoric_playground/index', {
+        VisitCounter.init('secondary_school/chinese/rhetoric_playground/index', {
             scriptUrl: SCRIPT_URL,
             containerId: 'visit-counter-container'
         });

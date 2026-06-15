@@ -8,11 +8,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script
       crossorigin
-      src="https://unpkg.com/react@18/umd/react.development.js"
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
     ></script>
     <script
       crossorigin
-      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
     ></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -238,7 +238,7 @@
                     max="600"
                     step="5"
                     value={weight}
-                    onChange={(e) => setWeight(parseInt(e.target.value))}
+                    onChange={(e) => setWeight(parseInt(e.target.value, 10) || 0)}
                     className="w-full accent-cyan-500"
                     disabled={activeStep > 0 && activeStep < 6}
                   />

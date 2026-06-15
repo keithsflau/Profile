@@ -3,21 +3,21 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Cell, ResponsiveContainer } from 'recharts';
 import { Sun, Leaf, Rabbit, Bird, AlertTriangle, Flame, Wind } from 'lucide-react';
 
-// Energy flow calculation based on 10% rule
+// Energy flow calculation based on 10% rule (≈10% of each trophic level's energy passes to the next)
 const calculateEnergyFlow = (solarInput) => {
   const producer = solarInput * 0.01; // 1% fixation
   const producerRespiration = producer * 0.7; // 70% lost to respiration
   const producerAvailable = producer - producerRespiration;
-  
-  const primaryConsumer = producerAvailable * 0.1; // 10% transfer
+
+  const primaryConsumer = producer * 0.1; // 10% of producer energy transferred up
   const primaryRespiration = primaryConsumer * 0.7;
   const primaryAvailable = primaryConsumer - primaryRespiration;
-  
-  const secondaryConsumer = primaryAvailable * 0.1;
+
+  const secondaryConsumer = primaryConsumer * 0.1;
   const secondaryRespiration = secondaryConsumer * 0.7;
   const secondaryAvailable = secondaryConsumer - secondaryRespiration;
-  
-  const tertiaryConsumer = secondaryAvailable * 0.1;
+
+  const tertiaryConsumer = secondaryConsumer * 0.1;
   const tertiaryRespiration = tertiaryConsumer * 0.7;
   const tertiaryAvailable = tertiaryConsumer - tertiaryRespiration;
   

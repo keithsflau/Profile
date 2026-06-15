@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -8,7 +8,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <!-- MathJax for Formulas -->
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <style>
@@ -171,7 +170,7 @@
         // --- UPDATE FUNCTION ---
         function updateSankey() {
             // 1. Get Values
-            const eff = parseInt(slider.value); // 0 to 100
+            const eff = parseInt(slider.value, 10); // 0 to 100
             const waste = 100 - eff;
 
             // 2. Update Text

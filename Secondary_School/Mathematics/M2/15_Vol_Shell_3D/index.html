@@ -253,7 +253,7 @@
         while (solidGroup.children.length > 0)
           solidGroup.remove(solidGroup.children[0]);
 
-        const n = parseInt(document.getElementById("shells").value);
+        const n = parseInt(document.getElementById("shells").value, 10);
         const rMax = parseFloat(document.getElementById("radiusMax").value);
         const angleMax = parseFloat(document.getElementById("angle").value);
 

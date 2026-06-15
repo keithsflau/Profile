@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -290,7 +290,7 @@
                 glowColor: '#ffffff',
                 lines: [
                     { wl: 587.1, intensity: 0.8, name: 'Yellow Line' },
-                    { wl: 557.0, intensity: 1.0, name: 'Strong Green Line' }, 
+                    { wl: 450.2, intensity: 1.0, name: 'Blue-Green Line' }, 
                     { wl: 427.4, intensity: 0.6 }
                 ]
             },
@@ -777,12 +777,13 @@
                     photons.push(new Photon(px, py, activeElement.glowColor));
                 }
 
-                // Update and draw photons
-                photons.forEach((p, index) => {
+                // Update and draw photons (iterate backwards when splicing)
+                for (let i = photons.length - 1; i >= 0; i--) {
+                    const p = photons[i];
                     p.update();
                     p.draw(ctx);
-                    if(p.life <= 0) photons.splice(index, 1);
-                });
+                    if (p.life <= 0) photons.splice(i, 1);
+                }
             }
 
             animationId = requestAnimationFrame(animate);

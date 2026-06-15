@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <title>小三數學：單數與雙數 | Even and Odd</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <script src="../../common/i18n.js"></script>
@@ -145,7 +145,7 @@
                 value={num}
                 onChange={(e) =>
                   setNum(
-                    Math.max(0, Math.min(30, parseInt(e.target.value) || 0))
+                    Math.max(0, Math.min(30, parseInt(e.target.value, 10) || 0))
                   )
                 }
                 className="w-full px-8 py-6 text-6xl font-black text-center rounded-2xl border-4 border-orange-300 mb-6 focus:border-orange-600 outline-none"

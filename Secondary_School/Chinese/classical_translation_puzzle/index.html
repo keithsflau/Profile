@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-HK">
 
 <head>
@@ -49,6 +49,7 @@
         ];
         let currentPuzzle = 0;
         let userTranslation = [];
+        let tokenSeq = 0;
 
         function loadPuzzle() {
             const puzzle = PUZZLES[currentPuzzle];
@@ -66,22 +67,28 @@
             });
             document.getElementById('translation-area').innerHTML = '';
             userTranslation = [];
+            tokenSeq = 0;
         }
 
         function addWord(word, btn) {
-            userTranslation.push(word);
+            const token = { id: tokenSeq++, word };
+            userTranslation.push(token);
             const area = document.getElementById('translation-area');
             const wordEl = document.createElement('div');
             wordEl.className = 'bg-green-700 px-3 py-1 rounded';
             wordEl.textContent = word;
-            wordEl.onclick = () => { userTranslation = userTranslation.filter(w => w !== word); wordEl.remove(); btn.style.opacity = '1'; };
+            wordEl.onclick = () => {
+                userTranslation = userTranslation.filter(t => t.id !== token.id);
+                wordEl.remove();
+                btn.style.opacity = '1';
+            };
             area.appendChild(wordEl);
             btn.style.opacity = '0.3';
         }
 
         function check() {
             const puzzle = PUZZLES[currentPuzzle];
-            const userAnswer = userTranslation.join('');
+            const userAnswer = userTranslation.map(t => t.word).join('');
             if (userAnswer === puzzle.correct) {
                 document.getElementById('feedback').innerHTML = '✅ <span class="text-green-400">正確！</span>';
                 setTimeout(() => { currentPuzzle++; if (currentPuzzle < PUZZLES.length) loadPuzzle(); else alert('全部完成！'); }, 2000);
@@ -100,7 +107,7 @@
     <script src="../../../visit-counter.js"></script>
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
-        VisitCounter.init('seconardychinese/classical_translation_puzzle/index', {
+        VisitCounter.init('secondary_school/chinese/classical_translation_puzzle/index', {
             scriptUrl: SCRIPT_URL,
             containerId: 'visit-counter-container'
         });

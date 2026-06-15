@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>小二數學：跳數複習 | Skip Counting Review</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="../../common/i18n.js"></script>
     <link
@@ -91,7 +91,7 @@
         useEffect(() => newGame(2), []);
 
         const checkGame = () => {
-          if (parseInt(input) === ans) {
+          if (parseInt(input, 10) === ans) {
             setFeedback("CORRECT");
             setTimeout(() => newGame(step), 1500);
           } else {

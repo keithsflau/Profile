@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -306,7 +306,7 @@
             // 3. Bernoulli Calculation for Pressure
             // P1 + 0.5 * rho * v1^2 = P2 + 0.5 * rho * v2^2
             // We set a base total head to ensure P is positive for visualization
-            const totalHead = BASE_PRESSURE_HEAD + 0.5 * RHO * Math.pow(state.v1 * 0.5, 2) + 100; // +100 static offset
+            const totalHead = BASE_PRESSURE_HEAD + 0.5 * RHO * Math.pow(state.v1, 2) + 100; // +100 static offset (consistent with p1/p2)
             
             // Calculate dynamic pressure heads (visual height in pixels)
             // Note: v terms are scaled down slightly to make visual height differences less extreme

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-HK">
 
 <head>
@@ -53,7 +53,7 @@
     </div>
     <script>
         const CASES = [
-            { sentence: "何陋之有？", particle: "之", options: ["代詞 (它)", "助詞 (的)", "動詞 (到/往)"], correct: 0, evidence: "此句為倒裝句，原句應為「有何陋」，「之」代替「陋室」，故為代詞。" },
+            { sentence: "何陋之有？", particle: "之", options: ["代詞 (它)", "助詞 (賓語前置標誌)", "動詞 (到/往)"], correct: 1, evidence: "此為賓語前置句，原句為「有何陋」。「之」是賓語前置的結構助詞，標示「陋」前置，不是代詞。" },
             { sentence: "吾欲之南海。", particle: "之", options: ["代詞", "助詞", "動詞 (到/往)"], correct: 2, evidence: "此處「之」解作「前往」，為動詞。" },
             { sentence: "師者，所以傳道授業解惑也。", particle: "也", options: ["語氣助詞", "代詞", "動詞"], correct: 0, evidence: "「也」用於句末，表示判斷語氣，為語氣助詞。" },
             { sentence: "此誠危急存亡之秋也。", particle: "之", options: ["代詞", "助詞 (的)", "動詞"], correct: 1, evidence: "「存亡之秋」即「存亡的時候」，「之」為結構助詞，相當於「的」。" },
@@ -105,7 +105,7 @@
     <script src="../../../visit-counter.js"></script>
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
-        VisitCounter.init('seconardychinese/particle_courtroom/index', {
+        VisitCounter.init('secondary_school/chinese/particle_courtroom/index', {
             scriptUrl: SCRIPT_URL,
             containerId: 'visit-counter-container'
         });

@@ -40,7 +40,7 @@ export function ControlPanel({ currentStep, setStep, totalSteps, toxicology }) {
                         min="0"
                         max={totalSteps - 1}
                         value={currentStep}
-                        onChange={(e) => setStep(parseInt(e.target.value))}
+                        onChange={(e) => setStep(parseInt(e.target.value, 10))}
                         className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-teal-500"
                     />
                     <div className="flex justify-between text-[10px] text-slate-500 px-1 uppercase tracking-wider">

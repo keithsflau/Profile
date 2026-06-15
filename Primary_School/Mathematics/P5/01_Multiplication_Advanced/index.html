@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>小五數學：多位數乘法 | Multi-Digit Multiplication</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
@@ -116,7 +116,7 @@
           .split("")
           .reverse()
           .map((d, i) => {
-            const digit = parseInt(d);
+            const digit = parseInt(d, 10);
             const val = digit * n1;
             const shift = i;
             const realVal = val * Math.pow(10, shift);

@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>小二數學：連加法 | Repeated Addition</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="../../common/i18n.js"></script>
     <link
@@ -85,7 +85,7 @@
           // We expect: count x n
           // or n x count? Usually "3 groups of 2" => 3 x 2.
           // HK Curriculum: "count" x "n" usually.
-          if (parseInt(inputs.count) === count && parseInt(inputs.n) === n) {
+          if (parseInt(inputs.count, 10) === count && parseInt(inputs.n, 10) === n) {
             setFeedback("CORRECT");
             setTimeout(newProb, 2000);
           } else {

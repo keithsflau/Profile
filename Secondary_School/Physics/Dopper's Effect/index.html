@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -46,11 +46,11 @@
             <div class="flex gap-3">
                 <div class="flex items-center gap-2 px-3 py-1 bg-slate-700 rounded-full text-xs border border-slate-600">
                     <div class="w-3 h-3 rounded-full bg-cyan-400 shadow-[0_0_10px_#22d3ee]"></div>
-                    <span>Approaching (Blue Shift)</span>
+                    <span>Approaching observer (higher pitch)</span>
                 </div>
                 <div class="flex items-center gap-2 px-3 py-1 bg-slate-700 rounded-full text-xs border border-slate-600">
                     <div class="w-3 h-3 rounded-full bg-red-400 shadow-[0_0_10px_#f87171]"></div>
-                    <span>Receding (Red Shift)</span>
+                    <span>Receding from observer (lower pitch)</span>
                 </div>
             </div>
         </div>
@@ -145,6 +145,7 @@
         let gainNode = null;
         let isAudioOn = false;
         const BASE_FREQ = 220; // Base note (A3)
+        const V_SOUND = 343; // Speed of sound in air (m/s), for Doppler scaling
 
         // Entities
         let source = { x: 0, y: 0, vx: 0 };
@@ -216,27 +217,15 @@
             // Clamp volume to avoid distortion
             gainNode.gain.setTargetAtTime(volume * 0.15, audioCtx.currentTime, 0.05);
 
-            // 2. Calculate Pitch (Doppler Shift)
-            // Basic approximation logic:
-            // Moving towards center (Left side) -> Higher Pitch
-            // Moving away from center (Right side) -> Lower Pitch
-            
-            let pitchMultiplier = 1;
-            
-            // Doppler Formula Approximation: f = f0 * (v / (v - vs))
-            // We simplify for visual effect scaling
-            const shiftIntensity = sourceSpeed * 0.4;
-
-            if (source.x < centerX) {
-                // Approaching
-                pitchMultiplier = 1 + shiftIntensity;
-            } else {
-                // Receding
-                pitchMultiplier = 1 - (shiftIntensity * 0.8); // Receding often perceived lower
-            }
-
-            // Apply pitch
-            const newFreq = BASE_FREQ * pitchMultiplier;
+            // 2. Calculate Pitch (Doppler Shift) — stationary observer at centre
+            // Source moves +x (left to right). Radial velocity toward observer:
+            //   +vx when source is left of observer (approaching); -vx when right (receding).
+            // Classical: f' = f0 * v_sound / (v_sound - v_r),  v_r = component of source velocity toward observer (positive = approaching).
+            const vsMag = Math.abs(source.vx) * 12; // scale canvas pixels/frame → ~m/s (keeps |v_r| ≪ v_sound)
+            const vRadial = source.x < centerX ? vsMag : -vsMag;
+            const denom = V_SOUND - vRadial;
+            const safeDenom = Math.max(denom, V_SOUND * 0.5); // avoid singularity / negative
+            const newFreq = BASE_FREQ * (V_SOUND / safeDenom);
             oscillator.frequency.setTargetAtTime(newFreq, audioCtx.currentTime, 0.1);
         }
 
@@ -357,7 +346,7 @@
         });
 
         freqSlider.addEventListener('input', (e) => {
-            emissionRate = parseInt(e.target.value);
+            emissionRate = parseInt(e.target.value, 10);
             freqVal.innerText = emissionRate > 20 ? "High" : (emissionRate < 10 ? "Low" : "Normal");
         });
 

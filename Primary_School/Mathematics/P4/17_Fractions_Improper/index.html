@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>小四數學：假分數 | Improper Fractions</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="../../common/i18n.js"></script>
     <link
@@ -94,7 +94,7 @@
                   min="1"
                   value={num}
                   onChange={(e) =>
-                    setNum(Math.max(1, parseInt(e.target.value)))
+                    setNum(Math.max(1, parseInt(e.target.value, 10)))
                   }
                   className="w-full text-5xl font-black text-center bg-transparent border-b-4 border-fuchsia-400 outline-none"
                 />
@@ -104,7 +104,7 @@
                   min="1"
                   value={den}
                   onChange={(e) =>
-                    setDen(Math.max(1, parseInt(e.target.value)))
+                    setDen(Math.max(1, parseInt(e.target.value, 10)))
                   }
                   className="w-full text-5xl font-black text-center bg-transparent border-b-4 border-fuchsia-400 outline-none"
                 />

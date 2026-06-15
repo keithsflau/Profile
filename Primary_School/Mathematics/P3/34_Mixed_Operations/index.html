@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>小三數學：這是一個好玩的混合運算 | Mixed Operations</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <script src="../../common/i18n.js"></script>
@@ -27,6 +27,15 @@
       const { useState } = React;
       const { motion, AnimatePresence } = window.Motion;
       const { LanguageSelector, get } = window.MathI18n;
+
+      /** + − × only (numbers from generated questions) */
+      function applyOp(a, b, op) {
+        const o = (op || "").replace("×", "*");
+        if (o === "+") return a + b;
+        if (o === "-") return a - b;
+        if (o === "*") return a * b;
+        return NaN;
+      }
 
       const t = {
         title: {
@@ -180,9 +189,9 @@
         let step1Val, finalVal, explanationKey, expStr;
 
         if (q.hasBracket) {
-          const inside = eval(`${q.n1} ${q.op1.replace("×", "*")} ${q.n2}`);
+          const inside = applyOp(q.n1, q.n2, q.op1);
           step1Val = inside;
-          finalVal = eval(`${inside} ${q.op2.replace("×", "*")} ${q.n3}`);
+          finalVal = applyOp(inside, q.n3, q.op2);
           explanationKey = "bracket";
           expStr = `${q.n1} ${q.op1} ${q.n2} = ${inside}`;
         } else {
@@ -191,17 +200,17 @@
 
           if (p1 && !p2) {
             step1Val = q.n1 * q.n2;
-            finalVal = eval(`${step1Val} ${q.op2.replace("×", "*")} ${q.n3}`);
+            finalVal = applyOp(step1Val, q.n3, q.op2);
             explanationKey = "md";
             expStr = `${q.n1} × ${q.n2} = ${step1Val}`;
           } else if (!p1 && p2) {
             step1Val = q.n2 * q.n3;
-            finalVal = eval(`${q.n1} ${q.op1.replace("×", "*")} ${step1Val}`);
+            finalVal = applyOp(q.n1, step1Val, q.op1);
             explanationKey = "md";
             expStr = `${q.n2} × ${q.n3} = ${step1Val}`;
           } else {
-            step1Val = eval(`${q.n1} ${q.op1.replace("×", "*")} ${q.n2}`);
-            finalVal = eval(`${step1Val} ${q.op2.replace("×", "*")} ${q.n3}`);
+            step1Val = applyOp(q.n1, q.n2, q.op1);
+            finalVal = applyOp(step1Val, q.n3, q.op2);
             explanationKey = "lr";
             expStr = `${q.n1} ${q.op1} ${q.n2} = ${step1Val}`;
           }

@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>小三數學：3D 圖形轉轉看 | 3D Shape Rotator</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="../../common/i18n.js"></script>
     <style>
@@ -460,7 +460,7 @@
                     min="-90"
                     max="90"
                     value={rotX}
-                    onChange={(e) => setRotX(parseInt(e.target.value))}
+                    onChange={(e) => setRotX(parseInt(e.target.value, 10))}
                     className="w-full h-2 bg-indigo-900 rounded-lg appearance-none cursor-pointer"
                   />
                 </div>

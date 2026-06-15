@@ -202,7 +202,7 @@ export default function App() {
     } else if (r >= total * 0.3 && r < total * 0.8) {
       setAnnotation({ title: "Selection", text: "If antibiotics are present, resistant bacteria survive and reproduce, while blue ones die." });
     } else if (r >= total * 0.8) {
-      setAnnotation({ title: "Evolution", text: "The population has evolved. The allele for resistance is now dominant." });
+      setAnnotation({ title: "Evolution", text: "The population has evolved. The allele for resistance is now prevalent (high frequency)." });
     } else if (total > MAX_POPULATION * 0.9 && r === 0) {
       setAnnotation({ title: "Competition", text: "Carrying capacity reached. Bacteria compete for resources." });
     }

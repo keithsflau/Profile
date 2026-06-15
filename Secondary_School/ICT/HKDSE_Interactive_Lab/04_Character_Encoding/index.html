@@ -8,11 +8,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script
       crossorigin
-      src="https://unpkg.com/react@18/umd/react.development.js"
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
     ></script>
     <script
       crossorigin
-      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
     ></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -80,17 +80,17 @@
         const getBinary = (char, type) => {
           const code = char.charCodeAt(0);
           if (type === "ascii") {
-            if (code > 255) return "??";
+            if (code > 127) return "?? (not 7-bit ASCII)";
             return code.toString(2).padStart(8, "0");
           }
           if (type === "big5") {
-            if (code > 255)
-              return code
-                .toString(2)
-                .padStart(16, "0")
-                .match(/.{1,8}/g)
-                .join(" ");
-            return code.toString(2).padStart(8, "0");
+            if (code <= 127) return code.toString(2).padStart(8, "0");
+            // Real Big5 is a 2-byte lookup per character; Unicode code point ≠ Big5 bytes
+            return code
+              .toString(2)
+              .padStart(16, "0")
+              .match(/.{1,8}/g)
+              .join(" ");
           }
           if (type === "unicode")
             return "U+" + code.toString(16).toUpperCase().padStart(4, "0");
@@ -219,11 +219,18 @@
               <div className="mb-4 flex items-center gap-2 text-slate-500 text-xs font-bold uppercase">
                 <Binary size={14} /> Memory Representation
               </div>
+              {encoding === "big5" && (
+                <p className="text-xs text-amber-200/90 mb-3 bg-amber-950/40 border border-amber-800/50 rounded-lg p-2">
+                  Note: True Big5 uses a 2-byte lookup table per character. For non-ASCII
+                  characters below, bits shown are the Unicode code point (for reference only),
+                  not the exact Big5 byte pair.
+                </p>
+              )}
               <div className="space-y-4">
                 {text.split("").map((char, i) => {
                   const bin = getBinary(char, encoding);
                   const isInvalid =
-                    encoding === "ascii" && char.charCodeAt(0) > 255;
+                    encoding === "ascii" && char.charCodeAt(0) > 127;
                   return (
                     <div
                       key={i}

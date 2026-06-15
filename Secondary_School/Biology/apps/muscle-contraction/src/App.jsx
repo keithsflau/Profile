@@ -77,7 +77,7 @@ function App() {
                 min="0"
                 max="100"
                 value={contraction}
-                onChange={(e) => setContraction(parseInt(e.target.value))}
+                onChange={(e) => setContraction(parseInt(e.target.value, 10))}
                 className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600 hover:accent-indigo-500 transition-all"
               />
 

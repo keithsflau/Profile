@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>小五數學：分數乘分數 | Fraction × Fraction</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
@@ -151,7 +151,7 @@
                       min="1"
                       value={n1}
                       onChange={(e) =>
-                        setN1(Math.max(1, parseInt(e.target.value) || 1))
+                        setN1(Math.max(1, parseInt(e.target.value, 10) || 1))
                       }
                       className="w-20 bg-transparent text-center text-5xl font-black outline-none border-b-4 border-pink-500 focus:border-white transition-colors text-pink-400"
                     />
@@ -160,7 +160,7 @@
                       min="1"
                       value={d1}
                       onChange={(e) =>
-                        setD1(Math.max(1, parseInt(e.target.value) || 1))
+                        setD1(Math.max(1, parseInt(e.target.value, 10) || 1))
                       }
                       className="w-20 bg-transparent text-center text-5xl font-black outline-none text-slate-400"
                     />
@@ -172,7 +172,7 @@
                       min="1"
                       value={n2}
                       onChange={(e) =>
-                        setN2(Math.max(1, parseInt(e.target.value) || 1))
+                        setN2(Math.max(1, parseInt(e.target.value, 10) || 1))
                       }
                       className="w-20 bg-transparent text-center text-5xl font-black outline-none border-b-4 border-indigo-500 focus:border-white transition-colors text-indigo-400"
                     />
@@ -181,7 +181,7 @@
                       min="1"
                       value={d2}
                       onChange={(e) =>
-                        setD2(Math.max(1, parseInt(e.target.value) || 1))
+                        setD2(Math.max(1, parseInt(e.target.value, 10) || 1))
                       }
                       className="w-20 bg-transparent text-center text-5xl font-black outline-none text-slate-400"
                     />

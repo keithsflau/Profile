@@ -7,11 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script
       crossorigin
-      src="https://unpkg.com/react@18/umd/react.development.js"
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
     ></script>
     <script
       crossorigin
-      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
     ></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <link
@@ -175,7 +175,7 @@
                           0,
                           ...e.target.value
                             .split(/\s+/)
-                            .map((x) => parseInt(x) || 0),
+                            .map((x) => parseInt(x, 10) || 0),
                         ])
                       }
                       className="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2 font-mono"
@@ -192,7 +192,7 @@
                     <input
                       type="number"
                       value={n}
-                      onChange={(e) => setN(parseInt(e.target.value) || 1)}
+                      onChange={(e) => setN(parseInt(e.target.value, 10) || 1)}
                       className="w-24 bg-slate-900 border border-slate-600 rounded px-3 py-2 font-mono text-center"
                     />
                   </div>

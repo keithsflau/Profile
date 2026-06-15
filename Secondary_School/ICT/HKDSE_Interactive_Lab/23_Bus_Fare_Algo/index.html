@@ -8,11 +8,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script
       crossorigin
-      src="https://unpkg.com/react@18/umd/react.development.js"
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
     ></script>
     <script
       crossorigin
-      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
     ></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -78,7 +78,7 @@
       };
       const Bus = (p) => <LucideIcon name="bus" {...p} />;
       const Coins = (p) => <LucideIcon name="coins" {...p} />;
-      const UserCircle2 = (p) => <LucideIcon name="user-circlet-2" {...p} />;
+      const UserCircle2 = (p) => <LucideIcon name="user-circle-2" {...p} />;
       const ArrowRight = (p) => <LucideIcon name="arrow-right" {...p} />;
       // --- END SHIM ---
 
@@ -135,7 +135,7 @@
                       min="0"
                       max="100"
                       value={age}
-                      onChange={(e) => setAge(parseInt(e.target.value))}
+                      onChange={(e) => setAge(parseInt(e.target.value, 10) || 0)}
                       className="w-full accent-yellow-500 mb-2"
                     />
                     <div className="text-center bg-slate-900 border border-slate-700 rounded py-2 font-mono text-xl text-white font-bold">
@@ -160,7 +160,7 @@
               </div>
               <div className="space-y-2 mt-4">
                 <div className="text-slate-500 mb-4">
-                  // Full Fare = ${FULL_FARE}
+                  {`// Full Fare = ${FULL_FARE}`}
                 </div>
                 <div
                   className={`p-3 border-l-4 rounded logic-block ${

@@ -6,11 +6,11 @@
     <title>小四數學：分數探索樂園 | Fraction Explorer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script
-      src="https://unpkg.com/react@18/umd/react.development.js"
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
       crossorigin
     ></script>
     <script
-      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
       crossorigin
     ></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -516,7 +516,7 @@
                       min="0"
                       max={denominator}
                       value={numerator}
-                      onChange={(e) => setNumerator(parseInt(e.target.value))}
+                      onChange={(e) => setNumerator(parseInt(e.target.value, 10))}
                       className="w-full"
                     />
                     <div className="text-4xl font-black text-center text-slate-800 mt-2">
@@ -534,7 +534,7 @@
                       max={MAX_PARTS}
                       value={denominator}
                       onChange={(e) => {
-                        const newDen = parseInt(e.target.value);
+                        const newDen = parseInt(e.target.value, 10);
                         setDenominator(newDen);
                         if (numerator > newDen) setNumerator(newDen);
                       }}

@@ -7,11 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script
       crossorigin
-      src="https://unpkg.com/react@18/umd/react.development.js"
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
     ></script>
     <script
       crossorigin
-      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
     ></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
@@ -222,7 +222,7 @@
               S = S % 10;
               steps.push({ step: 11, S, log: `S ← S mod 10 = ${S}` });
 
-              if (S === parseInt(D)) {
+              if (S === parseInt(d, 10)) {
                 steps.push({
                   step: 12,
                   S,
@@ -293,7 +293,7 @@
                             [k]:
                               k === "C"
                                 ? e.target.value.toUpperCase()
-                                : parseInt(e.target.value) || 0,
+                                : parseInt(e.target.value, 10) || 0,
                           })
                         }
                         className="w-full bg-slate-900 border border-slate-600 rounded px-2 py-2 text-center font-mono"

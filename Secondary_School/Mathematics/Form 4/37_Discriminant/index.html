@@ -92,7 +92,8 @@
           const f = (x) => a * x * x + b * x + c;
 
           // Roots for display
-          const r1 = (-b + Math.sqrt(Math.abs(delta)) * (delta >= 0 ? 1 : 1j)) / (2 * a); // Simplified logic
+          // 僅顯示用：複數根不以此式計算（JS 無 1j 語法）
+          const r1 = (-b + Math.sqrt(Math.abs(delta))) / (2 * a);
           const rootDisplay = () => {
               if (delta > 0) {
                   const x1 = (-b + Math.sqrt(delta))/(2*a);

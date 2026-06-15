@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -415,12 +415,12 @@
             window.addEventListener('touchend', handleEnd);
 
             inputR.addEventListener('input', (e) => {
-                state.ratio.r = parseInt(e.target.value);
+                state.ratio.r = parseInt(e.target.value, 10);
                 valR.innerText = state.ratio.r;
                 render();
             });
             inputS.addEventListener('input', (e) => {
-                state.ratio.s = parseInt(e.target.value);
+                state.ratio.s = parseInt(e.target.value, 10);
                 valS.innerText = state.ratio.s;
                 render();
             });

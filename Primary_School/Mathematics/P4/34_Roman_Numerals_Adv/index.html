@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>小四數學：羅馬數字進階 | Roman Numerals</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="../../common/i18n.js"></script>
     <link
@@ -101,7 +101,7 @@
                 min="1"
                 value={num}
                 onChange={(e) =>
-                  setNum(Math.min(3999, Math.max(1, parseInt(e.target.value))))
+                  setNum(Math.min(3999, Math.max(1, parseInt(e.target.value, 10))))
                 }
                 className="text-6xl font-black text-center border-b-4 border-indigo-500 w-64 mb-8 bg-transparent outline-none text-indigo-900"
               />

@@ -55,8 +55,7 @@
             'AUG': 'Met', 'UUU': 'Phe', 'UUC': 'Phe',
             'UUA': 'Leu', 'UUG': 'Leu', 'GGU': 'Gly', 'GGC': 'Gly',
             'GGA': 'Gly', 'GGG': 'Gly', 'UAA': 'STOP', 'UAG': 'STOP', 'UGA': 'STOP',
-            // Simplified table for demo
-            'AAA': 'Lys', 'CCC': 'Pro', 'GGG': 'Gly', 'UUU': 'Phe'
+            'AAA': 'Lys', 'CCC': 'Pro'
         };
 
         const App = () => {
@@ -81,9 +80,10 @@
                 const correctAnti = getAnticodon(correct);
 
                 // Fake options
+                // Anticodon must match codon via A↔U, G↔C (e.g. codon AAA → anticodon UUU → Lys)
                 const pool = [
-                    { anti: "UUU", aa: "Phe" }, { anti: "AAA", aa: "Lys" },
-                    { anti: "GGG", aa: "Gly" }, { anti: "CCC", aa: "Pro" }
+                    { anti: "UUU", aa: "Lys" }, { anti: "AAA", aa: "Phe" },
+                    { anti: "GGG", aa: "Pro" }, { anti: "CCC", aa: "Gly" }
                 ].filter(x => x.anti !== correctAnti);
 
                 // Mix

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-HK">
 
 <head>
@@ -436,7 +436,11 @@
             const feedback = document.getElementById('feedback');
 
             // Check if correct (order doesn't matter for simple cases)
-            const isCorrect = arraysEqual(STATE.selectedRadicals.sort(), STATE.currentTarget.radicals.sort());
+            // Avoid mutating arrays (Array.sort() changes in-place)
+            const isCorrect = arraysEqual(
+                [...STATE.selectedRadicals].sort(),
+                [...STATE.currentTarget.radicals].sort()
+            );
 
             if (isCorrect) {
                 // Success!
@@ -536,7 +540,7 @@
     <script src="../../../visit-counter.js"></script>
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
-        VisitCounter.init('seconardychinese/radical_monster_crafter/index', {
+        VisitCounter.init('secondary_school/chinese/radical_monster_crafter/index', {
             scriptUrl: SCRIPT_URL,
             containerId: 'visit-counter-container'
         });

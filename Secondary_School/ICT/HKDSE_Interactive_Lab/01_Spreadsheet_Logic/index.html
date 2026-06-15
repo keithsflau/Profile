@@ -8,11 +8,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script
       crossorigin
-      src="https://unpkg.com/react@18/umd/react.development.js"
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
     ></script>
     <script
       crossorigin
-      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
     ></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -197,9 +197,9 @@
           // Simple C2:E2 logic
           const [start, end] = rangeStr.split(":");
           const startCol = start.charAt(0);
-          const startRow = parseInt(start.slice(1));
+          const startRow = parseInt(start.slice(1), 10);
           const endCol = end.charAt(0);
-          const endRow = parseInt(end.slice(1));
+          const endRow = parseInt(end.slice(1), 10);
 
           const cells = [];
           for (let r = startRow; r <= endRow; r++) {
@@ -215,13 +215,19 @@
         };
 
         const evaluateCriteria = (val, criteria) => {
+          // Coerce spreadsheet cell values (numbers or numeric strings, e.g. AVERAGE → "66.0") for reliable comparisons
+          const num =
+            typeof val === "number" && !Number.isNaN(val)
+              ? val
+              : parseFloat(String(val).trim());
+          if (Number.isNaN(num)) return false;
           if (criteria.startsWith(">="))
-            return val >= Number(criteria.slice(2));
+            return num >= Number(criteria.slice(2));
           if (criteria.startsWith("<="))
-            return val <= Number(criteria.slice(2));
-          if (criteria.startsWith(">")) return val > Number(criteria.slice(1));
-          if (criteria.startsWith("<")) return val < Number(criteria.slice(1));
-          return val == criteria;
+            return num <= Number(criteria.slice(2));
+          if (criteria.startsWith(">")) return num > Number(criteria.slice(1));
+          if (criteria.startsWith("<")) return num < Number(criteria.slice(1));
+          return String(val) == criteria;
         };
 
         const handleSelect = (cell) => {

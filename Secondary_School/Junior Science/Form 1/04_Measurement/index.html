@@ -237,9 +237,9 @@
                     {/* Simplified massive zoom view would go here - for now just a placeholder for the concept */}
                     <div className="text-center text-slate-500">
                       <div className="text-6xl font-mono text-slate-800 mb-4">
-                        {parseInt(position)}.{Math.round((position % 1) * 10)}
+                        {parseInt(position, 10)}.{Math.round((position % 1) * 10)}
                       </div>
-                      <p>Main Scale: {parseInt(position)}mm</p>
+                      <p>Main Scale: {parseInt(position, 10)}mm</p>
                       <p>Vernier Scale: {Math.round((position % 1) * 10)}</p>
                     </div>
                   </div>

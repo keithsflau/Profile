@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>小六數學：分數除以整數 | Fraction ÷ Whole Number</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="../../common/i18n.js"></script>
     <link
@@ -132,7 +132,7 @@
                       min="1"
                       value={num}
                       onChange={(e) =>
-                        setNum(Math.max(1, parseInt(e.target.value) || 1))
+                        setNum(Math.max(1, parseInt(e.target.value, 10) || 1))
                       }
                       className="w-14 text-3xl font-black text-center border-b-4 border-orange-400 bg-transparent"
                     />
@@ -142,7 +142,7 @@
                       min="1"
                       value={denom}
                       onChange={(e) =>
-                        setDenom(Math.max(1, parseInt(e.target.value) || 1))
+                        setDenom(Math.max(1, parseInt(e.target.value, 10) || 1))
                       }
                       className="w-14 text-3xl font-black text-center bg-transparent"
                     />
@@ -154,7 +154,7 @@
                   min="1"
                   value={divisor}
                   onChange={(e) =>
-                    setDivisor(Math.max(1, parseInt(e.target.value) || 1))
+                    setDivisor(Math.max(1, parseInt(e.target.value, 10) || 1))
                   }
                   className="w-20 text-4xl font-black text-center bg-amber-50 border-4 border-amber-200 rounded-xl p-2"
                 />

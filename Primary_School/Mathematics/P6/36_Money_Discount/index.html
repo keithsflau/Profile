@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>小六數學：折扣計算 | Discounts</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
@@ -269,7 +269,7 @@
                       max="95"
                       step="5"
                       value={pct}
-                      onChange={(e) => setPct(parseInt(e.target.value) || 0)}
+                      onChange={(e) => setPct(parseInt(e.target.value, 10) || 0)}
                       className="w-full accent-rose-500 h-3 bg-slate-700 rounded-lg cursor-pointer mb-2"
                     />
                     <div className="text-right text-rose-400 font-mono text-xl">

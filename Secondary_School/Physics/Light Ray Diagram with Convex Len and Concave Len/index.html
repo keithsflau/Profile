@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -443,8 +443,8 @@
 
         // --- Interaction Logic ---
         function handleInput() {
-            state.f = parseInt(sliderF.value);
-            state.do = parseInt(sliderDo.value);
+            state.f = parseInt(sliderF.value, 10);
+            state.do = parseInt(sliderDo.value, 10);
             
             calculatePhysics();
             updateUI();

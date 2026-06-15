@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>小六數學：兩步方程 | Two-Step Equations</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
@@ -144,7 +144,7 @@
         const [status, setStatus] = useState("s1"); // s1, s2, done
 
         const handleCheck1 = () => {
-          if (parseInt(step1Val) === p.c - p.b) {
+          if (parseInt(step1Val, 10) === p.c - p.b) {
             setStatus("s2");
           } else {
             alert(getText("tryAgain", lang));
@@ -152,7 +152,7 @@
         };
 
         const handleCheck2 = () => {
-          if (parseInt(step2Val) === p.x) {
+          if (parseInt(step2Val, 10) === p.x) {
             setStatus("done");
           } else {
             alert(getText("tryAgain", lang));

@@ -656,7 +656,7 @@ function checkStory() {
   let missed = 0;
 
   allElements.forEach((el) => {
-    const i = parseInt(el.dataset.idx);
+    const i = parseInt(el.dataset.idx, 10);
     const isP = story.content[i].isP;
     const isSelected = state.storySelectedIndices.has(i);
 
@@ -1003,7 +1003,7 @@ function startChallenge() {
   state.challengeTeam = team;
   state.challengeScore = 0;
   state.challengeTimeLeft =
-    parseInt(document.getElementById("chSeconds").value) || 60;
+    parseInt(document.getElementById("chSeconds").value, 10) || 60;
   const totalTime = state.challengeTimeLeft;
 
   state.challengeRunning = true;

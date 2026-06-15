@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>小六數學：繪製圓形圖 | Pie Chart Creator</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
@@ -308,7 +308,7 @@
                             updateItem(
                               item.id,
                               "val",
-                              Math.max(0, parseInt(e.target.value) || 0)
+                              Math.max(0, parseInt(e.target.value, 10) || 0)
                             )
                           }
                           className="flex-1 bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-right font-mono"

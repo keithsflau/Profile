@@ -1437,7 +1437,7 @@ Koinonia (團契) 的意思
         document.querySelectorAll(".song-delete").forEach((btn) => {
           btn.addEventListener("click", (e) => {
             e.stopPropagation();
-            deleteUploadedSong(parseInt(btn.dataset.index) - songs.length);
+            deleteUploadedSong(parseInt(btn.dataset.index, 10) - songs.length);
           });
         });
         document.getElementById(
@@ -1699,13 +1699,13 @@ Koinonia (團契) 的意思
             e.preventDefault();
             volumeSlider.value = Math.min(
               100,
-              parseInt(volumeSlider.value) + 5
+              parseInt(volumeSlider.value, 10) + 5
             );
             volumeSlider.dispatchEvent(new Event("input"));
             break;
           case "ArrowDown":
             e.preventDefault();
-            volumeSlider.value = Math.max(0, parseInt(volumeSlider.value) - 5);
+            volumeSlider.value = Math.max(0, parseInt(volumeSlider.value, 10) - 5);
             volumeSlider.dispatchEvent(new Event("input"));
             break;
         }

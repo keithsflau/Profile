@@ -346,10 +346,10 @@
             return map[color] || map.blue;
           };
 
-          document.write(
-            apps
-              .map(
-                (app) => `
+          const grid = document.currentScript.parentElement;
+          const html = apps
+            .map(
+              (app) => `
                     <a href="./${
                       app.path
                     }/index.html" class="app-card bg-white rounded-3xl p-6 shadow-sm border border-slate-100 block group relative overflow-hidden">
@@ -371,9 +371,10 @@
                         </div>
                     </a>
                 `
-              )
-              .join("")
-          );
+            )
+            .join("");
+          grid.insertAdjacentHTML("beforeend", html);
+          grid.removeChild(document.currentScript);
         </script>
       </div>
 

@@ -95,7 +95,10 @@
                   <div className="bg-white p-8 rounded-3xl shadow-xl border border-amber-100 w-full mb-8">
                       {/* Equation Display */}
                       <div className="text-center text-4xl font-mono bg-amber-50 p-6 rounded-2xl mb-8 border border-amber-200">
-                          \[ {base}^x = {result} \]
+                          {"["}
+                          {base}
+                          <sup>x</sup> = {result}
+                          {"]"}
                       </div>
 
                       {/* Controls */}
@@ -122,21 +125,27 @@
                                   <span className="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center font-bold text-sm shrink-0">1</span>
                                   <div>
                                       <div className="text-slate-500 text-sm">{t.step1}</div>
-                                      <div className="font-mono">\[ \log({base}^x) = \log({result}) \]</div>
+                                      <div className="font-mono">
+                                        {`log(${base}^x) = log(${result})`}
+                                      </div>
                                   </div>
                               </div>
                               <div className="flex items-start gap-4">
                                   <span className="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center font-bold text-sm shrink-0">2</span>
                                   <div>
                                       <div className="text-slate-500 text-sm">{t.step2}: log(aˣ) = x·log(a)</div>
-                                      <div className="font-mono">\[ x \cdot \log({base}) = \log({result}) \]</div>
+                                      <div className="font-mono">
+                                        {`x · log(${base}) = log(${result})`}
+                                      </div>
                                   </div>
                               </div>
                               <div className="flex items-start gap-4">
                                   <span className="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center font-bold text-sm shrink-0">3</span>
                                   <div>
                                       <div className="text-slate-500 text-sm">{t.step3}</div>
-                                      <div className="font-mono">\[ x = \frac{\log({result})}{\log({base})} \]</div>
+                                      <div className="font-mono">
+                                        {`x = log(${result}) / log(${base})`}
+                                      </div>
                                   </div>
                               </div>
                           </div>

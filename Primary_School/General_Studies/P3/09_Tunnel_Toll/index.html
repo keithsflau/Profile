@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>小三常識：隧道收費員 | Tunnel Toll</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <script src="../../common/i18n.js"></script>
@@ -263,7 +263,7 @@
                         if (btn === "C") setInput(0);
                         else
                           setInput((curr) =>
-                            parseInt(`${curr}${btn}`.substring(0, 3))
+                            parseInt(`${curr}${btn}`.substring(0, 3), 10)
                           ); // Limit length
                       }}
                       className="bg-slate-600 hover:bg-slate-500 text-white font-black text-2xl py-4 rounded-xl shadow active:scale-95 transition-transform border-b-4 border-slate-800 active:border-b-0 active:translate-y-1"

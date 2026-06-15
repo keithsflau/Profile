@@ -6,11 +6,11 @@
     <title>小六數學：百分數全能計算機</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script
-      src="https://unpkg.com/react@18/umd/react.development.js"
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
       crossorigin
     ></script>
     <script
-      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
       crossorigin
     ></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -36,11 +36,6 @@
     <div id="root"></div>
 
     <script type="text/babel">
-      const { useState } = React;
-      const { motion } = window.Motion;
-      const { Percent, TrendingUp, TrendingDown, Calculator, ShoppingBag } =
-        window.LucideReact;
-
       const { useState } = React;
       const { motion } = window.Motion;
       const { Percent, TrendingUp, TrendingDown, Calculator, ShoppingBag } =
@@ -732,7 +727,7 @@
                         max="100"
                         value={percentage}
                         onChange={(e) =>
-                          setPercentage(parseInt(e.target.value))
+                          setPercentage(parseInt(e.target.value, 10))
                         }
                         className="w-full mb-3"
                       />
@@ -795,7 +790,7 @@
                         max="90"
                         value={discountRate}
                         onChange={(e) =>
-                          setDiscountRate(parseInt(e.target.value))
+                          setDiscountRate(parseInt(e.target.value, 10))
                         }
                         className="w-full mb-3"
                       />

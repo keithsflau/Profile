@@ -80,8 +80,8 @@
 
         const checkGuess = () => {
           if (
-            parseInt(guessMul) === rule.mul &&
-            parseInt(guessAdd) === rule.add
+            parseInt(guessMul, 10) === rule.mul &&
+            parseInt(guessAdd, 10) === rule.add
           ) {
             setStatus("won");
           } else {

@@ -110,7 +110,7 @@
 
                               {/* A ∩ B within B */}
                               <rect x="230" y="60" width={140 * pConditional} height={h - 100} fill="rgba(34, 197, 94, 0.5)" stroke="#22c55a" strokeWidth="2" rx="4" />
-                              <text x={230 + 70 * pConditional} y={(h)/2 + 10} textAnchor="middle" className="text-sm fill-green-700 font-bold">A ∩ B</text>
+                              <text x={230 + 70 * pConditional} y={(h / 2) + 10} textAnchor="middle" className="text-sm fill-green-700 font-bold">A ∩ B</text>
 
                               {/* Arrow */}
                               <path d="M 190 125 L 210 125" stroke="#64748b" strokeWidth="2" markerEnd="url(#arrow)" />
@@ -140,7 +140,10 @@
                       {/* Formula */}
                       <div className="bg-indigo-50 p-4 rounded-xl mb-6 text-center border border-indigo-100">
                           <div className="text-sm font-bold text-indigo-400 uppercase mb-2">{t.formula}</div>
-                          <div className="text-xl font-mono">\[ P(A|B) = \frac{P(A \cap B)}{P(B)} = \frac{ {validIntersect.toFixed(2)} }{ {pB.toFixed(2)} } \]</div>
+                          <div className="text-xl font-mono">
+                            P(A|B) = P(A ∩ B) ÷ P(B) = {validIntersect.toFixed(2)} ÷ {pB.toFixed(2)} ={" "}
+                            {pB > 0 ? (validIntersect / pB).toFixed(4) : "—"}
+                          </div>
                       </div>
 
                       {/* Result */}

@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>小六數學：比例尺地圖 | Map Scales</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
@@ -285,7 +285,7 @@
                     min="1"
                     max="15"
                     value={mapCm}
-                    onChange={(e) => setMapCm(parseInt(e.target.value))}
+                    onChange={(e) => setMapCm(parseInt(e.target.value, 10))}
                     className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-yellow-400 mb-2"
                   />
                   <div className="flex justify-between items-center">

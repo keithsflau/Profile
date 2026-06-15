@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -323,7 +323,7 @@
         function updateChart() {
             const P = parseFloat(document.getElementById('principal').value) || 0;
             const r = parseFloat(document.getElementById('rate').value);
-            const t = parseInt(document.getElementById('years').value);
+            const t = parseInt(document.getElementById('years').value, 10);
 
             document.getElementById('rateValue').innerText = r;
             document.getElementById('yearsValue').innerText = t;
@@ -367,7 +367,7 @@
             const price = parseFloat(document.getElementById('propPrice').value) || 0;
             const downPercent = parseFloat(document.getElementById('downPay').value) || 0;
             const annualRate = parseFloat(document.getElementById('mortRate').value) || 0;
-            const years = parseInt(document.getElementById('mortYears').value) || 0;
+            const years = parseInt(document.getElementById('mortYears').value, 10) || 0;
 
             // Update UI Labels
             document.getElementById('mortYearsDisplay').innerText = years;

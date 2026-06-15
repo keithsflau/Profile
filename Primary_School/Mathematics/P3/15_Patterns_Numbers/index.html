@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>小三數學：數字規律 | Number Patterns</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <script src="../../common/i18n.js"></script>
@@ -203,9 +203,9 @@
                 <div className="text-2xl font-black text-yellow-900">
                   {t.nextIs[lang] || t.nextIs["en"]}{" "}
                   {p.rule.includes("+")
-                    ? p.seq[p.seq.length - 1] + parseInt(p.rule.slice(1))
+                    ? p.seq[p.seq.length - 1] + parseInt(p.rule.slice(1), 10)
                     : p.rule.includes("-")
-                    ? p.seq[p.seq.length - 1] - parseInt(p.rule.slice(1))
+                    ? p.seq[p.seq.length - 1] - parseInt(p.rule.slice(1), 10)
                     : p.seq[p.seq.length - 1] * 2}
                 </div>
               </div>

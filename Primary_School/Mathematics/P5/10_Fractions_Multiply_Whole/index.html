@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>小五數學：分數乘整數 | Fraction × Whole Number</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
@@ -169,7 +169,7 @@
                     min="1"
                     value={num}
                     onChange={(e) =>
-                      setNum(Math.max(1, parseInt(e.target.value) || 1))
+                      setNum(Math.max(1, parseInt(e.target.value, 10) || 1))
                     }
                     className="w-20 bg-transparent text-center text-5xl font-black outline-none border-b-4 border-slate-600 focus:border-white transition-colors text-emerald-400"
                   />
@@ -178,7 +178,7 @@
                     min="1"
                     value={denom}
                     onChange={(e) =>
-                      setDenom(Math.max(1, parseInt(e.target.value) || 1))
+                      setDenom(Math.max(1, parseInt(e.target.value, 10) || 1))
                     }
                     className="w-20 bg-transparent text-center text-5xl font-black outline-none text-slate-400"
                   />
@@ -189,7 +189,7 @@
                   min="1"
                   value={whole}
                   onChange={(e) =>
-                    setWhole(Math.max(1, parseInt(e.target.value) || 1))
+                    setWhole(Math.max(1, parseInt(e.target.value, 10) || 1))
                   }
                   className="w-24 bg-transparent text-center text-6xl font-black outline-none border border-slate-700/50 rounded-lg focus:border-white transition-colors py-2 text-white"
                 />

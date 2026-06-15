@@ -136,7 +136,7 @@ function App() {
   const handleExercise = () => {
     // Immediate usage
     setGlucose(prev => Math.max(prev - 20, 40));
-    addMessage("Exercising: Muscles burning Glucose rapidy.");
+    addMessage("Exercising: Muscles burning glucose rapidly.");
   };
 
   const reset = () => {
@@ -278,7 +278,7 @@ function App() {
             </h2>
 
             <div className="space-y-4 text-sm text-slate-300">
-              <InfoBlock title="Hyperglycemia (>90 mg/dL)" color="border-red-500">
+              <InfoBlock title="Hyperglycemia (e.g. fasting &gt;126 mg/dL)" color="border-red-500">
                 Beta cells in Pancreas release <span className="text-[#457B9D] font-bold">Insulin</span>. Causes Liver to store glucose as Glycogen and cells to uptake glucose.
               </InfoBlock>
 

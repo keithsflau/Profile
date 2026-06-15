@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-HK">
 
 <head>
@@ -346,7 +346,7 @@
         }
 
         function setSize(s) {
-            currentSize = parseInt(s);
+            currentSize = parseInt(s, 10);
             const indicator = document.getElementById('size-indicator');
             indicator.style.width = s + 'px';
             indicator.style.height = s + 'px';
@@ -484,7 +484,7 @@
             ctx.fillStyle = '#888';
             ctx.font = '14px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText(`成語四格漫畫大師 - Create by AI`, 420, 680);
+            ctx.fillText(`成語四格漫畫大師 - Created with AI`, 420, 680);
 
             const link = document.createElement('a');
             link.download = `idiom-comic-${Date.now()}.png`;
@@ -504,7 +504,7 @@
     <script src="../../../visit-counter.js"></script>
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
-        VisitCounter.init('seconardychinese/idiom_comic_maker/index', {
+        VisitCounter.init('secondary_school/chinese/idiom_comic_maker/index', {
             scriptUrl: SCRIPT_URL,
             containerId: 'visit-counter-container'
         });

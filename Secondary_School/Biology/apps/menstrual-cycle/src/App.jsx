@@ -99,7 +99,7 @@ const HormoneFeedback = ({ day }) => {
     message = "Developing follicle secretes Estrogen. Low Estrogen INHIBITS FSH (Negative Feedback) to prevent too many follicles.";
     statusColor = "bg-blue-50";
   } else if (day <= 13) {
-    message = "CRITCAL: Estrogen levels get VERY HIGH. Feedback switches to POSITIVE. High Estrogen -> LH Surge.";
+    message = "CRITICAL: Estrogen levels get VERY HIGH. Feedback switches to POSITIVE. High Estrogen -> LH Surge.";
     statusColor = "bg-red-50 border-red-200";
   } else if (day === 14) {
     message = "LH Surge triggers Ovulation (bursting of the follicle).";

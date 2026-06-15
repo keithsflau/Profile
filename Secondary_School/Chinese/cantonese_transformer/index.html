@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-HK">
 
 <head>
@@ -267,7 +267,9 @@
             boss: null,
             lastTime: 0,
             shake: 0,
-            bgStars: []
+            bgStars: [],
+            enemyIntervalId: null,
+            bossIntervalId: null
         };
 
         // --- Input ---
@@ -461,8 +463,18 @@
             state.isPlaying = true;
             updateHUD();
 
+            // Prevent setInterval stacking on retry
+            if (state.enemyIntervalId) {
+                clearInterval(state.enemyIntervalId);
+                state.enemyIntervalId = null;
+            }
+            if (state.bossIntervalId) {
+                clearInterval(state.bossIntervalId);
+                state.bossIntervalId = null;
+            }
+
             // Spawn Logic
-            setInterval(() => {
+            state.enemyIntervalId = setInterval(() => {
                 if (!state.isPlaying || state.boss) return;
                 if (state.enemies.length < 5 + state.wave) {
                     state.enemies.push(new Enemy());
@@ -470,7 +482,7 @@
             }, 1000);
 
             // Boss Logic
-            setInterval(() => {
+            state.bossIntervalId = setInterval(() => {
                 if (!state.isPlaying || state.boss) return;
                 if (state.score > state.wave * 1000 && !state.boss) {
                     spawnBoss();
@@ -525,6 +537,14 @@
 
         function gameOver() {
             state.isPlaying = false;
+            if (state.enemyIntervalId) {
+                clearInterval(state.enemyIntervalId);
+                state.enemyIntervalId = null;
+            }
+            if (state.bossIntervalId) {
+                clearInterval(state.bossIntervalId);
+                state.bossIntervalId = null;
+            }
             document.getElementById('game-over-screen').style.display = 'flex';
             document.getElementById('final-score').textContent = state.score;
         }
@@ -645,10 +665,11 @@
                                 }
                                 updateHUD();
                                 hit = true;
+                            } else {
+                                // Wrong word: let the bullet pass by deflecting slightly
+                                // (otherwise bullets get destroyed on any collision)
+                                b.angle += (Math.random() - 0.5) * 0.6;
                             }
-                            // If wrong word, maybe just destroy bullet or deflect?
-                            // For now, only correct word hits.
-                            hit = true;
                             break;
                         }
                     }
@@ -679,7 +700,7 @@
     <script src="../../../visit-counter.js"></script>
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
-        VisitCounter.init('seconardychinese/cantonese_transformer/index', {
+        VisitCounter.init('secondary_school/chinese/cantonese_transformer/index', {
             scriptUrl: SCRIPT_URL,
             containerId: 'visit-counter-container'
         });

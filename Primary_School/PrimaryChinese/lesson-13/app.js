@@ -199,7 +199,7 @@ function setupEventListeners() {
     document.getElementById('eraserBtn')?.addEventListener('click', () => setTool('eraser'));
     document.getElementById('penBtn')?.addEventListener('click', () => setTool('pen'));
     document.getElementById('penSize')?.addEventListener('input', (e) => {
-        canvasState.penSize = parseInt(e.target.value);
+        canvasState.penSize = parseInt(e.target.value, 10);
         document.getElementById('penSizeValue').textContent = e.target.value;
     });
 
@@ -802,7 +802,7 @@ function submitQuizAnswer() {
         return;
     }
 
-    const selectedIndex = parseInt(selected.dataset.index);
+    const selectedIndex = parseInt(selected.dataset.index, 10);
     const question = quizQuestions[state.quizProgress.current];
 
     // Show correct/incorrect

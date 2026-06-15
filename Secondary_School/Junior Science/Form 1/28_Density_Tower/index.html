@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -194,7 +194,7 @@
         const handRight = document.getElementById('hand-right');
 
         slider.addEventListener('input', function() {
-            const pressure = parseInt(this.value);
+            const pressure = parseInt(this.value, 10);
             const percent = pressure / 100;
             
             // 1. SQUEEZE THE BOTTLE (Visual Deformation)
@@ -246,7 +246,7 @@
             resultText.classList.remove('hidden');
             
             if(isCorrect) {
-                resultText.textContent = "✅ Correct! Mass increases, Volume stays same = Density increases.";
+                resultText.textContent = "✅ Correct! Mass increases, Volume decreases = Density increases.";
                 resultText.classList.add('text-green-300');
                 resultText.classList.remove('text-red-300');
             } else {
@@ -261,7 +261,7 @@
     <script src="../../../../visit-counter.js"></script>
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
-        VisitCounter.init('science/junior science/castesian diver/index', {
+        VisitCounter.init('science/junior science/cartesian diver/index', {
             scriptUrl: SCRIPT_URL,
             containerId: 'visit-counter-container'
         });

@@ -3,6 +3,35 @@ import StomataVisualizer from './components/StomataVisualizer';
 import PotometerLab from './components/PotometerLab';
 import { Leaf } from 'lucide-react';
 
+const Footer = () => (
+  <footer className="mt-8 text-center text-slate-500 text-sm z-10 p-4 border-t border-slate-200">
+    <p className="italic mb-1">
+      But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
+      understanding. Jeremiah 10:12
+    </p>
+    <p className="text-xs mb-1 mt-2">
+      「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
+    </p>
+    <p className="text-xs mt-2 pt-2 border-t border-slate-200">© 2025 HKDSE Biology | Transpiration lab</p>
+  </footer>
+);
+
+const VisitCounter = () => {
+  const [visits, setVisits] = React.useState(0);
+  React.useEffect(() => {
+    const key = window.location.pathname.replace(/\//g, '_') || 'home';
+    fetch(`https://api.countapi.xyz/hit/keithsflau-profile/${key}`)
+      .then((res) => res.json())
+      .then((data) => setVisits(data.value))
+      .catch(() => {});
+  }, []);
+  return (
+    <div className="fixed bottom-2 right-2 text-[10px] text-slate-400 pointer-events-none z-50">
+      Visits: {visits}
+    </div>
+  );
+};
+
 function App() {
   // Environmental States
   const [light, setLight] = useState(50);

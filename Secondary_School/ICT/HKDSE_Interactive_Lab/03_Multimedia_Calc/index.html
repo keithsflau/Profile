@@ -6,14 +6,8 @@
     <title>HKDSE ICT - Multimedia Calcs</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <script
-      crossorigin
-      src="https://unpkg.com/react@18/umd/react.development.js"
-    ></script>
-    <script
-      crossorigin
-      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
-    ></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link
@@ -233,8 +227,8 @@
                       {formatSize(imgBits)}
                     </div>
                     <div className="text-slate-500 font-mono text-xs">
-                      Formula: {imgState.w} × {imgState.h} × {imgState.depth}{" "}
-                      bits
+                      Formula: {imgState.w} × {imgState.h} × {imgState.depth} ×{" "}
+                      {imgState.count} bits
                     </div>
                   </div>
                 </div>
@@ -290,8 +284,97 @@
                 </div>
               )}
               {activeTab === "audio" && (
-                <div className="p-8 text-center text-slate-500 italic">
-                  Audio Calc - Coming Soon
+                <div className="result-card slide-in">
+                  <h2 className="text-xl font-bold flex items-center gap-2 mb-4">
+                    <Music className="text-pink-400" /> Uncompressed PCM Audio
+                  </h2>
+                  <p className="text-slate-400 text-sm mb-6">
+                    試題常用：未壓縮音訊資料量（bits）= 取樣率 × 位元深度 × 聲道數 × 時間（秒）。
+                    單位：Hz × bits × channels × s → bits。
+                  </p>
+                  <div className="grid grid-cols-2 gap-6 mb-8">
+                    <div>
+                      <label className="label-text">Sample rate (Hz)</label>
+                      <select
+                        className="input-dark"
+                        value={audioState.sampleRate}
+                        onChange={(e) =>
+                          setAudioState({
+                            ...audioState,
+                            sampleRate: +e.target.value,
+                          })
+                        }
+                      >
+                        <option value={8000}>8000</option>
+                        <option value={11025}>11025</option>
+                        <option value={16000}>16000</option>
+                        <option value={22050}>22050</option>
+                        <option value={44100}>44100 (CD)</option>
+                        <option value={48000}>48000</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="label-text">Bit depth</label>
+                      <select
+                        className="input-dark"
+                        value={audioState.bitDepth}
+                        onChange={(e) =>
+                          setAudioState({
+                            ...audioState,
+                            bitDepth: +e.target.value,
+                          })
+                        }
+                      >
+                        <option value={8}>8-bit</option>
+                        <option value={16}>16-bit</option>
+                        <option value={24}>24-bit</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="label-text">Channels</label>
+                      <select
+                        className="input-dark"
+                        value={audioState.channels}
+                        onChange={(e) =>
+                          setAudioState({
+                            ...audioState,
+                            channels: +e.target.value,
+                          })
+                        }
+                      >
+                        <option value={1}>Mono (1)</option>
+                        <option value={2}>Stereo (2)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="label-text">Duration (s)</label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.1"
+                        className="input-dark"
+                        value={audioState.seconds}
+                        onChange={(e) =>
+                          setAudioState({
+                            ...audioState,
+                            seconds: Math.max(0, +e.target.value),
+                          })
+                        }
+                      />
+                    </div>
+                  </div>
+                  <div className="bg-slate-900 p-4 rounded-xl border border-slate-700/50">
+                    <div className="text-slate-400 text-xs mb-1">
+                      Uncompressed size
+                    </div>
+                    <div className="text-3xl font-mono font-bold text-white mb-2">
+                      {formatSize(audioBits)}
+                    </div>
+                    <div className="text-slate-500 font-mono text-xs break-all">
+                      = {audioState.sampleRate} × {audioState.bitDepth} ×{" "}
+                      {audioState.channels} × {audioState.seconds} bits
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>小四數學：重量加法 | Weight Addition</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="../../common/i18n.js"></script>
     <link
@@ -95,14 +95,14 @@
                     <input
                       type="number"
                       value={kg1}
-                      onChange={(e) => setKg1(parseInt(e.target.value) || 0)}
+                      onChange={(e) => setKg1(parseInt(e.target.value, 10) || 0)}
                       className="w-16 text-center text-xl font-bold bg-white rounded"
                     />{" "}
                     kg
                     <input
                       type="number"
                       value={g1}
-                      onChange={(e) => setG1(parseInt(e.target.value) || 0)}
+                      onChange={(e) => setG1(parseInt(e.target.value, 10) || 0)}
                       className="w-20 text-center text-xl font-bold bg-white rounded"
                     />{" "}
                     g
@@ -118,14 +118,14 @@
                     <input
                       type="number"
                       value={kg2}
-                      onChange={(e) => setKg2(parseInt(e.target.value) || 0)}
+                      onChange={(e) => setKg2(parseInt(e.target.value, 10) || 0)}
                       className="w-16 text-center text-xl font-bold bg-white rounded"
                     />{" "}
                     kg
                     <input
                       type="number"
                       value={g2}
-                      onChange={(e) => setG2(parseInt(e.target.value) || 0)}
+                      onChange={(e) => setG2(parseInt(e.target.value, 10) || 0)}
                       className="w-20 text-center text-xl font-bold bg-white rounded"
                     />{" "}
                     g

@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>小五數學：多位數除法 | Long Division</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
@@ -142,7 +142,7 @@
           }
 
           // Remove leading zeros from quotient unless it is 0
-          const finalQuotient = parseInt(quotientStr);
+          const finalQuotient = parseInt(quotientStr, 10);
           const finalRemainder = currentRemainder;
 
           return { steps, finalQuotient, finalRemainder };
@@ -205,7 +205,7 @@
                     type="number"
                     value={dividend}
                     onChange={(e) =>
-                      setDividend(Math.max(0, parseInt(e.target.value) || 0))
+                      setDividend(Math.max(0, parseInt(e.target.value, 10) || 0))
                     }
                     className="bg-slate-800 text-white text-2xl font-bold p-3 rounded-lg w-full mb-4 outline-none focus:ring-2 ring-amber-500"
                   />
@@ -217,7 +217,7 @@
                     type="number"
                     value={divisor}
                     onChange={(e) =>
-                      setDivisor(Math.max(1, parseInt(e.target.value) || 1))
+                      setDivisor(Math.max(1, parseInt(e.target.value, 10) || 1))
                     }
                     className="bg-slate-800 text-white text-2xl font-bold p-3 rounded-lg w-full mb-6 outline-none focus:ring-2 ring-amber-500"
                   />

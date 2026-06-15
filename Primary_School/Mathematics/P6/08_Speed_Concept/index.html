@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>小六數學：速率概念 | Speed Concept</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
@@ -258,7 +258,7 @@
                       type="number"
                       value={dist}
                       onChange={(e) =>
-                        setDist(Math.max(1, parseInt(e.target.value) || 1))
+                        setDist(Math.max(1, parseInt(e.target.value, 10) || 1))
                       }
                       className="w-full text-3xl font-black text-center bg-slate-800 border-b-4 border-amber-500 rounded-xl py-2 outline-none"
                     />
@@ -271,7 +271,7 @@
                       type="number"
                       value={time}
                       onChange={(e) =>
-                        setTime(Math.max(1, parseInt(e.target.value) || 1))
+                        setTime(Math.max(1, parseInt(e.target.value, 10) || 1))
                       }
                       className="w-full text-3xl font-black text-center bg-slate-800 border-b-4 border-lime-500 rounded-xl py-2 outline-none"
                     />

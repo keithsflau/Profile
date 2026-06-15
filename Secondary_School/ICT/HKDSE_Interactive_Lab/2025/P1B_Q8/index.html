@@ -8,11 +8,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script
       crossorigin
-      src="https://unpkg.com/react@18/umd/react.development.js"
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
     ></script>
     <script
       crossorigin
-      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
     ></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -108,7 +108,7 @@
 
         const handleScoreChange = (idx, val) => {
           const newScores = [...scores];
-          newScores[idx] = Math.min(100, Math.max(0, parseInt(val) || 0));
+          newScores[idx] = Math.min(100, Math.max(0, parseInt(val, 10) || 0));
           setScores(newScores);
         };
 

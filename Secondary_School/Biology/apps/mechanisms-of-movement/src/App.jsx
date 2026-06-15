@@ -152,7 +152,7 @@ function App() {
                     <input
                       type="range" min="0" max="80"
                       value={params.soluteLeft}
-                      onChange={(e) => setParams(p => ({ ...p, soluteLeft: parseInt(e.target.value) }))}
+                      onChange={(e) => setParams(p => ({ ...p, soluteLeft: parseInt(e.target.value, 10) }))}
                       className="w-full accent-blue-500"
                     />
                     <div className="flex justify-between text-xs text-gray-400">
@@ -165,7 +165,7 @@ function App() {
                     <input
                       type="range" min="0" max="80"
                       value={params.soluteRight}
-                      onChange={(e) => setParams(p => ({ ...p, soluteRight: parseInt(e.target.value) }))}
+                      onChange={(e) => setParams(p => ({ ...p, soluteRight: parseInt(e.target.value, 10) }))}
                       className="w-full accent-yellow-500"
                     />
                   </div>
@@ -180,7 +180,7 @@ function App() {
                     <input
                       type="range" min="0" max="100"
                       value={params.leftConc}
-                      onChange={(e) => setParams(p => ({ ...p, leftConc: parseInt(e.target.value) }))}
+                      onChange={(e) => setParams(p => ({ ...p, leftConc: parseInt(e.target.value, 10) }))}
                       className="w-full accent-blue-500"
                     />
                     <div className="flex justify-between text-xs text-gray-400">
@@ -193,7 +193,7 @@ function App() {
                     <input
                       type="range" min="0" max="100"
                       value={params.rightConc}
-                      onChange={(e) => setParams(p => ({ ...p, rightConc: parseInt(e.target.value) }))}
+                      onChange={(e) => setParams(p => ({ ...p, rightConc: parseInt(e.target.value, 10) }))}
                       className="w-full accent-yellow-500"
                     />
                   </div>
@@ -234,7 +234,7 @@ function App() {
             <h3 className="font-semibold text-indigo-900 mb-2">Observations</h3>
             <ul className="text-sm text-indigo-800 space-y-2 list-disc pl-4">
               {mode === MODES.SIMPLE && <li>Oxygen molecules are small and non-polar, allowing them to slip directly through the phospholipid bilayer gaps.</li>}
-              {mode === MODES.FACILITATED && <li>Glucose is too large/polar to pass lipids. It requires specific Channel Proteins. Movement is passive (Down gradient).</li>}
+              {mode === MODES.FACILITATED && <li>Glucose is too large/polar to pass lipids. It requires specific carrier proteins (e.g. GLUT). Movement is passive (down gradient).</li>}
               {mode === MODES.OSMOSIS && <li>Water moves from high water potential (dilute solute) to low water potential (concentrated solute) via Aquaporins.</li>}
               {mode === MODES.ACTIVE && <li>Sodium ions are pumped against their gradient (Low to High). This requires energy (ATP) to change the carrier protein's shape.</li>}
             </ul>

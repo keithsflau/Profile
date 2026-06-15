@@ -7,8 +7,8 @@
       小二數學：三位數減法 (不退位) | 3-Digit Subtraction (No Borrow)
     </title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="../../common/i18n.js"></script>
     <link
@@ -90,9 +90,9 @@
           const ansH = Math.floor(n1 / 100) - Math.floor(n2 / 100);
 
           if (
-            parseInt(inputs.u) === ansU &&
-            parseInt(inputs.t) === ansT &&
-            parseInt(inputs.h) === ansH
+            parseInt(inputs.u, 10) === ansU &&
+            parseInt(inputs.t, 10) === ansT &&
+            parseInt(inputs.h, 10) === ansH
           ) {
             setFeedback("CORRECT");
             setTimeout(newProb, 2000);

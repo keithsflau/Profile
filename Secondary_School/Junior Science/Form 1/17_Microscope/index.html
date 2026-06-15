@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -393,7 +393,7 @@
         const perfectFine = 50;
 
         function updateMagnification() {
-            const objectiveVal = parseInt(objectiveSelect.value);
+            const objectiveVal = parseInt(objectiveSelect.value, 10);
             const total = 10 * objectiveVal;
             totalMagDisplay.innerText = total;
 
@@ -411,8 +411,8 @@
         }
 
         function updateFocus() {
-            const cVal = parseInt(coarseSlider.value);
-            const fVal = parseInt(fineSlider.value);
+            const cVal = parseInt(coarseSlider.value, 10);
+            const fVal = parseInt(fineSlider.value, 10);
 
             // Update numerical display
             document.getElementById('coarse-val').innerText = cVal;

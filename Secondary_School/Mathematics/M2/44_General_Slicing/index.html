@@ -256,7 +256,7 @@
         while (slicesGroup.children.length > 0)
           slicesGroup.remove(slicesGroup.children[0]);
 
-        const n = parseInt(document.getElementById("slices").value);
+        const n = parseInt(document.getElementById("slices").value, 10);
         const r = 2; // radius of base
 
         const startX = -r;

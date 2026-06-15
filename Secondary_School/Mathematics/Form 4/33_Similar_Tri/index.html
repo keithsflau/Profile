@@ -120,7 +120,7 @@
                               <text x={C.x} y={C.y - 10} textAnchor="middle" className="text-xs fill-amber-600 font-bold">C</text>
 
                               {/* Side labels */}
-                              <text x={(A.x + B.x)/2} y={A.y + 25} textAnchor="middle" className="text-[10px] fill-amber-500 font-mono">{AB.toFixed(0)}</text>
+                              <text x={(A.x + B.x) / 2} y={A.y + 25} textAnchor="middle" className="text-xs fill-amber-500 font-mono">{AB.toFixed(0)}</text>
 
                               {/* Similar Triangle */}
                               <polygon
@@ -132,12 +132,12 @@
                               <circle cx={A2.x} cy={A2.y} r="4" fill="#3b82f6" />
                               <circle cx={B2.x} cy={B2.y} r="4" fill="#3b82f6" />
                               <circle cx={C2.x} cy={C2.y} r="4" fill="#3b82f6" />
-                              <text x={A2.x - 15} y={A2.y + 15} className="text-xs fill-blue-600 font-bold">A'</text>
-                              <text x={B2.x + 5} y={B2.y + 15} className="text-xs fill-blue-600 font-bold">B'</text>
-                              <text x={C2.x} y={C2.y - 10} textAnchor="middle" className="text-xs fill-blue-600 font-bold">C'</text>
+                              <text x={A2.x - 15} y={A2.y + 15} className="text-xs fill-blue-600 font-bold">{"A'"}</text>
+                              <text x={B2.x + 5} y={B2.y + 15} className="text-xs fill-blue-600 font-bold">{"B'"}</text>
+                              <text x={C2.x} y={C2.y - 10} textAnchor="middle" className="text-xs fill-blue-600 font-bold">{"C'"}</text>
 
                               {/* Side labels */}
-                              <text x={(A2.x + B2.x)/2} y={A2.y + 25} textAnchor="middle" className="text-[10px] fill-blue-500 font-mono">{AB2.toFixed(0)}</text>
+                              <text x={(A2.x + B2.x) / 2} y={A2.y + 25} textAnchor="middle" className="text-xs fill-blue-500 font-mono">{AB2.toFixed(0)}</text>
                           </svg>
                       </div>
 
@@ -161,9 +161,9 @@
                           <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
                               <div className="text-sm font-bold text-blue-500 uppercase mb-3">{t.similarTriangle}</div>
                               <div className="space-y-1 font-mono text-sm">
-                                  <div>A'B' = {AB2.toFixed(1)}</div>
-                                  <div>B'C' = {BC2.toFixed(1)}</div>
-                                  <div>C'A' = {CA2.toFixed(1)}</div>
+                                  <div>{`A'B' = ${AB2.toFixed(1)}`}</div>
+                                  <div>{`B'C' = ${BC2.toFixed(1)}`}</div>
+                                  <div>{`C'A' = ${CA2.toFixed(1)}`}</div>
                               </div>
                           </div>
                       </div>
@@ -172,7 +172,7 @@
                       <div className="bg-emerald-50 p-6 rounded-xl mt-6 text-center border border-emerald-100">
                           <div className="text-sm font-bold text-emerald-500 uppercase mb-2">{t.ratio}</div>
                           <div className="text-2xl font-mono">
-                              \[ \frac{A'B'}{AB} = \frac{B'C'}{BC} = \frac{C'A'}{CA} = k = {k.toFixed(1)} \]
+                              {`A'B'/AB = B'C'/BC = C'A'/CA = k = ${k.toFixed(1)}`}
                           </div>
                       </div>
                   </div>

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -530,9 +530,9 @@
         // --- Module C: Gear Logic ---
         function updateGears() {
             // Inputs
-            const t1 = parseInt(document.getElementById('teeth1').value);
-            const s1 = parseInt(document.getElementById('speed1').value);
-            const t2 = parseInt(document.getElementById('teeth2').value);
+            const t1 = parseInt(document.getElementById('teeth1').value, 10);
+            const s1 = parseInt(document.getElementById('speed1').value, 10);
+            const t2 = parseInt(document.getElementById('teeth2').value, 10);
 
             // Update Labels
             document.getElementById('teeth1Val').innerText = t1;

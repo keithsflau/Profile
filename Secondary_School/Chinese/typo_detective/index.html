@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-HK">
 
 <head>
@@ -89,40 +89,6 @@
     </div>
 
     <script>
-        const CASES = [
-            {
-                id: 1,
-                messages: [
-                    { sender: "小明", text: "我今日去左圖書館，借左幾本書。", side: "left" },
-                    { sender: "小芳", text: "係咩書呀？", side: "right" },
-                    { sender: "小明", text: "有一本關於歷史的，講秦朝統一六國的故事。秦始皇建力萬里長城。", side: "left", typos: [{ wrong: "建力", correct: "建立" }] },
-                    { sender: "小芳", text: "哇，聽起來好有趣！我對古代歷史都好有性趣。", side: "right", typos: [{ wrong: "性趣", correct: "興趣" }] },
-                    { sender: "小明", text: "係呀，而且書入面有好多彩色插圖，令人一目了燃。", side: "left", typos: [{ wrong: "了燃", correct: "了然" }] }
-                ]
-            },
-            {
-                id: 2,
-                messages: [
-                    { sender: "老師", text: "同學們，下星期我們要去郊遊，請大家做好準備。", side: "left" },
-                    { sender: "學生A", text: "老師，我們需要帶什麼東西？", side: "right" },
-                    { sender: "老師", text: "要帶水、零食、防曬用品，還要穿合適的鞋，因為要行山。記得要準時集合，不要遲到。", side: "left" },
-                    { sender: "學生B", text: "明白！我會準時到逹。", side: "right", typos: [{ wrong: "到逹", correct: "到達" }] },
-                    { sender: "學生C", text: "我都好期待！聽說山頂的風景很優美，到時拍照一定很上像。", side: "right", typos: [{ wrong: "上像", correct: "上相" }] }
-                ]
-            },
-            {
-                id: 3,
-                messages: [
-                    { sender: "媽媽", text: "阿仔，你作業做完未？", side: "left" },
-                    { sender: "兒子", text: "做緊呀，不過有啲唔識。", side: "right" },
-                    { sender: "媽媽", text: "唔識咩？我幫你睇下。", side: "left" },
-                    { sender: "兒子", text: "呢題數學題，我計左好多次都唔岩。可能係我粗心大意，經常算錯數。", side: "right", typos: [{ wrong: "粗心大意", correct: "粗心大意" }] }, // This one is actually correct, let me fix
-                    { sender: "媽媽", text: "等我睇下...你呢度寫錯左符號，應該係加號，唔係減號。你要細心點，唔好再掉以輕心。", side: "left", typos: [{ wrong: "掉以輕心", correct: "掉以輕心" }] } // Also correct, let me revise
-                ]
-            }
-        ];
-
-        // REVISE CASES:
         const CASES_REVISED = [
             {
                 id: 1,
@@ -146,6 +112,16 @@
             },
             {
                 id: 3,
+                messages: [
+                    { sender: "媽媽", text: "阿仔，你作業做完未？", side: "left" },
+                    { sender: "兒子", text: "做緊呀，不過有啲唔識。", side: "right" },
+                    { sender: "媽媽", text: "唔識咩？我幫你睇下。", side: "left" },
+                    { sender: "兒子", text: "呢題數學題，我<span class='typo' data-correct='計咗'>計左</span>好多次都<span class='typo' data-correct='唔啱'>唔岩</span>。可能係我粗心大意，經常算錯數。", side: "right" },
+                    { sender: "媽媽", text: "等我睇下...你呢度寫錯左符號，應該係加號，唔係減號。你要細心點，唔好再<span class='typo' data-correct='掉以輕心'>掉以清心</span>。", side: "left" }
+                ]
+            },
+            {
+                id: 4,
                 messages: [
                     { sender: "警察", text: "你好，我們懷疑這宗失竊案與你有關。", side: "left" },
                     { sender: "嫌疑人", text: "我真係冇做過！我當時在家中休<span class='typo' data-correct='息'>憩</span>。", side: "right" },
@@ -216,7 +192,7 @@
     <script src="../../../visit-counter.js"></script>
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
-        VisitCounter.init('seconardychinese/typo_detective/index', {
+        VisitCounter.init('secondary_school/chinese/typo_detective/index', {
             scriptUrl: SCRIPT_URL,
             containerId: 'visit-counter-container'
         });

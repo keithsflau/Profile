@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>小二數學：加法 (進位) | Addition with Carry</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="../../common/i18n.js"></script>
     <link
@@ -98,9 +98,9 @@
         const check = () => {
           const sum = n1 + n2;
           const userSum =
-            parseInt(inputs.h || 0) * 100 +
-            parseInt(inputs.t || 0) * 10 +
-            parseInt(inputs.u || 0);
+            parseInt(inputs.h || 0, 10) * 100 +
+            parseInt(inputs.t || 0, 10) * 10 +
+            parseInt(inputs.u || 0, 10);
 
           if (userSum === sum) {
             setFeedback("CORRECT");

@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>小四數學：多位數加法進階 | Advanced Addition</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <script src="../../common/i18n.js"></script>
@@ -55,20 +55,20 @@
           .toString()
           .padStart(6, " ")
           .split("")
-          .map((c) => (c === " " ? "" : parseInt(c)));
+          .map((c) => (c === " " ? "" : parseInt(c, 10)));
         const s2 = n2
           .toString()
           .padStart(6, " ")
           .split("")
-          .map((c) => (c === " " ? "" : parseInt(c)));
+          .map((c) => (c === " " ? "" : parseInt(c, 10)));
         const res = (n1 + n2).toString().padStart(6, " ").split("");
 
         // Calculate carries
         let carries = Array(6).fill("");
         let tempCarry = 0;
         for (let i = 5; i >= 0; i--) {
-          const a = parseInt(s1[i]) || 0;
-          const b = parseInt(s2[i]) || 0;
+          const a = parseInt(s1[i], 10) || 0;
+          const b = parseInt(s2[i], 10) || 0;
           const sum = a + b + tempCarry;
           if (sum >= 10) {
             tempCarry = 1;
@@ -90,14 +90,14 @@
                 <input
                   type="number"
                   value={n1}
-                  onChange={(e) => setN1(parseInt(e.target.value) || 0)}
+                  onChange={(e) => setN1(parseInt(e.target.value, 10) || 0)}
                   className="w-32 bg-blue-50 text-2xl font-bold p-2 rounded"
                 />
                 <div className="text-2xl font-black text-blue-500">+</div>
                 <input
                   type="number"
                   value={n2}
-                  onChange={(e) => setN2(parseInt(e.target.value) || 0)}
+                  onChange={(e) => setN2(parseInt(e.target.value, 10) || 0)}
                   className="w-32 bg-blue-50 text-2xl font-bold p-2 rounded"
                 />
               </div>

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -523,7 +523,7 @@
         // --- Logic: Rounding (Same as before) ---
         function calculateRounding() {
             const numVal = parseFloat(document.getElementById('round-input').value);
-            const precision = parseInt(document.getElementById('precision-slider').value);
+            const precision = parseInt(document.getElementById('precision-slider').value, 10);
             document.getElementById('precision-display').innerText = precision;
 
             if (isNaN(numVal)) return;

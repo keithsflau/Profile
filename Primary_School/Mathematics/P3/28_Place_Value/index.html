@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <title>小三數學：數位值 | Place Value</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="../../common/i18n.js"></script>
     <link
@@ -113,7 +113,7 @@
                 value={num}
                 onChange={(e) =>
                   setNum(
-                    Math.max(0, Math.min(9999, parseInt(e.target.value) || 0))
+                    Math.max(0, Math.min(9999, parseInt(e.target.value, 10) || 0))
                   )
                 }
                 className="w-full px-8 py-6 text-7xl font-black text-center rounded-2xl border-4 border-purple-300 mb-8"
@@ -131,7 +131,7 @@
                       {d.val}
                     </div>
                     <div className="text-sm text-purple-700">
-                      {parseInt(d.val) * d.place}
+                      {parseInt(d.val, 10) * d.place}
                     </div>
                   </div>
                 ))}

@@ -224,7 +224,7 @@
                     step="1"
                     value={airHoleOpen ? 1 : 0}
                     onChange={(e) =>
-                      setAirHoleOpen(parseInt(e.target.value) === 1)
+                      setAirHoleOpen(parseInt(e.target.value, 10) === 1)
                     }
                     className="w-full h-2 bg-slate-600 rounded-lg appearance-none cursor-pointer accent-blue-500"
                   />

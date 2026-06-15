@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>小三數學：神奇陣列圖 | Magic Array</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <script src="../../common/i18n.js"></script>
@@ -188,7 +188,7 @@
                     min="1"
                     max="10"
                     value={rows}
-                    onChange={(e) => setRows(parseInt(e.target.value))}
+                    onChange={(e) => setRows(parseInt(e.target.value, 10))}
                     className="w-full h-3 bg-indigo-900/50 rounded-lg appearance-none cursor-pointer accent-indigo-400"
                   />
                 </div>
@@ -203,7 +203,7 @@
                     min="1"
                     max="10"
                     value={cols}
-                    onChange={(e) => setCols(parseInt(e.target.value))}
+                    onChange={(e) => setCols(parseInt(e.target.value, 10))}
                     className="w-full h-3 bg-indigo-900/50 rounded-lg appearance-none cursor-pointer accent-indigo-400"
                   />
                 </div>

@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>小五數學：代數符號入門 | Intro to Algebra</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <link
@@ -176,7 +176,7 @@
                     <input
                       type="number"
                       value={x}
-                      onChange={(e) => setX(parseInt(e.target.value) || 0)}
+                      onChange={(e) => setX(parseInt(e.target.value, 10) || 0)}
                       className="w-32 md:w-40 bg-slate-800 border-b-4 border-green-500 text-center text-6xl md:text-7xl font-black text-green-400 focus:outline-none focus:bg-slate-700 transition-colors rounded-t-xl py-2"
                     />
                     <div className="absolute -bottom-8 w-full text-center text-slate-500 text-xs font-bold uppercase tracking-widest">

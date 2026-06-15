@@ -339,14 +339,15 @@
                 for(let i = 0; i < buffer.numberOfChannels; i++)
                     channels.push(buffer.getChannelData(i));
 
-                while(pos < buffer.length) {
+                let sampleIdx = 0;
+                while(sampleIdx < buffer.length) {
                     for(let i = 0; i < numOfChan; i++) {
-                        sample = Math.max(-1, Math.min(1, channels[i][pos]));
+                        sample = Math.max(-1, Math.min(1, channels[i][sampleIdx]));
                         sample = (sample < 0 ? sample * 0x8000 : sample * 0x7FFF) | 0;
                         view.setInt16(44 + offset, sample, true);
                         offset += 2;
                     }
-                    pos++;
+                    sampleIdx++;
                 }
                 return out;
             };
@@ -532,7 +533,7 @@
                                      ) : (
                                          <Download size={20} />
                                      )}
-                                     {isProcessing ? 'Rendering...' : 'Download Transposed MP3'}
+                                     {isProcessing ? 'Rendering...' : 'Download Transposed WAV'}
                                  </button>
                              </div>
                         )}

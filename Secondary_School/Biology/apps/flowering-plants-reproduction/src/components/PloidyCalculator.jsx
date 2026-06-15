@@ -9,7 +9,7 @@ export default function PloidyCalculator() {
   const checkAnswer = () => {
     const n = diploidNumber / 2;
     const correctAns = n * 3;
-    if (parseInt(userAnswer) === correctAns) {
+    if (parseInt(userAnswer, 10) === correctAns) {
       setResult('correct');
     } else {
       setResult('incorrect');

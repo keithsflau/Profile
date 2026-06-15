@@ -156,7 +156,7 @@
         };
 
         const handleDrop = (e, zoneType) => {
-          const id = parseInt(e.dataTransfer.getData("id"));
+          const id = parseInt(e.dataTransfer.getData("id"), 10);
           const item = items.find((i) => i.id === id);
 
           if (

@@ -8,11 +8,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script
       crossorigin
-      src="https://unpkg.com/react@18/umd/react.development.js"
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
     ></script>
     <script
       crossorigin
-      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
     ></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -108,7 +108,7 @@
           for (let p of parts) {
             if (!/^\d+$/.test(p))
               return setStatus({ valid: false, msg: "Must be digits" });
-            const num = parseInt(p);
+            const num = parseInt(p, 10);
             if (num < 0 || num > 255)
               return setStatus({
                 valid: false,

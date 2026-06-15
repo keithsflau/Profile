@@ -89,21 +89,26 @@
           h = 300;
         const xMin = mu - 4 * sigma;
         const xMax = mu + 4 * sigma;
+        const plotTop = 30;
+        const plotBottom = h - 40;
+        const plotH = plotBottom - plotTop;
 
         const curve = useMemo(() => {
+          const peak = normalPDF(mu, mu, sigma) || 1e-9;
           let d = "";
           const step = (xMax - xMin) / 200;
           for (let x = xMin; x <= xMax; x += step) {
             const y = normalPDF(x, mu, sigma);
             const sx = 50 + ((x - xMin) / (xMax - xMin)) * (w - 100);
-            const sy = h - 40 - y * sigma * 1000;
+            const sy = plotBottom - (y / peak) * plotH;
             d += (d ? "L" : "M") + `${sx.toFixed(1)},${sy.toFixed(1)} `;
           }
           return d;
-        }, [mu, sigma]);
+        }, [mu, sigma, xMin, xMax]);
 
         // Shaded areas
         const shadedArea = (zLow, zHigh, color) => {
+          const peak = normalPDF(mu, mu, sigma) || 1e-9;
           const x1 = mu + zLow * sigma;
           const x2 = mu + zHigh * sigma;
           let d = "";
@@ -111,19 +116,19 @@
 
           // Start at baseline
           const sx1 = 50 + ((x1 - xMin) / (xMax - xMin)) * (w - 100);
-          d = `M ${sx1} ${h - 40}`;
+          d = `M ${sx1} ${plotBottom}`;
 
           // Curve up
           for (let x = x1; x <= x2; x += step) {
             const y = normalPDF(x, mu, sigma);
             const sx = 50 + ((x - xMin) / (xMax - xMin)) * (w - 100);
-            const sy = h - 40 - y * sigma * 1000;
+            const sy = plotBottom - (y / peak) * plotH;
             d += ` L ${sx.toFixed(1)},${sy.toFixed(1)}`;
           }
 
           // Close at baseline
           const sx2 = 50 + ((x2 - xMin) / (xMax - xMin)) * (w - 100);
-          d += ` L ${sx2} ${h - 40} Z`;
+          d += ` L ${sx2} ${plotBottom} Z`;
 
           return <path d={d} fill={color} />;
         };

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -362,7 +362,7 @@
         });
 
         heatSlider.addEventListener('input', (e) => {
-            heatIntensity = parseInt(e.target.value);
+            heatIntensity = parseInt(e.target.value, 10);
         });
 
         resetBtn.addEventListener('click', init);

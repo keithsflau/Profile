@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>小二數學：乘法概念 (組) | Multiplication Groups</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="../../common/i18n.js"></script>
     <link
@@ -109,8 +109,8 @@
 
         const check = () => {
           if (
-            parseInt(inputs.g) === groups &&
-            parseInt(inputs.p) === perGroup
+            parseInt(inputs.g, 10) === groups &&
+            parseInt(inputs.p, 10) === perGroup
           ) {
             setFeedback("CORRECT");
             setTimeout(newProb, 2000);
