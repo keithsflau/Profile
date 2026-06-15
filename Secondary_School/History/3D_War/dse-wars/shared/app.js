@@ -787,16 +787,18 @@ const cDay=new THREE.Color(0x6f9fd0), cDayB=new THREE.Color(0xcad9e2), cNight=ne
       cNightB=new THREE.Color(0x243349), cOver=new THREE.Color(0x5a6470), cOverB=new THREE.Color(0x808a92), cSmoke=new THREE.Color(0x4a3f3a);
 const _t=new THREE.Color(), _b=new THREE.Color();
 function applyWeather(day){
-  const w=curWeather(day), overcast=clamp(Math.max(w.rain,w.smoke*0.6),0,1);
-  _t.copy(cDay).lerp(cOver,overcast).lerp(cNight,w.night);
-  _b.copy(cDayB).lerp(cOverB,overcast).lerp(cNightB,w.night).lerp(cSmoke,w.smoke*0.4);
+  const w=curWeather(day), outro=Director.mode==="outro";
+  const night=outro?0:w.night, fogAmt=outro?w.fog*0.25:w.fog, smokeAmt=outro?w.smoke*0.2:w.smoke;
+  const overcast=clamp(Math.max(w.rain,smokeAmt*0.6),0,1);
+  _t.copy(cDay).lerp(cOver,overcast).lerp(cNight,night);
+  _b.copy(cDayB).lerp(cOverB,overcast).lerp(cNightB,night).lerp(cSmoke,smokeAmt*0.4);
   skyMat.uniforms.top.value.copy(_t); skyMat.uniforms.bot.value.copy(_b);
-  scene.fog.color.copy(_b); scene.fog.density=0.00012 + w.fog*0.00055 + w.smoke*0.00022;
-  sun.intensity=lerp(1.2,0.1,w.night)*(1-0.55*overcast);
-  sun.color.setHex(w.night>0.5?0x8ea6cf:0xfff1d6);
-  hemi.intensity=lerp(0.5,0.22,w.night)*(1-0.3*overcast);
-  amb.intensity=lerp(0.45,0.36,w.night); amb.color.setHex(w.night>0.5?0x1c2a44:0x404a55);
-  renderer.toneMappingExposure=lerp(1.08,0.78,w.night);
+  scene.fog.color.copy(_b); scene.fog.density=0.00012 + fogAmt*0.00055 + smokeAmt*0.00022;
+  sun.intensity=lerp(1.2,0.1,night)*(1-0.55*overcast)*(outro?1.08:1);
+  sun.color.setHex(night>0.5?0x8ea6cf:0xfff1d6);
+  hemi.intensity=lerp(0.5,0.22,night)*(1-0.3*overcast)*(outro?1.1:1);
+  amb.intensity=lerp(0.45,0.36,night)*(outro?1.15:1); amb.color.setHex(night>0.5?0x1c2a44:0x404a55);
+  renderer.toneMappingExposure=lerp(1.08,0.78,night)*(outro?1.12:1);
   if(seaMesh) seaMesh.material.color.copy(new THREE.Color(0x14323f)).lerp(cNight,w.night*0.8);
   if(rainMat){ rainMat.opacity=clamp(w.rain*0.6,0,0.6); rain.visible=w.rain>0.02; }
   return w;
@@ -861,7 +863,8 @@ function updateLabels(){ const NE=CFG.FOCUS.PLACE_NEAR, FA=CFG.FOCUS.PLACE_FAR, 
 /* ===================== CAMERA & DIRECTOR ========================= */
 const TITLE_DUR=4.5;
 // closing shot: a slow majestic pull-back/orbit over the whole fallen colony (harbour + island + Kowloon)
-const OUTRO_CAM = (D.outro && D.outro.cam) || META.outroCam || { lng:10, lat:50, dist:3000, az:0, el:48, orbit:0.8, tween:3.6 };
+const OUTRO_CAM = Object.assign({ tween: 3.6, orbit: 0.35 },
+  (D.outro && D.outro.cam) || META.outroCam || { lng: 10, lat: 50, dist: 3000, az: 0, el: 48, orbit: 0.35 });
 const WAR_START = META.startDate ? new Date(META.startDate[0], META.startDate[1]-1, META.startDate[2]) : new Date(1914,5,28);
 function dayToLabel(d){
   if(META.useYearOnly) return String(META.startYear + Math.floor((d-1)/365));
@@ -936,7 +939,8 @@ let playSpeed=1;
 const Director = {
   shots:D.storyboard, i:-1, t:0, mode:"title", playing:true, userFree:false, capShown:false, sceneFx:[],
   fromPos:new THREE.Vector3(), fromTgt:new THREE.Vector3(), tgt:new THREE.Vector3(), fromDay:8, toDay:8,
-  start(){ this.mode="title"; this.t=0; this.playing=true; this.userFree=false; this.sceneFx=[]; hideNextBattle(); setDay(this.shots[0].day);
+  outroHold:null, outroAz:0, outroEl:46,
+  start(){ this.mode="title"; this.t=0; this.playing=true; this.userFree=false; this.sceneFx=[]; this.outroHold=null; hideNextBattle(); setDay(this.shots[0].day);
     const ic=META.introCam||this.shots[0].cam;
     const c=camFromShot(ic); camera.position.copy(c.pos); controls.target.copy(c.target);
     lookTarget.copy(controls.target);
@@ -960,12 +964,14 @@ const Director = {
     if(!this.playing) return;
     this.t+=dt;
     if(this.mode==="title"){ if(this.t>=TITLE_DUR){ hideCap(); this.enterShot(0); this.mode="play"; } return; }
-    if(this.mode==="outro"){ const dist=OUTRO_CAM.dist*CFG.ZOOM;
-      if(this.t<OUTRO_CAM.tween){ const e=easeIO(this.t/OUTRO_CAM.tween);
-        camera.position.lerpVectors(this.fromPos,spherical(this.tgt,dist,OUTRO_CAM.az,OUTRO_CAM.el),e);
-        controls.target.lerpVectors(this.fromTgt,this.tgt,e); }
-      else { const ot=this.t-OUTRO_CAM.tween;
-        controls.target.copy(this.tgt); camera.position.copy(spherical(this.tgt,dist,OUTRO_CAM.az+OUTRO_CAM.orbit*ot,OUTRO_CAM.el)); }
+    if(this.mode==="outro"){
+      // stay on the battlefield — gentle orbit only, no pull-back into black fog/sea
+      const hold=this.outroHold;
+      if(hold){
+        controls.target.copy(hold.tgt);
+        const az=hold.az+OUTRO_CAM.orbit*this.t, el=hold.el;
+        camera.position.copy(spherical(hold.tgt,hold.dist,az,el));
+      }
       lookTarget.copy(controls.target); updateProgress(); return; }
     const sh=this.shots[this.i], dur=CFG.TWEEN+sh.hold, dist=sh.cam.dist*CFG.ZOOM;
     if(this.t<CFG.TWEEN){ const e=easeIO(this.t/CFG.TWEEN);
@@ -978,9 +984,11 @@ const Director = {
     lookTarget.copy(controls.target);
     if(this.t>=dur){
       if(this.i+1<this.shots.length) this.enterShot(this.i+1);
-      else { this.mode="outro"; this.t=0; focusSet=new Set(); this.sceneFx=[];
-        this.fromPos.copy(camera.position); this.fromTgt.copy(controls.target);
-        this.tgt.copy(vec(OUTRO_CAM.lng,OUTRO_CAM.lat,8));
+      else { this.mode="outro"; this.t=0; this.sceneFx=[];
+        const tgt=controls.target.clone(), off=camera.position.clone().sub(tgt);
+        const dist=off.length()||sh.cam.dist*CFG.ZOOM;
+        const az=Math.atan2(off.x,off.z)/deg, el=Math.asin(clamp(off.y/dist,-1,1))/deg;
+        this.outroHold={ tgt, dist, az, el };
         card(D.outro.title_zh,D.outro.title_en,D.outro.narration_zh,D.outro.narration_en); showNextBattle(); updatePlayBtn(); } }
     updateProgress();
   }
