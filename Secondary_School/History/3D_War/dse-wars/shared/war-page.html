@@ -118,6 +118,21 @@
   @keyframes load{0%{margin-left:-30%}100%{margin-left:100%}}
   #boot .msg{font-family:var(--mono);font-size:10px;color:var(--ink-dim)}
   #err{position:fixed;inset:0;z-index:60;background:#1a0d0d;color:#ffd9d2;font-family:var(--mono);font-size:13px;padding:40px;display:none;white-space:pre-wrap}
+  #compass{position:fixed;z-index:5;left:18px;bottom:96px;width:68px;height:68px;padding:6px;pointer-events:none;
+    display:flex;align-items:center;justify-content:center}
+  #compass-rose{position:relative;width:54px;height:54px;will-change:transform}
+  #compass-rose .c-cross{position:absolute;inset:11px;pointer-events:none}
+  #compass-rose .c-cross::before,#compass-rose .c-cross::after{content:"";position:absolute;background:rgba(210,190,140,.5);border-radius:1px}
+  #compass-rose .c-cross::before{left:50%;top:0;bottom:0;width:2px;transform:translateX(-50%)}
+  #compass-rose .c-cross::after{top:50%;left:0;right:0;height:2px;transform:translateY(-50%)}
+  #compass-rose span{position:absolute;font-family:var(--cjk);font-size:11px;font-weight:700;line-height:1;
+    text-shadow:0 1px 4px #000;transform:translate(-50%,-50%);pointer-events:none}
+  #compass-rose .c-n{top:0;left:50%;color:#f4a8a8}
+  #compass-rose .c-s{bottom:0;left:50%;color:var(--ink-dim)}
+  #compass-rose .c-e{right:0;top:50%;color:var(--ink-dim)}
+  #compass-rose .c-w{left:0;top:50%;color:var(--ink-dim)}
+  .compass-lbl{font-family:var(--cjk);font-weight:700;font-size:13px;color:#f4ecd6;text-shadow:0 1px 4px #000;
+    letter-spacing:2px;pointer-events:none;user-select:none}
 </style>
 </head>
 <body>
@@ -141,6 +156,12 @@
     <div class="sep"></div>
     <div class="row front"><span class="ln"></span><span>戰線 Front</span></div>
     <div class="row loc"><span class="ln"></span><span>界線 Boundary</span></div>
+  </div>
+  <div id="compass" class="panel" title="方位 · Compass" aria-hidden="true">
+    <div id="compass-rose">
+      <span class="c-n">北</span><span class="c-s">南</span><span class="c-e">東</span><span class="c-w">西</span>
+      <div class="c-cross"></div>
+    </div>
   </div>
   <div id="analysis-dock" class="panel">
     <div class="ad-hd"><span>戰役分析 · BATTLE ANALYSIS</span><button id="analysis-close" type="button" title="關閉">✕</button></div>

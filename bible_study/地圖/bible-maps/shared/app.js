@@ -1116,7 +1116,7 @@ function decollide(){
   const R=items.map(el=>el.getBoundingClientRect());   // batched reads (one reflow)
   const placed=[];
   // fixed HUD panels are immovable obstacles — a map label must never hide under them
-  for(const hudId of ["hud-tl","key"]){ const el=document.getElementById(hudId);
+  for(const hudId of ["hud-tl","key","compass"]){ const el=document.getElementById(hudId);
     if(el){ const hb=el.getBoundingClientRect(); if(hb.width>0) placed.push({top:hb.top,bottom:hb.bottom,left:hb.left,right:hb.right}); } }
   for(let i=0;i<items.length;i++){
     const r={top:R[i].top,bottom:R[i].bottom,left:R[i].left,right:R[i].right}; let dy=0, guard=0, moved=true;
@@ -1127,7 +1127,17 @@ function decollide(){
     placed.push(r);
   }
 }
-function renderScene(){ controls.update(); renderer.render(scene,camera); labelRenderer.render(scene,camera); decollide(); }
+const _cmpC=new THREE.Vector3(), _cmpN=new THREE.Vector3();
+function updateCompass(){
+  const rose=document.getElementById("compass-rose");
+  if(!rose) return;
+  const g=CFG.GEO, midLng=(g.minLng+g.maxLng)/2, midLat=(g.minLat+g.maxLat)/2;
+  _cmpC.copy(vec(midLng,midLat,0)).project(camera);
+  _cmpN.copy(vec(midLng,g.maxLat,0)).project(camera);
+  const angle=Math.atan2(_cmpN.x-_cmpC.x, _cmpN.y-_cmpC.y);
+  rose.style.transform=`rotate(${angle}rad)`;
+}
+function renderScene(){ controls.update(); updateCompass(); renderer.render(scene,camera); labelRenderer.render(scene,camera); decollide(); }
 function frame(dt){
   const spd=playSpeed;
   Director.update(dt*spd);

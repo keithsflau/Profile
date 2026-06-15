@@ -41,6 +41,17 @@
   #key .ln{width:16px;height:0;border-top:3px solid currentColor}
   #key .front{color:#ffb24a} #key .loc{color:#6fa0d8}
   #key .sep-factions,#key .sep{height:1px;background:var(--panel-edge);margin:6px 0}
+  #compass{position:fixed;z-index:5;top:130px;right:18px;width:76px;height:76px;padding:8px;pointer-events:none}
+  .compass-rose{position:relative;width:100%;height:100%}
+  .compass-rose .c-ax{position:absolute;inset:0;pointer-events:none}
+  .compass-rose .c-ax::before,.compass-rose .c-ax::after{content:"";position:absolute;left:50%;top:50%;background:rgba(216,192,138,.42);border-radius:1px}
+  .compass-rose .c-ax::before{width:2px;height:54px;transform:translate(-50%,-50%)}
+  .compass-rose .c-ax::after{height:2px;width:54px;transform:translate(-50%,-50%)}
+  .compass-rose span{position:absolute;font-family:var(--mono);font-size:10px;font-weight:700;color:var(--ink-dim);text-shadow:0 1px 3px #000;letter-spacing:1px}
+  .compass-rose .c-n{top:0;left:50%;transform:translateX(-50%);color:#f4ecd6;font-size:11px}
+  .compass-rose .c-s{bottom:0;left:50%;transform:translateX(-50%)}
+  .compass-rose .c-e{right:0;top:50%;transform:translateY(-50%)}
+  .compass-rose .c-w{left:0;top:50%;transform:translateY(-50%)}
   #caption{position:fixed;z-index:5;left:50%;bottom:78px;transform:translateX(-50%) translateY(14px);
     width:min(760px,92vw);text-align:center;opacity:0;transition:opacity .7s,transform .7s;pointer-events:none}
   #caption.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -131,6 +142,15 @@
     <div class="sep"></div>
     <div class="row front"><span class="ln"></span><span>路線 Route</span></div>
     <div class="row loc"><span class="ln"></span><span>地點 Place</span></div>
+  </div>
+  <div id="compass" class="panel" aria-label="方向羅盤">
+    <div id="compass-rose" class="compass-rose">
+      <div class="c-ax"></div>
+      <span class="c-n">北</span>
+      <span class="c-s">南</span>
+      <span class="c-e">東</span>
+      <span class="c-w">西</span>
+    </div>
   </div>
   <div id="analysis-dock" class="panel">
     <div class="ad-hd"><span>事件分析 · EVENT ANALYSIS</span><button id="analysis-close" type="button">✕</button></div>

@@ -40,6 +40,22 @@
   #key .ln{width:16px;height:0;border-top:3px solid currentColor}
   #key .front{color:#ffb24a} #key .loc{color:#6fa0d8}
   #key .sep-factions,#key .sep{height:1px;background:var(--panel-edge);margin:6px 0}
+  #compass{position:fixed;z-index:5;bottom:88px;right:18px;width:76px;height:76px;padding:7px;pointer-events:none}
+  #compass .compass-dial{position:relative;width:100%;height:100%;border-radius:50%;
+    border:1px solid var(--panel-edge);background:rgba(12,15,21,.72);transform-origin:50% 50%}
+  #compass .compass-dial span{position:absolute;font-family:var(--cjk);font-size:11px;font-weight:700;
+    color:var(--accent);text-shadow:0 1px 4px #000;letter-spacing:1px}
+  #compass .cN{top:3px;left:50%;transform:translateX(-50%)}
+  #compass .cS{bottom:3px;left:50%;transform:translateX(-50%);color:var(--ink-dim);font-size:10px}
+  #compass .cE{right:4px;top:50%;transform:translateY(-50%)}
+  #compass .cW{left:4px;top:50%;transform:translateY(-50%);color:var(--ink-dim);font-size:10px}
+  #compass .compass-cross{position:absolute;inset:20px;pointer-events:none}
+  #compass .compass-cross::before,#compass .compass-cross::after{
+    content:"";position:absolute;background:rgba(216,192,138,.5);border-radius:1px}
+  #compass .compass-cross::before{left:50%;top:0;bottom:0;width:2px;transform:translateX(-50%)}
+  #compass .compass-cross::after{top:50%;left:0;right:0;height:2px;transform:translateY(-50%)}
+  .compass-lbl{font-family:var(--cjk);font-weight:700;font-size:13px;color:#f4ecd6;text-shadow:0 1px 4px #000;
+    letter-spacing:2px;pointer-events:none;user-select:none}
   #caption{position:fixed;z-index:5;left:50%;bottom:78px;transform:translateX(-50%) translateY(14px);
     width:min(760px,92vw);text-align:center;opacity:0;transition:opacity .7s,transform .7s;pointer-events:none}
   #caption.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -140,6 +156,15 @@
     <div class="sep"></div>
     <div class="row front"><span class="ln"></span><span>戰線 Front</span></div>
     <div class="row loc"><span class="ln"></span><span>界線 Boundary</span></div>
+  </div>
+  <div id="compass" class="panel" title="方位 · Cardinal directions">
+    <div id="compass-dial" class="compass-dial">
+      <span class="cN">北</span>
+      <span class="cE">東</span>
+      <span class="cS">南</span>
+      <span class="cW">西</span>
+      <div class="compass-cross"></div>
+    </div>
   </div>
   <div id="analysis-dock" class="panel">
     <div class="ad-hd"><span>戰役分析 · BATTLE ANALYSIS</span><button id="analysis-close" type="button" title="關閉">✕</button></div>

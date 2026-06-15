@@ -171,6 +171,17 @@ function syncControlModes(){
   controls.enablePan=free;
   controls.enableZoom=free;
 }
+const MAP_NORTH = new THREE.Vector3(0, 0, -1);
+const _cmpFwd = new THREE.Vector3();
+function updateCompass(){
+  const rose = document.getElementById("compass-rose");
+  if(!rose) return;
+  camera.getWorldDirection(_cmpFwd);
+  _cmpFwd.y = 0;
+  if(_cmpFwd.lengthSq() < 1e-8) return;
+  _cmpFwd.normalize();
+  rose.style.transform = `rotate(${(-Math.atan2(_cmpFwd.x, -_cmpFwd.z) * 180 / Math.PI).toFixed(1)}deg)`;
+}
 function wireZoomUI(){
   const zIn=$("zoom-in"), zOut=$("zoom-out");
   if(zIn) zIn.onclick=()=>zoomCamera(1);
@@ -1168,7 +1179,7 @@ function decollide(){
     placed.push(r);
   }
 }
-function renderScene(){ syncControlModes(); controls.update(); renderer.render(scene,camera); labelRenderer.render(scene,camera); decollide(); }
+function renderScene(){ syncControlModes(); controls.update(); updateCompass(); renderer.render(scene,camera); labelRenderer.render(scene,camera); decollide(); }
 function frame(dt){
   const spd=playSpeed;
   Director.update(dt*spd);
