@@ -77,11 +77,11 @@ const CFG = {
   GEO: META.geo || { minLng:22.5, maxLng:40.5, minLat:44.0, maxLat:52.5, Z:9 },
   TILE: TILE_SRC,
   TARGET_UNITS: 2000,   // world width of the map (height derived → to scale)
-  VEXAG: 2.0,           // baseline; recalibrated after DEM load for map extent
-  VEXAG_TARGET: 0.055,  // local relief span ≈ this fraction of map width
-  VEXAG_MIN: 18, VEXAG_MAX: 45,
-  RELIEF_BLUR: 18,      // DEM px — detrend radius (~2–3 km at z10) to expose local ridges/valleys
-  NORMAL_GAIN: 4.2,     // normal-map strength (visual shading for subtle relief)
+  VEXAG: 1.0,           // true scale: metres × M2U (no extra vertical exaggeration)
+  VEXAG_TARGET: 0,
+  VEXAG_MIN: 1, VEXAG_MAX: 1,
+  RELIEF_BLUR: 0,       // use absolute elevation, not detrended local bumps
+  NORMAL_GAIN: 1.8,     // subtle shading for natural relief
   EDGE_FRAC: 0.14,       // soft rim width (fraction of map); wider on large theatres
   TERR_SEG: 480,        // terrain mesh resolution
   SSAA: 1.4,            // supersample factor → render above display res to calm terrain/coastline texture aliasing under the orbit (capped so retina never regresses)
@@ -232,33 +232,20 @@ async function loadTiles(){
   for(let i=0;i<heightData.length;i++){ const j=i*4;
     heightData[i]=(px[j]*256 + px[j+1] + px[j+2]/256) - 32768; }
 
-  // Detrend on a coarse grid: exposes local ridges/valleys on the flat steppe.
-  const R=CFG.RELIEF_BLUR, w=demW, h=demH;
-  const mean=new Float32Array(w*h);
-  for(let y=0;y<h;y++){
-    for(let x=0;x<w;x++){
-      let sum=0, cnt=0;
-      for(let dy=-R;dy<=R;dy+=4){
-        for(let dx=-R;dx<=R;dx+=4){
-          const nx=clamp(x+dx,0,w-1), ny=clamp(y+dy,0,h-1);
-          sum+=heightData[ny*w+nx]; cnt++;
-        }
-      }
-      mean[y*w+x]=sum/cnt;
-    }
-  }
-  reliefData=new Float32Array(w*h);
-  let rMin=Infinity, rMax=-Infinity;
-  for(let i=0;i<w*h;i++){
-    const r=heightData[i]-mean[i];
+  // Absolute elevation above tile minimum → true-scale relief (no detrend / VEXAG boost).
+  let baseElev=Infinity;
+  for(let i=0;i<heightData.length;i++) if(heightData[i]<baseElev) baseElev=heightData[i];
+  reliefData=new Float32Array(demW*demH);
+  let rMax=0;
+  for(let i=0;i<heightData.length;i++){
+    const r=heightData[i]-baseElev;
     reliefData[i]=r;
-    if(r<rMin) rMin=r; if(r>rMax) rMax=r;
+    if(r>rMax) rMax=r;
   }
-  const rRange=rMax-rMin, target=MAPW*CFG.VEXAG_TARGET;
-  CFG.VEXAG = rRange>2 ? clamp(target/(rRange*M2U), CFG.VEXAG_MIN, CFG.VEXAG_MAX) : CFG.VEXAG_MAX;
-  console.log(`DEM local relief ${rMin.toFixed(0)}–${rMax.toFixed(0)} m · VEXAG ${CFG.VEXAG.toFixed(1)}`);
+  CFG.VEXAG=1.0;
+  console.log(`DEM base ${baseElev.toFixed(0)} m · relief span ${rMax.toFixed(0)} m · true-scale VEXAG ${CFG.VEXAG}`);
 
-  normalTex=buildNormalTex(reliefData,w,h,CFG.NORMAL_GAIN);
+  normalTex=buildNormalTex(reliefData,demW,demH,CFG.NORMAL_GAIN);
 
   // --- imagery → texture (graded for a documentary look) ---
   bootMsg("載入衛星影像…");
@@ -330,7 +317,7 @@ function buildTerrain(){
   geo.computeVertexNormals();
   const terrain=new THREE.Mesh(geo, new THREE.MeshStandardMaterial({
     map:imageryTex, normalMap:normalTex,
-    normalScale:new THREE.Vector2(1.8,1.8),
+    normalScale:new THREE.Vector2(1.1,1.1),
     roughness:0.9, metalness:0.0 }));
   scene.add(terrain);
   // static cast-shadows for relief form — the sun direction is FIXED (no arc) so shadows never move;
