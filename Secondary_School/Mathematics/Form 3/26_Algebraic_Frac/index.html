@@ -13,7 +13,6 @@
       crossorigin
       src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
     ></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap"
@@ -27,130 +26,114 @@
   </head>
   <body class="bg-rose-50 text-slate-800 min-h-screen">
     <div id="root"></div>
-    <script type="text/babel">
-      const { useState } = React;
-      const App = () => {
-        const [lang, setLang] = useState("en");
-        const [a, setA] = useState(2);
-        const [b, setB] = useState(3);
-
-        const t = {
-          title: { en: "Algebraic Fractions", zh: "代數分式" },
-          back: { en: "Back to Dashboard", zh: "返回主頁" },
-        };
-
-        return (
-          <div className="p-6 max-w-4xl mx-auto min-h-screen flex flex-col">
-            <header className="mb-6 flex justify-between items-center">
-              <div>
-                <div className="text-rose-600 font-bold uppercase text-xs tracking-widest mb-1">
-                  S3 Math
-                </div>
-                <h1 className="text-3xl font-extrabold text-slate-900">
-                  {t.title[lang]}
-                </h1>
-              </div>
-              <button
-                onClick={() => setLang(lang === "en" ? "zh" : "en")}
-                className="px-3 py-1 bg-white border border-rose-200 rounded-lg text-sm font-bold hover:bg-rose-100"
-              >
-                {lang === "en" ? "中文" : "ENG"}
-              </button>
-            </header>
-
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="bg-white p-4 rounded-xl shadow-sm border border-rose-100">
-                <label className="block text-xs font-bold text-slate-400 mb-1">
-                  a = {a}
-                </label>
-                <input
-                  type="range"
-                  min="1"
-                  max="5"
-                  value={a}
-                  onChange={(e) => setA(Number(e.target.value))}
-                  className="w-full accent-rose-500"
-                />
-              </div>
-              <div className="bg-white p-4 rounded-xl shadow-sm border border-rose-100">
-                <label className="block text-xs font-bold text-slate-400 mb-1">
-                  b = {b}
-                </label>
-                <input
-                  type="range"
-                  min="1"
-                  max="5"
-                  value={b}
-                  onChange={(e) => setB(Number(e.target.value))}
-                  className="w-full accent-rose-500"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="bg-white p-4 rounded-xl border border-rose-100">
-                <div className="text-xs font-bold text-rose-500 mb-2">
-                  {lang === "en" ? "Addition" : "加法"}
-                </div>
-                <div className="text-xl font-mono text-center">
-                  <span className="inline-flex flex-col items-center mx-2">
-                    <span>{a}</span>
-                    <span className="border-t border-black w-8">{b}</span>
-                  </span>{" "}
-                  +
-                  <span className="inline-flex flex-col items-center mx-2">
-                    <span>1</span>
-                    <span className="border-t border-black w-8">{b}</span>
-                  </span>{" "}
-                  =
-                  <span className="inline-flex flex-col items-center mx-2 text-rose-600 font-bold">
-                    <span>{a + 1}</span>
-                    <span className="border-t border-black w-8">{b}</span>
-                  </span>
-                </div>
-              </div>
-              <div className="bg-white p-4 rounded-xl border border-rose-100">
-                <div className="text-xs font-bold text-rose-500 mb-2">
-                  {lang === "en" ? "Multiplication" : "乘法"}
-                </div>
-                <div className="text-xl font-mono text-center">
-                  <span className="inline-flex flex-col items-center mx-2">
-                    <span>x</span>
-                    <span className="border-t border-black w-8">{a}</span>
-                  </span>{" "}
-                  ×
-                  <span className="inline-flex flex-col items-center mx-2">
-                    <span>{a}</span>
-                    <span className="border-t border-black w-8">x</span>
-                  </span>{" "}
-                  =<span className="font-bold text-rose-600 mx-2">1</span>
-                </div>
-              </div>
-              <div className="bg-white p-4 rounded-xl border border-rose-100">
-                <div className="text-xs font-bold text-rose-500 mb-2">
-                  {lang === "en" ? "Simplification" : "約簡"}
-                </div>
-                <div className="text-xl font-mono text-center">
-                  <span className="inline-flex flex-col items-center mx-2">
-                    <span>{a * b}x</span>
-                    <span className="border-t border-black w-12">{a}x²</span>
-                  </span>{" "}
-                  =
-                  <span className="inline-flex flex-col items-center mx-2 text-rose-600 font-bold">
-                    <span>{b}</span>
-                    <span className="border-t border-black w-8">x</span>
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            
-          </div>
-        );
-      };
-      const root = ReactDOM.createRoot(document.getElementById("root"));
-      root.render(<App />);
-    </script>
+    <script>
+const {
+  useState
+} = React;
+const App = () => {
+  const [lang, setLang] = useState("en");
+  const [a, setA] = useState(2);
+  const [b, setB] = useState(3);
+  const t = {
+    title: {
+      en: "Algebraic Fractions",
+      zh: "代數分式"
+    },
+    back: {
+      en: "Back to Dashboard",
+      zh: "返回主頁"
+    }
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    className: "p-6 max-w-4xl mx-auto min-h-screen flex flex-col"
+  }, /*#__PURE__*/React.createElement("header", {
+    className: "mb-6 flex justify-between items-center"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "text-rose-600 font-bold uppercase text-xs tracking-widest mb-1"
+  }, "S3 Math"), /*#__PURE__*/React.createElement("h1", {
+    className: "text-3xl font-extrabold text-slate-900"
+  }, t.title[lang])), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setLang(lang === "en" ? "zh" : "en"),
+    className: "px-3 py-1 bg-white border border-rose-200 rounded-lg text-sm font-bold hover:bg-rose-100"
+  }, lang === "en" ? "中文" : "ENG")), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-2 gap-4 mb-6"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-white p-4 rounded-xl shadow-sm border border-rose-100"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "block text-xs font-bold text-slate-400 mb-1"
+  }, "a = ", a), /*#__PURE__*/React.createElement("input", {
+    type: "range",
+    min: "1",
+    max: "5",
+    value: a,
+    onChange: e => setA(Number(e.target.value)),
+    className: "w-full accent-rose-500"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "bg-white p-4 rounded-xl shadow-sm border border-rose-100"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "block text-xs font-bold text-slate-400 mb-1"
+  }, "b = ", b), /*#__PURE__*/React.createElement("input", {
+    type: "range",
+    min: "1",
+    max: "5",
+    value: b,
+    onChange: e => setB(Number(e.target.value)),
+    className: "w-full accent-rose-500"
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "space-y-4"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-white p-4 rounded-xl border border-rose-100"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-xs font-bold text-rose-500 mb-2"
+  }, lang === "en" ? "Addition" : "加法"), /*#__PURE__*/React.createElement("div", {
+    className: "text-xl font-mono text-center"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "inline-flex flex-col items-center mx-2"
+  }, /*#__PURE__*/React.createElement("span", null, a), /*#__PURE__*/React.createElement("span", {
+    className: "border-t border-black w-8"
+  }, b)), " ", "+", /*#__PURE__*/React.createElement("span", {
+    className: "inline-flex flex-col items-center mx-2"
+  }, /*#__PURE__*/React.createElement("span", null, "1"), /*#__PURE__*/React.createElement("span", {
+    className: "border-t border-black w-8"
+  }, b)), " ", "=", /*#__PURE__*/React.createElement("span", {
+    className: "inline-flex flex-col items-center mx-2 text-rose-600 font-bold"
+  }, /*#__PURE__*/React.createElement("span", null, a + 1), /*#__PURE__*/React.createElement("span", {
+    className: "border-t border-black w-8"
+  }, b)))), /*#__PURE__*/React.createElement("div", {
+    className: "bg-white p-4 rounded-xl border border-rose-100"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-xs font-bold text-rose-500 mb-2"
+  }, lang === "en" ? "Multiplication" : "乘法"), /*#__PURE__*/React.createElement("div", {
+    className: "text-xl font-mono text-center"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "inline-flex flex-col items-center mx-2"
+  }, /*#__PURE__*/React.createElement("span", null, "x"), /*#__PURE__*/React.createElement("span", {
+    className: "border-t border-black w-8"
+  }, a)), " ", "×", /*#__PURE__*/React.createElement("span", {
+    className: "inline-flex flex-col items-center mx-2"
+  }, /*#__PURE__*/React.createElement("span", null, a), /*#__PURE__*/React.createElement("span", {
+    className: "border-t border-black w-8"
+  }, "x")), " ", "=", /*#__PURE__*/React.createElement("span", {
+    className: "font-bold text-rose-600 mx-2"
+  }, "1"))), /*#__PURE__*/React.createElement("div", {
+    className: "bg-white p-4 rounded-xl border border-rose-100"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-xs font-bold text-rose-500 mb-2"
+  }, lang === "en" ? "Simplification" : "約簡"), /*#__PURE__*/React.createElement("div", {
+    className: "text-xl font-mono text-center"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "inline-flex flex-col items-center mx-2"
+  }, /*#__PURE__*/React.createElement("span", null, a * b, "x"), /*#__PURE__*/React.createElement("span", {
+    className: "border-t border-black w-12"
+  }, a, "x²")), " ", "=", /*#__PURE__*/React.createElement("span", {
+    className: "inline-flex flex-col items-center mx-2 text-rose-600 font-bold"
+  }, /*#__PURE__*/React.createElement("span", null, b), /*#__PURE__*/React.createElement("span", {
+    className: "border-t border-black w-8"
+  }, "x"))))));
+};
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(/*#__PURE__*/React.createElement(App, null));
+</script>
   
       
       <!-- Footer -->

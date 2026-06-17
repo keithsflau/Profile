@@ -13,7 +13,6 @@
       crossorigin
       src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
     ></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <script
       type="text/javascript"
@@ -40,207 +39,172 @@
   </head>
   <body class="min-h-screen flex flex-col">
     <div id="root" class="flex-grow flex flex-col"></div>
-    <script type="text/babel">
-      const { useState, useEffect } = React;
+    <script>
+const {
+  useState,
+  useEffect
+} = React;
+const translations = {
+  en: {
+    unit: "Module 1: Calculus",
+    title: "Indefinite Integral",
+    desc: "Introduction to anti-derivatives and the constant C.",
+    func: "f(x) (Derivative)",
+    primitive: "F(x) (Primitive)",
+    constant: "Constant C",
+    family: "Family of Curves",
+    langBtn: "中文"
+  },
+  zh: {
+    unit: "單元一：微積分",
+    title: "不定積分",
+    desc: "介紹反導數與常數 C。",
+    func: "f(x) (導數)",
+    primitive: "F(x) (原函數)",
+    constant: "常數 C",
+    family: "曲線族",
+    langBtn: "English"
+  }
+};
+const App = () => {
+  const [lang, setLang] = useState("en");
+  const t = translations[lang];
+  const [n, setN] = useState(1); // power: x^n
+  const [c, setC] = useState(0); // Constant of integration
 
-      const translations = {
-        en: {
-          unit: "Module 1: Calculus",
-          title: "Indefinite Integral",
-          desc: "Introduction to anti-derivatives and the constant C.",
-          func: "f(x) (Derivative)",
-          primitive: "F(x) (Primitive)",
-          constant: "Constant C",
-          family: "Family of Curves",
-          langBtn: "中文",
-        },
-        zh: {
-          unit: "單元一：微積分",
-          title: "不定積分",
-          desc: "介紹反導數與常數 C。",
-          func: "f(x) (導數)",
-          primitive: "F(x) (原函數)",
-          constant: "常數 C",
-          family: "曲線族",
-          langBtn: "English",
-        },
-      };
+  // f(x) = x^n
+  // F(x) = x^(n+1)/(n+1) + C
 
-      const App = () => {
-        const [lang, setLang] = useState("en");
-        const t = translations[lang];
+  const f = x => Math.pow(x, n);
+  const F = x => Math.pow(x, n + 1) / (n + 1) + c;
 
-        const [n, setN] = useState(1); // power: x^n
-        const [c, setC] = useState(0); // Constant of integration
+  // Graph
+  const size = 400;
+  const range = 5;
+  const scale = size / (2 * range);
+  const cx = size / 2;
+  const cy = size / 2;
+  const toScreen = (x, y) => ({
+    x: cx + x * scale,
+    y: cy - y * scale
+  });
 
-        // f(x) = x^n
-        // F(x) = x^(n+1)/(n+1) + C
+  // Path for F(x)
+  const pts = [];
+  for (let x = -range; x <= range; x += 0.1) {
+    // handle domain issues for non-integer powers if needed, but slider is integer
+    pts.push(toScreen(x, F(x)));
+  }
+  const pathD = `M ${pts.map(p => `${p.x},${p.y}`).join(" L ")}`;
 
-        const f = (x) => Math.pow(x, n);
-        const F = (x) => Math.pow(x, n + 1) / (n + 1) + c;
-
-        // Graph
-        const size = 400;
-        const range = 5;
-        const scale = size / (2 * range);
-        const cx = size / 2;
-        const cy = size / 2;
-
-        const toScreen = (x, y) => ({
-          x: cx + x * scale,
-          y: cy - y * scale,
-        });
-
-        // Path for F(x)
-        const pts = [];
-        for (let x = -range; x <= range; x += 0.1) {
-          // handle domain issues for non-integer powers if needed, but slider is integer
-          pts.push(toScreen(x, F(x)));
-        }
-        const pathD = `M ${pts.map((p) => `${p.x},${p.y}`).join(" L ")}`;
-
-        // Family of curves (ghosts)
-        const ghosts = [-4, -2, 2, 4].map((offset) => {
-          const gPts = [];
-          for (let x = -range; x <= range; x += 0.1) {
-            gPts.push(toScreen(x, Math.pow(x, n + 1) / (n + 1) + offset));
-          }
-          return `M ${gPts.map((p) => `${p.x},${p.y}`).join(" L ")}`;
-        });
-
-        useEffect(() => {
-          if (window.MathJax) window.MathJax.typesetPromise();
-        }, [n, c, lang]);
-
-        return (
-          <div className="flex-grow flex flex-col items-center justify-center p-8 select-none">
-            <div className="absolute top-4 right-4">
-              <button
-                onClick={() => setLang((l) => (l === "en" ? "zh" : "en"))}
-                className="px-3 py-1 bg-slate-800 border border-slate-600 rounded-full text-xs font-bold text-emerald-400 hover:bg-slate-700 hover:text-white transition flex items-center gap-2"
-              >
-                <i className="fa-solid fa-language"></i>
-                {t.langBtn}
-              </button>
-            </div>
-
-            <header className="mb-8 text-center">
-              <div className="text-indigo-500 font-bold uppercase tracking-widest text-xs mb-2">
-                {t.unit}
-              </div>
-              <h1 className="text-4xl font-extrabold text-white mb-2">
-                {t.title}
-              </h1>
-              <p className="text-slate-400 font-mono text-lg">{t.desc}</p>
-            </header>
-
-            <div className="flex flex-col lg:flex-row gap-8 w-full max-w-5xl">
-              {/* Graph */}
-              <div className="glass p-4 rounded-3xl flex-1 flex justify-center items-center border border-indigo-500/30">
-                <svg
-                  width={size}
-                  height={size}
-                  className="bg-slate-900 rounded-xl overflow-hidden"
-                >
-                  {/* Axes */}
-                  <line
-                    x1="0"
-                    y1={cy}
-                    x2={size}
-                    y2={cy}
-                    stroke="#475569"
-                    strokeWidth="2"
-                  />
-                  <line
-                    x1={cx}
-                    y1="0"
-                    x2={cx}
-                    y2={size}
-                    stroke="#475569"
-                    strokeWidth="2"
-                  />
-
-                  {/* Family Ghosts */}
-                  {ghosts.map((d, i) => (
-                    <path
-                      key={i}
-                      d={d}
-                      fill="none"
-                      stroke="#475569"
-                      strokeWidth="2"
-                      strokeDasharray="4"
-                      opacity="0.5"
-                    />
-                  ))}
-
-                  {/* Main Curve F(x) */}
-                  <path
-                    d={pathD}
-                    fill="none"
-                    stroke="#818cf8"
-                    strokeWidth="4"
-                  />
-                  <text
-                    x={size - 120}
-                    y={50}
-                    className="fill-indigo-400 font-bold text-xs"
-                  >
-                    y = F(x) (Family)
-                  </text>
-                </svg>
-              </div>
-
-              {/* Controls */}
-              <div className="glass p-6 rounded-3xl flex-1 space-y-8 flex flex-col justify-center">
-                <div className="text-center">
-                  <h3 className="text-lg font-bold text-indigo-300 mb-2 font-mono">
-                    {t.func}: <span className="text-white">x^{n}</span>
-                  </h3>
-                  <input
-                    type="range"
-                    min="0"
-                    max="3"
-                    step="1"
-                    value={n}
-                    onChange={(e) => setN(Number(e.target.value))}
-                    className="w-full accent-indigo-500"
-                  />
-                </div>
-
-                <div className="bg-indigo-600 text-white p-8 rounded-2xl shadow-lg text-center transform transition-all hover:scale-[1.02]">
-                  <div className="text-xs font-bold opacity-75 uppercase mb-4">
-                    Integral
-                  </div>
-                  <div className="text-2xl font-bold font-mono overflow-x-auto">
-                    {`\\[ \\int x^{${n}} \\, dx = \\frac{x^{${n + 1}}}{${n + 1}} + C \\]`}
-                  </div>
-                </div>
-
-                <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 text-center">
-                  <div className="text-xs font-bold text-slate-400 uppercase mb-2">
-                    {t.constant} C = {c}
-                  </div>
-                  <input
-                    type="range"
-                    min="-4"
-                    max="4"
-                    step="0.5"
-                    value={c}
-                    onChange={(e) => setC(Number(e.target.value))}
-                    className="w-full accent-emerald-500 mb-2"
-                  />
-                  <p className="text-xs text-slate-500">
-                    Shift curve vertically
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-      };
-      const root = ReactDOM.createRoot(document.getElementById("root"));
-      root.render(<App />);
-    </script>
+  // Family of curves (ghosts)
+  const ghosts = [-4, -2, 2, 4].map(offset => {
+    const gPts = [];
+    for (let x = -range; x <= range; x += 0.1) {
+      gPts.push(toScreen(x, Math.pow(x, n + 1) / (n + 1) + offset));
+    }
+    return `M ${gPts.map(p => `${p.x},${p.y}`).join(" L ")}`;
+  });
+  useEffect(() => {
+    if (window.MathJax) window.MathJax.typesetPromise();
+  }, [n, c, lang]);
+  return /*#__PURE__*/React.createElement("div", {
+    className: "flex-grow flex flex-col items-center justify-center p-8 select-none"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "absolute top-4 right-4"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setLang(l => l === "en" ? "zh" : "en"),
+    className: "px-3 py-1 bg-slate-800 border border-slate-600 rounded-full text-xs font-bold text-emerald-400 hover:bg-slate-700 hover:text-white transition flex items-center gap-2"
+  }, /*#__PURE__*/React.createElement("i", {
+    className: "fa-solid fa-language"
+  }), t.langBtn)), /*#__PURE__*/React.createElement("header", {
+    className: "mb-8 text-center"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-indigo-500 font-bold uppercase tracking-widest text-xs mb-2"
+  }, t.unit), /*#__PURE__*/React.createElement("h1", {
+    className: "text-4xl font-extrabold text-white mb-2"
+  }, t.title), /*#__PURE__*/React.createElement("p", {
+    className: "text-slate-400 font-mono text-lg"
+  }, t.desc)), /*#__PURE__*/React.createElement("div", {
+    className: "flex flex-col lg:flex-row gap-8 w-full max-w-5xl"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "glass p-4 rounded-3xl flex-1 flex justify-center items-center border border-indigo-500/30"
+  }, /*#__PURE__*/React.createElement("svg", {
+    width: size,
+    height: size,
+    className: "bg-slate-900 rounded-xl overflow-hidden"
+  }, /*#__PURE__*/React.createElement("line", {
+    x1: "0",
+    y1: cy,
+    x2: size,
+    y2: cy,
+    stroke: "#475569",
+    strokeWidth: "2"
+  }), /*#__PURE__*/React.createElement("line", {
+    x1: cx,
+    y1: "0",
+    x2: cx,
+    y2: size,
+    stroke: "#475569",
+    strokeWidth: "2"
+  }), ghosts.map((d, i) => /*#__PURE__*/React.createElement("path", {
+    key: i,
+    d: d,
+    fill: "none",
+    stroke: "#475569",
+    strokeWidth: "2",
+    strokeDasharray: "4",
+    opacity: "0.5"
+  })), /*#__PURE__*/React.createElement("path", {
+    d: pathD,
+    fill: "none",
+    stroke: "#818cf8",
+    strokeWidth: "4"
+  }), /*#__PURE__*/React.createElement("text", {
+    x: size - 120,
+    y: 50,
+    className: "fill-indigo-400 font-bold text-xs"
+  }, "y = F(x) (Family)"))), /*#__PURE__*/React.createElement("div", {
+    className: "glass p-6 rounded-3xl flex-1 space-y-8 flex flex-col justify-center"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-center"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "text-lg font-bold text-indigo-300 mb-2 font-mono"
+  }, t.func, ": ", /*#__PURE__*/React.createElement("span", {
+    className: "text-white"
+  }, "x^", n)), /*#__PURE__*/React.createElement("input", {
+    type: "range",
+    min: "0",
+    max: "3",
+    step: "1",
+    value: n,
+    onChange: e => setN(Number(e.target.value)),
+    className: "w-full accent-indigo-500"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "bg-indigo-600 text-white p-8 rounded-2xl shadow-lg text-center transform transition-all hover:scale-[1.02]"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-xs font-bold opacity-75 uppercase mb-4"
+  }, "Integral"), /*#__PURE__*/React.createElement("div", {
+    className: "text-2xl font-bold font-mono overflow-x-auto"
+  }, `\\[ \\int x^{${n}} \\, dx = \\frac{x^{${n + 1}}}{${n + 1}} + C \\]`)), /*#__PURE__*/React.createElement("div", {
+    className: "bg-slate-800 p-6 rounded-2xl border border-slate-700 text-center"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-xs font-bold text-slate-400 uppercase mb-2"
+  }, t.constant, " C = ", c), /*#__PURE__*/React.createElement("input", {
+    type: "range",
+    min: "-4",
+    max: "4",
+    step: "0.5",
+    value: c,
+    onChange: e => setC(Number(e.target.value)),
+    className: "w-full accent-emerald-500 mb-2"
+  }), /*#__PURE__*/React.createElement("p", {
+    className: "text-xs text-slate-500"
+  }, "Shift curve vertically")))));
+};
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(/*#__PURE__*/React.createElement(App, null));
+</script>
   
       
       <!-- Footer -->

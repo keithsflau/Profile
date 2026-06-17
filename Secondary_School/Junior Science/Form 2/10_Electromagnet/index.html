@@ -13,7 +13,6 @@
       crossorigin
       src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
     ></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap"
@@ -51,232 +50,173 @@
   <body class="bg-orange-50 text-slate-800 min-h-screen">
     <div id="root"></div>
 
-    <script type="text/babel">
-      const { useState } = React;
+    <script>
+const {
+  useState
+} = React;
+const App = () => {
+  const [current, setCurrent] = useState(0); // Amps
+  const [turns, setTurns] = useState(10); // Number of turns
+  const [core, setCore] = useState("iron"); // iron vs steel
 
-      const App = () => {
-        const [current, setCurrent] = useState(0); // Amps
-        const [turns, setTurns] = useState(10); // Number of turns
-        const [core, setCore] = useState("iron"); // iron vs steel
-
-        const strength = current * turns * (core === "iron" ? 1.5 : 1.0);
-        const numClips = Math.floor(strength / 10);
-
-        return (
-          <div className="p-8 max-w-5xl mx-auto min-h-screen flex flex-col items-center">
-            <header className="text-center mb-10 w-full">
-              <span className="text-orange-600 font-bold uppercase text-xs tracking-widest">
-                Form 2 Science • Unit 8
-              </span>
-              <h1 className="text-4xl font-extrabold text-slate-800 mb-2">
-                Electromagnet Simulator
-              </h1>
-              <p className="text-slate-500">
-                How do current and turns affect magnetic strength?
-              </p>
-            </header>
-
-            <div className="flex flex-col md:flex-row gap-12 w-full">
-              {/* Simulation */}
-              <div className="bg-white p-8 rounded-3xl shadow-xl border border-orange-100 w-full md:w-2/3 flex flex-col items-center relative min-h-[400px]">
-                {/* Circuit wires */}
-                <div className="absolute top-10 left-0 w-full h-full pointer-events-none">
-                  <svg width="100%" height="100%">
-                    {/* Left Wire */}
-                    <path
-                      d="M 50 350 L 50 150 L 200 150"
-                      stroke="#334155"
-                      strokeWidth="6"
-                      fill="none"
-                    />
-                    {/* Right Wire */}
-                    <path
-                      d="M 600 350 L 600 150 L 450 150"
-                      stroke="#334155"
-                      strokeWidth="6"
-                      fill="none"
-                    />
-
-                    {/* Battery */}
-                    <rect
-                      x="20"
-                      y="320"
-                      width="60"
-                      height="60"
-                      rx="10"
-                      fill="#facc15"
-                      stroke="#ca8a04"
-                      strokeWidth="2"
-                    />
-                    <text x="35" y="360" fontSize="24" fontWeight="bold">
-                      V
-                    </text>
-
-                    {/* Switch (Visual only) */}
-                    <circle cx="600" cy="350" r="10" fill="#334155" />
-                  </svg>
-                </div>
-
-                {/* The Electromagnet */}
-                <div className="relative mt-20 z-10">
-                  {/* Core */}
-                  <div
-                    className={`w-80 h-10 rounded-full shadow-inner border border-slate-400 ${
-                      core === "iron" ? "bg-slate-300" : "bg-slate-500"
-                    }`}
-                  >
-                    <span className="absolute top-2 left-1/2 -translate-x-1/2 text-[10px] font-bold uppercase text-slate-500 spacing-widest">
-                      Soft {core} Core
-                    </span>
-                  </div>
-
-                  {/* Coils SVG Overlay */}
-                  <svg className="absolute top-[-20px] left-0 w-full h-[80px] pointer-events-none overflow-visible">
-                    {Array.from({ length: turns }).map((_, i) => (
-                      <ellipse
-                        key={i}
-                        cx={20 + i * (280 / turns)}
-                        cy="40"
-                        rx="10"
-                        ry="25"
-                        className="coil"
-                      />
-                    ))}
-
-                    {/* Field Lines (If active) */}
-                    {current > 0 && (
-                      <>
-                        <path
-                          d="M -20 40 Q 160 -100 340 40"
-                          className="field-line"
-                          style={{ opacity: strength / 50 }}
-                        />
-                        <path
-                          d="M -20 40 Q 160 180 340 40"
-                          className="field-line"
-                          style={{ opacity: strength / 50 }}
-                        />
-                      </>
-                    )}
-                  </svg>
-                </div>
-
-                {/* Attracted Objects - Paperclips */}
-                <div className="mt-32 relative w-full flex justify-center h-20">
-                  <div className="absolute top-0 w-60 h-2 bg-slate-200 rounded-full"></div>{" "}
-                  {/* Table/Tray */}
-                  {Array.from({ length: 20 }).map((_, i) => {
-                    const attracted = i < numClips;
-                    return (
-                      <div
-                        key={i}
-                        className="clip absolute text-slate-400 text-2xl"
-                        style={{
-                          left: `${20 + i * 5}%`,
-                          top: attracted ? "-90px" : "0px",
-                          transform: `rotate(${i * 20}deg)`,
-                          color: attracted ? "#f97316" : "#94a3b8",
-                        }}
-                      >
-                        <i className="fa-solid fa-paperclip"></i>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Strength Meter */}
-                <div className="absolute top-4 right-4 bg-slate-100 p-3 rounded-xl border border-slate-200 text-center">
-                  <div className="text-xs uppercase font-bold text-slate-400">
-                    Strength
-                  </div>
-                  <div className="text-2xl font-bold text-orange-600">
-                    {Math.round(strength)}{" "}
-                    <span className="text-xs text-slate-400">mT</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Controls */}
-              <div className="w-full md:w-1/3 space-y-8">
-                <div className="bg-white p-6 rounded-3xl shadow-md border border-orange-100">
-                  <label className="flex justify-between font-bold text-slate-600 mb-4">
-                    <span>
-                      <i className="fa-solid fa-bolt mr-2"></i> Current (I)
-                    </span>
-                    <span>{current} A</span>
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="5"
-                    step="0.5"
-                    value={current}
-                    onChange={(e) => setCurrent(Number(e.target.value))}
-                    className="w-full h-4 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-orange-500"
-                  />
-                </div>
-
-                <div className="bg-white p-6 rounded-3xl shadow-md border border-orange-100">
-                  <label className="flex justify-between font-bold text-slate-600 mb-4">
-                    <span>
-                      <i className="fa-solid fa-arrows-spin mr-2"></i> Turns (N)
-                    </span>
-                    <span>{turns}</span>
-                  </label>
-                  <input
-                    type="range"
-                    min="5"
-                    max="30"
-                    step="5"
-                    value={turns}
-                    onChange={(e) => setTurns(Number(e.target.value))}
-                    className="w-full h-4 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-orange-500"
-                  />
-                </div>
-
-                <div className="bg-white p-6 rounded-3xl shadow-md border border-orange-100">
-                  <label className="block font-bold text-slate-600 mb-4">
-                    <i className="fa-solid fa-gem mr-2"></i> Core Material
-                  </label>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setCore("iron")}
-                      className={`flex-1 py-2 rounded-lg font-bold border-2 ${
-                        core === "iron"
-                          ? "bg-orange-100 border-orange-500 text-orange-700"
-                          : "bg-slate-50 border-slate-200 text-slate-400"
-                      }`}
-                    >
-                      Soft Iron
-                    </button>
-                    <button
-                      onClick={() => setCore("steel")}
-                      className={`flex-1 py-2 rounded-lg font-bold border-2 ${
-                        core === "steel"
-                          ? "bg-slate-200 border-slate-500 text-slate-700"
-                          : "bg-slate-50 border-slate-200 text-slate-400"
-                      }`}
-                    >
-                      Steel
-                    </button>
-                  </div>
-                  <p className="text-xs text-slate-400 mt-2 p-2 bg-slate-50 rounded">
-                    {core === "iron"
-                      ? "Iron creates a stronger temporary magnet."
-                      : "Steel creates a weaker but permanent magnet."}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            
-          </div>
-        );
-      };
-
-      const root = ReactDOM.createRoot(document.getElementById("root"));
-      root.render(<App />);
-    </script>
+  const strength = current * turns * (core === "iron" ? 1.5 : 1.0);
+  const numClips = Math.floor(strength / 10);
+  return /*#__PURE__*/React.createElement("div", {
+    className: "p-8 max-w-5xl mx-auto min-h-screen flex flex-col items-center"
+  }, /*#__PURE__*/React.createElement("header", {
+    className: "text-center mb-10 w-full"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "text-orange-600 font-bold uppercase text-xs tracking-widest"
+  }, "Form 2 Science • Unit 8"), /*#__PURE__*/React.createElement("h1", {
+    className: "text-4xl font-extrabold text-slate-800 mb-2"
+  }, "Electromagnet Simulator"), /*#__PURE__*/React.createElement("p", {
+    className: "text-slate-500"
+  }, "How do current and turns affect magnetic strength?")), /*#__PURE__*/React.createElement("div", {
+    className: "flex flex-col md:flex-row gap-12 w-full"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-white p-8 rounded-3xl shadow-xl border border-orange-100 w-full md:w-2/3 flex flex-col items-center relative min-h-[400px]"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "absolute top-10 left-0 w-full h-full pointer-events-none"
+  }, /*#__PURE__*/React.createElement("svg", {
+    width: "100%",
+    height: "100%"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M 50 350 L 50 150 L 200 150",
+    stroke: "#334155",
+    strokeWidth: "6",
+    fill: "none"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: "M 600 350 L 600 150 L 450 150",
+    stroke: "#334155",
+    strokeWidth: "6",
+    fill: "none"
+  }), /*#__PURE__*/React.createElement("rect", {
+    x: "20",
+    y: "320",
+    width: "60",
+    height: "60",
+    rx: "10",
+    fill: "#facc15",
+    stroke: "#ca8a04",
+    strokeWidth: "2"
+  }), /*#__PURE__*/React.createElement("text", {
+    x: "35",
+    y: "360",
+    fontSize: "24",
+    fontWeight: "bold"
+  }, "V"), /*#__PURE__*/React.createElement("circle", {
+    cx: "600",
+    cy: "350",
+    r: "10",
+    fill: "#334155"
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "relative mt-20 z-10"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: `w-80 h-10 rounded-full shadow-inner border border-slate-400 ${core === "iron" ? "bg-slate-300" : "bg-slate-500"}`
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "absolute top-2 left-1/2 -translate-x-1/2 text-[10px] font-bold uppercase text-slate-500 spacing-widest"
+  }, "Soft ", core, " Core")), /*#__PURE__*/React.createElement("svg", {
+    className: "absolute top-[-20px] left-0 w-full h-[80px] pointer-events-none overflow-visible"
+  }, Array.from({
+    length: turns
+  }).map((_, i) => /*#__PURE__*/React.createElement("ellipse", {
+    key: i,
+    cx: 20 + i * (280 / turns),
+    cy: "40",
+    rx: "10",
+    ry: "25",
+    className: "coil"
+  })), current > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+    d: "M -20 40 Q 160 -100 340 40",
+    className: "field-line",
+    style: {
+      opacity: strength / 50
+    }
+  }), /*#__PURE__*/React.createElement("path", {
+    d: "M -20 40 Q 160 180 340 40",
+    className: "field-line",
+    style: {
+      opacity: strength / 50
+    }
+  })))), /*#__PURE__*/React.createElement("div", {
+    className: "mt-32 relative w-full flex justify-center h-20"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "absolute top-0 w-60 h-2 bg-slate-200 rounded-full"
+  }), " ", Array.from({
+    length: 20
+  }).map((_, i) => {
+    const attracted = i < numClips;
+    return /*#__PURE__*/React.createElement("div", {
+      key: i,
+      className: "clip absolute text-slate-400 text-2xl",
+      style: {
+        left: `${20 + i * 5}%`,
+        top: attracted ? "-90px" : "0px",
+        transform: `rotate(${i * 20}deg)`,
+        color: attracted ? "#f97316" : "#94a3b8"
+      }
+    }, /*#__PURE__*/React.createElement("i", {
+      className: "fa-solid fa-paperclip"
+    }));
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "absolute top-4 right-4 bg-slate-100 p-3 rounded-xl border border-slate-200 text-center"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-xs uppercase font-bold text-slate-400"
+  }, "Strength"), /*#__PURE__*/React.createElement("div", {
+    className: "text-2xl font-bold text-orange-600"
+  }, Math.round(strength), " ", /*#__PURE__*/React.createElement("span", {
+    className: "text-xs text-slate-400"
+  }, "mT")))), /*#__PURE__*/React.createElement("div", {
+    className: "w-full md:w-1/3 space-y-8"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-white p-6 rounded-3xl shadow-md border border-orange-100"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "flex justify-between font-bold text-slate-600 mb-4"
+  }, /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("i", {
+    className: "fa-solid fa-bolt mr-2"
+  }), " Current (I)"), /*#__PURE__*/React.createElement("span", null, current, " A")), /*#__PURE__*/React.createElement("input", {
+    type: "range",
+    min: "0",
+    max: "5",
+    step: "0.5",
+    value: current,
+    onChange: e => setCurrent(Number(e.target.value)),
+    className: "w-full h-4 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-orange-500"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "bg-white p-6 rounded-3xl shadow-md border border-orange-100"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "flex justify-between font-bold text-slate-600 mb-4"
+  }, /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("i", {
+    className: "fa-solid fa-arrows-spin mr-2"
+  }), " Turns (N)"), /*#__PURE__*/React.createElement("span", null, turns)), /*#__PURE__*/React.createElement("input", {
+    type: "range",
+    min: "5",
+    max: "30",
+    step: "5",
+    value: turns,
+    onChange: e => setTurns(Number(e.target.value)),
+    className: "w-full h-4 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-orange-500"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "bg-white p-6 rounded-3xl shadow-md border border-orange-100"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "block font-bold text-slate-600 mb-4"
+  }, /*#__PURE__*/React.createElement("i", {
+    className: "fa-solid fa-gem mr-2"
+  }), " Core Material"), /*#__PURE__*/React.createElement("div", {
+    className: "flex gap-2"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setCore("iron"),
+    className: `flex-1 py-2 rounded-lg font-bold border-2 ${core === "iron" ? "bg-orange-100 border-orange-500 text-orange-700" : "bg-slate-50 border-slate-200 text-slate-400"}`
+  }, "Soft Iron"), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setCore("steel"),
+    className: `flex-1 py-2 rounded-lg font-bold border-2 ${core === "steel" ? "bg-slate-200 border-slate-500 text-slate-700" : "bg-slate-50 border-slate-200 text-slate-400"}`
+  }, "Steel")), /*#__PURE__*/React.createElement("p", {
+    className: "text-xs text-slate-400 mt-2 p-2 bg-slate-50 rounded"
+  }, core === "iron" ? "Iron creates a stronger temporary magnet." : "Steel creates a weaker but permanent magnet.")))));
+};
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(/*#__PURE__*/React.createElement(App, null));
+</script>
   
       
       <!-- Footer -->

@@ -84,16 +84,31 @@
   }
 
   function renderHeader(cfg) {
+    const badgeBg = cfg.badgeBg || "bg-blue-50";
+    const badgeText = cfg.badgeText || "text-blue-600";
+    const badgeBorder = cfg.badgeBorder || "border-blue-200";
+    const badgeDot = cfg.badgeDot || "bg-blue-500";
+    const titleGradient = cfg.titleGradient || "from-blue-600 to-indigo-600";
     return (
       '<header class="relative py-12 px-6 mb-8 text-center bg-white/50 backdrop-blur-sm border-b border-white/40">' +
       '<div class="max-w-4xl mx-auto">' +
-      '<div class="inline-flex items-center gap-2 px-3 py-1 bg-math-100 text-math-600 text-xs font-bold uppercase tracking-wider rounded-full mb-4 border border-math-500">' +
-      '<span class="w-2 h-2 rounded-full bg-math-500 animate-pulse"></span>' +
+      '<div class="inline-flex items-center gap-2 px-3 py-1 ' +
+      badgeBg +
+      " " +
+      badgeText +
+      " text-xs font-bold uppercase tracking-wider rounded-full mb-4 border " +
+      badgeBorder +
+      '">' +
+      '<span class="w-2 h-2 rounded-full ' +
+      badgeDot +
+      ' animate-pulse"></span>' +
       esc(cfg.badge) +
       "</div>" +
       '<h1 class="font-outfit text-4xl md:text-6xl font-extrabold text-slate-900 tracking-tight mb-4">' +
       esc(cfg.titleLead) +
-      ' <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">' +
+      ' <span class="text-transparent bg-clip-text bg-gradient-to-r ' +
+      titleGradient +
+      '">' +
       esc(cfg.titleAccent) +
       "</span></h1>" +
       '<p class="text-lg text-slate-500 max-w-2xl mx-auto font-jakarta">' +
