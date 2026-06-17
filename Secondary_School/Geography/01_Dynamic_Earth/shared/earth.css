@@ -801,6 +801,26 @@ h1 { font-size: clamp(1.35rem, 3vw, 1.75rem); margin-bottom: 0.75rem; line-heigh
 }
 .viz-toolbar .btn { font-size: 0.68rem; padding: 0.35rem 0.65rem; }
 
+.viz-map-legend {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  right: 1rem;
+  z-index: 8;
+  max-width: 22rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.65rem;
+  background: rgba(6, 10, 18, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.82);
+  pointer-events: none;
+}
+.viz-map-legend strong { color: #fbbf24; font-weight: 600; }
+.viz-map-legend .legend { margin-top: 0.4rem; }
+.viz-map-legend .legend span { color: rgba(255, 255, 255, 0.7); }
+
 .side-panel--wide {
   max-height: 100vh;
   overflow-y: auto;

@@ -211,6 +211,7 @@
     if (typeof THREE === "undefined") throw new Error("THREE required");
     const R = opts.radius || 2.2;
     const showPlates = opts.showPlates !== false;
+    const showBoundaries = opts.showBoundaries !== false;
     const w = container.clientWidth || 640;
     const h = container.clientHeight || 480;
 
@@ -289,22 +290,24 @@
     );
     earthGroup.add(atmos);
 
-    BOUNDARIES.forEach((b) => {
-      const pts = greatCirclePoints(b.pts, R * 1.004, 14);
-      const geo = new THREE.BufferGeometry().setFromPoints(pts);
-      const line = new THREE.Line(
-        geo,
-        new THREE.LineBasicMaterial({
-          color: BOUNDARY_COLORS[b.type] || 0xffffff,
-          transparent: true,
-          opacity: 0.95,
-          depthTest: false,
-        })
-      );
-      line.userData.boundaryType = b.type;
-      line.renderOrder = 2;
-      earthGroup.add(line);
-    });
+    if (showBoundaries) {
+      BOUNDARIES.forEach((b) => {
+        const pts = greatCirclePoints(b.pts, R * 1.004, 14);
+        const geo = new THREE.BufferGeometry().setFromPoints(pts);
+        const line = new THREE.Line(
+          geo,
+          new THREE.LineBasicMaterial({
+            color: BOUNDARY_COLORS[b.type] || 0xffffff,
+            transparent: true,
+            opacity: 0.95,
+            depthTest: false,
+          })
+        );
+        line.userData.boundaryType = b.type;
+        line.renderOrder = 2;
+        earthGroup.add(line);
+      });
+    }
 
     const hkMarker = latLngToVec3(22.32, 114.17, R * 1.02);
     const marker = new THREE.Mesh(
