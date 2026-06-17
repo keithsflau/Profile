@@ -10,22 +10,36 @@
       .replace(/"/g, "&quot;");
   }
 
-  function renderAppCard(app, colorBase) {
+  function renderAppCard(app, colorBase, cfg) {
     const live = !app.status || app.status === "live";
     const href = live ? esc(app.path) : "#";
+    const dark = cfg.theme === "dark";
     const cardCls = live
-      ? "glossy-card cursor-pointer"
-      : "bg-slate-50 border border-slate-100 opacity-60 cursor-not-allowed";
+      ? (cfg.cardClass || "glossy-card") + " cursor-pointer"
+      : dark
+        ? "bg-slate-800/50 border border-slate-700 opacity-60 cursor-not-allowed"
+        : "bg-slate-50 border border-slate-100 opacity-60 cursor-not-allowed";
     const iconCls = live
-      ? "bg-white shadow-sm " + colorBase
-      : "bg-slate-200 text-slate-400";
+      ? (dark ? "bg-slate-900/80 shadow-sm " : "bg-white shadow-sm ") + colorBase
+      : dark
+        ? "bg-slate-800 text-slate-500"
+        : "bg-slate-200 text-slate-400";
     const titleCls = live
-      ? "text-slate-800 group-hover:text-blue-600 transition-colors"
-      : "text-slate-400";
+      ? dark
+        ? "text-slate-100 group-hover:text-sky-300 transition-colors"
+        : "text-slate-800 group-hover:text-blue-600 transition-colors"
+      : dark
+        ? "text-slate-500"
+        : "text-slate-400";
     const badgeCls = live
-      ? "bg-emerald-100 text-emerald-700"
-      : "bg-slate-200 text-slate-500";
-    const badgeText = live ? "Active" : "Planned";
+      ? dark
+        ? "bg-sky-900/60 text-sky-300"
+        : "bg-emerald-100 text-emerald-700"
+      : dark
+        ? "bg-slate-700 text-slate-400"
+        : "bg-slate-200 text-slate-500";
+    const badgeText = live ? (dark ? "LIVE" : "Active") : "Planned";
+    const title = app.title || "App " + app.id;
 
     return (
       '<a href="' +
@@ -49,7 +63,7 @@
       '<h3 class="font-outfit font-bold text-lg leading-tight mb-1 ' +
       titleCls +
       '">' +
-      esc(app.title) +
+      esc(title) +
       "</h3>" +
       '<p class="text-xs text-slate-400 font-mono">APP-' +
       esc(app.id) +
@@ -57,16 +71,19 @@
     );
   }
 
-  function renderUnit(unit) {
+  function renderUnit(unit, cfg) {
+    const dark = cfg.theme === "dark";
+    const unitBg = unit.bg || (dark ? "bg-slate-800/40" : "bg-blue-50");
+    const unitTitle = unit.title || unit.id;
     const cards = unit.apps.map(function (app) {
-      return renderAppCard(app, unit.color);
+      return renderAppCard(app, unit.color, cfg);
     }).join("");
 
     return (
       '<div class="mb-12">' +
       '<div class="flex items-center gap-3 mb-6 pl-2">' +
       '<div class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl shadow-sm ' +
-      unit.bg +
+      unitBg +
       " " +
       unit.color +
       " border " +
@@ -74,9 +91,13 @@
       '"><i class="fa-solid ' +
       esc(unit.icon) +
       '"></i></div>' +
-      "<div><h2 class=\"font-outfit text-2xl font-bold text-slate-800\">" +
-      esc(unit.title) +
-      '</h2><div class="h-1 w-20 bg-gradient-to-r from-slate-200 to-transparent mt-1 rounded-full"></div></div></div>' +
+      "<div><h2 class=\"font-outfit text-2xl font-bold " +
+      (dark ? "text-slate-100" : "text-slate-800") +
+      '">' +
+      esc(unitTitle) +
+      '</h2><div class="h-1 w-20 bg-gradient-to-r ' +
+      (dark ? "from-slate-600 to-transparent" : "from-slate-200 to-transparent") +
+      ' mt-1 rounded-full"></div></div></div>' +
       '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">' +
       cards +
       "</div></div>"
@@ -84,14 +105,21 @@
   }
 
   function renderHeader(cfg) {
-    const badgeBg = cfg.badgeBg || "bg-blue-50";
-    const badgeText = cfg.badgeText || "text-blue-600";
-    const badgeBorder = cfg.badgeBorder || "border-blue-200";
-    const badgeDot = cfg.badgeDot || "bg-blue-500";
-    const titleGradient = cfg.titleGradient || "from-blue-600 to-indigo-600";
+    const dark = cfg.theme === "dark";
+    const badgeBg = cfg.badgeBg || (dark ? "bg-sky-900/50" : "bg-blue-50");
+    const badgeText = cfg.badgeText || (dark ? "text-sky-300" : "text-blue-600");
+    const badgeBorder = cfg.badgeBorder || (dark ? "border-sky-500/30" : "border-blue-200");
+    const badgeDot = cfg.badgeDot || (dark ? "bg-sky-400" : "bg-blue-500");
+    const titleGradient = cfg.titleGradient || (dark ? "from-white via-sky-200 to-sky-400" : "from-blue-600 to-indigo-600");
+    const headerBg = dark
+      ? "relative py-12 px-6 mb-8 text-center border-b border-slate-700/50"
+      : "relative py-12 px-6 mb-8 text-center bg-white/50 backdrop-blur-sm border-b border-white/40";
+    const titleColor = dark ? "text-white" : "text-slate-900";
+    const subtitleColor = dark ? "text-slate-400 font-mono" : "text-slate-500 font-jakarta";
     return (
-      '<header class="relative py-12 px-6 mb-8 text-center bg-white/50 backdrop-blur-sm border-b border-white/40">' +
-      '<div class="max-w-4xl mx-auto">' +
+      '<header class="' + headerBg + '">' +
+      (dark ? '<div class="absolute inset-0 bg-gradient-to-b from-sky-900/20 to-transparent pointer-events-none"></div>' : "") +
+      '<div class="max-w-4xl mx-auto relative z-10">' +
       '<div class="inline-flex items-center gap-2 px-3 py-1 ' +
       badgeBg +
       " " +
@@ -104,14 +132,18 @@
       ' animate-pulse"></span>' +
       esc(cfg.badge) +
       "</div>" +
-      '<h1 class="font-outfit text-4xl md:text-6xl font-extrabold text-slate-900 tracking-tight mb-4">' +
+      '<h1 class="font-outfit text-4xl md:text-6xl font-extrabold ' +
+      titleColor +
+      ' tracking-tight mb-4">' +
       esc(cfg.titleLead) +
       ' <span class="text-transparent bg-clip-text bg-gradient-to-r ' +
       titleGradient +
-      '">' +
+      (dark ? ' neon-text">' : '">') +
       esc(cfg.titleAccent) +
       "</span></h1>" +
-      '<p class="text-lg text-slate-500 max-w-2xl mx-auto font-jakarta">' +
+      '<p class="text-lg ' +
+      subtitleColor +
+      ' max-w-2xl mx-auto">' +
       esc(cfg.subtitle) +
       "</p></div></header>"
     );
@@ -140,7 +172,7 @@
     }
 
     var units = curriculum
-      .map(renderUnit)
+      .map(function (u) { return renderUnit(u, cfg); })
       .join("");
 
     root.innerHTML =
