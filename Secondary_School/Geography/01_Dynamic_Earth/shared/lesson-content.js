@@ -415,6 +415,41 @@ window.LESSON_CONTENT = {
       { name: "維港兩岸", internal: 20, external: 30, urban: 90, note: "大幅填海；天然海岸線改變" },
       { name: "西貢火山岩區", internal: 85, external: 55, urban: 25, note: "古代火山（內營力）+ 現代侵蝕海岸" },
     ],
+    sortExercise: {
+      title: "營力分類",
+      prompt: "將下列地貌作用分類為內營力、外營力或人為營力",
+      categories: [
+        { id: "internal", label: "內營力" },
+        { id: "external", label: "外營力" },
+        { id: "human", label: "人為營力" },
+      ],
+      items: [
+        { text: "西貢火山噴發", category: "internal" },
+        { text: "岩層褶皺", category: "internal" },
+        { text: "斷層錯動", category: "internal" },
+        { text: "球狀風化", category: "external" },
+        { text: "海浪侵蝕", category: "external" },
+        { text: "河流搬運泥沙", category: "external" },
+        { text: "山泥傾瀉", category: "external" },
+        { text: "維港填海", category: "human" },
+        { text: "削坡建屋", category: "human" },
+        { text: "採石場開採", category: "human" },
+      ],
+    },
+    examEssays: [
+      {
+        title: "比較內營力與外營力",
+        marks: 8,
+        question: "比較內營力與外營力塑造香港地貌的方式，並各舉一個本地例子。（8分）",
+        markScheme: `<p>須有<strong>對比</strong>：內營力（抬升、火山、褶皺）vs 外營力（風化、侵蝕、沉積）。例子如西貢火山岩柱（內）與東平洲海蝕地貌（外）。</p>`,
+      },
+      {
+        title: "評估人為營力",
+        marks: 6,
+        question: "評估填海對香港地貌與環境的影響。（6分）",
+        markScheme: `<p>雙面：土地供應、基建（利）vs 收窄維港、生態、水質（弊）+ 緩解（EIA）。</p>`,
+      },
+    ],
   },
 
   tectonic_hazards: {
@@ -717,6 +752,19 @@ window.LESSON_CONTENT = {
         impacts: ["顯著降低人為滑坡死亡", "發展成本增加", "部分高危區發展受限"],
         mitigation: ["岩釘、擋土牆、排水", "紅黃警示與疏散", "限制高危斜坡建屋", "市民舉報渠道"],
         stakeholders: "土木工程拓展署、屋宇署、業主、居民、保險公司",
+      },
+      resource: {
+        title: "地質資源 · 填料與石礦",
+        timeline: [
+          "1950s–80s 本港石礦場供應碎石（屯門藍地等）",
+          "大型填海轉向海域挖泥及公眾填土區",
+          "多個石礦場關閉，改復育或發展",
+          "部分填料改由外地輸入",
+          "須平衡供應、成本與環境影響",
+        ],
+        impacts: ["礦場開採破壞山體與植被", "噪音與塵埃影響鄰近社區", "關閉後改變填料供應鏈", "進口砂石增加碳足跡"],
+        mitigation: ["復育計劃與綠化", "公眾填土區循環建築廢料", "海域挖泥須環評及監測", "規劃遠離敏感受體的採礦區"],
+        stakeholders: "政府、承建商、環保團體、鄰近居民、填海工程方",
       },
     },
   },

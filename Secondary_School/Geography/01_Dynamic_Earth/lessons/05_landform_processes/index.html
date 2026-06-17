@@ -6,10 +6,6 @@
   <title>05 塑造香港地貌的營力 | 動態地球</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../shared/earth.css">
-  <style>
-    #sim-canvas { width:100%; height:100%; min-height:52vh; }
-    @media(min-width:900px){ #sim-canvas { min-height:100vh; } }
-  </style>
 </head>
 <body>
   <nav class="lesson-nav">
@@ -17,16 +13,8 @@
     <span class="lesson-nav__title">05 · 地貌營力</span>
     <span style="width:4rem"></span>
   </nav>
-  <div class="layout layout--wide layout--reverse">
-    <div class="viz-panel">
-      <div class="viz-toolbar">
-        <button class="btn is-active" data-sc="default" type="button">自訂</button>
-        <button class="btn" data-sc="tsuen" type="button">荃灣—大帽山</button>
-        <button class="btn" data-sc="harbour" type="button">維港兩岸</button>
-        <button class="btn" data-sc="sai" type="button">西貢火山岩</button>
-      </div>
-      <canvas id="sim-canvas"></canvas>
-    </div>
+  <div class="layout layout--force">
+    <div class="viz-panel" id="force-root"></div>
     <aside class="side-panel side-panel--wide" id="lesson-panel"></aside>
   </div>
   <div class="lesson-pager" id="lesson-pager" style="max-width:56rem;margin:0 auto;padding:1rem 1.25rem 2rem"></div>
@@ -34,15 +22,29 @@
   <script src="../../shared/lesson-content.js"></script>
   <script src="../../shared/lesson-exercises.js"></script>
   <script src="../../shared/lesson-ui.js"></script>
+  <script src="../../shared/force-explorer.js"></script>
   <script>
-    const scenarios = {};
-    LESSON_CONTENT.landform_processes.scenarios.forEach((s, i) => {
-      scenarios[['tsuen', 'harbour', 'sai'][i]] = s;
+    const CASE_SYNC = {
+      internal: 'hex_volcano',
+      external: 'spheroidal',
+      human: 'harbour_fill',
+      volcano: 'hex_volcano',
+      coast: 'coastal',
+      reclaim: 'harbour_fill',
+    };
+
+    const explorer = ForceExplorer.createForceExplorer(document.getElementById('force-root'), {
+      defaultCase: 'hex_volcano',
+      onSelect(c) {
+        document.querySelectorAll('[data-force-sync]').forEach((btn) => {
+          btn.classList.toggle('is-active', btn.dataset.forceSync === c.category);
+        });
+      },
     });
 
     LessonUI.initLesson('landform_processes', {
       title: '塑造香港地貌的營力',
-      lead: '模擬內營力（褶皺抬升）、外營力（侵蝕）與城市化（填海削坡）對剖面的影響。可載入香港三個典型情景。',
+      lead: '左：香港實景相片（Wikimedia Commons）逐步對應地貌機制；可展開剖面示意。右：DSE 筆記、分類練習、論述題、測驗。',
       pager: {
         prev: '../04_hk_geology/index.html',
         prevLabel: '香港地質',
@@ -51,155 +53,54 @@
       },
     });
 
-    const sliders = LessonUI.el('div', 'card');
-    sliders.innerHTML = `
-      <h3>營力模擬控制</h3>
-      <label style="font-size:0.8rem;display:flex;justify-content:space-between;margin:0.5rem 0 0.25rem">內營力（擠壓／抬升）<output id="out-fold">50%</output></label>
-      <input type="range" id="fold" min="0" max="100" value="50" style="width:100%;accent-color:#f97316">
-      <label style="font-size:0.8rem;display:flex;justify-content:space-between;margin:0.75rem 0 0.25rem">外營力（侵蝕）<output id="out-erode">30%</output></label>
-      <input type="range" id="erode" min="0" max="100" value="30" style="width:100%;accent-color:#38bdf8">
-      <label style="font-size:0.8rem;display:flex;justify-content:space-between;margin:0.75rem 0 0.25rem">城市化（填海／削坡）<output id="out-urban">20%</output></label>
-      <input type="range" id="urban" min="0" max="100" value="20" style="width:100%;accent-color:#fbbf24">
-      <p id="scenario-note" class="note" style="margin-top:0.75rem">拖曳滑桿或選擇情景預設。</p>`;
-    document.querySelectorAll('.lesson-pane')[0].appendChild(sliders);
+    const overview = document.querySelector('.lesson-pane');
 
-    let fold = 50, erode = 30, urban = 20, note = '';
-    const canvas = document.getElementById('sim-canvas');
-    const ctx = canvas.getContext('2d');
+    const jumpCard = LessonUI.el('div', 'card');
+    jumpCard.innerHTML = `
+      <h3>快速跳轉營力類型</h3>
+      <p class="muted" style="margin-bottom:0.5rem">同步左側個案選單</p>
+      <div class="case-sync-bar">
+        <button type="button" class="btn is-active" data-force-sync="internal">🌋 內營力</button>
+        <button type="button" class="btn" data-force-sync="external">🌊 外營力</button>
+        <button type="button" class="btn" data-force-sync="human">🏗 人為營力</button>
+      </div>`;
+    overview.appendChild(jumpCard);
 
-    function resize() {
-      const p = canvas.parentElement;
-      canvas.width = p.clientWidth * devicePixelRatio;
-      canvas.height = (p.clientHeight || 400) * devicePixelRatio;
-      ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
-      draw();
-    }
+    const compareCard = LessonUI.el('div', 'card');
+    compareCard.innerHTML = `
+      <h3>三大營力一覽（HKDSE）</h3>
+      <table class="data-table">
+        <tr><th>類型</th><th>能量來源</th><th>香港例子</th></tr>
+        <tr><td><strong style="color:#f97316">內營力</strong></td><td>地球內部</td><td>西貢六角岩柱、花崗岩抬升</td></tr>
+        <tr><td><strong style="color:#38bdf8">外營力</strong></td><td>太陽能、重力</td><td>球狀風化、海蝕柱、山泥傾瀉</td></tr>
+        <tr><td><strong style="color:#fbbf24">人為營力</strong></td><td>人類活動</td><td>維港填海、削坡發展</td></tr>
+      </table>
+      <p class="note" style="margin-top:0.5rem">DSE 比較題：內營力<strong>抬升</strong> vs 外營力<strong>削低</strong> — 須各舉本港例子。</p>`;
+    overview.appendChild(compareCard);
 
-    function draw() {
-      const w = canvas.width / devicePixelRatio, h = canvas.height / devicePixelRatio;
-      const baseY = h * 0.58;
-      ctx.fillStyle = '#060912';
-      ctx.fillRect(0, 0, w, h);
+    const presetCard = LessonUI.el('div', 'card');
+    presetCard.innerHTML = `
+      <h3>香港情景預設</h3>
+      <div class="case-sync-bar">
+        <button type="button" class="btn" data-case-jump="hex_volcano">西貢火山岩</button>
+        <button type="button" class="btn" data-case-jump="spheroidal">球狀風化</button>
+        <button type="button" class="btn" data-case-jump="coastal">海岸侵蝕</button>
+        <button type="button" class="btn" data-case-jump="harbour_fill">維港填海</button>
+      </div>`;
+    overview.appendChild(presetCard);
 
-      const sky = ctx.createLinearGradient(0, 0, 0, h * 0.5);
-      sky.addColorStop(0, '#0a1628');
-      sky.addColorStop(1, '#1a2840');
-      ctx.fillStyle = sky;
-      ctx.fillRect(0, 0, w, h * 0.55);
-
-      const f = fold / 100, e = erode / 100, u = urban / 100;
-      const n = 100;
-      const pts = [];
-      for (let i = 0; i <= n; i++) {
-        const x = (i / n) * w;
-        let y = baseY
-          - Math.sin(i * 0.12) * f * 95
-          - Math.sin(i * 0.35 + 1) * f * 45
-          - Math.cos(i * 0.08) * f * 25
-          + e * 40 * Math.sin(i * 0.06)
-          - e * 30;
-        if (i > n * 0.52) y += u * 70;
-        pts.push({ x, y });
-      }
-
-      for (let layer = 0; layer < 4; layer++) {
-        ctx.beginPath();
-        ctx.moveTo(0, h);
-        pts.forEach((p, i) => {
-          const ly = p.y + layer * 12 + Math.sin(i * 0.2 + layer) * f * 8;
-          ctx.lineTo(p.x, ly);
-        });
-        ctx.lineTo(w, h);
-        ctx.closePath();
-        const colors = ['#3d2b1f', '#5c4033', '#7a5c44', '#4a6741'];
-        ctx.fillStyle = colors[layer];
-        ctx.globalAlpha = 0.85 - layer * 0.15;
-        ctx.fill();
-        ctx.globalAlpha = 1;
-      }
-
-      if (f > 0.3) {
-        ctx.strokeStyle = 'rgba(249,115,22,0.5)';
-        ctx.lineWidth = 1.5;
-        ctx.setLineDash([6, 4]);
-        for (let i = 20; i < n - 20; i += 15) {
-          ctx.beginPath();
-          ctx.moveTo(pts[i].x, pts[i].y + 50);
-          ctx.lineTo(pts[i + 5].x, pts[i + 5].y + 20);
-          ctx.stroke();
-        }
-        ctx.setLineDash([]);
-        ctx.fillStyle = 'rgba(249,115,22,0.7)';
-        ctx.font = '10px Inter';
-        ctx.fillText('褶皺層理（內營力）', 14, h * 0.2);
-      }
-
-      if (u > 0.15) {
-        ctx.fillStyle = `rgba(100,116,139,${0.35 + u * 0.45})`;
-        const ux = w * 0.52;
-        ctx.fillRect(ux, pts[Math.floor(n * 0.52)].y, w * 0.42, h);
-        ctx.fillStyle = '#38bdf8';
-        ctx.fillRect(ux, pts[Math.floor(n * 0.52)].y + 15, w * 0.38, 8);
-        ctx.fillStyle = '#fbbf24';
-        ctx.font = '11px Inter';
-        ctx.fillText('填海／城市化', ux + 10, pts[Math.floor(n * 0.52)].y + 40);
-      }
-
-      ctx.strokeStyle = 'rgba(56,189,248,0.4)';
-      ctx.setLineDash([4, 4]);
-      ctx.beginPath();
-      ctx.moveTo(0, baseY);
-      ctx.lineTo(w, baseY);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = 'rgba(255,255,255,0.35)';
-      ctx.font = '10px Inter';
-      ctx.fillText('參考基準面', 10, baseY - 6);
-
-      if (note) {
-        ctx.fillStyle = 'rgba(74,222,128,0.9)';
-        ctx.font = '12px Inter';
-        ctx.fillText(note, 14, h - 16);
-      }
-    }
-
-    function applyScenario(key) {
-      if (key === 'default') { note = ''; return; }
-      const s = scenarios[key];
-      if (!s) return;
-      fold = s.internal; erode = s.external; urban = s.urban;
-      note = s.name + '：' + s.note;
-      document.getElementById('fold').value = fold;
-      document.getElementById('erode').value = erode;
-      document.getElementById('urban').value = urban;
-      ['fold', 'erode', 'urban'].forEach((id) => {
-        document.getElementById('out-' + id).textContent = document.getElementById(id).value + '%';
-      });
-      document.getElementById('scenario-note').textContent = note;
-      draw();
-    }
-
-    ['fold', 'erode', 'urban'].forEach((id) => {
-      document.getElementById(id).oninput = function () {
-        window[id === 'fold' ? 'fold' : id === 'erode' ? 'erode' : 'urban'] = +this.value;
-        document.getElementById('out-' + id).textContent = this.value + '%';
-        document.querySelectorAll('[data-sc]').forEach((b) => b.classList.remove('is-active'));
-        document.querySelector('[data-sc="default"]')?.classList.add('is-active');
-        note = '';
-        draw();
-      };
-    });
-
-    document.querySelectorAll('[data-sc]').forEach((btn) => {
+    document.querySelectorAll('[data-force-sync]').forEach((btn) => {
       btn.onclick = () => {
-        document.querySelectorAll('[data-sc]').forEach((b) => b.classList.remove('is-active'));
-        btn.classList.add('is-active');
-        applyScenario(btn.dataset.sc);
+        explorer.select(CASE_SYNC[btn.dataset.forceSync]);
+        document.querySelectorAll('[data-force-sync]').forEach((b) => {
+          b.classList.toggle('is-active', b === btn);
+        });
       };
     });
 
-    resize();
-    window.addEventListener('resize', resize);
+    document.querySelectorAll('[data-case-jump]').forEach((btn) => {
+      btn.onclick = () => explorer.select(btn.dataset.caseJump);
+    });
   </script>
 </body>
 </html>

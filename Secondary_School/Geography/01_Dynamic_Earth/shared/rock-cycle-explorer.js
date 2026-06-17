@@ -56,11 +56,11 @@
 
   const EDGES = [
     { id: "e1", from: "magma", to: "igneous", label: "冷卻結晶", force: "volcanic", lx: 0, ly: -10 },
-    { id: "e2", from: "igneous", to: "sedimentary", label: "風化·侵蝕·沉積", force: "external", lx: 18, ly: -4 },
+    { id: "e2", from: "igneous", to: "sedimentary", label: "風化·侵蝕·沉積", force: "sedimentary", lx: 18, ly: -4 },
     { id: "e3", from: "sedimentary", to: "metamorphic", label: "變質作用", force: "metamorphic", lx: 0, ly: -10 },
     { id: "e4", from: "metamorphic", to: "magma", label: "熔融", force: "volcanic", lx: -12, ly: 0 },
     { id: "e5", from: "igneous", to: "metamorphic", label: "變質作用", force: "metamorphic", lx: -22, ly: 6 },
-    { id: "e6", from: "metamorphic", to: "sedimentary", label: "風化·沉積", force: "external", lx: 0, ly: 12 },
+    { id: "e6", from: "metamorphic", to: "sedimentary", label: "風化·沉積", force: "sedimentary", lx: 0, ly: 12 },
     { id: "e7", from: "igneous", to: "magma", label: "重熔", force: "volcanic", lx: 12, ly: 8 },
     { id: "e8", from: "sedimentary", to: "magma", label: "俯衝·部分熔融", force: "volcanic", lx: 20, ly: 4 },
   ];
@@ -165,8 +165,29 @@
 
     function edgeVisible(e) {
       if (filterForce === "all") return true;
+      if (filterForce === "external") {
+        return e.label.includes("風化") || e.label.includes("侵蝕");
+      }
       return e.force === filterForce;
     }
+
+    function edgesForFilter() {
+      return EDGES.filter(edgeVisible);
+    }
+
+    const FILTER_FOCUS = {
+      volcanic: "magma",
+      sedimentary: "sedimentary",
+      metamorphic: "metamorphic",
+      external: "sedimentary",
+    };
+
+    const FILTER_CAPTION = {
+      volcanic: "🌋 火山作用：冷卻結晶、熔融、重熔",
+      sedimentary: "🏖 沉積作用：風化 → 搬運 → 沉積 → 形成沉積岩",
+      metamorphic: "💎 變質作用：高溫高壓重結晶（不熔融）",
+      external: "🌧 外營力：風化、侵蝕、搬運碎屑",
+    };
 
     function stopFlowRaf() {
       if (flowRaf) cancelAnimationFrame(flowRaf);
@@ -252,8 +273,11 @@
     }
 
     function renderSvg() {
+      const filtered = edgesForFilter();
+      const filterIds = new Set(filtered.map((e) => e.id));
       const manualEdges = edgesForRock(selectedRock).filter(edgeVisible);
       const manualIds = new Set(manualEdges.map((e) => e.id));
+      const useFilterMode = filterForce !== "all" && !animating;
 
       let svg = `
         <defs>
@@ -264,18 +288,18 @@
         </defs>`;
 
       EDGES.filter(edgeVisible).forEach((e) => {
-        const col = FORCES[e.force].color;
         const isMainCycle = CYCLE_STEPS.some((s) => s.edge === e.id);
         const isFlow = activeEdgeId === e.id;
-        const isHighlight = animating ? isFlow : manualIds.has(e.id);
+        const isHighlight = animating ? isFlow : useFilterMode ? filterIds.has(e.id) : manualIds.has(e.id);
         const d = edgePath(e.from, e.to);
         const lp = edgeLabelPos(e.from, e.to, e);
+        const strokeCol = FORCES[e.force]?.color || "#888";
 
         svg += `<path id="rc-path-${e.id}" class="rc-edge${isFlow ? " is-flow" : ""}${isHighlight ? " is-active" : ""}${isMainCycle ? " is-main" : ""}"
-          data-edge="${e.id}" d="${d}" fill="none" stroke="${col}"
-          stroke-width="${isFlow ? 4 : isHighlight ? 2.5 : 1.5}"
-          stroke-opacity="${isFlow ? 1 : isHighlight ? 0.85 : isMainCycle ? 0.4 : 0.2}"
-          marker-end="url(#rc-arr)" style="color:${col}"/>`;
+          data-edge="${e.id}" d="${d}" fill="none" stroke="${strokeCol}"
+          stroke-width="${isFlow ? 4 : isHighlight ? 3 : 1.5}"
+          stroke-opacity="${isFlow ? 1 : isHighlight ? 1 : isMainCycle ? 0.4 : 0.2}"
+          marker-end="url(#rc-arr)" style="color:${strokeCol}"/>`;
 
         const showLabel = animating ? isFlow : isHighlight;
         if (showLabel) {
@@ -319,10 +343,12 @@
     function renderDetail() {
       const r = ROCKS[selectedRock];
       const F = FORCES[r.force];
-      const related = edgesForRock(selectedRock);
+      const related = edgesForRock(selectedRock).filter(edgeVisible);
       const stepHint = animating
         ? `<p class="rock-cycle__anim-hint">🔄 ${CYCLE_STEPS[cycleStep].caption}</p>`
-        : "";
+        : filterForce !== "all" && FILTER_CAPTION[filterForce]
+          ? `<p class="rock-cycle__anim-hint">${FILTER_CAPTION[filterForce]}</p>`
+          : "";
       detailEl.innerHTML = `
         ${stepHint}
         <span class="rock-cycle__tag" style="color:${r.color}">${r.icon} ${r.name} · ${F.icon} ${F.zh}</span>
@@ -377,7 +403,18 @@
         filterForce = btn.dataset.force;
         filtersEl.querySelectorAll(".btn").forEach((b) => b.classList.remove("is-active"));
         btn.classList.add("is-active");
-        renderSvg();
+        captionEl.textContent = FILTER_CAPTION[filterForce] || "";
+        const focusRock = FILTER_FOCUS[filterForce];
+        if (focusRock) {
+          selectedRock = focusRock;
+          onSelect(ROCKS[focusRock]);
+          renderRocks();
+          renderSvg();
+          renderDetail();
+        } else {
+          captionEl.textContent = "";
+          renderSvg();
+        }
       };
     });
 

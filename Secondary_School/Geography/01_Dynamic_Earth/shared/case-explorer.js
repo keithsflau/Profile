@@ -70,7 +70,7 @@
     },
     quarry: {
       id: "quarry", name: "屯門藍地石礦", region: "新界西",
-      layer: "resource", caseKey: "slope",
+      layer: "resource", caseKey: "resource",
       lat: 22.4078, lng: 113.9852, zoom: 14,
       detail: "昔日填海及建築碎石來源；礦場關閉後轉向海域挖泥及輸入砂石。",
       fact: "填料來源",
@@ -110,9 +110,8 @@
     root.className = "case-explorer";
     root.innerHTML = `
       <div class="case-explorer__help">
-        <strong>點選個案按鈕</strong> → 衛星圖飛至真實位置 · 可拖曳縮放 · 右側欄同步 DSE 筆記
+        <strong>① 撳個案按鈕</strong> 或地圖圓點 → 衛星圖飛至真實位置 · <strong>② 右欄</strong>同步 DSE 時間線與持份者
       </div>
-      <div class="case-explorer__filters" id="ce-filters"></div>
       <div class="case-explorer__map-wrap case-explorer__map-wrap--sat">
         <div class="case-explorer__map-head">
           <p class="case-explorer__map-title">香港衛星圖（Esri World Imagery）</p>
@@ -121,6 +120,7 @@
         <div class="case-explorer__map" id="ce-map"></div>
         <p class="case-explorer__attrib" id="ce-attrib"></p>
       </div>
+      <div class="case-explorer__filters" id="ce-filters"></div>
       <div class="case-explorer__main">
         <div class="case-explorer__list" id="ce-list"></div>
         <div class="case-explorer__detail" id="ce-detail"></div>
@@ -165,9 +165,18 @@
         markerById[s.id] = m;
       });
 
-      const fixSize = () => { if (map) map.invalidateSize(); };
-      setTimeout(fixSize, 120);
+      const fixSize = () => {
+        if (!map) return;
+        map.invalidateSize({ animate: false });
+      };
+      setTimeout(fixSize, 80);
+      setTimeout(fixSize, 400);
       window.addEventListener("resize", fixSize);
+      if (typeof ResizeObserver !== "undefined") {
+        const ro = new ResizeObserver(() => fixSize());
+        ro.observe(mapEl);
+        ro.observe(root);
+      }
     }
 
     function isVisible(site) {
@@ -258,7 +267,20 @@
       select(selectedId);
     }
 
-    return { select, getSites: () => SITES, getMap: () => map };
+    const CASE_SYNC_SITE = {
+      airport: "airport",
+      shamwan: "shamwan",
+      slope: "slope_nt",
+      resource: "quarry",
+    };
+
+    return {
+      select,
+      getSites: () => SITES,
+      getMap: () => map,
+      getSelected: () => SITES[selectedId],
+      syncSiteForCase: (caseKey) => CASE_SYNC_SITE[caseKey] || caseKey,
+    };
   }
 
   global.CaseExplorer = { createCaseExplorer, SITES, LAYER_LABELS };
