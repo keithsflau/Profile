@@ -9,451 +9,634 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif+TC:wght@500;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    :root {
+      --paper: #f8fafc;
+      --paper-warm: #fffbeb;
+      --ink: #0f172a;
+      --muted: #475569;
+      --accent: #0891b2;
+      --accent-soft: #e0f2fe;
     }
 
-    .gradient-bg {
+    html.lenis, html.lenis body { height: auto; }
+    .lenis.lenis-smooth { scroll-behavior: auto !important; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+
+    .serif { font-family: 'Noto Serif TC', serif; }
+
+    /* ── Scroll sequence (YouTube Burger Lab pattern) ── */
+    .scroll-sequence {
+      position: relative;
+      height: 640vh;
+    }
+
+    .scroll-sequence__sticky {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    #scroll-canvas {
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at 20% 20%, rgba(56, 189, 248, 0.15), transparent 35%),
-        radial-gradient(circle at 80% 0%, rgba(192, 132, 252, 0.15), transparent 30%),
-        radial-gradient(circle at 50% 80%, rgba(74, 222, 128, 0.12), transparent 30%);
-      filter: blur(60px);
-      opacity: 0.9;
-      animation: gradientShift 8s ease-in-out infinite;
+      width: 100%;
+      height: 100%;
+      display: block;
     }
 
-    @keyframes gradientShift {
-
-      0%,
-      100% {
-        background: radial-gradient(circle at 20% 20%, rgba(56, 189, 248, 0.15), transparent 35%),
-          radial-gradient(circle at 80% 0%, rgba(192, 132, 252, 0.15), transparent 30%),
-          radial-gradient(circle at 50% 80%, rgba(74, 222, 128, 0.12), transparent 30%);
-      }
-
-      50% {
-        background: radial-gradient(circle at 80% 80%, rgba(56, 189, 248, 0.2), transparent 35%),
-          radial-gradient(circle at 20% 0%, rgba(192, 132, 252, 0.2), transparent 30%),
-          radial-gradient(circle at 50% 20%, rgba(74, 222, 128, 0.15), transparent 30%);
-      }
+    .hero-vignette {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 100% 90% at 50% 45%, transparent 35%, rgba(248, 250, 252, 0.12) 75%, rgba(248, 250, 252, 0.35) 100%),
+        linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.08) 50%, rgba(248, 250, 252, 0.42) 100%);
+      pointer-events: none;
+      z-index: 2;
     }
 
-    @keyframes float {
-
-      0%,
-      100% {
-        transform: translateY(0px);
-      }
-
-      50% {
-        transform: translateY(-20px);
-      }
+    .scroll-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 0 1.5rem 5rem;
+      pointer-events: none;
     }
 
-    @keyframes pulse {
-
-      0%,
-      100% {
-        opacity: 1;
-        transform: scale(1);
-      }
-
-      50% {
-        opacity: 0.9;
-        transform: scale(1.05);
-      }
+    @media (min-width: 640px) {
+      .scroll-overlay { padding: 0 2rem 6rem; }
     }
 
-    @keyframes bounce {
-
-      0%,
-      100% {
-        transform: translateY(0);
-      }
-
-      50% {
-        transform: translateY(-15px);
-      }
+    .scroll-chapter {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-start;
+      padding: 6rem 1.5rem 7rem;
+      opacity: 0;
+      pointer-events: none;
     }
 
-    @keyframes sparkle {
-
-      0%,
-      100% {
-        opacity: 0;
-        transform: scale(0) rotate(0deg);
-      }
-
-      50% {
-        opacity: 1;
-        transform: scale(1) rotate(180deg);
-      }
+    @media (min-width: 640px) {
+      .scroll-chapter { padding: 8rem 3rem 8rem; }
     }
 
-    @keyframes cardEntrance {
-      from {
-        opacity: 0;
-        transform: translateY(30px) scale(0.9);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
+    .scroll-chapter--intro {
+      justify-content: center;
+      padding-bottom: 5rem;
     }
 
-    @keyframes particle {
-      0% {
-        transform: translateY(0) scale(0);
-        opacity: 0;
-      }
-
-      50% {
-        opacity: 1;
-      }
-
-      100% {
-        transform: translateY(-100px) scale(1);
-        opacity: 0;
-      }
-    }
-
-    @keyframes wave {
-
-      0%,
-      100% {
-        transform: translateX(0);
-      }
-
-      50% {
-        transform: translateX(10px);
-      }
-    }
-
-    .glass-card {
+    .verse-intro {
+      border-left: 3px solid rgba(8, 145, 178, 0.55);
+      padding: 1.25rem 1.25rem 1.25rem 1.25rem;
+      background: rgba(255, 255, 255, 0.82);
+      border-radius: 0 0.75rem 0.75rem 0;
       backdrop-filter: blur(10px);
-      background: rgba(255, 255, 255, 0.7);
-      border: 1px solid rgba(0, 0, 0, 0.1);
-      transition: all 0.3s ease;
+      box-shadow: 0 8px 32px rgba(15, 23, 42, 0.08);
     }
 
-    .glass-card:hover {
-      background: rgba(255, 255, 255, 0.9);
-      border-color: rgba(56, 189, 248, 0.3);
-      transform: translateY(-4px) scale(1.02);
-      box-shadow: 0 10px 30px rgba(56, 189, 248, 0.15);
+    @media (min-width: 640px) {
+      .verse-intro { padding: 1.5rem 1.75rem 1.5rem 1.75rem; }
     }
 
-    .category-card {
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      animation: cardEntrance 0.8s ease-out forwards;
-      opacity: 0;
+    .scroll-item {
+      max-width: 36rem;
+      width: 100%;
+      padding: 1.5rem 1.75rem;
+      border-radius: 1.25rem;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
+      backdrop-filter: blur(14px);
+      transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+      color: var(--ink);
     }
 
-    .category-card:hover {
-      transform: translateY(-12px) scale(1.05);
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    a.scroll-item:hover {
+      border-color: rgba(8, 145, 178, 0.35);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.1);
     }
 
-    .category-card:nth-child(1) {
-      animation-delay: 0.1s;
+    .scroll-item__tag {
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      opacity: 0.75;
     }
 
-    .category-card:nth-child(2) {
-      animation-delay: 0.2s;
+    .scroll-item__cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      font-weight: 500;
     }
 
-    .category-card:nth-child(3) {
-      animation-delay: 0.3s;
-    }
-
-    .category-card:nth-child(4) {
-      animation-delay: 0.4s;
-    }
-
-    .category-card:nth-child(5) {
-      animation-delay: 0.5s;
-    }
-
-    .particle {
+    .frame-dots {
       position: absolute;
-      width: 4px;
-      height: 4px;
-      background: #3b82f6;
-      border-radius: 50%;
-      opacity: 0;
-      animation: particle 3s ease-in-out infinite;
+      right: 1.25rem;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 4;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
     }
 
-    .wave-animation {
-      animation: wave 2s ease-in-out infinite;
-    }
-
-    .hover-glow {
-      transition: all 0.3s ease;
-    }
-
-    .hover-glow:hover {
-      box-shadow: 0 0 30px rgba(56, 189, 248, 0.5);
-      transform: scale(1.05);
-    }
-
-    .card-entrance {
-      animation: cardEntrance 0.6s ease-out forwards;
-      opacity: 0;
-      transform: translateY(20px);
-    }
-
-    .float-animation {
-      animation: float 5s ease-in-out infinite;
-    }
-
-    .pulse-animation {
-      animation: pulse 3s ease-in-out infinite;
-    }
-
-    .bounce-animation {
-      animation: bounce 2s ease-in-out infinite;
-    }
-
-    .sparkle {
-      position: absolute;
+    .frame-dot {
       width: 6px;
       height: 6px;
-      background: #3b82f6;
       border-radius: 50%;
+      background: rgba(15, 23, 42, 0.15);
+      transition: background 0.3s, transform 0.3s;
+    }
+
+    .frame-dot.is-active {
+      background: #0891b2;
+      transform: scale(1.35);
+    }
+
+    .scroll-progress {
+      position: absolute;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 4;
+      width: min(280px, 70vw);
+      height: 2px;
+      background: rgba(15, 23, 42, 0.08);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .scroll-progress__bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #0891b2, #6366f1);
+      border-radius: 2px;
+      transition: none;
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 3.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 4;
+      color: rgba(15, 23, 42, 0.4);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .scroll-hint svg {
+      animation: hintBounce 2s ease-in-out infinite;
+    }
+
+    @keyframes hintBounce {
+      0%, 100% { transform: translateY(0); opacity: 0.5; }
+      50% { transform: translateY(6px); opacity: 1; }
+    }
+
+    .grain {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.02;
+      z-index: 100;
+      mix-blend-mode: multiply;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    .nav-blur {
+      backdrop-filter: blur(16px);
+      background: rgba(255, 255, 255, 0.82);
+      border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #0891b2 0%, #4f46e5 45%, #7c3aed 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .card-glass {
+      background: #ffffff;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+      transition: border-color 0.35s ease, transform 0.35s ease, box-shadow 0.35s ease;
+    }
+
+    .card-glass:hover {
+      border-color: rgba(8, 145, 178, 0.3);
+      transform: translateY(-6px);
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+    }
+
+    .stat-pill {
+      background: #ffffff;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+    }
+
+    .content-wrap {
+      position: relative;
+      z-index: 10;
+      background: var(--paper);
+    }
+
+    #loader {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: var(--paper);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      transition: opacity 0.6s ease, visibility 0.6s;
+      color: var(--ink);
+    }
+
+    #loader.hidden {
       opacity: 0;
-      animation: sparkle 4s ease-in-out infinite;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loader-bar {
+      width: 200px;
+      height: 2px;
+      background: rgba(15, 23, 42, 0.08);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .loader-bar__fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #0891b2, #6366f1);
+      transition: width 0.2s ease;
     }
   </style>
   <link rel="stylesheet" href="./visit-counter.css">
 </head>
 
-<body
-  class="antialiased text-slate-900 bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 min-h-screen overflow-x-hidden">
-  <div class="relative min-h-screen overflow-hidden">
-    <div aria-hidden="true" class="gradient-bg pointer-events-none"></div>
-
-    <!-- Floating Particles -->
-    <div class="particle" style="top: 20%; left: 10%; animation-delay: 0s;"></div>
-    <div class="particle" style="top: 40%; left: 80%; animation-delay: 1s;"></div>
-    <div class="particle" style="top: 60%; left: 20%; animation-delay: 2s;"></div>
-    <div class="particle" style="top: 80%; left: 70%; animation-delay: 0.5s;"></div>
-    <div class="particle" style="top: 30%; left: 50%; animation-delay: 1.5s;"></div>
-
-    <!-- Sparkles -->
-    <div class="sparkle" style="top: 15%; left: 25%; animation-delay: 0s;"></div>
-    <div class="sparkle" style="top: 45%; left: 75%; animation-delay: 1s;"></div>
-    <div class="sparkle" style="top: 65%; left: 15%; animation-delay: 2s;"></div>
-    <div class="sparkle" style="top: 85%; left: 60%; animation-delay: 1.5s;"></div>
-    <div class="sparkle" style="top: 35%; left: 45%; animation-delay: 0.5s;"></div>
-
-    <div class="relative z-10">
-
-      <!-- Header -->
-      <header class="px-6 py-8 sm:py-12">
-        <div class="mx-auto max-w-7xl">
-          <div class="text-center space-y-6">
-            <div class="relative mx-auto w-24 h-24">
-              <div
-                class="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-400 via-blue-500 to-indigo-600 flex items-center justify-center float-animation shadow-2xl shadow-cyan-500/50 hover-glow">
-                <svg class="w-12 h-12 text-white pulse-animation" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                </svg>
-              </div>
-            </div>
-            <div>
-              <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
-                <span
-                  class="bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-600 bg-clip-text text-transparent pulse-animation inline-block">
-                  Education Engineering Portfolio
-                </span>
-              </h1>
-              <div class="mt-6 flex items-center justify-center gap-4 text-sm text-slate-600 flex-wrap">
-                <span
-                  class="font-mono px-3 py-1 bg-cyan-100 rounded-lg hover:bg-cyan-200 transition-all duration-300 hover:scale-110 cursor-default bounce-animation"
-                  style="animation-delay: 0s;">教育</span>
-                <span
-                  class="font-mono px-3 py-1 bg-blue-100 rounded-lg hover:bg-blue-200 transition-all duration-300 hover:scale-110 cursor-default bounce-animation"
-                  style="animation-delay: 0.2s;">學習</span>
-                <span
-                  class="font-mono px-3 py-1 bg-indigo-100 rounded-lg hover:bg-indigo-200 transition-all duration-300 hover:scale-110 cursor-default bounce-animation"
-                  style="animation-delay: 0.4s;">互動</span>
-              </div>
-            </div>
-            <p class="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto pulse-animation">
-              互動式學習體驗與網頁應用程式 | Interactive Learning Experiences & Web Applications
-            </p>
-            <p class="text-sm text-slate-500">為香港教育而設計 | Designed for Hong Kong Education</p>
-          </div>
-        </div>
-      </header>
-
-      <!-- Main Content -->
-      <main class="px-6 pb-16">
-        <div class="mx-auto max-w-7xl">
-
-          <!-- Main Categories -->
-          <section>
-            <div class="mb-12 text-center">
-              <div class="mb-6 flex items-center justify-center gap-3">
-                <div class="h-1 w-12 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full pulse-animation"></div>
-                <h2 class="text-3xl sm:text-4xl font-semibold">主要分類 | Main Categories</h2>
-                <div class="h-1 w-12 bg-gradient-to-l from-blue-500 to-indigo-600 rounded-full pulse-animation"></div>
-              </div>
-            </div>
-
-            <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-
-              <!-- Primary School -->
-              <a href="Primary_School/index.html"
-                class="category-card glass-card rounded-2xl p-8 hover:bg-white/90 group">
-                <div class="space-y-4">
-                  <div
-                    class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 via-orange-500 to-red-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                    </svg>
-                  </div>
-                  <div class="text-center">
-                    <h3 class="text-xl font-semibold mb-2 group-hover:text-amber-600 transition-colors text-slate-900">
-                      小學資源 | Primary</h3>
-                    <p class="text-sm text-slate-600">小學中文與英文學習資源</p>
-                    <p class="text-xs text-slate-500 mt-1">Chinese & English Resources</p>
-                  </div>
-                  <div class="pt-2 text-center">
-                    <span class="text-xs text-amber-600 group-hover:text-amber-700">進入 →</span>
-                  </div>
-                </div>
-              </a>
-
-              <!-- Secondary School -->
-              <a href="Secondary_School/index.html"
-                class="category-card glass-card rounded-2xl p-8 hover:bg-white/90 group">
-                <div class="space-y-4">
-                  <div
-                    class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-400 via-indigo-500 to-violet-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M19.428 15.428a2 2 0 0 0-1.022-.547l-2.387-.477a6 6 0 0 0-3.86.517l-.318.158a6 6 0 0 1-3.86.517L6.05 15.21a2 2 0 0 0-1.806.547M8 4h8l-1 1v5.172a2 2 0 0 0 .586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 0 0 9 10.172V5L8 4z" />
-                    </svg>
-                  </div>
-                  <div class="text-center">
-                    <h3 class="text-xl font-semibold mb-2 group-hover:text-blue-600 transition-colors text-slate-900">
-                      中學資源 | Secondary</h3>
-                    <p class="text-sm text-slate-600">中學各科互動模擬學習</p>
-                    <p class="text-xs text-slate-500 mt-1">Interactive Simulations & Apps</p>
-                  </div>
-                  <div class="pt-2 text-center">
-                    <span class="text-xs text-blue-600 group-hover:text-blue-700">進入 →</span>
-                  </div>
-                </div>
-              </a>
-
-              <!-- Bible Study -->
-              <a href="bible_study/index.html" class="category-card glass-card rounded-2xl p-8 hover:bg-white/90 group">
-                <div class="space-y-4">
-                  <div
-                    class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                    </svg>
-                  </div>
-                  <div class="text-center">
-                    <h3
-                      class="text-xl font-semibold mb-2 group-hover:text-emerald-600 transition-colors text-slate-900">
-                      聖經研讀 | Bible Study</h3>
-                    <p class="text-sm text-slate-600">經文結構分析與研讀</p>
-                    <p class="text-xs text-slate-500 mt-1">Biblical Structure Analysis</p>
-                  </div>
-                  <div class="pt-2 text-center">
-                    <span class="text-xs text-emerald-600 group-hover:text-emerald-700">進入 →</span>
-                  </div>
-                </div>
-              </a>
-
-              <!-- Typing Test -->
-              <a href="typing test/index.html" class="category-card glass-card rounded-2xl p-8 hover:bg-white/90 group">
-                <div class="space-y-4">
-                  <div
-                    class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-400 via-purple-500 to-pink-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                    </svg>
-                  </div>
-                  <div class="text-center">
-                    <h3 class="text-xl font-semibold mb-2 group-hover:text-indigo-600 transition-colors text-slate-900">
-                      打字測試 | Typing</h3>
-                    <p class="text-sm text-slate-600">中英文打字速度測試</p>
-                    <p class="text-xs text-slate-500 mt-1">Typing Speed Test</p>
-                  </div>
-                  <div class="pt-2 text-center">
-                    <span class="text-xs text-indigo-600 group-hover:text-indigo-700">進入 →</span>
-                  </div>
-                </div>
-              </a>
-
-
-
-
-
-            </div>
-          </section>
-
-          <!-- Featured Bible Study Section -->
-          <section class="mt-16">
-            <div class="mb-8 text-center">
-              <div class="mb-6 flex items-center justify-center gap-3">
-                <div class="h-1 w-12 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full pulse-animation"></div>
-                <h2 class="text-2xl sm:text-3xl font-semibold">精選聖經研讀內容</h2>
-                <div class="h-1 w-12 bg-gradient-to-l from-orange-500 to-amber-400 rounded-full pulse-animation"></div>
-              </div>
-              <p class="text-slate-600 text-sm sm:text-base">Featured Bible Study Resources</p>
-            </div>
-            <div class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-              <!-- Old Testament Characters -->
-              
-            </div>
-          </section>
-
-        </div>
-
-        <!-- Visit Counter -->
-        <div id="visit-counter-container"></div>
-      </main>
-
-      
-
-    </div>
+<body>
+  <!-- Preloader -->
+  <div id="loader">
+    <p class="text-xs tracking-[0.3em] uppercase text-slate-500">Loading experience</p>
+    <div class="loader-bar"><div class="loader-bar__fill" id="loader-fill"></div></div>
+    <p class="text-[10px] text-slate-400" id="loader-text">0%</p>
   </div>
 
-        <!-- Footer -->
-      <footer class="text-center py-4 text-slate-500 text-sm">
-        <p class="italic mb-1">
-          But God made the earth by his power; he founded the world by his wisdom and stretched out the heavens by his
-          understanding. Jeremiah 10:12
-        </p>
-        <p class="text-xs mb-1 mt-2">
-          「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」 耶利米書 10:12
-        </p>
-        <p class="text-xs mt-2 pt-2 border-t border-slate-300">
-          @ 2025 Education Engineering Portfolio | Generated by Gemini Pro 3.0 | Prepared by SF Lau
-        </p>
-      </footer>
-<!-- Visit Counter Script -->
+  <div class="grain" aria-hidden="true"></div>
+
+  <nav class="nav-blur fixed top-0 inset-x-0 z-50 px-6 py-4">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <a href="#" class="text-sm font-semibold tracking-wide text-slate-800">Education Engineering Portfolio - By Lau Siu Fung (Kau Yan College)</a>
+      <div class="hidden sm:flex gap-6 text-xs text-slate-600">
+        <a href="Secondary_School/index.html" class="hover:text-cyan-700 transition-colors">中學</a>
+        <a href="Primary_School/index.html" class="hover:text-cyan-700 transition-colors">小學</a>
+        <a href="bible_study/index.html" class="hover:text-cyan-700 transition-colors">聖經</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══ SCROLL-DRIVEN SEQUENCE (like YouTube demo) ═══ -->
+  <section id="scroll-experience" class="scroll-sequence" aria-label="Scroll-driven cinematic intro">
+    <div class="scroll-sequence__sticky">
+      <canvas id="scroll-canvas" aria-hidden="true"></canvas>
+      <div class="hero-vignette"></div>
+
+      <!-- Frame 1: Intro + 經文 -->
+      <div class="scroll-chapter scroll-chapter--intro max-w-7xl mx-auto w-full" id="chapter-1" data-frame="0">
+        <blockquote class="verse-intro max-w-3xl">
+          <p class="text-xl sm:text-2xl lg:text-3xl font-medium serif leading-relaxed text-slate-800">
+            「神造萬物，各按其時成為美好，又將永生安置在世人心裡。然而神從始至終的作為，人不能參透。」
+          </p>
+          <cite class="block mt-5 text-sm text-cyan-700 not-italic tracking-wide">傳道書 3:11</cite>
+        </blockquote>
+        <p class="mt-10 text-xs tracking-[0.35em] uppercase text-slate-500">教育工程作品集 · Education Engineering Portfolio</p>
+      </div>
+
+      <!-- Frame 2: 救恩書院 → 中學教材 -->
+      <div class="scroll-chapter max-w-7xl mx-auto w-full" id="chapter-2" data-frame="1">
+        <a href="Secondary_School/index.html" class="scroll-item block group">
+          <p class="scroll-item__tag text-blue-700">救恩書院 · Secondary</p>
+          <h2 class="text-2xl sm:text-4xl font-bold serif mt-2 leading-snug text-slate-900">中學教材</h2>
+          <p class="text-sm text-slate-600 mt-2 leading-relaxed">F1–F6 互動模擬、溫習與專題 — 配合中學課程與 DSE 準備</p>
+          <span class="scroll-item__cta text-blue-700 group-hover:text-blue-800">進入中學資源 →</span>
+        </a>
+      </div>
+
+      <!-- Frame 3: 香島道官立小學（2024 殺校）→ 小學教材 -->
+      <div class="scroll-chapter max-w-7xl mx-auto w-full" id="chapter-3" data-frame="2">
+        <a href="Primary_School/index.html" class="scroll-item block group">
+          <p class="scroll-item__tag text-amber-700">香島道官立小學 · 2024 停辦</p>
+          <h2 class="text-2xl sm:text-4xl font-bold serif mt-2 leading-snug text-slate-900">小學教材</h2>
+          <p class="text-sm text-slate-600 mt-2 leading-relaxed">P1–P6 常識、中文、英文 — 為現役小學而建的互動課堂資源</p>
+          <span class="scroll-item__cta text-amber-700 group-hover:text-amber-800">進入小學資源 →</span>
+        </a>
+      </div>
+
+      <!-- Frame 4: The Creation of Adam → 聖經研讀 -->
+      <div class="scroll-chapter max-w-7xl mx-auto w-full" id="chapter-4" data-frame="3">
+        <a href="bible_study/index.html" class="scroll-item block group">
+          <p class="scroll-item__tag text-emerald-700">Michelangelo · 創造亞當</p>
+          <h2 class="text-2xl sm:text-4xl font-bold serif mt-2 leading-snug text-slate-900">聖經研讀</h2>
+          <p class="text-sm text-slate-600 mt-2 leading-relaxed">查經法、經卷、地圖 — 從創世記出發，遇見創造主</p>
+          <span class="scroll-item__cta text-emerald-700 group-hover:text-emerald-800">進入聖經資源 →</span>
+        </a>
+      </div>
+
+      <div class="frame-dots" id="frame-dots" aria-hidden="true">
+        <span class="frame-dot is-active" data-i="0"></span>
+        <span class="frame-dot" data-i="1"></span>
+        <span class="frame-dot" data-i="2"></span>
+        <span class="frame-dot" data-i="3"></span>
+      </div>
+
+      <div class="scroll-progress" aria-hidden="true">
+        <div class="scroll-progress__bar" id="progress-bar"></div>
+      </div>
+      <div class="scroll-hint" id="scroll-hint">
+        <span>Scroll to explore</span>
+        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 9l-7 7-7-7"/></svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ MAIN CONTENT (slides up after sequence) ═══ -->
+  <div class="content-wrap">
+
+    <section id="more" class="relative py-20 px-6 border-t border-slate-200 bg-white">
+      <div class="max-w-7xl mx-auto">
+        <div class="mb-10 text-center">
+          <p class="text-xs tracking-[0.3em] uppercase text-indigo-600 mb-3">More</p>
+          <h2 class="text-2xl sm:text-3xl font-bold serif text-slate-900">其他工具</h2>
+        </div>
+        <a href="typing test/index.html" class="cat-card card-glass rounded-2xl p-8 group block max-w-md mx-auto">
+          <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-500 to-pink-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2 text-slate-900 group-hover:text-indigo-700 transition-colors">打字測試</h3>
+          <p class="text-sm text-slate-600">中英文打字速度測試</p>
+          <span class="inline-block mt-6 text-xs text-indigo-600 group-hover:text-indigo-700">進入 →</span>
+        </a>
+      </div>
+    </section>
+
+    <section id="featured" class="relative py-24 px-6 border-t border-slate-200 bg-slate-50">
+      <div class="max-w-7xl mx-auto">
+        <div class="mb-12 text-center">
+          <p class="text-xs tracking-[0.3em] uppercase text-amber-700 mb-3">Featured</p>
+          <h2 class="text-2xl sm:text-3xl font-bold serif text-slate-900">精選聖經研讀</h2>
+        </div>
+        <div class="grid gap-4 sm:grid-cols-3">
+          <a href="bible_study/查經/查經法/OIA/index.html" class="card-glass rounded-xl p-6 block hover:border-cyan-500/40">
+            <p class="text-xs text-cyan-700 mb-2">查經法</p>
+            <h3 class="font-semibold text-slate-900">OIA 查經法</h3>
+            <p class="text-xs text-slate-500 mt-2">觀察 · 解釋 · 應用</p>
+          </a>
+          <a href="bible_study/經卷/摩西五經/index.html" class="card-glass rounded-xl p-6 block hover:border-amber-500/40">
+            <p class="text-xs text-amber-700 mb-2">經卷</p>
+            <h3 class="font-semibold text-slate-900">摩西五經</h3>
+            <p class="text-xs text-slate-500 mt-2">Torah 深入研讀</p>
+          </a>
+          <a href="bible_study/地圖/bible-maps/index.html" class="card-glass rounded-xl p-6 block hover:border-emerald-500/40">
+            <p class="text-xs text-emerald-700 mb-2">地圖</p>
+            <h3 class="font-semibold text-slate-900">聖經地圖</h3>
+            <p class="text-xs text-slate-500 mt-2">互動地理研讀</p>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <div id="visit-counter-container" class="max-w-7xl mx-auto px-6 pb-8"></div>
+
+    <footer class="text-center py-10 px-6 border-t border-slate-200 bg-white text-slate-500 text-sm">
+      <p class="italic mb-2 text-slate-600">But God made the earth by his power, he founded the world by his wisdom and stretched out the heavens by his understanding. Jeremiah 10:12</p>
+      <p class="text-xs mb-4 text-slate-500">「耶和華用能力創造大地，用智慧建立世界，用聰明鋪張穹蒼。」耶利米書 10:12</p>
+      <p class="text-xs text-slate-400">© 2025 Education Engineering Portfolio · Prepared by SF Lau</p>
+      <p class="text-[10px] text-slate-400 mt-2">背景圖：Wikimedia Commons · 救恩書院、香島道官立小學、The Creation of Adam (Michelangelo)</p>
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
   <script src="./visit-counter.js"></script>
   <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec';
+    gsap.registerPlugin(ScrollTrigger);
+
+    /** 一帧 = 一个分类；替换 assets/scroll-frames/ 内图片即可（救恩書院 / 小學 / 教會） */
+    const FRAME_PATHS = [
+      './assets/scroll-frames/frame-intro.png',
+      './assets/scroll-frames/frame-secondary.png',
+      './assets/scroll-frames/frame-primary.png',
+      './assets/scroll-frames/frame-church.png'
+    ];
+
+    const canvas = document.getElementById('scroll-canvas');
+    const ctx = canvas.getContext('2d');
+    const images = [];
+    const loader = document.getElementById('loader');
+    const loaderFill = document.getElementById('loader-fill');
+    const loaderText = document.getElementById('loader-text');
+    const progressBar = document.getElementById('progress-bar');
+    const scrollHint = document.getElementById('scroll-hint');
+
+    function resizeCanvas() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      canvas.style.width = window.innerWidth + 'px';
+      canvas.style.height = window.innerHeight + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function drawCover(img) {
+      if (!img || !img.complete) return;
+      const cw = window.innerWidth;
+      const ch = window.innerHeight;
+      const scale = Math.max(cw / img.width, ch / img.height);
+      const w = img.width * scale;
+      const h = img.height * scale;
+      const x = (cw - w) / 2;
+      const y = (ch - h) / 2;
+      ctx.drawImage(img, x, y, w, h);
+    }
+
+    /** 畫面與文字共用同一分段：每格 1/n 滾動，中段 hold、尾段 crossfade */
+    const SCRUB_HOLD = 0.72;
+
+    function segmentLocal(p, index, total) {
+      const seg = 1 / total;
+      const start = index * seg;
+      const end = (index + 1) * seg;
+      if (p < start || p >= end) return null;
+      return (p - start) / seg;
+    }
+
+    function getScrubFrame(p) {
+      const n = images.length;
+      const seg = 1 / n;
+      const idx = Math.min(n - 1, Math.floor(p / seg));
+      const local = segmentLocal(p, idx, n);
+      if (local === null) return { idx: n - 1, blend: 0 };
+      if (idx >= n - 1) return { idx: n - 1, blend: 0 };
+      const blend = local > SCRUB_HOLD ? (local - SCRUB_HOLD) / (1 - SCRUB_HOLD) : 0;
+      return { idx, blend: Math.min(1, blend) };
+    }
+
+    function chapterOpacity(p, index, total) {
+      const local = segmentLocal(p, index, total);
+      if (local === null) return 0;
+      const trans = 1 - SCRUB_HOLD;
+      if (local < trans) return local / trans;
+      if (local <= SCRUB_HOLD) return 1;
+      return Math.max(0, 1 - (local - SCRUB_HOLD) / trans);
+    }
+
+    /** Crossfade between frames — mimics video scrub (YouTube technique) */
+    function renderScrub(progress) {
+      const { idx, blend } = getScrubFrame(progress);
+      const imgA = images[idx];
+      const imgB = images[Math.min(idx + 1, images.length - 1)];
+
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      if (imgA) drawCover(imgA);
+      if (blend > 0.001 && imgB && imgB !== imgA) {
+        ctx.globalAlpha = blend;
+        drawCover(imgB);
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    function preloadFrames() {
+      let loaded = 0;
+      return Promise.all(FRAME_PATHS.map((src, i) => new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+          images[i] = img;
+          loaded++;
+          const pct = Math.round((loaded / FRAME_PATHS.length) * 100);
+          loaderFill.style.width = pct + '%';
+          loaderText.textContent = pct + '%';
+          resolve();
+        };
+        img.onerror = reject;
+        img.src = src;
+      })));
+    }
+
+    function initScrollScrub() {
+      resizeCanvas();
+      renderScrub(0);
+
+      const total = FRAME_PATHS.length;
+      const chapters = FRAME_PATHS.map((_, i) => ({
+        el: `#chapter-${i + 1}`,
+        index: i
+      }));
+      const frameDots = document.querySelectorAll('.frame-dot');
+
+      ScrollTrigger.create({
+        trigger: '#scroll-experience',
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 0.65,
+        onUpdate: (self) => {
+          const p = self.progress;
+          renderScrub(p);
+          progressBar.style.width = (p * 100) + '%';
+
+          const { idx: activeFrame } = getScrubFrame(p);
+          frameDots.forEach((dot, i) => {
+            dot.classList.toggle('is-active', i === activeFrame);
+          });
+
+          chapters.forEach(({ el, index }) => {
+            const node = document.querySelector(el);
+            if (!node) return;
+            const opacity = chapterOpacity(p, index, total);
+            const y = (1 - opacity) * 36;
+            const visible = opacity > 0.15;
+            gsap.set(node, { opacity: Math.max(0, opacity), y });
+            node.style.pointerEvents = visible && index > 0 ? 'auto' : 'none';
+          });
+
+          if (p > 0.04) {
+            gsap.to(scrollHint, { opacity: 0, duration: 0.3 });
+          }
+        }
+      });
+
+      window.addEventListener('resize', () => {
+        resizeCanvas();
+        ScrollTrigger.refresh();
+      });
+    }
+
+    function initContentAnimations() {
+      gsap.from('#more .cat-card', {
+        opacity: 0,
+        y: 70,
+        duration: 0.9,
+        ease: 'power3.out',
+        scrollTrigger: { trigger: '#more', start: 'top 80%' }
+      });
+
+      gsap.from('#featured .card-glass', {
+        opacity: 0,
+        y: 50,
+        duration: 0.8,
+        stagger: 0.08,
+        ease: 'power3.out',
+        scrollTrigger: { trigger: '#featured', start: 'top 85%' }
+      });
+    }
+
+    preloadFrames()
+      .then(() => {
+        loader.classList.add('hidden');
+        const lenis = new Lenis({ duration: 1.15, smoothWheel: true });
+        lenis.on('scroll', ScrollTrigger.update);
+        gsap.ticker.add((t) => lenis.raf(t * 1000));
+        gsap.ticker.lagSmoothing(0);
+        initScrollScrub();
+        initContentAnimations();
+      })
+      .catch((err) => {
+        console.error('Frame load failed', err);
+        loaderText.textContent = 'Load failed — refresh';
+      });
+
     VisitCounter.init('index', {
-      scriptUrl: SCRIPT_URL,
+      scriptUrl: 'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec',
       containerId: 'visit-counter-container'
     });
   </script>
