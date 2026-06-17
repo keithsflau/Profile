@@ -13,8 +13,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "..");
 
 const DEFAULT_DIRS = [
+  "Primary_School",
   "Secondary_School/Mathematics",
   "Secondary_School/Junior Science",
+  "Secondary_School/ICT",
+  "Secondary_School/Biology",
 ];
 
 const BABEL_RE =
@@ -26,7 +29,7 @@ function walk(dir, files = []) {
     const full = path.join(dir, name);
     const st = fs.statSync(full);
     if (st.isDirectory()) walk(full, files);
-    else if (name === "index.html") files.push(full);
+    else if (name.endsWith(".html")) files.push(full);
   }
   return files;
 }
@@ -45,12 +48,13 @@ function transpileHtml(html) {
     const trimmed = code.trim();
     if (!trimmed) return _match;
     try {
+      const isModule = /^\s*(import|export)\s/m.test(trimmed);
       const result = Babel.transform(trimmed, {
         presets: [["react", { runtime: "classic" }]],
-        sourceType: "script",
+        sourceType: isModule ? "module" : "script",
       });
       changed = true;
-      return `<script>\n${result.code}\n</script>`;
+      return `<script${isModule ? ' type="module"' : ""}>\n${result.code}\n</script>`;
     } catch (err) {
       throw new Error(`Babel error: ${err.message}`);
     }

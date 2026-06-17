@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     <script src="../../common/i18n.js"></script>
     <link
@@ -23,165 +22,158 @@
   </head>
   <body>
     <div id="root"></div>
-    <script type="text/babel">
-      const { useState, useEffect } = React;
-      const { motion, AnimatePresence } = window.Motion;
-      const { LanguageSelector, get } = window.MathI18n;
-
-      const t = {
-        title: {
-          en: "🥚 Concept of Zero",
-          zh: "🥚 0的概念",
-          ja: "🥚 ゼロの概念",
-          ko: "🥚 0의 개념",
-          es: "🥚 Concepto de Cero",
-          de: "🥚 Konzept von Null",
-          fi: "🥚 Nollan käsite",
-          fr: "🥚 Concept de Zéro",
-          ar: "🥚 مفهوم الصفر",
-          it: "🥚 Concetto di Zero",
-        },
-        left: {
-          en: "{n} candies left",
-          zh: "還有 {n} 粒糖",
-          ja: "飴が残り {n} 個",
-          ko: "사탕 {n}개 남음",
-          es: "Quedan {n} dulces",
-          de: "Noch {n} Bonbons",
-          fi: "{n} karkkia jäljellä",
-          fr: "Il reste {n} bonbons",
-          ar: "بقي {n} حلوى",
-          it: "{n} caramelle rimaste",
-        },
-        empty: {
-          en: "It's Empty!",
-          zh: "沒有糖了！",
-          ja: "空っぽです！",
-          ko: "비었습니다!",
-          es: "¡Está vacío!",
-          de: "Es ist leer!",
-          fi: "Se on tyhjä!",
-          fr: "C'est vide !",
-          ar: "إنها فارغة!",
-          it: "È vuoto!",
-        },
-        eat: {
-          en: "Eat one",
-          zh: "吃一粒",
-          ja: "1つ食べる",
-          ko: "하나 먹기",
-          es: "Comer uno",
-          de: "Iss eins",
-          fi: "Syö yksi",
-          fr: "Manger un",
-          ar: "تناول واحدة",
-          it: "Mangiane uno",
-        },
-        refill: {
-          en: "Refill",
-          zh: "倒滿",
-          ja: "補充する",
-          ko: "리필",
-          es: "Rellenar",
-          de: "Auffüllen",
-          fi: "Täytä",
-          fr: "Remplir",
-          ar: "إعادة تعبئة",
-          it: "Riempi",
-        },
-        zeroMeans: {
-          en: "Zero means nothing.",
-          zh: "「0」代表甚麼也沒有。",
-          ja: "ゼロは何もないことを意味します。",
-          ko: "0은 아무것도 없음을 의미합니다.",
-          es: "Cero significa nada.",
-          de: "Null bedeutet nichts.",
-          fi: "Nolla tarkoittaa ei mitään.",
-          fr: "Zéro signifie rien.",
-          ar: "الصفر يعني لا شيء.",
-          it: "Zero significa niente.",
-        },
-      };
-
-      function App() {
-        const [lang, setLang] = useState("zh");
-        const [candies, setCandies] = useState(3);
-
-        const getStatus = () => {
-          if (candies > 0) {
-            let txt = t.left[lang] || t.left["en"];
-            return txt.replace("{n}", candies);
-          }
-          return t.empty[lang] || t.empty["en"];
-        };
-
-        return (
-          <div className="min-h-screen p-8 flex flex-col items-center justify-center">
-            <LanguageSelector lang={lang} setLang={setLang} />
-
-            <h1 className="text-5xl font-black text-indigo-900 mb-8 max-w-2xl text-center">
-              {t.title[lang] || t.title["en"]}
-            </h1>
-
-            <div className="bg-white/90 rounded-3xl p-8 shadow-2xl w-full max-w-2xl text-center border-4 border-indigo-200">
-              <div className="relative w-64 h-64 mx-auto mb-8 bg-indigo-50 rounded-full border-8 border-indigo-300 flex items-center justify-center overflow-hidden">
-                <div className="absolute inset-x-0 bottom-0 h-1/2 bg-white/50 rounded-b-full"></div>{" "}
-                {/* Jar gloss */}
-                <div className="relative z-10 flex flex-wrap justify-center gap-2 max-w-[70%]">
-                  <AnimatePresence>
-                    {[...Array(candies)].map((_, i) => (
-                      <motion.div
-                        key={i}
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        exit={{ scale: 0, y: 50, opacity: 0 }}
-                        className="text-5xl"
-                      >
-                        🍬
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
-                </div>
-              </div>
-
-              <div className="text-4xl font-bold text-indigo-800 mb-8">
-                {getStatus()}
-              </div>
-
-              <div className="text-6xl font-black text-indigo-600 mb-8 font-mono border-4 border-indigo-100 inline-block px-8 py-2 rounded-xl">
-                {candies}
-              </div>
-
-              <div className="flex justify-center gap-4">
-                <button
-                  onClick={() => setCandies(Math.max(0, candies - 1))}
-                  className="px-8 py-3 bg-red-400 text-white rounded-xl font-bold text-xl shadow-lg hover:bg-red-500 active:scale-95 transition-all"
-                >
-                  {t.eat[lang] || t.eat["en"]}
-                </button>
-                <button
-                  onClick={() => setCandies(5)}
-                  className="px-8 py-3 bg-indigo-500 text-white rounded-xl font-bold text-xl shadow-lg hover:bg-indigo-600 active:scale-95 transition-all"
-                >
-                  {t.refill[lang] || t.refill["en"]}
-                </button>
-              </div>
-
-              {candies === 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-6 text-xl text-indigo-500 font-bold"
-                >
-                  {t.zeroMeans[lang] || t.zeroMeans["en"]}
-                </motion.div>
-              )}
-            </div>
-          </div>
-        );
-      }
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
-    </script>
+    <script>
+const {
+  useState,
+  useEffect
+} = React;
+const {
+  motion,
+  AnimatePresence
+} = window.Motion;
+const {
+  LanguageSelector,
+  get
+} = window.MathI18n;
+const t = {
+  title: {
+    en: "🥚 Concept of Zero",
+    zh: "🥚 0的概念",
+    ja: "🥚 ゼロの概念",
+    ko: "🥚 0의 개념",
+    es: "🥚 Concepto de Cero",
+    de: "🥚 Konzept von Null",
+    fi: "🥚 Nollan käsite",
+    fr: "🥚 Concept de Zéro",
+    ar: "🥚 مفهوم الصفر",
+    it: "🥚 Concetto di Zero"
+  },
+  left: {
+    en: "{n} candies left",
+    zh: "還有 {n} 粒糖",
+    ja: "飴が残り {n} 個",
+    ko: "사탕 {n}개 남음",
+    es: "Quedan {n} dulces",
+    de: "Noch {n} Bonbons",
+    fi: "{n} karkkia jäljellä",
+    fr: "Il reste {n} bonbons",
+    ar: "بقي {n} حلوى",
+    it: "{n} caramelle rimaste"
+  },
+  empty: {
+    en: "It's Empty!",
+    zh: "沒有糖了！",
+    ja: "空っぽです！",
+    ko: "비었습니다!",
+    es: "¡Está vacío!",
+    de: "Es ist leer!",
+    fi: "Se on tyhjä!",
+    fr: "C'est vide !",
+    ar: "إنها فارغة!",
+    it: "È vuoto!"
+  },
+  eat: {
+    en: "Eat one",
+    zh: "吃一粒",
+    ja: "1つ食べる",
+    ko: "하나 먹기",
+    es: "Comer uno",
+    de: "Iss eins",
+    fi: "Syö yksi",
+    fr: "Manger un",
+    ar: "تناول واحدة",
+    it: "Mangiane uno"
+  },
+  refill: {
+    en: "Refill",
+    zh: "倒滿",
+    ja: "補充する",
+    ko: "리필",
+    es: "Rellenar",
+    de: "Auffüllen",
+    fi: "Täytä",
+    fr: "Remplir",
+    ar: "إعادة تعبئة",
+    it: "Riempi"
+  },
+  zeroMeans: {
+    en: "Zero means nothing.",
+    zh: "「0」代表甚麼也沒有。",
+    ja: "ゼロは何もないことを意味します。",
+    ko: "0은 아무것도 없음을 의미합니다.",
+    es: "Cero significa nada.",
+    de: "Null bedeutet nichts.",
+    fi: "Nolla tarkoittaa ei mitään.",
+    fr: "Zéro signifie rien.",
+    ar: "الصفر يعني لا شيء.",
+    it: "Zero significa niente."
+  }
+};
+function App() {
+  const [lang, setLang] = useState("zh");
+  const [candies, setCandies] = useState(3);
+  const getStatus = () => {
+    if (candies > 0) {
+      let txt = t.left[lang] || t.left["en"];
+      return txt.replace("{n}", candies);
+    }
+    return t.empty[lang] || t.empty["en"];
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    className: "min-h-screen p-8 flex flex-col items-center justify-center"
+  }, /*#__PURE__*/React.createElement(LanguageSelector, {
+    lang: lang,
+    setLang: setLang
+  }), /*#__PURE__*/React.createElement("h1", {
+    className: "text-5xl font-black text-indigo-900 mb-8 max-w-2xl text-center"
+  }, t.title[lang] || t.title["en"]), /*#__PURE__*/React.createElement("div", {
+    className: "bg-white/90 rounded-3xl p-8 shadow-2xl w-full max-w-2xl text-center border-4 border-indigo-200"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "relative w-64 h-64 mx-auto mb-8 bg-indigo-50 rounded-full border-8 border-indigo-300 flex items-center justify-center overflow-hidden"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "absolute inset-x-0 bottom-0 h-1/2 bg-white/50 rounded-b-full"
+  }), " ", /*#__PURE__*/React.createElement("div", {
+    className: "relative z-10 flex flex-wrap justify-center gap-2 max-w-[70%]"
+  }, /*#__PURE__*/React.createElement(AnimatePresence, null, [...Array(candies)].map((_, i) => /*#__PURE__*/React.createElement(motion.div, {
+    key: i,
+    initial: {
+      scale: 0
+    },
+    animate: {
+      scale: 1
+    },
+    exit: {
+      scale: 0,
+      y: 50,
+      opacity: 0
+    },
+    className: "text-5xl"
+  }, "🍬"))))), /*#__PURE__*/React.createElement("div", {
+    className: "text-4xl font-bold text-indigo-800 mb-8"
+  }, getStatus()), /*#__PURE__*/React.createElement("div", {
+    className: "text-6xl font-black text-indigo-600 mb-8 font-mono border-4 border-indigo-100 inline-block px-8 py-2 rounded-xl"
+  }, candies), /*#__PURE__*/React.createElement("div", {
+    className: "flex justify-center gap-4"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setCandies(Math.max(0, candies - 1)),
+    className: "px-8 py-3 bg-red-400 text-white rounded-xl font-bold text-xl shadow-lg hover:bg-red-500 active:scale-95 transition-all"
+  }, t.eat[lang] || t.eat["en"]), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setCandies(5),
+    className: "px-8 py-3 bg-indigo-500 text-white rounded-xl font-bold text-xl shadow-lg hover:bg-indigo-600 active:scale-95 transition-all"
+  }, t.refill[lang] || t.refill["en"])), candies === 0 && /*#__PURE__*/React.createElement(motion.div, {
+    initial: {
+      opacity: 0,
+      y: 10
+    },
+    animate: {
+      opacity: 1,
+      y: 0
+    },
+    className: "mt-6 text-xl text-indigo-500 font-bold"
+  }, t.zeroMeans[lang] || t.zeroMeans["en"])));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/*#__PURE__*/React.createElement(App, null));
+</script>
   
       
       <!-- Footer -->

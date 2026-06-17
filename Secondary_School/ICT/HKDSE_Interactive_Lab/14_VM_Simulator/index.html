@@ -14,7 +14,6 @@
       crossorigin
       src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
     ></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
@@ -46,234 +45,202 @@
   >
     <div id="root" class="w-full max-w-6xl"></div>
 
-    <script type="text/babel">
-      const { useState, useEffect } = React;
+    <script>
+const {
+  useState,
+  useEffect
+} = React;
 
-      // --- LUCIDE ICON SHIM ---
-      const LucideIcon = ({ name, size = 24, className = "" }) => {
-        const formatName = (n) =>
-          n
-            .split("-")
-            .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
-            .join("");
-        const iconName = formatName(name);
+// --- LUCIDE ICON SHIM ---
+const LucideIcon = ({
+  name,
+  size = 24,
+  className = ""
+}) => {
+  const formatName = n => n.split("-").map(p => p.charAt(0).toUpperCase() + p.slice(1)).join("");
+  const iconName = formatName(name);
+  const [svgHtml, setSvgHtml] = useState("");
+  useEffect(() => {
+    if (window.lucide && window.lucide.icons && window.lucide.icons[iconName] && typeof window.lucide.icons[iconName].toSvg === "function") {
+      setSvgHtml(window.lucide.icons[iconName].toSvg({
+        width: size,
+        height: size,
+        class: className
+      }));
+    }
+  }, [name, size, className, iconName]);
+  return /*#__PURE__*/React.createElement("span", {
+    dangerouslySetInnerHTML: {
+      __html: svgHtml
+    },
+    style: {
+      display: "inline-flex"
+    }
+  });
+};
+const Monitor = p => /*#__PURE__*/React.createElement(LucideIcon, {
+  name: "monitor",
+  ...p
+});
+const Layers = p => /*#__PURE__*/React.createElement(LucideIcon, {
+  name: "layers",
+  ...p
+});
+const Shield = p => /*#__PURE__*/React.createElement(LucideIcon, {
+  name: "shield",
+  ...p
+});
+const Cpu = p => /*#__PURE__*/React.createElement(LucideIcon, {
+  name: "cpu",
+  ...p
+}); // unused
+const HardDrive = p => /*#__PURE__*/React.createElement(LucideIcon, {
+  name: "hard-drive",
+  ...p
+});
+const Maximize2 = p => /*#__PURE__*/React.createElement(LucideIcon, {
+  name: "maximize-2",
+  ...p
+});
+const Minimize2 = p => /*#__PURE__*/React.createElement(LucideIcon, {
+  name: "minimize-2",
+  ...p
+});
+const Power = p => /*#__PURE__*/React.createElement(LucideIcon, {
+  name: "power",
+  ...p
+});
+const AlertTriangle = p => /*#__PURE__*/React.createElement(LucideIcon, {
+  name: "alert-triangle",
+  ...p
+});
+// --- END SHIM ---
 
-        const [svgHtml, setSvgHtml] = useState("");
-
-        useEffect(() => {
-          if (
-            window.lucide &&
-            window.lucide.icons &&
-            window.lucide.icons[iconName] &&
-            typeof window.lucide.icons[iconName].toSvg === "function"
-          ) {
-            setSvgHtml(
-              window.lucide.icons[iconName].toSvg({
-                width: size,
-                height: size,
-                class: className,
-              })
-            );
-          }
-        }, [name, size, className, iconName]);
-
-        return (
-          <span
-            dangerouslySetInnerHTML={{ __html: svgHtml }}
-            style={{ display: "inline-flex" }}
-          />
-        );
-      };
-      const Monitor = (p) => <LucideIcon name="monitor" {...p} />;
-      const Layers = (p) => <LucideIcon name="layers" {...p} />;
-      const Shield = (p) => <LucideIcon name="shield" {...p} />;
-      const Cpu = (p) => <LucideIcon name="cpu" {...p} />; // unused
-      const HardDrive = (p) => <LucideIcon name="hard-drive" {...p} />;
-      const Maximize2 = (p) => <LucideIcon name="maximize-2" {...p} />;
-      const Minimize2 = (p) => <LucideIcon name="minimize-2" {...p} />;
-      const Power = (p) => <LucideIcon name="power" {...p} />;
-      const AlertTriangle = (p) => <LucideIcon name="alert-triangle" {...p} />;
-      // --- END SHIM ---
-
-      const App = () => {
-        const [vmStatus, setVmStatus] = useState("off");
-        const [hostTask, setHostTask] = useState("Idle");
-
-        const toggleVM = () => {
-          if (vmStatus === "off") {
-            setVmStatus("booting");
-            setTimeout(() => setVmStatus("on"), 2000);
-          } else setVmStatus("off");
-        };
-
-        return (
-          <div className="w-full h-[600px] relative bg-[url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80')] bg-cover bg-center rounded-xl overflow-hidden border-8 border-slate-800 shadow-2xl">
-            <div className="absolute inset-0 flex flex-col pointer-events-none">
-              <div className="p-8 space-y-4 pointer-events-auto">
-                <div className="w-20 h-20 flex flex-col items-center justify-center hover:bg-white/10 rounded cursor-pointer group">
-                  <HardDrive
-                    size={40}
-                    className="text-white drop-shadow-lg mb-1 group-hover:scale-110 transition-transform"
-                  />
-                  <span className="text-white text-xs drop-shadow font-bold">
-                    This PC
-                  </span>
-                </div>
-                <div
-                  onClick={toggleVM}
-                  className="w-20 h-20 flex flex-col items-center justify-center hover:bg-white/10 rounded cursor-pointer group"
-                >
-                  <Layers
-                    size={40}
-                    className="text-blue-400 drop-shadow-lg mb-1 group-hover:scale-110 transition-transform"
-                  />
-                  <span className="text-white text-xs drop-shadow font-bold">
-                    VMware
-                  </span>
-                </div>
-              </div>
-              <div className="mt-auto h-12 bg-slate-900/90 backdrop-blur border-t border-slate-700 flex items-center px-4 pointer-events-auto">
-                <div className="w-8 h-8 bg-cyan-600 rounded mr-4 flex items-center justify-center hover:bg-cyan-500 cursor-pointer">
-                  <Monitor size={16} className="text-white" />
-                </div>
-                <div className="text-xs text-slate-400 font-mono">
-                  Host OS: Windows 11 | CPU: 15% | RAM: 8.2GB / 16GB
-                </div>
-                {vmStatus === "on" && (
-                  <div className="ml-4 bg-slate-800 px-3 py-1 rounded text-xs text-blue-300 border border-blue-500/50 flex items-center gap-2">
-                    <Layers size={12} /> VM Running
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {vmStatus !== "off" && (
-              <div
-                className={`absolute top-10 left-10 right-10 bottom-20 bg-slate-950 rounded-lg shadow-2xl border border-slate-700 flex flex-col overflow-hidden pointer-events-auto guest-os ${
-                  vmStatus === "minimized" ? "guest-minimized" : ""
-                }`}
-              >
-                <div className="h-8 bg-slate-800 flex items-center justify-between px-3 border-b border-slate-700">
-                  <div className="flex items-center gap-2 text-xs font-bold text-slate-300">
-                    <Layers size={14} className="text-orange-500" />
-                    Guest OS - Ubuntu Linux [Running]
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() =>
-                        setVmStatus((s) =>
-                          s === "minimized" ? "on" : "minimized"
-                        )
-                      }
-                      className="hover:bg-slate-700 p-1 rounded"
-                    >
-                      {vmStatus === "minimized" ? (
-                        <Maximize2 size={12} className="text-white" />
-                      ) : (
-                        <Minimize2 size={12} className="text-white" />
-                      )}
-                    </button>
-                    <button
-                      onClick={() => setVmStatus("off")}
-                      className="hover:bg-red-900/50 p-1 rounded"
-                    >
-                      <Power size={12} className="text-red-400" />
-                    </button>
-                  </div>
-                </div>
-                <div className="flex-1 bg-neutral-900 text-green-400 font-mono p-4 overflow-hidden relative">
-                  {vmStatus === "booting" ? (
-                    <div className="flex flex-col items-center justify-center h-full space-y-4">
-                      <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
-                      <div>Booting Kernel...</div>
-                    </div>
-                  ) : (
-                    <div className="space-y-2 text-sm">
-                      <div>dev@ubuntu:~$ neofetch</div>
-                      <div className="flex gap-4 mt-4 text-white">
-                        <div className="text-orange-500 hidden md:block">
-                          {`            .-.
+const App = () => {
+  const [vmStatus, setVmStatus] = useState("off");
+  const [hostTask, setHostTask] = useState("Idle");
+  const toggleVM = () => {
+    if (vmStatus === "off") {
+      setVmStatus("booting");
+      setTimeout(() => setVmStatus("on"), 2000);
+    } else setVmStatus("off");
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    className: "w-full h-[600px] relative bg-[url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80')] bg-cover bg-center rounded-xl overflow-hidden border-8 border-slate-800 shadow-2xl"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "absolute inset-0 flex flex-col pointer-events-none"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "p-8 space-y-4 pointer-events-auto"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "w-20 h-20 flex flex-col items-center justify-center hover:bg-white/10 rounded cursor-pointer group"
+  }, /*#__PURE__*/React.createElement(HardDrive, {
+    size: 40,
+    className: "text-white drop-shadow-lg mb-1 group-hover:scale-110 transition-transform"
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "text-white text-xs drop-shadow font-bold"
+  }, "This PC")), /*#__PURE__*/React.createElement("div", {
+    onClick: toggleVM,
+    className: "w-20 h-20 flex flex-col items-center justify-center hover:bg-white/10 rounded cursor-pointer group"
+  }, /*#__PURE__*/React.createElement(Layers, {
+    size: 40,
+    className: "text-blue-400 drop-shadow-lg mb-1 group-hover:scale-110 transition-transform"
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "text-white text-xs drop-shadow font-bold"
+  }, "VMware"))), /*#__PURE__*/React.createElement("div", {
+    className: "mt-auto h-12 bg-slate-900/90 backdrop-blur border-t border-slate-700 flex items-center px-4 pointer-events-auto"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "w-8 h-8 bg-cyan-600 rounded mr-4 flex items-center justify-center hover:bg-cyan-500 cursor-pointer"
+  }, /*#__PURE__*/React.createElement(Monitor, {
+    size: 16,
+    className: "text-white"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "text-xs text-slate-400 font-mono"
+  }, "Host OS: Windows 11 | CPU: 15% | RAM: 8.2GB / 16GB"), vmStatus === "on" && /*#__PURE__*/React.createElement("div", {
+    className: "ml-4 bg-slate-800 px-3 py-1 rounded text-xs text-blue-300 border border-blue-500/50 flex items-center gap-2"
+  }, /*#__PURE__*/React.createElement(Layers, {
+    size: 12
+  }), " VM Running"))), vmStatus !== "off" && /*#__PURE__*/React.createElement("div", {
+    className: `absolute top-10 left-10 right-10 bottom-20 bg-slate-950 rounded-lg shadow-2xl border border-slate-700 flex flex-col overflow-hidden pointer-events-auto guest-os ${vmStatus === "minimized" ? "guest-minimized" : ""}`
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "h-8 bg-slate-800 flex items-center justify-between px-3 border-b border-slate-700"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-2 text-xs font-bold text-slate-300"
+  }, /*#__PURE__*/React.createElement(Layers, {
+    size: 14,
+    className: "text-orange-500"
+  }), "Guest OS - Ubuntu Linux [Running]"), /*#__PURE__*/React.createElement("div", {
+    className: "flex gap-2"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setVmStatus(s => s === "minimized" ? "on" : "minimized"),
+    className: "hover:bg-slate-700 p-1 rounded"
+  }, vmStatus === "minimized" ? /*#__PURE__*/React.createElement(Maximize2, {
+    size: 12,
+    className: "text-white"
+  }) : /*#__PURE__*/React.createElement(Minimize2, {
+    size: 12,
+    className: "text-white"
+  })), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setVmStatus("off"),
+    className: "hover:bg-red-900/50 p-1 rounded"
+  }, /*#__PURE__*/React.createElement(Power, {
+    size: 12,
+    className: "text-red-400"
+  })))), /*#__PURE__*/React.createElement("div", {
+    className: "flex-1 bg-neutral-900 text-green-400 font-mono p-4 overflow-hidden relative"
+  }, vmStatus === "booting" ? /*#__PURE__*/React.createElement("div", {
+    className: "flex flex-col items-center justify-center h-full space-y-4"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin"
+  }), /*#__PURE__*/React.createElement("div", null, "Booting Kernel...")) : /*#__PURE__*/React.createElement("div", {
+    className: "space-y-2 text-sm"
+  }, /*#__PURE__*/React.createElement("div", null, "dev@ubuntu:~$ neofetch"), /*#__PURE__*/React.createElement("div", {
+    className: "flex gap-4 mt-4 text-white"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-orange-500 hidden md:block"
+  }, `            .-.
            (   )
           (     )
          (       )
           (     )
            (   )
-            '-'`}
-                        </div>
-                        <div className="space-y-1 text-xs md:text-sm">
-                          <div>
-                            <span className="text-green-500 font-bold">OS</span>
-                            : Ubuntu 22.04 LTS
-                          </div>
-                          <div>
-                            <span className="text-green-500 font-bold">
-                              Host
-                            </span>
-                            : KVM/QEMU
-                          </div>
-                          <div>
-                            <span className="text-green-500 font-bold">
-                              Kernel
-                            </span>
-                            : 5.15.0-generic
-                          </div>
-                          <div>
-                            <span className="text-green-500 font-bold">
-                              Packages
-                            </span>
-                            : 1450 (dpkg)
-                          </div>
-                          <div>
-                            <span className="text-green-500 font-bold">
-                              Memory
-                            </span>
-                            : 2048MiB / 4096MiB
-                          </div>
-                        </div>
-                      </div>
-                      <div className="mt-8">dev@ubuntu:~$ _</div>
-                      <div className="absolute right-4 bottom-4 w-64 bg-slate-800/90 backdrop-blur p-4 rounded border border-slate-600 shadow-xl text-slate-300 text-xs">
-                        <div className="flex items-center gap-2 font-bold text-white mb-2">
-                          <Shield size={14} className="text-cyan-400" /> VM
-                          Concept (Q13)
-                        </div>
-                        <p className="mb-2">
-                          This "Guest OS" runs inside the "Host OS".
-                        </p>
-                        <ul className="list-disc pl-4 space-y-1 text-[11px] text-slate-400">
-                          <li>Isolate crashes/viruses from Host.</li>
-                          <li>
-                            Run incompatible software (e.g. Linux apps on
-                            Windows).
-                          </li>
-                          <li>Requires extra RAM/CPU.</li>
-                        </ul>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {vmStatus === "off" && (
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/50 backdrop-blur-sm p-6 rounded-xl border border-white/10 text-center pointer-events-none">
-                <h2 className="text-2xl font-bold text-white mb-2">
-                  Virtual Machine Lab
-                </h2>
-                <p className="text-slate-200">
-                  Click the{" "}
-                  <span className="text-blue-300 font-bold">VMware</span> icon
-                  to launch the Guest OS.
-                </p>
-              </div>
-            )}
-          </div>
-        );
-      };
-
-      const root = ReactDOM.createRoot(document.getElementById("root"));
-      root.render(<App />);
-    </script>
+            '-'`), /*#__PURE__*/React.createElement("div", {
+    className: "space-y-1 text-xs md:text-sm"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+    className: "text-green-500 font-bold"
+  }, "OS"), ": Ubuntu 22.04 LTS"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+    className: "text-green-500 font-bold"
+  }, "Host"), ": KVM/QEMU"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+    className: "text-green-500 font-bold"
+  }, "Kernel"), ": 5.15.0-generic"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+    className: "text-green-500 font-bold"
+  }, "Packages"), ": 1450 (dpkg)"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+    className: "text-green-500 font-bold"
+  }, "Memory"), ": 2048MiB / 4096MiB"))), /*#__PURE__*/React.createElement("div", {
+    className: "mt-8"
+  }, "dev@ubuntu:~$ _"), /*#__PURE__*/React.createElement("div", {
+    className: "absolute right-4 bottom-4 w-64 bg-slate-800/90 backdrop-blur p-4 rounded border border-slate-600 shadow-xl text-slate-300 text-xs"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-2 font-bold text-white mb-2"
+  }, /*#__PURE__*/React.createElement(Shield, {
+    size: 14,
+    className: "text-cyan-400"
+  }), " VM Concept (Q13)"), /*#__PURE__*/React.createElement("p", {
+    className: "mb-2"
+  }, "This \"Guest OS\" runs inside the \"Host OS\"."), /*#__PURE__*/React.createElement("ul", {
+    className: "list-disc pl-4 space-y-1 text-[11px] text-slate-400"
+  }, /*#__PURE__*/React.createElement("li", null, "Isolate crashes/viruses from Host."), /*#__PURE__*/React.createElement("li", null, "Run incompatible software (e.g. Linux apps on Windows)."), /*#__PURE__*/React.createElement("li", null, "Requires extra RAM/CPU.")))))), vmStatus === "off" && /*#__PURE__*/React.createElement("div", {
+    className: "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/50 backdrop-blur-sm p-6 rounded-xl border border-white/10 text-center pointer-events-none"
+  }, /*#__PURE__*/React.createElement("h2", {
+    className: "text-2xl font-bold text-white mb-2"
+  }, "Virtual Machine Lab"), /*#__PURE__*/React.createElement("p", {
+    className: "text-slate-200"
+  }, "Click the", " ", /*#__PURE__*/React.createElement("span", {
+    className: "text-blue-300 font-bold"
+  }, "VMware"), " icon to launch the Guest OS.")));
+};
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(/*#__PURE__*/React.createElement(App, null));
+</script>
   
       
       <!-- Footer -->

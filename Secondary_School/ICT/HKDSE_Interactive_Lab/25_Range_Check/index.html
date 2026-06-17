@@ -14,7 +14,6 @@
       crossorigin
       src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
     ></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
@@ -55,219 +54,183 @@
   <body class="min-h-screen p-8 flex justify-center items-center bg-slate-900">
     <div id="root" class="w-full max-w-2xl"></div>
 
-    <script type="text/babel">
-      const { useState, useEffect } = React;
+    <script>
+const {
+  useState,
+  useEffect
+} = React;
 
-      // --- LUCIDE ICON SHIM ---
-      const LucideIcon = ({ name, size = 24, className = "" }) => {
-        const formatName = (n) =>
-          n
-            .split("-")
-            .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
-            .join("");
-        const iconName = formatName(name);
+// --- LUCIDE ICON SHIM ---
+const LucideIcon = ({
+  name,
+  size = 24,
+  className = ""
+}) => {
+  const formatName = n => n.split("-").map(p => p.charAt(0).toUpperCase() + p.slice(1)).join("");
+  const iconName = formatName(name);
+  const [svgHtml, setSvgHtml] = useState("");
+  useEffect(() => {
+    if (window.lucide && window.lucide.icons && window.lucide.icons[iconName] && typeof window.lucide.icons[iconName].toSvg === "function") {
+      setSvgHtml(window.lucide.icons[iconName].toSvg({
+        width: size,
+        height: size,
+        class: className
+      }));
+    }
+  }, [name, size, className, iconName]);
+  return /*#__PURE__*/React.createElement("span", {
+    dangerouslySetInnerHTML: {
+      __html: svgHtml
+    },
+    style: {
+      display: "inline-flex"
+    }
+  });
+};
+const ShieldCheck = p => /*#__PURE__*/React.createElement(LucideIcon, {
+  name: "shield-check",
+  ...p
+});
+const AlertOctagon = p => /*#__PURE__*/React.createElement(LucideIcon, {
+  name: "alert-octagon",
+  ...p
+});
+const CheckCircle2 = p => /*#__PURE__*/React.createElement(LucideIcon, {
+  name: "check-circle-2",
+  ...p
+});
+const ArrowRight = p => /*#__PURE__*/React.createElement(LucideIcon, {
+  name: "arrow-right",
+  ...p
+});
+// --- END SHIM ---
 
-        const [svgHtml, setSvgHtml] = useState("");
-
-        useEffect(() => {
-          if (
-            window.lucide &&
-            window.lucide.icons &&
-            window.lucide.icons[iconName] &&
-            typeof window.lucide.icons[iconName].toSvg === "function"
-          ) {
-            setSvgHtml(
-              window.lucide.icons[iconName].toSvg({
-                width: size,
-                height: size,
-                class: className,
-              })
-            );
-          }
-        }, [name, size, className, iconName]);
-
-        return (
-          <span
-            dangerouslySetInnerHTML={{ __html: svgHtml }}
-            style={{ display: "inline-flex" }}
-          />
-        );
-      };
-      const ShieldCheck = (p) => <LucideIcon name="shield-check" {...p} />;
-      const AlertOctagon = (p) => <LucideIcon name="alert-octagon" {...p} />;
-      const CheckCircle2 = (p) => <LucideIcon name="check-circle-2" {...p} />;
-      const ArrowRight = (p) => <LucideIcon name="arrow-right" {...p} />;
-      // --- END SHIM ---
-
-      const App = () => {
-        const [min, setMin] = useState(1);
-        const [max, setMax] = useState(100);
-        const [val, setVal] = useState("");
-        const [status, setStatus] = useState("idle");
-
-        const check = (e) => {
-          const input = e.target.value;
-          setVal(input);
-          if (input === "") {
-            setStatus("idle");
-            return;
-          }
-          const num = parseFloat(input);
-          if (isNaN(num)) {
-            setStatus("invalid");
-            return;
-          }
-          const lo = Math.min(min, max);
-          const hi = Math.max(min, max);
-          if (num >= lo && num <= hi) setStatus("valid");
-          else setStatus("invalid");
-        };
-
-        const lo = Math.min(min, max);
-        const hi = Math.max(min, max);
-        const pad = Math.max((hi - lo) * 0.15, 1);
-        const viewMin = lo - pad;
-        const viewMax = hi + pad;
-        const viewW = viewMax - viewMin || 1;
-        const toPct = (v) =>
-          Math.min(100, Math.max(0, ((v - viewMin) / viewW) * 100));
-
-        return (
-          <div className="space-y-8 text-center bg-slate-800 p-8 rounded-3xl border border-slate-700 shadow-2xl relative overflow-hidden">
-            <header>
-              <h1 className="text-3xl font-bold text-white mb-2 flex items-center justify-center gap-2">
-                <ShieldCheck className="text-cyan-400" /> Data Validation: Range
-                Check
-              </h1>
-              <p className="text-slate-400">Paper 1A Q33 Concept</p>
-            </header>
-            <div className="flex items-center justify-center gap-4 bg-slate-900 p-4 rounded-xl border border-slate-800 font-mono text-lg text-slate-300">
-              <div className="flex flex-col items-center">
-                <label className="text-[10px] text-slate-500 font-bold uppercase mb-1">
-                  Min
-                </label>
-                <input
-                  type="number"
-                  value={min}
-                  onChange={(e) =>
-                    setMin(parseInt(e.target.value, 10) || 0)
-                  }
-                  className="w-16 bg-slate-800 border border-slate-600 rounded text-center text-white"
-                />
-              </div>
-              <span className="text-slate-500 font-bold text-2xl">≤</span>
-              <div className="text-cyan-400 font-bold">Input (N)</div>
-              <span className="text-slate-500 font-bold text-2xl">≤</span>
-              <div className="flex flex-col items-center">
-                <label className="text-[10px] text-slate-500 font-bold uppercase mb-1">
-                  Max
-                </label>
-                <input
-                  type="number"
-                  value={max}
-                  onChange={(e) =>
-                    setMax(parseInt(e.target.value, 10) || 0)
-                  }
-                  className="w-16 bg-slate-800 border border-slate-600 rounded text-center text-white"
-                />
-              </div>
-            </div>
-            <div className="relative h-24 my-12 w-full px-8">
-              <div className="absolute top-1/2 left-0 right-0 h-1 bg-slate-700 -translate-y-1/2 rounded-full"></div>
-              <div
-                className="absolute top-1/2 h-2 bg-green-500/30 -translate-y-1/2 rounded pointer-events-none transition-all duration-300"
-                style={{
-                  left: `${toPct(lo)}%`,
-                  width: `${Math.max(0, toPct(hi) - toPct(lo))}%`,
-                }}
-              ></div>
-              <div
-                className="absolute top-1/2 w-4 h-4 bg-slate-500 rounded-full -translate-y-1/2 border-2 border-slate-900 transition-all duration-300"
-                style={{
-                  left: `${toPct(min)}%`,
-                }}
-              >
-                <span className="absolute -top-8 left-1/2 -translate-x-1/2 text-xs font-bold text-slate-400">
-                  {min}
-                </span>
-              </div>
-              <div
-                className="absolute top-1/2 w-4 h-4 bg-slate-500 rounded-full -translate-y-1/2 border-2 border-slate-900 transition-all duration-300"
-                style={{
-                  left: `${toPct(max)}%`,
-                }}
-              >
-                <span className="absolute -top-8 left-1/2 -translate-x-1/2 text-xs font-bold text-slate-400">
-                  {max}
-                </span>
-              </div>
-              {val !== "" && !isNaN(parseFloat(val)) && (
-                <div
-                  className="absolute top-1/2 -translate-y-1/2 transition-all duration-300"
-                  style={{
-                    left: `${toPct(parseFloat(val))}%`,
-                  }}
-                >
-                  <div
-                    className={`w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[12px] ${
-                      status === "valid"
-                        ? "border-t-green-500"
-                        : "border-t-red-500"
-                    } absolute -top-1 -translate-x-1/2`}
-                  ></div>
-                  <div
-                    className={`mt-2 text-sm font-bold ${
-                      status === "valid" ? "text-green-400" : "text-red-400"
-                    } absolute -translate-x-1/2`}
-                  >
-                    {val}
-                  </div>
-                </div>
-              )}
-            </div>
-            <div className="max-w-xs mx-auto relative">
-              <input
-                type="number"
-                placeholder={`Enter ${min}-${max}`}
-                value={val}
-                onChange={check}
-                className={`w-full bg-slate-900 border-2 rounded-xl p-4 text-center text-3xl font-bold text-white outline-none input-box ${
-                  status === "valid"
-                    ? "input-valid"
-                    : status === "invalid"
-                    ? "input-invalid"
-                    : "border-slate-600 focus:border-cyan-500"
-                }`}
-              />
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                {status === "valid" && (
-                  <CheckCircle2 className="text-green-500" size={32} />
-                )}
-                {status === "invalid" && (
-                  <AlertOctagon className="text-red-500" size={32} />
-                )}
-              </div>
-            </div>
-            <div className="h-8">
-              {status === "invalid" && (
-                <p className="text-red-400 text-sm font-bold flex items-center justify-center gap-2 animate-bounce">
-                  <AlertOctagon size={16} /> Invalid: Input must be between{" "}
-                  {lo} and {hi} (inclusive).
-                </p>
-              )}
-              {status === "valid" && (
-                <p className="text-green-400 text-sm font-bold flex items-center justify-center gap-2">
-                  <CheckCircle2 size={16} /> Valid Input Accepted.
-                </p>
-              )}
-            </div>
-          </div>
-        );
-      };
-
-      const root = ReactDOM.createRoot(document.getElementById("root"));
-      root.render(<App />);
-    </script>
+const App = () => {
+  const [min, setMin] = useState(1);
+  const [max, setMax] = useState(100);
+  const [val, setVal] = useState("");
+  const [status, setStatus] = useState("idle");
+  const check = e => {
+    const input = e.target.value;
+    setVal(input);
+    if (input === "") {
+      setStatus("idle");
+      return;
+    }
+    const num = parseFloat(input);
+    if (isNaN(num)) {
+      setStatus("invalid");
+      return;
+    }
+    const lo = Math.min(min, max);
+    const hi = Math.max(min, max);
+    if (num >= lo && num <= hi) setStatus("valid");else setStatus("invalid");
+  };
+  const lo = Math.min(min, max);
+  const hi = Math.max(min, max);
+  const pad = Math.max((hi - lo) * 0.15, 1);
+  const viewMin = lo - pad;
+  const viewMax = hi + pad;
+  const viewW = viewMax - viewMin || 1;
+  const toPct = v => Math.min(100, Math.max(0, (v - viewMin) / viewW * 100));
+  return /*#__PURE__*/React.createElement("div", {
+    className: "space-y-8 text-center bg-slate-800 p-8 rounded-3xl border border-slate-700 shadow-2xl relative overflow-hidden"
+  }, /*#__PURE__*/React.createElement("header", null, /*#__PURE__*/React.createElement("h1", {
+    className: "text-3xl font-bold text-white mb-2 flex items-center justify-center gap-2"
+  }, /*#__PURE__*/React.createElement(ShieldCheck, {
+    className: "text-cyan-400"
+  }), " Data Validation: Range Check"), /*#__PURE__*/React.createElement("p", {
+    className: "text-slate-400"
+  }, "Paper 1A Q33 Concept")), /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center justify-center gap-4 bg-slate-900 p-4 rounded-xl border border-slate-800 font-mono text-lg text-slate-300"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex flex-col items-center"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "text-[10px] text-slate-500 font-bold uppercase mb-1"
+  }, "Min"), /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: min,
+    onChange: e => setMin(parseInt(e.target.value, 10) || 0),
+    className: "w-16 bg-slate-800 border border-slate-600 rounded text-center text-white"
+  })), /*#__PURE__*/React.createElement("span", {
+    className: "text-slate-500 font-bold text-2xl"
+  }, "≤"), /*#__PURE__*/React.createElement("div", {
+    className: "text-cyan-400 font-bold"
+  }, "Input (N)"), /*#__PURE__*/React.createElement("span", {
+    className: "text-slate-500 font-bold text-2xl"
+  }, "≤"), /*#__PURE__*/React.createElement("div", {
+    className: "flex flex-col items-center"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "text-[10px] text-slate-500 font-bold uppercase mb-1"
+  }, "Max"), /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: max,
+    onChange: e => setMax(parseInt(e.target.value, 10) || 0),
+    className: "w-16 bg-slate-800 border border-slate-600 rounded text-center text-white"
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "relative h-24 my-12 w-full px-8"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "absolute top-1/2 left-0 right-0 h-1 bg-slate-700 -translate-y-1/2 rounded-full"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "absolute top-1/2 h-2 bg-green-500/30 -translate-y-1/2 rounded pointer-events-none transition-all duration-300",
+    style: {
+      left: `${toPct(lo)}%`,
+      width: `${Math.max(0, toPct(hi) - toPct(lo))}%`
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "absolute top-1/2 w-4 h-4 bg-slate-500 rounded-full -translate-y-1/2 border-2 border-slate-900 transition-all duration-300",
+    style: {
+      left: `${toPct(min)}%`
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "absolute -top-8 left-1/2 -translate-x-1/2 text-xs font-bold text-slate-400"
+  }, min)), /*#__PURE__*/React.createElement("div", {
+    className: "absolute top-1/2 w-4 h-4 bg-slate-500 rounded-full -translate-y-1/2 border-2 border-slate-900 transition-all duration-300",
+    style: {
+      left: `${toPct(max)}%`
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "absolute -top-8 left-1/2 -translate-x-1/2 text-xs font-bold text-slate-400"
+  }, max)), val !== "" && !isNaN(parseFloat(val)) && /*#__PURE__*/React.createElement("div", {
+    className: "absolute top-1/2 -translate-y-1/2 transition-all duration-300",
+    style: {
+      left: `${toPct(parseFloat(val))}%`
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: `w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[12px] ${status === "valid" ? "border-t-green-500" : "border-t-red-500"} absolute -top-1 -translate-x-1/2`
+  }), /*#__PURE__*/React.createElement("div", {
+    className: `mt-2 text-sm font-bold ${status === "valid" ? "text-green-400" : "text-red-400"} absolute -translate-x-1/2`
+  }, val))), /*#__PURE__*/React.createElement("div", {
+    className: "max-w-xs mx-auto relative"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    placeholder: `Enter ${min}-${max}`,
+    value: val,
+    onChange: check,
+    className: `w-full bg-slate-900 border-2 rounded-xl p-4 text-center text-3xl font-bold text-white outline-none input-box ${status === "valid" ? "input-valid" : status === "invalid" ? "input-invalid" : "border-slate-600 focus:border-cyan-500"}`
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"
+  }, status === "valid" && /*#__PURE__*/React.createElement(CheckCircle2, {
+    className: "text-green-500",
+    size: 32
+  }), status === "invalid" && /*#__PURE__*/React.createElement(AlertOctagon, {
+    className: "text-red-500",
+    size: 32
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "h-8"
+  }, status === "invalid" && /*#__PURE__*/React.createElement("p", {
+    className: "text-red-400 text-sm font-bold flex items-center justify-center gap-2 animate-bounce"
+  }, /*#__PURE__*/React.createElement(AlertOctagon, {
+    size: 16
+  }), " Invalid: Input must be between", " ", lo, " and ", hi, " (inclusive)."), status === "valid" && /*#__PURE__*/React.createElement("p", {
+    className: "text-green-400 text-sm font-bold flex items-center justify-center gap-2"
+  }, /*#__PURE__*/React.createElement(CheckCircle2, {
+    size: 16
+  }), " Valid Input Accepted.")));
+};
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(/*#__PURE__*/React.createElement(App, null));
+</script>
   
       
       <!-- Footer -->

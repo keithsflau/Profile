@@ -1553,879 +1553,937 @@
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <!-- Babel Standalone for JSX transformation -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script>
+const {
+  useState
+} = React;
 
-    <script type="text/babel">
-        const { useState } = React;
+// Questions data
+const questions = [{
+  question: "「美麗」的反義詞是什麼？",
+  options: ["醜陋", "漂亮", "好看", "優雅"],
+  correct: 0,
+  explanation: "「美麗」的反義詞是「醜陋」，表示外表不好看。"
+}, {
+  question: "「快樂」的同義詞是什麼？",
+  options: ["開心", "難過", "生氣", "害怕"],
+  correct: 0,
+  explanation: "「快樂」和「開心」意思相近，都表示心情愉快。"
+}, {
+  question: "「他跑得很快」中的「得」是什麼詞？",
+  options: ["助詞", "動詞", "名詞", "形容詞"],
+  correct: 0,
+  explanation: "「得」在這裡是結構助詞，用於連接動詞和補語。"
+}, {
+  question: "「畫蛇添足」這個成語比喻什麼？",
+  options: ["多此一舉", "精益求精", "恰到好處", "完美無缺"],
+  correct: 0,
+  explanation: "「畫蛇添足」比喻做了多餘的事，非但無益，反而不合適。"
+}, {
+  question: "「美麗的花朵」中「美麗的」是什麼成分？",
+  options: ["定語", "狀語", "補語", "主語"],
+  correct: 0,
+  explanation: "「美麗的」修飾名詞「花朵」，是定語。"
+}, {
+  question: "「守株待兔」的故事告訴我們什麼道理？",
+  options: ["不應墨守成規", "應該勤奮工作", "要懂得變通", "以上皆是"],
+  correct: 3,
+  explanation: "「守株待兔」比喻不主動努力，而存萬一的僥倖心理，希望得到意外的收穫。"
+}, {
+  question: "「他認真地學習」中「認真地」是什麼成分？",
+  options: ["狀語", "定語", "補語", "謂語"],
+  correct: 0,
+  explanation: "「認真地」修飾動詞「學習」，是狀語。"
+}, {
+  question: "「亡羊補牢」的意思是？",
+  options: ["為時已晚", "及時補救", "無可挽回", "後悔莫及"],
+  correct: 1,
+  explanation: "「亡羊補牢」比喻出了問題以後想辦法補救，可以防止繼續受損失。"
+}, {
+  question: "「掩耳盜鈴」比喻什麼？",
+  options: ["自欺欺人", "聰明機智", "勇敢無畏", "誠實守信"],
+  correct: 0,
+  explanation: "「掩耳盜鈴」比喻自己欺騙自己，明明掩不住的事偏要設法掩蓋。"
+}, {
+  question: "「把」字句的基本結構是？",
+  options: ["主語+把+賓語+動詞", "主語+動詞+把+賓語", "把+主語+動詞+賓語", "動詞+把+主語+賓語"],
+  correct: 0,
+  explanation: "「把」字句的基本結構是「主語+把+賓語+動詞+其他成分」。"
+}, {
+  question: "「刻舟求劍」的故事說明什麼？",
+  options: ["事物是變化發展的", "要堅持不懈", "要勇敢嘗試", "要相信命運"],
+  correct: 0,
+  explanation: "「刻舟求劍」比喻不懂事物已發生變化而仍靜止地看問題。"
+}, {
+  question: "「被」字句表示什麼語義關係？",
+  options: ["被動", "主動", "使動", "意動"],
+  correct: 0,
+  explanation: "「被」字句表示被動關係，主語是動作的承受者。"
+}, {
+  question: "「春風又綠江南岸」中「綠」字的用法是？",
+  options: ["形容詞作動詞", "名詞作動詞", "動詞作名詞", "副詞作動詞"],
+  correct: 0,
+  explanation: "「綠」原本是形容詞，這裡活用為動詞，意思是「使...變綠」。"
+}, {
+  question: "「落紅不是無情物，化作春泥更護花」運用了什麼修辭手法？",
+  options: ["擬人", "比喻", "對偶", "以上皆是"],
+  correct: 3,
+  explanation: "這句詩運用了擬人（無情物）、比喻（化作春泥）和對偶的修辭手法。"
+}, {
+  question: "「但願人長久，千里共嬋娟」中的「嬋娟」指什麼？",
+  options: ["月亮", "美女", "美好", "長久"],
+  correct: 0,
+  explanation: "「嬋娟」在這裡指月亮，是借代修辭手法。"
+}, {
+  question: "「山重水複疑無路，柳暗花明又一村」運用了什麼修辭手法？",
+  options: ["對偶", "比喻", "擬人", "誇張"],
+  correct: 0,
+  explanation: "「山重水複」與「柳暗花明」形成對偶，結構對稱，意義相關。"
+}, {
+  question: "「春蠶到死絲方盡，蠟炬成灰淚始乾」中的「絲」和「淚」分別指什麼？",
+  options: ["蠶絲和蠟淚", "思念和眼淚", "頭髮和汗水", "絲線和淚水"],
+  correct: 1,
+  explanation: "「絲」諧音「思」，指思念；「淚」指蠟燭燃燒時流下的蠟油，比喻眼淚。"
+}, {
+  question: "「問君能有幾多愁？恰似一江春水向東流」運用了什麼修辭手法？",
+  options: ["比喻", "設問", "比喻和設問", "誇張"],
+  correct: 2,
+  explanation: "「問君能有幾多愁？」是設問，「恰似一江春水向東流」是比喻，將愁緒比作江水。"
+}, {
+  question: "「會當凌絕頂，一覽眾山小」表達了什麼情感？",
+  options: ["雄心壯志", "憂愁苦悶", "思鄉之情", "離別之痛"],
+  correct: 0,
+  explanation: "這句詩表達了詩人勇於攀登、不畏艱難的雄心壯志和遠大抱負。"
+}, {
+  question: "「海內存知己，天涯若比鄰」中的「比鄰」是什麼意思？",
+  options: ["鄰居", "附近", "旁邊", "相近"],
+  correct: 0,
+  explanation: "「比鄰」指近鄰、鄰居，整句意思是即使遠在天涯，也像近鄰一樣親近。"
+}];
 
-        // Questions data
-        const questions = [
-            {
-                question: "「美麗」的反義詞是什麼？",
-                options: ["醜陋", "漂亮", "好看", "優雅"],
-                correct: 0,
-                explanation: "「美麗」的反義詞是「醜陋」，表示外表不好看。"
-            },
-            {
-                question: "「快樂」的同義詞是什麼？",
-                options: ["開心", "難過", "生氣", "害怕"],
-                correct: 0,
-                explanation: "「快樂」和「開心」意思相近，都表示心情愉快。"
-            },
-            {
-                question: "「他跑得很快」中的「得」是什麼詞？",
-                options: ["助詞", "動詞", "名詞", "形容詞"],
-                correct: 0,
-                explanation: "「得」在這裡是結構助詞，用於連接動詞和補語。"
-            },
-            {
-                question: "「畫蛇添足」這個成語比喻什麼？",
-                options: ["多此一舉", "精益求精", "恰到好處", "完美無缺"],
-                correct: 0,
-                explanation: "「畫蛇添足」比喻做了多餘的事，非但無益，反而不合適。"
-            },
-            {
-                question: "「美麗的花朵」中「美麗的」是什麼成分？",
-                options: ["定語", "狀語", "補語", "主語"],
-                correct: 0,
-                explanation: "「美麗的」修飾名詞「花朵」，是定語。"
-            },
-            {
-                question: "「守株待兔」的故事告訴我們什麼道理？",
-                options: ["不應墨守成規", "應該勤奮工作", "要懂得變通", "以上皆是"],
-                correct: 3,
-                explanation: "「守株待兔」比喻不主動努力，而存萬一的僥倖心理，希望得到意外的收穫。"
-            },
-            {
-                question: "「他認真地學習」中「認真地」是什麼成分？",
-                options: ["狀語", "定語", "補語", "謂語"],
-                correct: 0,
-                explanation: "「認真地」修飾動詞「學習」，是狀語。"
-            },
-            {
-                question: "「亡羊補牢」的意思是？",
-                options: ["為時已晚", "及時補救", "無可挽回", "後悔莫及"],
-                correct: 1,
-                explanation: "「亡羊補牢」比喻出了問題以後想辦法補救，可以防止繼續受損失。"
-            },
-            {
-                question: "「掩耳盜鈴」比喻什麼？",
-                options: ["自欺欺人", "聰明機智", "勇敢無畏", "誠實守信"],
-                correct: 0,
-                explanation: "「掩耳盜鈴」比喻自己欺騙自己，明明掩不住的事偏要設法掩蓋。"
-            },
-            {
-                question: "「把」字句的基本結構是？",
-                options: ["主語+把+賓語+動詞", "主語+動詞+把+賓語", "把+主語+動詞+賓語", "動詞+把+主語+賓語"],
-                correct: 0,
-                explanation: "「把」字句的基本結構是「主語+把+賓語+動詞+其他成分」。"
-            },
-            {
-                question: "「刻舟求劍」的故事說明什麼？",
-                options: ["事物是變化發展的", "要堅持不懈", "要勇敢嘗試", "要相信命運"],
-                correct: 0,
-                explanation: "「刻舟求劍」比喻不懂事物已發生變化而仍靜止地看問題。"
-            },
-            {
-                question: "「被」字句表示什麼語義關係？",
-                options: ["被動", "主動", "使動", "意動"],
-                correct: 0,
-                explanation: "「被」字句表示被動關係，主語是動作的承受者。"
-            },
-            {
-                question: "「春風又綠江南岸」中「綠」字的用法是？",
-                options: ["形容詞作動詞", "名詞作動詞", "動詞作名詞", "副詞作動詞"],
-                correct: 0,
-                explanation: "「綠」原本是形容詞，這裡活用為動詞，意思是「使...變綠」。"
-            },
-            {
-                question: "「落紅不是無情物，化作春泥更護花」運用了什麼修辭手法？",
-                options: ["擬人", "比喻", "對偶", "以上皆是"],
-                correct: 3,
-                explanation: "這句詩運用了擬人（無情物）、比喻（化作春泥）和對偶的修辭手法。"
-            },
-            {
-                question: "「但願人長久，千里共嬋娟」中的「嬋娟」指什麼？",
-                options: ["月亮", "美女", "美好", "長久"],
-                correct: 0,
-                explanation: "「嬋娟」在這裡指月亮，是借代修辭手法。"
-            },
-            {
-                question: "「山重水複疑無路，柳暗花明又一村」運用了什麼修辭手法？",
-                options: ["對偶", "比喻", "擬人", "誇張"],
-                correct: 0,
-                explanation: "「山重水複」與「柳暗花明」形成對偶，結構對稱，意義相關。"
-            },
-            {
-                question: "「春蠶到死絲方盡，蠟炬成灰淚始乾」中的「絲」和「淚」分別指什麼？",
-                options: ["蠶絲和蠟淚", "思念和眼淚", "頭髮和汗水", "絲線和淚水"],
-                correct: 1,
-                explanation: "「絲」諧音「思」，指思念；「淚」指蠟燭燃燒時流下的蠟油，比喻眼淚。"
-            },
-            {
-                question: "「問君能有幾多愁？恰似一江春水向東流」運用了什麼修辭手法？",
-                options: ["比喻", "設問", "比喻和設問", "誇張"],
-                correct: 2,
-                explanation: "「問君能有幾多愁？」是設問，「恰似一江春水向東流」是比喻，將愁緒比作江水。"
-            },
-            {
-                question: "「會當凌絕頂，一覽眾山小」表達了什麼情感？",
-                options: ["雄心壯志", "憂愁苦悶", "思鄉之情", "離別之痛"],
-                correct: 0,
-                explanation: "這句詩表達了詩人勇於攀登、不畏艱難的雄心壯志和遠大抱負。"
-            },
-            {
-                question: "「海內存知己，天涯若比鄰」中的「比鄰」是什麼意思？",
-                options: ["鄰居", "附近", "旁邊", "相近"],
-                correct: 0,
-                explanation: "「比鄰」指近鄰、鄰居，整句意思是即使遠在天涯，也像近鄰一樣親近。"
-            }
-        ];
+// PatientCharacter Component
+function PatientCharacter({
+  currentLevel,
+  totalLevels,
+  health,
+  showResult,
+  isCorrect
+}) {
+  const getPatientState = () => {
+    // 如果剛答錯題目，顯示危險狀態
+    if (showResult && !isCorrect) {
+      if (health <= 20) {
+        return {
+          emoji: '😵',
+          status: '失血過多！',
+          level: 'level-critical',
+          statusClass: 'critical'
+        };
+      } else if (health <= 40) {
+        return {
+          emoji: '😰',
+          status: '危險！',
+          level: 'level-danger',
+          statusClass: 'danger'
+        };
+      } else {
+        return {
+          emoji: '😟',
+          status: '受傷了',
+          level: 'level-danger',
+          statusClass: 'danger'
+        };
+      }
+    }
 
-        // PatientCharacter Component
-        function PatientCharacter({ currentLevel, totalLevels, health, showResult, isCorrect }) {
-            const getPatientState = () => {
-                // 如果剛答錯題目，顯示危險狀態
-                if (showResult && !isCorrect) {
-                    if (health <= 20) {
-                        return { emoji: '😵', status: '失血過多！', level: 'level-critical', statusClass: 'critical' };
-                    } else if (health <= 40) {
-                        return { emoji: '😰', status: '危險！', level: 'level-danger', statusClass: 'danger' };
-                    } else {
-                        return { emoji: '😟', status: '受傷了', level: 'level-danger', statusClass: 'danger' };
-                    }
-                }
-                
-                // 根據生命值顯示狀態
-                if (health <= 20) {
-                    return { emoji: '😵', status: '失血過多！', level: 'level-critical', statusClass: 'critical' };
-                } else if (health <= 40) {
-                    return { emoji: '😰', status: '危險！', level: 'level-danger', statusClass: 'danger' };
-                } else if (health <= 60) {
-                    return { emoji: '😐', status: '需要治療', level: 'level-low' };
-                }
-                
-                // 根據進度顯示正常狀態
-                const progress = currentLevel / totalLevels;
-                if (progress < 0.25) {
-                    return { emoji: '😊', status: '開始學習', level: 'level-low' };
-                } else if (progress < 0.5) {
-                    return { emoji: '😄', status: '漸入佳境', level: 'level-mid' };
-                } else if (progress < 0.75) {
-                    return { emoji: '😆', status: '越戰越勇', level: 'level-high' };
-                } else {
-                    return { emoji: '🤩', status: '得意洋洋', level: 'level-max' };
-                }
-            };
+    // 根據生命值顯示狀態
+    if (health <= 20) {
+      return {
+        emoji: '😵',
+        status: '失血過多！',
+        level: 'level-critical',
+        statusClass: 'critical'
+      };
+    } else if (health <= 40) {
+      return {
+        emoji: '😰',
+        status: '危險！',
+        level: 'level-danger',
+        statusClass: 'danger'
+      };
+    } else if (health <= 60) {
+      return {
+        emoji: '😐',
+        status: '需要治療',
+        level: 'level-low'
+      };
+    }
 
-            const patientState = getPatientState();
+    // 根據進度顯示正常狀態
+    const progress = currentLevel / totalLevels;
+    if (progress < 0.25) {
+      return {
+        emoji: '😊',
+        status: '開始學習',
+        level: 'level-low'
+      };
+    } else if (progress < 0.5) {
+      return {
+        emoji: '😄',
+        status: '漸入佳境',
+        level: 'level-mid'
+      };
+    } else if (progress < 0.75) {
+      return {
+        emoji: '😆',
+        status: '越戰越勇',
+        level: 'level-high'
+      };
+    } else {
+      return {
+        emoji: '🤩',
+        status: '得意洋洋',
+        level: 'level-max'
+      };
+    }
+  };
+  const patientState = getPatientState();
+  return /*#__PURE__*/React.createElement("div", {
+    className: "patient-character"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: `patient-avatar ${patientState.level}`
+  }, patientState.emoji), /*#__PURE__*/React.createElement("div", {
+    className: `patient-status ${patientState.statusClass || ''}`
+  }, patientState.status), health !== undefined && /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: '0.5rem',
+      fontSize: '0.75rem',
+      color: health <= 40 ? '#DC143C' : '#FFD700',
+      fontWeight: 'bold'
+    }
+  }, "生命值: ", health, "%"));
+}
 
-            return (
-                <div className="patient-character">
-                    <div className={`patient-avatar ${patientState.level}`}>
-                        {patientState.emoji}
-                    </div>
-                    <div className={`patient-status ${patientState.statusClass || ''}`}>
-                        {patientState.status}
-                    </div>
-                    {health !== undefined && (
-                        <div style={{ 
-                            marginTop: '0.5rem', 
-                            fontSize: '0.75rem', 
-                            color: health <= 40 ? '#DC143C' : '#FFD700',
-                            fontWeight: 'bold'
-                        }}>
-                            生命值: {health}%
-                        </div>
-                    )}
-                </div>
-            );
+// GameScene Component
+function GameScene({
+  currentLevel,
+  totalLevels,
+  health,
+  showResult,
+  isCorrect
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "game-scene-2d"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "scene-title"
+  }, "語文百萬富翁"), /*#__PURE__*/React.createElement("div", {
+    className: "scene-level"
+  }, "第 ", currentLevel, " 題"), /*#__PURE__*/React.createElement(PatientCharacter, {
+    currentLevel: currentLevel,
+    totalLevels: totalLevels,
+    health: health,
+    showResult: showResult,
+    isCorrect: isCorrect
+  }));
+}
+
+// QuestionPanel Component
+function QuestionPanel({
+  question,
+  selectedAnswer,
+  onAnswerSelect,
+  onConfirm,
+  showResult,
+  isCorrect,
+  currentPrize,
+  guaranteedPrize,
+  onWalkAway,
+  usedLifelines
+}) {
+  const getAnswerClass = index => {
+    let className = 'answer-option';
+    if (showResult) {
+      if (index === question.correct) {
+        className += ' correct';
+      } else if (index === selectedAnswer && !isCorrect) {
+        className += ' wrong';
+      }
+    } else if (index === selectedAnswer) {
+      className += ' selected';
+    }
+    return className;
+  };
+  const getAnswerLabel = index => {
+    if (usedLifelines.fiftyFifty && index !== question.correct) {
+      const wrongAnswers = question.options.map((_, idx) => idx).filter(idx => idx !== question.correct);
+      const hiddenAnswers = wrongAnswers.slice(0, 2);
+      if (hiddenAnswers.includes(index)) {
+        return null;
+      }
+    }
+    return String.fromCharCode(65 + index);
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    className: "question-panel"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "question-header"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "prize-info"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "current-prize"
+  }, "當前獎金: $", currentPrize.toLocaleString()), guaranteedPrize > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "guaranteed-prize"
+  }, "保證獎金: $", guaranteedPrize.toLocaleString())), /*#__PURE__*/React.createElement("button", {
+    className: "walk-away-button",
+    onClick: onWalkAway,
+    disabled: showResult
+  }, "退出遊戲")), /*#__PURE__*/React.createElement("div", {
+    className: "question-content"
+  }, /*#__PURE__*/React.createElement("h2", {
+    className: "question-text"
+  }, question.question), /*#__PURE__*/React.createElement("div", {
+    className: "answers-grid"
+  }, question.options.map((option, index) => {
+    const label = getAnswerLabel(index);
+    if (label === null) return null;
+    return /*#__PURE__*/React.createElement("button", {
+      key: index,
+      className: getAnswerClass(index),
+      onClick: () => onAnswerSelect(index),
+      disabled: showResult
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "answer-label"
+    }, label, "."), /*#__PURE__*/React.createElement("span", {
+      className: "answer-text"
+    }, option));
+  })), selectedAnswer !== null && !showResult && /*#__PURE__*/React.createElement("button", {
+    className: "confirm-button",
+    onClick: onConfirm
+  }, "確認答案"), showResult && /*#__PURE__*/React.createElement("div", {
+    className: `result-message ${isCorrect ? 'correct' : 'wrong'}`
+  }, isCorrect ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "result-icon"
+  }, "✓"), /*#__PURE__*/React.createElement("div", {
+    className: "result-text"
+  }, "答對了！"), /*#__PURE__*/React.createElement("div", {
+    className: "result-explanation"
+  }, question.explanation)) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "result-icon"
+  }, "✗"), /*#__PURE__*/React.createElement("div", {
+    className: "result-text"
+  }, "答錯了"), /*#__PURE__*/React.createElement("div", {
+    className: "result-explanation"
+  }, "正確答案是: ", question.options[question.correct]), /*#__PURE__*/React.createElement("div", {
+    className: "result-explanation"
+  }, question.explanation)))));
+}
+
+// PrizeLadder Component
+function PrizeLadder({
+  prizeLevels,
+  currentLevel
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "prize-ladder"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "ladder-title"
+  }, "獎金等級"), /*#__PURE__*/React.createElement("div", {
+    className: "ladder-list"
+  }, prizeLevels.slice().reverse().map((prize, index) => {
+    const actualLevel = prizeLevels.length - index;
+    const isCurrent = actualLevel === currentLevel;
+    const isPassed = actualLevel < currentLevel;
+    return /*#__PURE__*/React.createElement("div", {
+      key: prize.level,
+      className: `ladder-item ${isCurrent ? 'current' : ''} ${isPassed ? 'passed' : ''} ${prize.safe ? 'safe' : ''}`
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "level-number"
+    }, prize.level), /*#__PURE__*/React.createElement("div", {
+      className: "prize-amount"
+    }, "$", prize.amount.toLocaleString()), prize.safe && /*#__PURE__*/React.createElement("div", {
+      className: "safe-marker"
+    }, "安全線"));
+  })));
+}
+
+// Lifelines Component
+function Lifelines({
+  usedLifelines,
+  onUseLifeline,
+  currentQuestion,
+  selectedAnswer
+}) {
+  const [showPhoneFriend, setShowPhoneFriend] = useState(false);
+  const [showAudience, setShowAudience] = useState(false);
+  const handleFiftyFifty = () => {
+    if (!usedLifelines.fiftyFifty) {
+      onUseLifeline('fiftyFifty');
+    }
+  };
+  const handlePhoneFriend = () => {
+    if (!usedLifelines.phoneAFriend) {
+      onUseLifeline('phoneAFriend');
+      setShowPhoneFriend(true);
+      setTimeout(() => setShowPhoneFriend(false), 5000);
+    }
+  };
+  const handleAskAudience = () => {
+    if (!usedLifelines.askAudience) {
+      onUseLifeline('askAudience');
+      setShowAudience(true);
+      setTimeout(() => setShowAudience(false), 5000);
+    }
+  };
+  const getPhoneFriendAdvice = () => {
+    const isCorrect = Math.random() < 0.7;
+    if (isCorrect) {
+      return `我認為答案是 ${String.fromCharCode(65 + currentQuestion.correct)}`;
+    } else {
+      const wrongOptions = currentQuestion.options.map((_, idx) => idx).filter(idx => idx !== currentQuestion.correct);
+      const randomWrong = wrongOptions[Math.floor(Math.random() * wrongOptions.length)];
+      return `我認為答案是 ${String.fromCharCode(65 + randomWrong)}`;
+    }
+  };
+  const getAudiencePoll = () => {
+    const percentages = [0, 0, 0, 0];
+    const correctIndex = currentQuestion.correct;
+    percentages[correctIndex] = 40 + Math.random() * 20;
+    const remaining = 100 - percentages[correctIndex];
+    for (let i = 0; i < 4; i++) {
+      if (i !== correctIndex) {
+        percentages[i] = remaining / 3 + (Math.random() - 0.5) * 10;
+      }
+    }
+    const sum = percentages.reduce((a, b) => a + b, 0);
+    percentages.forEach((_, i) => {
+      percentages[i] = Math.round(percentages[i] / sum * 100);
+    });
+    return percentages;
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    className: "lifelines"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "lifelines-title"
+  }, "生命線"), /*#__PURE__*/React.createElement("div", {
+    className: "lifeline-item"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: `lifeline-button ${usedLifelines.fiftyFifty ? 'used' : ''}`,
+    onClick: handleFiftyFifty,
+    disabled: usedLifelines.fiftyFifty || selectedAnswer !== null
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "lifeline-icon"
+  }, "50:50"), /*#__PURE__*/React.createElement("span", {
+    className: "lifeline-label"
+  }, "50/50")), usedLifelines.fiftyFifty && /*#__PURE__*/React.createElement("span", {
+    className: "used-label"
+  }, "已使用")), /*#__PURE__*/React.createElement("div", {
+    className: "lifeline-item"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: `lifeline-button ${usedLifelines.phoneAFriend ? 'used' : ''}`,
+    onClick: handlePhoneFriend,
+    disabled: usedLifelines.phoneAFriend || selectedAnswer !== null
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "lifeline-icon"
+  }, "📞"), /*#__PURE__*/React.createElement("span", {
+    className: "lifeline-label"
+  }, "打電話")), usedLifelines.phoneAFriend && /*#__PURE__*/React.createElement("span", {
+    className: "used-label"
+  }, "已使用"), showPhoneFriend && /*#__PURE__*/React.createElement("div", {
+    className: "lifeline-result phone-result"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "result-title"
+  }, "朋友建議："), /*#__PURE__*/React.createElement("div", {
+    className: "result-content"
+  }, getPhoneFriendAdvice()))), /*#__PURE__*/React.createElement("div", {
+    className: "lifeline-item"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: `lifeline-button ${usedLifelines.askAudience ? 'used' : ''}`,
+    onClick: handleAskAudience,
+    disabled: usedLifelines.askAudience || selectedAnswer !== null
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "lifeline-icon"
+  }, "👥"), /*#__PURE__*/React.createElement("span", {
+    className: "lifeline-label"
+  }, "問觀眾")), usedLifelines.askAudience && /*#__PURE__*/React.createElement("span", {
+    className: "used-label"
+  }, "已使用"), showAudience && /*#__PURE__*/React.createElement("div", {
+    className: "lifeline-result audience-result"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "result-title"
+  }, "觀眾投票："), /*#__PURE__*/React.createElement("div", {
+    className: "audience-poll"
+  }, getAudiencePoll().map((percentage, index) => /*#__PURE__*/React.createElement("div", {
+    key: index,
+    className: "poll-item"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "poll-label"
+  }, String.fromCharCode(65 + index)), /*#__PURE__*/React.createElement("div", {
+    className: "poll-bar-container"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "poll-bar",
+    style: {
+      width: `${percentage}%`
+    }
+  }, percentage, "%"))))))));
+}
+
+// GameOverModal Component
+function GameOverModal({
+  reason,
+  finalScore,
+  guaranteedPrize,
+  onRestart,
+  completedLevels,
+  totalLevels,
+  playerName
+}) {
+  // Calculate completed levels correctly
+  const levelsCompleted = completedLevels || 0;
+
+  // 獲取排行榜
+  const getLeaderboard = () => {
+    const stored = localStorage.getItem('millionaireLeaderboard');
+    return stored ? JSON.parse(stored) : [];
+  };
+  const leaderboard = getLeaderboard();
+  const reasonText = reason === 'win' ? '恭喜完成所有關卡！' : reason === 'walk' ? '你選擇領取獎金離開' : '答錯了，遊戲結束';
+  return /*#__PURE__*/React.createElement("div", {
+    className: "game-over-overlay"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "game-over-modal"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: '4rem',
+      marginBottom: '1rem'
+    }
+  }, reason === 'win' ? '🎉' : reason === 'walk' ? '💰' : '😢'), /*#__PURE__*/React.createElement("h1", {
+    className: "game-over-title",
+    style: {
+      fontSize: '2.5rem',
+      marginBottom: '0.5rem'
+    }
+  }, reasonText), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: '1.2rem',
+      marginBottom: '0.5rem',
+      color: '#000000',
+      fontWeight: 'bold'
+    }
+  }, "玩家: ", playerName || '匿名玩家'), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: '1.5rem',
+      marginBottom: '1rem',
+      color: '#000000',
+      fontWeight: 'bold'
+    }
+  }, "你完成了 ", levelsCompleted, " 關！"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      border: '3px solid #000000',
+      borderRadius: '15px',
+      padding: '1rem',
+      marginBottom: '2rem',
+      background: '#FFFFFF'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.5rem',
+      marginBottom: '0.5rem'
+    }
+  }, /*#__PURE__*/React.createElement("span", null, "💰"), /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: '1.2rem',
+      color: '#000000',
+      fontWeight: 'bold'
+    }
+  }, "最終獎金")), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: '2rem',
+      color: '#000000',
+      fontWeight: 'bold',
+      textAlign: 'center'
+    }
+  }, "$", finalScore.toLocaleString())), /*#__PURE__*/React.createElement("div", {
+    style: {
+      border: '3px solid #000000',
+      borderRadius: '15px',
+      padding: '1rem',
+      marginBottom: '2rem',
+      background: '#FFFFFF',
+      maxHeight: '300px',
+      overflowY: 'auto'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.5rem',
+      marginBottom: '1rem'
+    }
+  }, /*#__PURE__*/React.createElement("span", null, "📊"), /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: '1.2rem',
+      color: '#000000',
+      fontWeight: 'bold'
+    }
+  }, "獎金榜")), leaderboard.length === 0 ? /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: '#000000',
+      textAlign: 'center'
+    }
+  }, "暫無記錄") : leaderboard.map((entry, index) => /*#__PURE__*/React.createElement("div", {
+    key: index,
+    style: {
+      border: '2px solid #000000',
+      borderRadius: '10px',
+      padding: '0.8rem',
+      marginBottom: '0.5rem',
+      background: index === 0 ? '#FFEB3B' : '#FFFFFF',
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.5rem'
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: '1.2rem'
+    }
+  }, index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: '1rem',
+      color: '#000000',
+      fontWeight: 'bold'
+    }
+  }, entry.name)), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: '1rem',
+      color: '#000000',
+      fontWeight: 'bold'
+    }
+  }, "$", entry.prize.toLocaleString())))), /*#__PURE__*/React.createElement("button", {
+    className: "restart-button",
+    onClick: onRestart,
+    style: {
+      marginTop: '1rem'
+    }
+  }, "⭐ 返回主選單")));
+}
+
+// Main App Component
+function App() {
+  const [gameState, setGameState] = useState('menu');
+  const [playerName, setPlayerName] = useState('');
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [score, setScore] = useState(0);
+  const [health, setHealth] = useState(100);
+  const [usedLifelines, setUsedLifelines] = useState({
+    fiftyFifty: false,
+    phoneAFriend: false,
+    askAudience: false
+  });
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [showResult, setShowResult] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(false);
+  const [gameOverReason, setGameOverReason] = useState('');
+
+  // 獲取排行榜
+  const getLeaderboard = () => {
+    const stored = localStorage.getItem('millionaireLeaderboard');
+    return stored ? JSON.parse(stored) : [];
+  };
+
+  // 保存到排行榜
+  const saveToLeaderboard = (name, prize) => {
+    const leaderboard = getLeaderboard();
+    leaderboard.push({
+      name: name || '匿名玩家',
+      prize: prize,
+      date: new Date().toLocaleString('zh-HK')
+    });
+    // 按獎金排序
+    leaderboard.sort((a, b) => b.prize - a.prize);
+    // 只保留前10名
+    const top10 = leaderboard.slice(0, 10);
+    localStorage.setItem('millionaireLeaderboard', JSON.stringify(top10));
+  };
+  const prizeLevels = [{
+    level: 1,
+    amount: 100,
+    safe: false
+  }, {
+    level: 2,
+    amount: 200,
+    safe: false
+  }, {
+    level: 3,
+    amount: 300,
+    safe: false
+  }, {
+    level: 4,
+    amount: 500,
+    safe: true
+  }, {
+    level: 5,
+    amount: 1000,
+    safe: false
+  }, {
+    level: 6,
+    amount: 2000,
+    safe: false
+  }, {
+    level: 7,
+    amount: 4000,
+    safe: false
+  }, {
+    level: 8,
+    amount: 8000,
+    safe: true
+  }, {
+    level: 9,
+    amount: 16000,
+    safe: false
+  }, {
+    level: 10,
+    amount: 32000,
+    safe: false
+  }, {
+    level: 11,
+    amount: 64000,
+    safe: false
+  }, {
+    level: 12,
+    amount: 125000,
+    safe: true
+  }, {
+    level: 13,
+    amount: 250000,
+    safe: false
+  }, {
+    level: 14,
+    amount: 500000,
+    safe: false
+  }, {
+    level: 15,
+    amount: 1000000,
+    safe: false
+  }, {
+    level: 16,
+    amount: 2000000,
+    safe: false
+  }, {
+    level: 17,
+    amount: 4000000,
+    safe: false
+  }, {
+    level: 18,
+    amount: 8000000,
+    safe: true
+  }, {
+    level: 19,
+    amount: 16000000,
+    safe: false
+  }, {
+    level: 20,
+    amount: 32000000,
+    safe: false
+  }];
+  const startGame = () => {
+    if (!playerName.trim()) {
+      alert('請輸入你的名字！');
+      return;
+    }
+    setGameState('playing');
+    setCurrentQuestion(0);
+    setScore(0);
+    setHealth(100);
+    setUsedLifelines({
+      fiftyFifty: false,
+      phoneAFriend: false,
+      askAudience: false
+    });
+    setSelectedAnswer(null);
+    setShowResult(false);
+  };
+  const handleAnswerSelect = answerIndex => {
+    if (showResult) return;
+    setSelectedAnswer(answerIndex);
+  };
+  const handleConfirmAnswer = () => {
+    if (selectedAnswer === null) return;
+    const question = questions[currentQuestion];
+    const correct = selectedAnswer === question.correct;
+    setIsCorrect(correct);
+    setShowResult(true);
+    if (correct) {
+      const newScore = prizeLevels[currentQuestion].amount;
+      setScore(newScore);
+      // 答對可以恢復少量生命值
+      setHealth(prev => Math.min(100, prev + 5));
+      setTimeout(() => {
+        if (currentQuestion === questions.length - 1) {
+          const finalPrize = prizeLevels[currentQuestion].amount;
+          saveToLeaderboard(playerName, finalPrize);
+          setGameState('gameOver');
+          setGameOverReason('win');
+        } else {
+          setCurrentQuestion(currentQuestion + 1);
+          setSelectedAnswer(null);
+          setShowResult(false);
         }
-
-        // GameScene Component
-        function GameScene({ currentLevel, totalLevels, health, showResult, isCorrect }) {
-            return (
-                <div className="game-scene-2d">
-                    <div className="scene-title">語文百萬富翁</div>
-                    <div className="scene-level">第 {currentLevel} 題</div>
-                    <PatientCharacter 
-                        currentLevel={currentLevel} 
-                        totalLevels={totalLevels}
-                        health={health}
-                        showResult={showResult}
-                        isCorrect={isCorrect}
-                    />
-                </div>
-            );
+      }, 3000);
+    } else {
+      // 答錯立即結束遊戲，顯示最後取得的獎金
+      const isSafeLevel = prizeLevels[currentQuestion].safe;
+      let finalPrize = 0;
+      if (isSafeLevel) {
+        finalPrize = prizeLevels[currentQuestion].amount;
+      } else {
+        const previousSafeLevels = prizeLevels.filter(p => p.safe && p.level < currentQuestion + 1);
+        if (previousSafeLevels.length > 0) {
+          finalPrize = previousSafeLevels[previousSafeLevels.length - 1].amount;
+        } else {
+          finalPrize = 0;
         }
+      }
+      setScore(finalPrize);
+      setTimeout(() => {
+        saveToLeaderboard(playerName, finalPrize);
+        setGameState('gameOver');
+        setGameOverReason('wrong');
+      }, 3000);
+    }
+  };
+  const handleWalkAway = () => {
+    const currentPrize = getCurrentPrize();
+    setScore(currentPrize);
+    saveToLeaderboard(playerName, currentPrize);
+    setGameState('gameOver');
+    setGameOverReason('walk');
+  };
+  const handleLifeline = lifelineType => {
+    if (usedLifelines[lifelineType]) return;
+    setUsedLifelines(prev => ({
+      ...prev,
+      [lifelineType]: true
+    }));
+  };
+  const getCurrentPrize = () => {
+    return prizeLevels[currentQuestion].amount;
+  };
+  const getGuaranteedPrize = () => {
+    const safeLevels = prizeLevels.filter(p => p.safe && p.level <= currentQuestion + 1);
+    if (safeLevels.length === 0) return 0;
+    return safeLevels[safeLevels.length - 1].amount;
+  };
+  if (!questions || questions.length === 0) {
+    return /*#__PURE__*/React.createElement("div", {
+      style: {
+        padding: '20px',
+        color: 'white',
+        background: 'red'
+      }
+    }, "錯誤：無法載入題目數據！");
+  }
+  return /*#__PURE__*/React.createElement("div", {
+    className: "app"
+  }, gameState === 'menu' && /*#__PURE__*/React.createElement("div", {
+    className: "menu-screen"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "menu-content"
+  }, /*#__PURE__*/React.createElement("h1", {
+    className: "menu-title"
+  }, "語文百萬富翁"), /*#__PURE__*/React.createElement("p", {
+    className: "menu-subtitle"
+  }, "中一中文學習遊戲"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: '2rem',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: '1rem'
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "text",
+    placeholder: "輸入你的名字",
+    value: playerName,
+    onChange: e => setPlayerName(e.target.value),
+    onKeyPress: e => e.key === 'Enter' && startGame(),
+    style: {
+      padding: '0.8rem 1.5rem',
+      fontSize: '1.2rem',
+      border: '3px solid #000000',
+      borderRadius: '10px',
+      textAlign: 'center',
+      width: '300px',
+      background: '#FFFFFF',
+      color: '#000000'
+    }
+  })), /*#__PURE__*/React.createElement("button", {
+    className: "start-button",
+    onClick: startGame
+  }, "開始遊戲"))), gameState === 'playing' && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "game-container"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "left-panel"
+  }, /*#__PURE__*/React.createElement(PrizeLadder, {
+    prizeLevels: prizeLevels,
+    currentLevel: currentQuestion + 1
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "center-panel"
+  }, /*#__PURE__*/React.createElement(GameScene, {
+    currentLevel: currentQuestion + 1,
+    totalLevels: prizeLevels.length,
+    health: health,
+    showResult: showResult,
+    isCorrect: isCorrect
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "right-panel"
+  }, /*#__PURE__*/React.createElement(Lifelines, {
+    usedLifelines: usedLifelines,
+    onUseLifeline: handleLifeline,
+    currentQuestion: questions[currentQuestion],
+    selectedAnswer: selectedAnswer
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "bottom-panel"
+  }, /*#__PURE__*/React.createElement(QuestionPanel, {
+    question: questions[currentQuestion],
+    selectedAnswer: selectedAnswer,
+    onAnswerSelect: handleAnswerSelect,
+    onConfirm: handleConfirmAnswer,
+    showResult: showResult,
+    isCorrect: isCorrect,
+    currentPrize: getCurrentPrize(),
+    guaranteedPrize: getGuaranteedPrize(),
+    onWalkAway: handleWalkAway,
+    usedLifelines: usedLifelines
+  }))), gameState === 'gameOver' && /*#__PURE__*/React.createElement(GameOverModal, {
+    reason: gameOverReason,
+    finalScore: score,
+    guaranteedPrize: getGuaranteedPrize(),
+    onRestart: () => {
+      setGameState('menu');
+      setPlayerName('');
+    },
+    playerName: playerName,
+    completedLevels: gameOverReason === 'win' ? questions.length : currentQuestion,
+    totalLevels: questions.length
+  }));
+}
 
-        // QuestionPanel Component
-        function QuestionPanel({
-            question,
-            selectedAnswer,
-            onAnswerSelect,
-            onConfirm,
-            showResult,
-            isCorrect,
-            currentPrize,
-            guaranteedPrize,
-            onWalkAway,
-            usedLifelines
-        }) {
-            const getAnswerClass = (index) => {
-                let className = 'answer-option';
-                
-                if (showResult) {
-                    if (index === question.correct) {
-                        className += ' correct';
-                    } else if (index === selectedAnswer && !isCorrect) {
-                        className += ' wrong';
-                    }
-                } else if (index === selectedAnswer) {
-                    className += ' selected';
-                }
-                
-                return className;
-            };
-
-            const getAnswerLabel = (index) => {
-                if (usedLifelines.fiftyFifty && index !== question.correct) {
-                    const wrongAnswers = question.options
-                        .map((_, idx) => idx)
-                        .filter(idx => idx !== question.correct);
-                    const hiddenAnswers = wrongAnswers.slice(0, 2);
-                    if (hiddenAnswers.includes(index)) {
-                        return null;
-                    }
-                }
-                return String.fromCharCode(65 + index);
-            };
-
-            return (
-                <div className="question-panel">
-                    <div className="question-header">
-                        <div className="prize-info">
-                            <div className="current-prize">
-                                當前獎金: ${currentPrize.toLocaleString()}
-                            </div>
-                            {guaranteedPrize > 0 && (
-                                <div className="guaranteed-prize">
-                                    保證獎金: ${guaranteedPrize.toLocaleString()}
-                                </div>
-                            )}
-                        </div>
-                        <button 
-                            className="walk-away-button"
-                            onClick={onWalkAway}
-                            disabled={showResult}
-                        >
-                            退出遊戲
-                        </button>
-                    </div>
-
-                    <div className="question-content">
-                        <h2 className="question-text">{question.question}</h2>
-                        
-                        <div className="answers-grid">
-                            {question.options.map((option, index) => {
-                                const label = getAnswerLabel(index);
-                                if (label === null) return null;
-                                
-                                return (
-                                    <button
-                                        key={index}
-                                        className={getAnswerClass(index)}
-                                        onClick={() => onAnswerSelect(index)}
-                                        disabled={showResult}
-                                    >
-                                        <span className="answer-label">{label}.</span>
-                                        <span className="answer-text">{option}</span>
-                                    </button>
-                                );
-                            })}
-                        </div>
-
-                        {selectedAnswer !== null && !showResult && (
-                            <button 
-                                className="confirm-button"
-                                onClick={onConfirm}
-                            >
-                                確認答案
-                            </button>
-                        )}
-
-                        {showResult && (
-                            <div className={`result-message ${isCorrect ? 'correct' : 'wrong'}`}>
-                                {isCorrect ? (
-                                    <>
-                                        <div className="result-icon">✓</div>
-                                        <div className="result-text">答對了！</div>
-                                        <div className="result-explanation">{question.explanation}</div>
-                                    </>
-                                ) : (
-                                    <>
-                                        <div className="result-icon">✗</div>
-                                        <div className="result-text">答錯了</div>
-                                        <div className="result-explanation">
-                                            正確答案是: {question.options[question.correct]}
-                                        </div>
-                                        <div className="result-explanation">{question.explanation}</div>
-                                    </>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                </div>
-            );
-        }
-
-        // PrizeLadder Component
-        function PrizeLadder({ prizeLevels, currentLevel }) {
-            return (
-                <div className="prize-ladder">
-                    <h3 className="ladder-title">獎金等級</h3>
-                    <div className="ladder-list">
-                        {prizeLevels.slice().reverse().map((prize, index) => {
-                            const actualLevel = prizeLevels.length - index;
-                            const isCurrent = actualLevel === currentLevel;
-                            const isPassed = actualLevel < currentLevel;
-                            
-                            return (
-                                <div
-                                    key={prize.level}
-                                    className={`ladder-item ${isCurrent ? 'current' : ''} ${isPassed ? 'passed' : ''} ${prize.safe ? 'safe' : ''}`}
-                                >
-                                    <div className="level-number">{prize.level}</div>
-                                    <div className="prize-amount">
-                                        ${prize.amount.toLocaleString()}
-                                    </div>
-                                    {prize.safe && (
-                                        <div className="safe-marker">安全線</div>
-                                    )}
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            );
-        }
-
-        // Lifelines Component
-        function Lifelines({ usedLifelines, onUseLifeline, currentQuestion, selectedAnswer }) {
-            const [showPhoneFriend, setShowPhoneFriend] = useState(false);
-            const [showAudience, setShowAudience] = useState(false);
-
-            const handleFiftyFifty = () => {
-                if (!usedLifelines.fiftyFifty) {
-                    onUseLifeline('fiftyFifty');
-                }
-            };
-
-            const handlePhoneFriend = () => {
-                if (!usedLifelines.phoneAFriend) {
-                    onUseLifeline('phoneAFriend');
-                    setShowPhoneFriend(true);
-                    setTimeout(() => setShowPhoneFriend(false), 5000);
-                }
-            };
-
-            const handleAskAudience = () => {
-                if (!usedLifelines.askAudience) {
-                    onUseLifeline('askAudience');
-                    setShowAudience(true);
-                    setTimeout(() => setShowAudience(false), 5000);
-                }
-            };
-
-            const getPhoneFriendAdvice = () => {
-                const isCorrect = Math.random() < 0.7;
-                if (isCorrect) {
-                    return `我認為答案是 ${String.fromCharCode(65 + currentQuestion.correct)}`;
-                } else {
-                    const wrongOptions = currentQuestion.options
-                        .map((_, idx) => idx)
-                        .filter(idx => idx !== currentQuestion.correct);
-                    const randomWrong = wrongOptions[Math.floor(Math.random() * wrongOptions.length)];
-                    return `我認為答案是 ${String.fromCharCode(65 + randomWrong)}`;
-                }
-            };
-
-            const getAudiencePoll = () => {
-                const percentages = [0, 0, 0, 0];
-                const correctIndex = currentQuestion.correct;
-                
-                percentages[correctIndex] = 40 + Math.random() * 20;
-                
-                const remaining = 100 - percentages[correctIndex];
-                for (let i = 0; i < 4; i++) {
-                    if (i !== correctIndex) {
-                        percentages[i] = remaining / 3 + (Math.random() - 0.5) * 10;
-                    }
-                }
-                
-                const sum = percentages.reduce((a, b) => a + b, 0);
-                percentages.forEach((_, i) => {
-                    percentages[i] = Math.round((percentages[i] / sum) * 100);
-                });
-                
-                return percentages;
-            };
-
-            return (
-                <div className="lifelines">
-                    <h3 className="lifelines-title">生命線</h3>
-                    
-                    <div className="lifeline-item">
-                        <button
-                            className={`lifeline-button ${usedLifelines.fiftyFifty ? 'used' : ''}`}
-                            onClick={handleFiftyFifty}
-                            disabled={usedLifelines.fiftyFifty || selectedAnswer !== null}
-                        >
-                            <span className="lifeline-icon">50:50</span>
-                            <span className="lifeline-label">50/50</span>
-                        </button>
-                        {usedLifelines.fiftyFifty && (
-                            <span className="used-label">已使用</span>
-                        )}
-                    </div>
-
-                    <div className="lifeline-item">
-                        <button
-                            className={`lifeline-button ${usedLifelines.phoneAFriend ? 'used' : ''}`}
-                            onClick={handlePhoneFriend}
-                            disabled={usedLifelines.phoneAFriend || selectedAnswer !== null}
-                        >
-                            <span className="lifeline-icon">📞</span>
-                            <span className="lifeline-label">打電話</span>
-                        </button>
-                        {usedLifelines.phoneAFriend && (
-                            <span className="used-label">已使用</span>
-                        )}
-                        {showPhoneFriend && (
-                            <div className="lifeline-result phone-result">
-                                <div className="result-title">朋友建議：</div>
-                                <div className="result-content">{getPhoneFriendAdvice()}</div>
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="lifeline-item">
-                        <button
-                            className={`lifeline-button ${usedLifelines.askAudience ? 'used' : ''}`}
-                            onClick={handleAskAudience}
-                            disabled={usedLifelines.askAudience || selectedAnswer !== null}
-                        >
-                            <span className="lifeline-icon">👥</span>
-                            <span className="lifeline-label">問觀眾</span>
-                        </button>
-                        {usedLifelines.askAudience && (
-                            <span className="used-label">已使用</span>
-                        )}
-                        {showAudience && (
-                            <div className="lifeline-result audience-result">
-                                <div className="result-title">觀眾投票：</div>
-                                <div className="audience-poll">
-                                    {getAudiencePoll().map((percentage, index) => (
-                                        <div key={index} className="poll-item">
-                                            <div className="poll-label">{String.fromCharCode(65 + index)}</div>
-                                            <div className="poll-bar-container">
-                                                <div 
-                                                    className="poll-bar"
-                                                    style={{ width: `${percentage}%` }}
-                                                >
-                                                    {percentage}%
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            );
-        }
-
-        // GameOverModal Component
-        function GameOverModal({ reason, finalScore, guaranteedPrize, onRestart, completedLevels, totalLevels, playerName }) {
-            // Calculate completed levels correctly
-            const levelsCompleted = completedLevels || 0;
-            
-            // 獲取排行榜
-            const getLeaderboard = () => {
-                const stored = localStorage.getItem('millionaireLeaderboard');
-                return stored ? JSON.parse(stored) : [];
-            };
-            
-            const leaderboard = getLeaderboard();
-            const reasonText = reason === 'win' ? '恭喜完成所有關卡！' : 
-                              reason === 'walk' ? '你選擇領取獎金離開' : 
-                              '答錯了，遊戲結束';
-            
-            return (
-                <div className="game-over-overlay">
-                    <div className="game-over-modal">
-                        <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>
-                            {reason === 'win' ? '🎉' : reason === 'walk' ? '💰' : '😢'}
-                        </div>
-                        <h1 className="game-over-title" style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>
-                            {reasonText}
-                        </h1>
-                        <p style={{ fontSize: '1.2rem', marginBottom: '0.5rem', color: '#000000', fontWeight: 'bold' }}>
-                            玩家: {playerName || '匿名玩家'}
-                        </p>
-                        <p style={{ fontSize: '1.5rem', marginBottom: '1rem', color: '#000000', fontWeight: 'bold' }}>
-                            你完成了 {levelsCompleted} 關！
-                        </p>
-                        
-                        <div style={{ 
-                            border: '3px solid #000000', 
-                            borderRadius: '15px', 
-                            padding: '1rem', 
-                            marginBottom: '2rem',
-                            background: '#FFFFFF'
-                        }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                                <span>💰</span>
-                                <h3 style={{ fontSize: '1.2rem', color: '#000000', fontWeight: 'bold' }}>最終獎金</h3>
-                            </div>
-                            <p style={{ fontSize: '2rem', color: '#000000', fontWeight: 'bold', textAlign: 'center' }}>
-                                ${finalScore.toLocaleString()}
-                            </p>
-                        </div>
-                        
-                        <div style={{ 
-                            border: '3px solid #000000', 
-                            borderRadius: '15px', 
-                            padding: '1rem', 
-                            marginBottom: '2rem',
-                            background: '#FFFFFF',
-                            maxHeight: '300px',
-                            overflowY: 'auto'
-                        }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-                                <span>📊</span>
-                                <h3 style={{ fontSize: '1.2rem', color: '#000000', fontWeight: 'bold' }}>獎金榜</h3>
-                            </div>
-                            {leaderboard.length === 0 ? (
-                                <p style={{ color: '#000000', textAlign: 'center' }}>暫無記錄</p>
-                            ) : (
-                                leaderboard.map((entry, index) => (
-                                    <div key={index} style={{ 
-                                        border: '2px solid #000000', 
-                                        borderRadius: '10px', 
-                                        padding: '0.8rem',
-                                        marginBottom: '0.5rem',
-                                        background: index === 0 ? '#FFEB3B' : '#FFFFFF',
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center'
-                                    }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                            <span style={{ fontSize: '1.2rem' }}>
-                                                {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`}
-                                            </span>
-                                            <span style={{ fontSize: '1rem', color: '#000000', fontWeight: 'bold' }}>
-                                                {entry.name}
-                                            </span>
-                                        </div>
-                                        <span style={{ fontSize: '1rem', color: '#000000', fontWeight: 'bold' }}>
-                                            ${entry.prize.toLocaleString()}
-                                        </span>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                        
-                        <button className="restart-button" onClick={onRestart} style={{ marginTop: '1rem' }}>
-                            ⭐ 返回主選單
-                        </button>
-                    </div>
-                </div>
-            );
-        }
-
-        // Main App Component
-        function App() {
-            const [gameState, setGameState] = useState('menu');
-            const [playerName, setPlayerName] = useState('');
-            const [currentQuestion, setCurrentQuestion] = useState(0);
-            const [score, setScore] = useState(0);
-            const [health, setHealth] = useState(100);
-            const [usedLifelines, setUsedLifelines] = useState({
-                fiftyFifty: false,
-                phoneAFriend: false,
-                askAudience: false
-            });
-            const [selectedAnswer, setSelectedAnswer] = useState(null);
-            const [showResult, setShowResult] = useState(false);
-            const [isCorrect, setIsCorrect] = useState(false);
-            const [gameOverReason, setGameOverReason] = useState('');
-
-            // 獲取排行榜
-            const getLeaderboard = () => {
-                const stored = localStorage.getItem('millionaireLeaderboard');
-                return stored ? JSON.parse(stored) : [];
-            };
-
-            // 保存到排行榜
-            const saveToLeaderboard = (name, prize) => {
-                const leaderboard = getLeaderboard();
-                leaderboard.push({
-                    name: name || '匿名玩家',
-                    prize: prize,
-                    date: new Date().toLocaleString('zh-HK')
-                });
-                // 按獎金排序
-                leaderboard.sort((a, b) => b.prize - a.prize);
-                // 只保留前10名
-                const top10 = leaderboard.slice(0, 10);
-                localStorage.setItem('millionaireLeaderboard', JSON.stringify(top10));
-            };
-
-            const prizeLevels = [
-                { level: 1, amount: 100, safe: false },
-                { level: 2, amount: 200, safe: false },
-                { level: 3, amount: 300, safe: false },
-                { level: 4, amount: 500, safe: true },
-                { level: 5, amount: 1000, safe: false },
-                { level: 6, amount: 2000, safe: false },
-                { level: 7, amount: 4000, safe: false },
-                { level: 8, amount: 8000, safe: true },
-                { level: 9, amount: 16000, safe: false },
-                { level: 10, amount: 32000, safe: false },
-                { level: 11, amount: 64000, safe: false },
-                { level: 12, amount: 125000, safe: true },
-                { level: 13, amount: 250000, safe: false },
-                { level: 14, amount: 500000, safe: false },
-                { level: 15, amount: 1000000, safe: false },
-                { level: 16, amount: 2000000, safe: false },
-                { level: 17, amount: 4000000, safe: false },
-                { level: 18, amount: 8000000, safe: true },
-                { level: 19, amount: 16000000, safe: false },
-                { level: 20, amount: 32000000, safe: false }
-            ];
-
-            const startGame = () => {
-                if (!playerName.trim()) {
-                    alert('請輸入你的名字！');
-                    return;
-                }
-                setGameState('playing');
-                setCurrentQuestion(0);
-                setScore(0);
-                setHealth(100);
-                setUsedLifelines({
-                    fiftyFifty: false,
-                    phoneAFriend: false,
-                    askAudience: false
-                });
-                setSelectedAnswer(null);
-                setShowResult(false);
-            };
-
-            const handleAnswerSelect = (answerIndex) => {
-                if (showResult) return;
-                setSelectedAnswer(answerIndex);
-            };
-
-            const handleConfirmAnswer = () => {
-                if (selectedAnswer === null) return;
-
-                const question = questions[currentQuestion];
-                const correct = selectedAnswer === question.correct;
-
-                setIsCorrect(correct);
-                setShowResult(true);
-
-                if (correct) {
-                    const newScore = prizeLevels[currentQuestion].amount;
-                    setScore(newScore);
-                    // 答對可以恢復少量生命值
-                    setHealth(prev => Math.min(100, prev + 5));
-                    
-                    setTimeout(() => {
-                        if (currentQuestion === questions.length - 1) {
-                            const finalPrize = prizeLevels[currentQuestion].amount;
-                            saveToLeaderboard(playerName, finalPrize);
-                            setGameState('gameOver');
-                            setGameOverReason('win');
-                        } else {
-                            setCurrentQuestion(currentQuestion + 1);
-                            setSelectedAnswer(null);
-                            setShowResult(false);
-                        }
-                    }, 3000);
-                } else {
-                    // 答錯立即結束遊戲，顯示最後取得的獎金
-                    const isSafeLevel = prizeLevels[currentQuestion].safe;
-                    let finalPrize = 0;
-                    
-                    if (isSafeLevel) {
-                        finalPrize = prizeLevels[currentQuestion].amount;
-                    } else {
-                        const previousSafeLevels = prizeLevels.filter(p => p.safe && p.level < currentQuestion + 1);
-                        if (previousSafeLevels.length > 0) {
-                            finalPrize = previousSafeLevels[previousSafeLevels.length - 1].amount;
-                        } else {
-                            finalPrize = 0;
-                        }
-                    }
-                    
-                    setScore(finalPrize);
-                    setTimeout(() => {
-                        saveToLeaderboard(playerName, finalPrize);
-                        setGameState('gameOver');
-                        setGameOverReason('wrong');
-                    }, 3000);
-                }
-            };
-
-            const handleWalkAway = () => {
-                const currentPrize = getCurrentPrize();
-                setScore(currentPrize);
-                saveToLeaderboard(playerName, currentPrize);
-                setGameState('gameOver');
-                setGameOverReason('walk');
-            };
-
-            const handleLifeline = (lifelineType) => {
-                if (usedLifelines[lifelineType]) return;
-                
-                setUsedLifelines(prev => ({
-                    ...prev,
-                    [lifelineType]: true
-                }));
-            };
-
-            const getCurrentPrize = () => {
-                return prizeLevels[currentQuestion].amount;
-            };
-
-            const getGuaranteedPrize = () => {
-                const safeLevels = prizeLevels.filter(p => p.safe && p.level <= currentQuestion + 1);
-                if (safeLevels.length === 0) return 0;
-                return safeLevels[safeLevels.length - 1].amount;
-            };
-
-            if (!questions || questions.length === 0) {
-                return (
-                    <div style={{ padding: '20px', color: 'white', background: 'red' }}>
-                        錯誤：無法載入題目數據！
-                    </div>
-                );
-            }
-
-            return (
-                <div className="app">
-                    {gameState === 'menu' && (
-                        <div className="menu-screen">
-                            <div className="menu-content">
-                                <h1 className="menu-title">語文百萬富翁</h1>
-                                <p className="menu-subtitle">中一中文學習遊戲</p>
-                                <div style={{ marginBottom: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-                                    <input
-                                        type="text"
-                                        placeholder="輸入你的名字"
-                                        value={playerName}
-                                        onChange={(e) => setPlayerName(e.target.value)}
-                                        onKeyPress={(e) => e.key === 'Enter' && startGame()}
-                                        style={{
-                                            padding: '0.8rem 1.5rem',
-                                            fontSize: '1.2rem',
-                                            border: '3px solid #000000',
-                                            borderRadius: '10px',
-                                            textAlign: 'center',
-                                            width: '300px',
-                                            background: '#FFFFFF',
-                                            color: '#000000'
-                                        }}
-                                    />
-                                </div>
-                                <button className="start-button" onClick={startGame}>
-                                    開始遊戲
-                                </button>
-                            </div>
-                        </div>
-                    )}
-
-                    {gameState === 'playing' && (
-                        <>
-                            <div className="game-container">
-                                <div className="left-panel">
-                                    <PrizeLadder 
-                                        prizeLevels={prizeLevels} 
-                                        currentLevel={currentQuestion + 1}
-                                    />
-                                </div>
-
-                                <div className="center-panel">
-                                    <GameScene 
-                                        currentLevel={currentQuestion + 1} 
-                                        totalLevels={prizeLevels.length}
-                                        health={health}
-                                        showResult={showResult}
-                                        isCorrect={isCorrect}
-                                    />
-                                </div>
-
-                                <div className="right-panel">
-                                    <Lifelines 
-                                        usedLifelines={usedLifelines}
-                                        onUseLifeline={handleLifeline}
-                                        currentQuestion={questions[currentQuestion]}
-                                        selectedAnswer={selectedAnswer}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="bottom-panel">
-                                <QuestionPanel
-                                    question={questions[currentQuestion]}
-                                    selectedAnswer={selectedAnswer}
-                                    onAnswerSelect={handleAnswerSelect}
-                                    onConfirm={handleConfirmAnswer}
-                                    showResult={showResult}
-                                    isCorrect={isCorrect}
-                                    currentPrize={getCurrentPrize()}
-                                    guaranteedPrize={getGuaranteedPrize()}
-                                    onWalkAway={handleWalkAway}
-                                    usedLifelines={usedLifelines}
-                                />
-                            </div>
-                        </>
-                    )}
-
-                    {gameState === 'gameOver' && (
-                        <GameOverModal
-                            reason={gameOverReason}
-                            finalScore={score}
-                            guaranteedPrize={getGuaranteedPrize()}
-                            onRestart={() => {
-                                setGameState('menu');
-                                setPlayerName('');
-                            }}
-                            playerName={playerName}
-                            completedLevels={gameOverReason === 'win' ? questions.length : currentQuestion}
-                            totalLevels={questions.length}
-                        />
-                    )}
-                </div>
-            );
-        }
-
-        // Initialize React App
-        const rootElement = document.getElementById('root');
-        if (rootElement) {
-            rootElement.innerHTML = '';
-            const root = ReactDOM.createRoot(rootElement);
-            root.render(
-                <React.StrictMode>
-                    <App />
-                </React.StrictMode>
-            );
-        }
-    </script>
+// Initialize React App
+const rootElement = document.getElementById('root');
+if (rootElement) {
+  rootElement.innerHTML = '';
+  const root = ReactDOM.createRoot(rootElement);
+  root.render(/*#__PURE__*/React.createElement(React.StrictMode, null, /*#__PURE__*/React.createElement(App, null)));
+}
+</script>
 
     <!-- Visit Counter -->
     <div id="visit-counter-container"></div>
