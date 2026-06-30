@@ -19,8 +19,8 @@
   <link rel="stylesheet" href="../../../../visit-counter.css">
   
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-  <link rel="stylesheet" href="../../../地圖/bible-maps/shared/book-map.css">
-  <link rel="stylesheet" href="../../../地圖/bible-maps/shared/book-study-ux.css">
+  <link rel="stylesheet" href="../../../3D地圖/bible-maps/shared/book-map.css">
+  <link rel="stylesheet" href="../../../3D地圖/bible-maps/shared/book-study-ux.css">
 </head>
 <body class="bg-indigo-50/30 text-slate-900 min-h-screen" style="--bc:#e2e8f0;--bh:#f8fafc">
   <header class="ux-header bg-gradient-to-br from-indigo-900 to-violet-950 text-white px-4 py-10">
@@ -203,7 +203,7 @@
       </div>
       <div class="book-map-footer">
         <span>坐標採 WGS84 · 考古/site 傳統鑑別 · 點選標記查看經文</span>
-        <a href="../../../地圖/bible-maps/maps/judah-fall/" target="_blank" rel="noopener">🌍 開啟 3D 互動地圖：猶大滅亡 →</a>
+        <a href="../../../3D地圖/bible-maps/maps/judah-fall/" target="_blank" rel="noopener">🌍 開啟 3D 互動地圖：猶大滅亡 →</a>
       </div>
     </section>
     
@@ -243,8 +243,8 @@
   <script>VisitCounter.init('bible_study/經卷/舊約/先知書/耶利米書/index',{scriptUrl:'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec',containerId:'visit-counter-container'});</script>
   
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <script src="../../../地圖/bible-maps/shared/book-map.js"></script>
-  <script src="../../../地圖/bible-maps/shared/book-study-ux.js"></script>
+  <script src="../../../3D地圖/bible-maps/shared/book-map.js"></script>
+  <script src="../../../3D地圖/bible-maps/shared/book-study-ux.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       BookMap.init({ places: [{"id":"anathoth","name_zh":"亞拿突","name_en":"Anathoth","lat":31.807,"lng":35.265,"type":"town","typeLabel":"城鎮","ref":"耶 1:1","note":"先知故鄉"},{"id":"jerusalem","name_zh":"耶路撒冷","name_en":"Jerusalem","lat":31.778,"lng":35.235,"type":"city","typeLabel":"城邑","ref":"耶 7:1","note":"聖殿門前宣講"},{"id":"lachish","name_zh":"拉吉","name_en":"Lachish","lat":31.565,"lng":34.848,"type":"fort","typeLabel":"要塞","ref":"耶 34:7","note":"圍城時僅存城邑"},{"id":"babylon","name_zh":"巴比倫","name_en":"Babylon","lat":32.536,"lng":44.42,"type":"city","typeLabel":"城邑","ref":"耶 29:1","note":"被擄者書信"},{"id":"egypt","name_zh":"埃及","name_en":"Egypt","lat":30.95,"lng":31.85,"type":"region","typeLabel":"地區","ref":"耶 43:7","note":"逃往埃及（答比匿）"}] });

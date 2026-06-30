@@ -8,7 +8,7 @@ export const prophetsMajor = [
       { href: '../../../舊約聖經人物/以賽亞/index.html', label: '以賽亞' },
       { href: '../../../舊約聖經人物/希西家/index.html', label: '希西家' },
       { href: '../../歷史書/列王紀下/index.html', label: '列王紀下（平行敘事）' },
-      { href: '../../../地圖/bible-maps/maps/assyria/index.html', label: '亞述帝國地圖' },
+      { href: '../../../3D地圖/bible-maps/maps/assyria/index.html', label: '亞述帝國地圖' },
     ],
     structureNote: '傳統以 1–39 章為「第一以賽亞」（審判與歷史）、40–55 為「第二以賽亞」（安慰與僕人）、56–66 為「第三以賽亞」（末世與新創造）。現代學者多視為同一作者或同一傳統群體；讀經宜按三段主題進入，不必先糾結作者問題。',
     background: {
@@ -335,7 +335,7 @@ export const prophetsMajor = [
     links: [
       { href: '../../../舊約聖經人物/以西結/index.html', label: '以西結' },
       { href: '耶利米書/index.html', label: '耶利米書（同期）' },
-      { href: '../../../地圖/bible-maps/maps/babylon/index.html', label: '巴比倫被擄地圖' },
+      { href: '../../../3D地圖/bible-maps/maps/babylon/index.html', label: '巴比倫被擄地圖' },
     ],
     structureNote: '可按四段進入：榮光與耶路撒冷審判（1–24）、列國神諭（25–32）、復興與新心（33–39）、新殿與新地（40–48）。33 章起「守望者」信息重現；40–48 章殿宇異象爭議大，宜以象徵與終末恢復為主，避免過度字面化地圖政治。',
     background: {
@@ -445,7 +445,7 @@ export const prophetsMajor = [
       { href: '../../../舊約聖經人物/但以理/index.html', label: '但以理' },
       { href: '../../../舊約聖經人物/尼布甲尼撒/index.html', label: '尼布甲尼撒' },
       { href: '以西結書/index.html', label: '以西結書（同期）' },
-      { href: '../../../地圖/bible-maps/maps/babylon/index.html', label: '巴比倫地圖' },
+      { href: '../../../3D地圖/bible-maps/maps/babylon/index.html', label: '巴比倫地圖' },
     ],
     structureNote: '1–6 章亞蘭文敘事（除 1 章）與 7–12 章希伯來文異象形成對稱：地上帝國見證與天上異象互釋。7 章四獸與 2 章大像呼應；8–12 章聚焦波斯希臘與「末期」。讀末世預言宜謙卑，以經解經，避免過度定日期。',
     background: {

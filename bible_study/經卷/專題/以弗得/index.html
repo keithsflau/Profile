@@ -18,8 +18,8 @@
   <link rel="stylesheet" href="../../../../visit-counter.css">
   
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-  <link rel="stylesheet" href="../../../地圖/bible-maps/shared/book-map.css">
-  <link rel="stylesheet" href="../../../地圖/bible-maps/shared/book-study-ux.css">
+  <link rel="stylesheet" href="../../../3D地圖/bible-maps/shared/book-map.css">
+  <link rel="stylesheet" href="../../../3D地圖/bible-maps/shared/book-study-ux.css">
 </head>
 <body class="bg-violet-50/30 text-slate-900 min-h-screen">
   <header class="ux-header bg-gradient-to-br from-violet-900 to-purple-950 text-white px-4 py-10">
@@ -169,7 +169,7 @@
       </div>
       <div class="book-map-footer">
         <span>坐標採 WGS84 · 考古/site 傳統鑑別 · 點選標記查看經文</span>
-        <a href="../../../地圖/bible-maps/maps/exodus-canaan/" target="_blank" rel="noopener">🌍 開啟 3D 互動地圖：會幕制度 →</a>
+        <a href="../../../3D地圖/bible-maps/maps/exodus-canaan/" target="_blank" rel="noopener">🌍 開啟 3D 互動地圖：會幕制度 →</a>
       </div>
     </section>
     
@@ -203,8 +203,8 @@
   <script>VisitCounter.init('bible_study/經卷/專題/以弗得/index',{scriptUrl:'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec',containerId:'visit-counter-container'});</script>
   
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <script src="../../../地圖/bible-maps/shared/book-map.js"></script>
-  <script src="../../../地圖/bible-maps/shared/book-study-ux.js"></script>
+  <script src="../../../3D地圖/bible-maps/shared/book-map.js"></script>
+  <script src="../../../3D地圖/bible-maps/shared/book-study-ux.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       BookMap.init({ places: [{"id":"sinai","name_zh":"西奈山","name_en":"Mount Sinai","lat":28.539,"lng":33.975,"type":"peak","typeLabel":"山嶺","ref":"出 28:4","note":"大祭司以弗得條例"},{"id":"shiloh","name_zh":"示羅","name_en":"Shiloh","lat":32.057,"lng":35.29,"type":"town","typeLabel":"城鎮","ref":"撒上 2:18","note":"示羅會幕"},{"id":"ophrah","name_zh":"俄弗拉","name_en":"Ophrah","lat":32.189,"lng":35.203,"type":"town","typeLabel":"城鎮","ref":"士 8:27","note":"基甸造以弗得"}] });

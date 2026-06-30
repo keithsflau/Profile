@@ -19,8 +19,8 @@
   <link rel="stylesheet" href="../../../../visit-counter.css">
   
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-  <link rel="stylesheet" href="../../../地圖/bible-maps/shared/book-map.css">
-  <link rel="stylesheet" href="../../../地圖/bible-maps/shared/book-study-ux.css">
+  <link rel="stylesheet" href="../../../3D地圖/bible-maps/shared/book-map.css">
+  <link rel="stylesheet" href="../../../3D地圖/bible-maps/shared/book-study-ux.css">
 </head>
 <body class="bg-sky-50/30 text-slate-900 min-h-screen" style="--bc:#e2e8f0;--bh:#f8fafc">
   <header class="ux-header bg-gradient-to-br from-sky-900 to-blue-950 text-white px-4 py-10">
@@ -32,7 +32,7 @@
     </div>
   </header>
   <main class="max-w-5xl mx-auto px-4 py-8 space-y-8">
-    <div class="flex flex-wrap gap-2"><a href="../../../舊約聖經人物/大衞/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">大衞</a><a href="../../../舊約聖經人物/押沙龍/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">押沙龍</a><a href="../../../舊約聖經人物/烏利亞/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">烏利亞</a><a href="../../../地圖/bible-maps/maps/david/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">大衛時代地圖</a><a href="撒母耳記上/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">先讀撒母耳記上</a>
+    <div class="flex flex-wrap gap-2"><a href="../../../舊約聖經人物/大衞/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">大衞</a><a href="../../../舊約聖經人物/押沙龍/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">押沙龍</a><a href="../../../舊約聖經人物/烏利亞/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">烏利亞</a><a href="../../../3D地圖/bible-maps/maps/david/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">大衛時代地圖</a><a href="撒母耳記上/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">先讀撒母耳記上</a>
       <a href="../../../查經/查經法/OIA/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800">OIA 查經法</a>
     </div>
 
@@ -211,7 +211,7 @@
       </div>
       <div class="book-map-footer">
         <span>坐標採 WGS84 · 考古/site 傳統鑑別 · 點選標記查看經文</span>
-        <a href="../../../地圖/bible-maps/maps/david/" target="_blank" rel="noopener">🌍 開啟 3D 互動地圖：大衛王朝 →</a>
+        <a href="../../../3D地圖/bible-maps/maps/david/" target="_blank" rel="noopener">🌍 開啟 3D 互動地圖：大衛王朝 →</a>
       </div>
     </section>
     
@@ -251,8 +251,8 @@
   <script>VisitCounter.init('bible_study/經卷/舊約/歷史書/撒母耳記下/index',{scriptUrl:'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec',containerId:'visit-counter-container'});</script>
   
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <script src="../../../地圖/bible-maps/shared/book-map.js"></script>
-  <script src="../../../地圖/bible-maps/shared/book-study-ux.js"></script>
+  <script src="../../../3D地圖/bible-maps/shared/book-map.js"></script>
+  <script src="../../../3D地圖/bible-maps/shared/book-study-ux.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       BookMap.init({ places: [{"id":"hebron","name_zh":"希伯崙","name_en":"Hebron","lat":31.524,"lng":35.099,"type":"town","typeLabel":"城鎮","ref":"撒下 2:1","note":"猶大王七年半"},{"id":"jerusalem","name_zh":"耶路撒冷","name_en":"Jerusalem","lat":31.778,"lng":35.235,"type":"city","typeLabel":"城邑","ref":"撒下 5:7","note":"攻取錫安、建都"},{"id":"en_gedi","name_zh":"隱基遍","name_en":"En-gedi","lat":31.453,"lng":35.388,"type":"town","typeLabel":"城鎮","ref":"撒下 1:1","note":"大衛躲掃羅"},{"id":"ziklag","name_zh":"洗革拉","name_en":"Ziklag","lat":31.383,"lng":34.683,"type":"town","typeLabel":"城鎮","ref":"撒下 1:1","note":"非利士境內洗革拉"},{"id":"bethlehem","name_zh":"伯利恆","name_en":"Bethlehem","lat":31.705,"lng":35.202,"type":"town","typeLabel":"城鎮","ref":"撒下 23:14","note":"大衛渴想家鄉井水"}] });

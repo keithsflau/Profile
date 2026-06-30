@@ -19,8 +19,8 @@
   <link rel="stylesheet" href="../../../../visit-counter.css">
   
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-  <link rel="stylesheet" href="../../../地圖/bible-maps/shared/book-map.css">
-  <link rel="stylesheet" href="../../../地圖/bible-maps/shared/book-study-ux.css">
+  <link rel="stylesheet" href="../../../3D地圖/bible-maps/shared/book-map.css">
+  <link rel="stylesheet" href="../../../3D地圖/bible-maps/shared/book-study-ux.css">
 </head>
 <body class="bg-indigo-50/30 text-slate-900 min-h-screen" style="--bc:#e2e8f0;--bh:#f8fafc">
   <header class="ux-header bg-gradient-to-br from-indigo-900 to-violet-950 text-white px-4 py-10">
@@ -189,7 +189,7 @@
       </div>
       <div class="book-map-footer">
         <span>坐標採 WGS84 · 考古/site 傳統鑑別 · 點選標記查看經文</span>
-        <a href="../../../地圖/bible-maps/maps/prophets/" target="_blank" rel="noopener">🌍 開啟 3D 互動地圖：先知時代 →</a>
+        <a href="../../../3D地圖/bible-maps/maps/prophets/" target="_blank" rel="noopener">🌍 開啟 3D 互動地圖：先知時代 →</a>
       </div>
     </section>
     
@@ -229,8 +229,8 @@
   <script>VisitCounter.init('bible_study/經卷/舊約/先知書/阿摩司書/index',{scriptUrl:'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec',containerId:'visit-counter-container'});</script>
   
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <script src="../../../地圖/bible-maps/shared/book-map.js"></script>
-  <script src="../../../地圖/bible-maps/shared/book-study-ux.js"></script>
+  <script src="../../../3D地圖/bible-maps/shared/book-map.js"></script>
+  <script src="../../../3D地圖/bible-maps/shared/book-study-ux.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       BookMap.init({ places: [{"id":"tekoa","name_zh":"提哥亞","name_en":"Tekoa","lat":31.65,"lng":35.22,"type":"town","typeLabel":"城鎮","ref":"摩 1:1","note":"阿摩司故鄉"},{"id":"samaria","name_zh":"撒瑪利亞","name_en":"Samaria","lat":32.276,"lng":35.193,"type":"city","typeLabel":"城邑","ref":"摩 3:9","note":"責備北國"},{"id":"bethel","name_zh":"伯特利","name_en":"Bethel","lat":31.927,"lng":35.222,"type":"town","typeLabel":"城鎮","ref":"摩 7:13","note":"祭壇與亞瑪謝衝突"},{"id":"jerusalem","name_zh":"耶路撒冷","name_en":"Jerusalem","lat":31.778,"lng":35.235,"type":"city","typeLabel":"城邑","ref":"摩 1:5","note":"亦論南國"}] });

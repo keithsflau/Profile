@@ -19,8 +19,8 @@
   <link rel="stylesheet" href="../../../../visit-counter.css">
   
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-  <link rel="stylesheet" href="../../../地圖/bible-maps/shared/book-map.css">
-  <link rel="stylesheet" href="../../../地圖/bible-maps/shared/book-study-ux.css">
+  <link rel="stylesheet" href="../../../3D地圖/bible-maps/shared/book-map.css">
+  <link rel="stylesheet" href="../../../3D地圖/bible-maps/shared/book-study-ux.css">
 </head>
 <body class="bg-blue-50/30 text-slate-900 min-h-screen" style="--bc:#e2e8f0;--bh:#f8fafc">
   <header class="ux-header bg-gradient-to-br from-blue-900 to-indigo-950 text-white px-4 py-10">
@@ -184,7 +184,7 @@
       </div>
       <div class="book-map-footer">
         <span>坐標採 WGS84 · 考古/site 傳統鑑別 · 點選標記查看經文</span>
-        <a href="../../../地圖/bible-maps/maps/paul/" target="_blank" rel="noopener">🌍 開啟 3D 互動地圖：保羅宣教 →</a>
+        <a href="../../../3D地圖/bible-maps/maps/paul/" target="_blank" rel="noopener">🌍 開啟 3D 互動地圖：保羅宣教 →</a>
       </div>
     </section>
     
@@ -224,8 +224,8 @@
   <script>VisitCounter.init('bible_study/經卷/新約/保羅書信/羅馬書/index',{scriptUrl:'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec',containerId:'visit-counter-container'});</script>
   
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <script src="../../../地圖/bible-maps/shared/book-map.js"></script>
-  <script src="../../../地圖/bible-maps/shared/book-study-ux.js"></script>
+  <script src="../../../3D地圖/bible-maps/shared/book-map.js"></script>
+  <script src="../../../3D地圖/bible-maps/shared/book-study-ux.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       BookMap.init({ places: [{"id":"corinth","name_zh":"哥林多","name_en":"Corinth","lat":37.906,"lng":22.878,"type":"city","typeLabel":"城邑","ref":"羅 16:23","note":"寫作地"},{"id":"rome","name_zh":"羅馬","name_en":"Rome","lat":41.902,"lng":12.453,"type":"city","typeLabel":"城邑","ref":"羅 1:7","note":"收信教會"}] });

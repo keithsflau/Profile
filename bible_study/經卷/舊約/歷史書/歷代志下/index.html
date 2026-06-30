@@ -19,8 +19,8 @@
   <link rel="stylesheet" href="../../../../visit-counter.css">
   
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-  <link rel="stylesheet" href="../../../地圖/bible-maps/shared/book-map.css">
-  <link rel="stylesheet" href="../../../地圖/bible-maps/shared/book-study-ux.css">
+  <link rel="stylesheet" href="../../../3D地圖/bible-maps/shared/book-map.css">
+  <link rel="stylesheet" href="../../../3D地圖/bible-maps/shared/book-study-ux.css">
 </head>
 <body class="bg-sky-50/30 text-slate-900 min-h-screen" style="--bc:#e2e8f0;--bh:#f8fafc">
   <header class="ux-header bg-gradient-to-br from-sky-900 to-blue-950 text-white px-4 py-10">
@@ -32,7 +32,7 @@
     </div>
   </header>
   <main class="max-w-5xl mx-auto px-4 py-8 space-y-8">
-    <div class="flex flex-wrap gap-2"><a href="../../../舊約聖經人物/所羅門/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">所羅門</a><a href="../../../舊約聖經人物/約西亞/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">約西亞</a><a href="../../../地圖/bible-maps/maps/solomon/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">所羅門時代地圖</a><a href="../../../地圖/bible-maps/maps/judah-fall/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">南國滅亡地圖</a><a href="歷代志上/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">先讀歷代志上</a>
+    <div class="flex flex-wrap gap-2"><a href="../../../舊約聖經人物/所羅門/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">所羅門</a><a href="../../../舊約聖經人物/約西亞/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">約西亞</a><a href="../../../3D地圖/bible-maps/maps/solomon/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">所羅門時代地圖</a><a href="../../../3D地圖/bible-maps/maps/judah-fall/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">南國滅亡地圖</a><a href="歷代志上/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">先讀歷代志上</a>
       <a href="../../../查經/查經法/OIA/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800">OIA 查經法</a>
     </div>
 
@@ -203,7 +203,7 @@
       </div>
       <div class="book-map-footer">
         <span>坐標採 WGS84 · 考古/site 傳統鑑別 · 點選標記查看經文</span>
-        <a href="../../../地圖/bible-maps/maps/kingdom-split/" target="_blank" rel="noopener">🌍 開啟 3D 互動地圖：猶大王國 →</a>
+        <a href="../../../3D地圖/bible-maps/maps/kingdom-split/" target="_blank" rel="noopener">🌍 開啟 3D 互動地圖：猶大王國 →</a>
       </div>
     </section>
     
@@ -243,8 +243,8 @@
   <script>VisitCounter.init('bible_study/經卷/舊約/歷史書/歷代志下/index',{scriptUrl:'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec',containerId:'visit-counter-container'});</script>
   
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <script src="../../../地圖/bible-maps/shared/book-map.js"></script>
-  <script src="../../../地圖/bible-maps/shared/book-study-ux.js"></script>
+  <script src="../../../3D地圖/bible-maps/shared/book-map.js"></script>
+  <script src="../../../3D地圖/bible-maps/shared/book-study-ux.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       BookMap.init({ places: [{"id":"temple_mount","name_zh":"聖殿山","name_en":"Temple Mount","lat":31.778,"lng":35.235,"type":"fort","typeLabel":"要塞","ref":"代下 3:1","note":"所羅門建殿"},{"id":"jerusalem","name_zh":"耶路撒冷","name_en":"Jerusalem","lat":31.778,"lng":35.235,"type":"city","typeLabel":"城邑","ref":"代下 36:19","note":"聖殿被焚"},{"id":"lachish","name_zh":"拉吉","name_en":"Lachish","lat":31.565,"lng":34.848,"type":"fort","typeLabel":"要塞","ref":"代下 32:9","note":"希西家、西拿基立"},{"id":"babylon","name_zh":"巴比倫","name_en":"Babylon","lat":32.536,"lng":44.42,"type":"city","typeLabel":"城邑","ref":"代下 36:20","note":"被擄七十年"}] });

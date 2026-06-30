@@ -18,8 +18,8 @@
   <link rel="stylesheet" href="../../../../visit-counter.css">
   
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-  <link rel="stylesheet" href="../../../地圖/bible-maps/shared/book-map.css">
-  <link rel="stylesheet" href="../../../地圖/bible-maps/shared/book-study-ux.css">
+  <link rel="stylesheet" href="../../../3D地圖/bible-maps/shared/book-map.css">
+  <link rel="stylesheet" href="../../../3D地圖/bible-maps/shared/book-study-ux.css">
 </head>
 <body class="bg-emerald-50/30 text-slate-900 min-h-screen">
   <header class="ux-header bg-gradient-to-br from-emerald-900 to-teal-950 text-white px-4 py-10">
@@ -157,7 +157,7 @@
       </div>
       <div class="book-map-footer">
         <span>坐標採 WGS84 · 考古/site 傳統鑑別 · 點選標記查看經文</span>
-        <a href="../../../地圖/bible-maps/maps/judah-fall/" target="_blank" rel="noopener">🌍 開啟 3D 互動地圖：被擄巴比倫 →</a>
+        <a href="../../../3D地圖/bible-maps/maps/judah-fall/" target="_blank" rel="noopener">🌍 開啟 3D 互動地圖：被擄巴比倫 →</a>
       </div>
     </section>
     
@@ -191,8 +191,8 @@
   <script>VisitCounter.init('bible_study/經卷/專題/垂絲柳樹/index',{scriptUrl:'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec',containerId:'visit-counter-container'});</script>
   
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <script src="../../../地圖/bible-maps/shared/book-map.js"></script>
-  <script src="../../../地圖/bible-maps/shared/book-study-ux.js"></script>
+  <script src="../../../3D地圖/bible-maps/shared/book-map.js"></script>
+  <script src="../../../3D地圖/bible-maps/shared/book-study-ux.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       BookMap.init({ places: [{"id":"babylon_river","name_zh":"巴比倫河","name_en":"Rivers of Babylon","lat":32.536,"lng":44.42,"type":"bay","typeLabel":"水域","ref":"詩 137:1","note":"巴比倫河邊坐著"},{"id":"babylon","name_zh":"巴比倫","name_en":"Babylon","lat":32.536,"lng":44.42,"type":"city","typeLabel":"城邑","ref":"詩 137:1","note":"被擄之地"},{"id":"jerusalem","name_zh":"耶路撒冷","name_en":"Jerusalem","lat":31.778,"lng":35.235,"type":"city","typeLabel":"城邑","ref":"詩 137:5","note":"若忘記耶路撒冷"}] });

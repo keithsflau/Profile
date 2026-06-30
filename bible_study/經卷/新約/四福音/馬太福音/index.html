@@ -653,8 +653,8 @@
 
 <!-- BOOK-GEO-HEAD -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-  <link rel="stylesheet" href="../../../地圖/bible-maps/shared/book-map.css">
-  <link rel="stylesheet" href="../../../地圖/bible-maps/shared/book-study-ux.css"><!-- /BOOK-GEO-HEAD -->
+  <link rel="stylesheet" href="../../../3D地圖/bible-maps/shared/book-map.css">
+  <link rel="stylesheet" href="../../../3D地圖/bible-maps/shared/book-study-ux.css"><!-- /BOOK-GEO-HEAD -->
 </head>
   <body>
     <div class="page">
@@ -1447,13 +1447,13 @@
       </div>
       <div class="book-map-footer">
         <span>坐標採 WGS84 · 考古/site 傳統鑑別 · 點選標記查看經文</span>
-        <a href="../../../地圖/bible-maps/maps/jesus/" target="_blank" rel="noopener">🌍 開啟 3D 互動地圖：耶穌生平 →</a>
+        <a href="../../../3D地圖/bible-maps/maps/jesus/" target="_blank" rel="noopener">🌍 開啟 3D 互動地圖：耶穌生平 →</a>
       </div>
     </section><!-- /BOOK-GEO-MAP -->
 <!-- BOOK-GEO-SCRIPTS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <script src="../../../地圖/bible-maps/shared/book-map.js"></script>
-  <script src="../../../地圖/bible-maps/shared/book-study-ux.js"></script>
+  <script src="../../../3D地圖/bible-maps/shared/book-map.js"></script>
+  <script src="../../../3D地圖/bible-maps/shared/book-study-ux.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       BookMap.init({ places: [{"id":"bethlehem","name_zh":"伯利恆","name_en":"Bethlehem","lat":31.705,"lng":35.202,"type":"town","typeLabel":"城鎮","ref":"太 2:1","note":"東方博士見嬰孩"},{"id":"nazareth","name_zh":"拿撒勒","name_en":"Nazareth","lat":32.702,"lng":35.297,"type":"town","typeLabel":"城鎮","ref":"太 2:23","note":"童年成長"},{"id":"capernaum","name_zh":"迦百農","name_en":"Capernaum","lat":32.881,"lng":35.575,"type":"town","typeLabel":"城鎮","ref":"太 4:13","note":"加利利事工中心"},{"id":"galilee_sea","name_zh":"加利利海","name_en":"Sea of Galilee","lat":32.833,"lng":35.5,"type":"bay","typeLabel":"水域","ref":"太 4:18","note":"呼召門徒"},{"id":"jerusalem","name_zh":"耶路撒冷","name_en":"Jerusalem","lat":31.778,"lng":35.235,"type":"city","typeLabel":"城邑","ref":"太 21:1","note":"榮入聖城"},{"id":"gethsemane","name_zh":"客西馬尼","name_en":"Gethsemane","lat":31.78,"lng":35.24,"type":"peak","typeLabel":"山嶺","ref":"太 26:36","note":"客西馬尼禱告"}] });

@@ -3,7 +3,7 @@ import { bookGeo } from './books-geo.mjs';
 import { uxHead, uxScripts } from './study-ux-embed.mjs';
 
 const require = createRequire(import.meta.url);
-const LOC = require('../../地圖/bible-maps/tools/bible-locations.js');
+const LOC = require('../../3D地圖/bible-maps/tools/bible-locations.js');
 
 const TYPE_ZH = {
   city: '城邑',
@@ -34,7 +34,7 @@ export function resolvePlaces(cfg) {
   });
 }
 
-const MAP_BASE = '../../../地圖/bible-maps';
+const MAP_BASE = '../../../3D地圖/bible-maps';
 
 /**
  * @param {string} slug - book or topic slug

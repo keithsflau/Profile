@@ -671,8 +671,8 @@
 
 <!-- BOOK-GEO-HEAD -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-  <link rel="stylesheet" href="../../../地圖/bible-maps/shared/book-map.css">
-  <link rel="stylesheet" href="../../../地圖/bible-maps/shared/book-study-ux.css"><!-- /BOOK-GEO-HEAD -->
+  <link rel="stylesheet" href="../../../3D地圖/bible-maps/shared/book-map.css">
+  <link rel="stylesheet" href="../../../3D地圖/bible-maps/shared/book-study-ux.css"><!-- /BOOK-GEO-HEAD -->
 </head>
   <body>
     <div class="page">
@@ -2093,13 +2093,13 @@
       </div>
       <div class="book-map-footer">
         <span>坐標採 WGS84 · 考古/site 傳統鑑別 · 點選標記查看經文</span>
-        <a href="../../../地圖/bible-maps/maps/jesus/" target="_blank" rel="noopener">🌍 開啟 3D 互動地圖：耶穌生平 →</a>
+        <a href="../../../3D地圖/bible-maps/maps/jesus/" target="_blank" rel="noopener">🌍 開啟 3D 互動地圖：耶穌生平 →</a>
       </div>
     </section><!-- /BOOK-GEO-MAP -->
 <!-- BOOK-GEO-SCRIPTS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <script src="../../../地圖/bible-maps/shared/book-map.js"></script>
-  <script src="../../../地圖/bible-maps/shared/book-study-ux.js"></script>
+  <script src="../../../3D地圖/bible-maps/shared/book-map.js"></script>
+  <script src="../../../3D地圖/bible-maps/shared/book-study-ux.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       BookMap.init({ places: [{"id":"nazareth","name_zh":"拿撒勒","name_en":"Nazareth","lat":32.702,"lng":35.297,"type":"town","typeLabel":"城鎮","ref":"路 4:16","note":"會堂宣讀以賽亞"},{"id":"capernaum","name_zh":"迦百農","name_en":"Capernaum","lat":32.881,"lng":35.575,"type":"town","typeLabel":"城鎮","ref":"路 4:31","note":"醫治鬼附的人"},{"id":"jericho","name_zh":"耶利哥","name_en":"Jericho","lat":31.872,"lng":35.444,"type":"fort","typeLabel":"要塞","ref":"路 19:1","note":"撒該"},{"id":"bethany","name_zh":"伯大尼","name_en":"Bethany","lat":31.771,"lng":35.263,"type":"town","typeLabel":"城鎮","ref":"路 19:29","note":"近耶路撒冷"},{"id":"emmaus","name_zh":"以馬忤斯","name_en":"Emmaus","lat":31.838,"lng":34.99,"type":"town","typeLabel":"城鎮","ref":"路 24:13","note":"復活後顯現"}] });

@@ -19,8 +19,8 @@
   <link rel="stylesheet" href="../../../../visit-counter.css">
   
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-  <link rel="stylesheet" href="../../../地圖/bible-maps/shared/book-map.css">
-  <link rel="stylesheet" href="../../../地圖/bible-maps/shared/book-study-ux.css">
+  <link rel="stylesheet" href="../../../3D地圖/bible-maps/shared/book-map.css">
+  <link rel="stylesheet" href="../../../3D地圖/bible-maps/shared/book-study-ux.css">
 </head>
 <body class="bg-sky-50/30 text-slate-900 min-h-screen" style="--bc:#e2e8f0;--bh:#f8fafc">
   <header class="ux-header bg-gradient-to-br from-sky-900 to-blue-950 text-white px-4 py-10">
@@ -32,7 +32,7 @@
     </div>
   </header>
   <main class="max-w-5xl mx-auto px-4 py-8 space-y-8">
-    <div class="flex flex-wrap gap-2"><a href="../../../舊約聖經人物/撒母耳/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">撒母耳</a><a href="../../../舊約聖經人物/掃羅/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">掃羅</a><a href="../../../舊約聖經人物/大衞/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">大衞</a><a href="../../../地圖/bible-maps/maps/david/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">大衛時代地圖</a><a href="../../經卷/歷史書/士師記/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">先讀士師記</a><a href="../../專題/以弗得/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">專題：以弗得</a>
+    <div class="flex flex-wrap gap-2"><a href="../../../舊約聖經人物/撒母耳/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">撒母耳</a><a href="../../../舊約聖經人物/掃羅/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">掃羅</a><a href="../../../舊約聖經人物/大衞/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">大衞</a><a href="../../../3D地圖/bible-maps/maps/david/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">大衛時代地圖</a><a href="../../經卷/歷史書/士師記/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">先讀士師記</a><a href="../../專題/以弗得/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">專題：以弗得</a>
       <a href="../../../查經/查經法/OIA/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800">OIA 查經法</a>
     </div>
 
@@ -219,7 +219,7 @@
       </div>
       <div class="book-map-footer">
         <span>坐標採 WGS84 · 考古/site 傳統鑑別 · 點選標記查看經文</span>
-        <a href="../../../地圖/bible-maps/maps/david/" target="_blank" rel="noopener">🌍 開啟 3D 互動地圖：大衛興起 →</a>
+        <a href="../../../3D地圖/bible-maps/maps/david/" target="_blank" rel="noopener">🌍 開啟 3D 互動地圖：大衛興起 →</a>
       </div>
     </section>
     
@@ -259,8 +259,8 @@
   <script>VisitCounter.init('bible_study/經卷/舊約/歷史書/撒母耳記上/index',{scriptUrl:'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec',containerId:'visit-counter-container'});</script>
   
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <script src="../../../地圖/bible-maps/shared/book-map.js"></script>
-  <script src="../../../地圖/bible-maps/shared/book-study-ux.js"></script>
+  <script src="../../../3D地圖/bible-maps/shared/book-map.js"></script>
+  <script src="../../../3D地圖/bible-maps/shared/book-study-ux.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       BookMap.init({ places: [{"id":"shiloh","name_zh":"示羅","name_en":"Shiloh","lat":32.057,"lng":35.29,"type":"town","typeLabel":"城鎮","ref":"撒上 1:3","note":"哈拿在示羅禱告"},{"id":"ramah","name_zh":"拉瑪","name_en":"Ramah","lat":31.85,"lng":35.195,"type":"town","typeLabel":"城鎮","ref":"撒上 1:1","note":"撒母耳故鄉"},{"id":"gibeah","name_zh":"基比亞","name_en":"Gibeah","lat":31.823,"lng":35.239,"type":"town","typeLabel":"城鎮","ref":"撒上 10:26","note":"掃羅京城"},{"id":"bethlehem","name_zh":"伯利恆","name_en":"Bethlehem","lat":31.705,"lng":35.202,"type":"town","typeLabel":"城鎮","ref":"撒上 16:1","note":"大衛受膏"},{"id":"elah","name_zh":"以拉谷","name_en":"Valley of Elah","lat":31.695,"lng":34.948,"type":"town","typeLabel":"城鎮","ref":"撒上 17:2","note":"大衛與歌利亞"},{"id":"keilah","name_zh":"基伊拉","name_en":"Keilah","lat":31.616,"lng":34.948,"type":"town","typeLabel":"城鎮","ref":"撒上 23:1","note":"大衛救基伊拉"}] });

@@ -19,8 +19,8 @@
   <link rel="stylesheet" href="../../../../visit-counter.css">
   
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-  <link rel="stylesheet" href="../../../地圖/bible-maps/shared/book-map.css">
-  <link rel="stylesheet" href="../../../地圖/bible-maps/shared/book-study-ux.css">
+  <link rel="stylesheet" href="../../../3D地圖/bible-maps/shared/book-map.css">
+  <link rel="stylesheet" href="../../../3D地圖/bible-maps/shared/book-study-ux.css">
 </head>
 <body class="bg-sky-50/30 text-slate-900 min-h-screen" style="--bc:#e2e8f0;--bh:#f8fafc">
   <header class="ux-header bg-gradient-to-br from-sky-900 to-blue-950 text-white px-4 py-10">
@@ -32,7 +32,7 @@
     </div>
   </header>
   <main class="max-w-5xl mx-auto px-4 py-8 space-y-8">
-    <div class="flex flex-wrap gap-2"><a href="../../../舊約聖經人物/底波拉/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">底波拉</a><a href="../../../舊約聖經人物/基甸/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">基甸</a><a href="../../../舊約聖經人物/參孫/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">參孫</a><a href="../../../地圖/bible-maps/maps/judges/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">士師時代地圖</a>
+    <div class="flex flex-wrap gap-2"><a href="../../../舊約聖經人物/底波拉/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">底波拉</a><a href="../../../舊約聖經人物/基甸/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">基甸</a><a href="../../../舊約聖經人物/參孫/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">參孫</a><a href="../../../3D地圖/bible-maps/maps/judges/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800 hover:bg-sky-50">士師時代地圖</a>
       <a href="../../../查經/查經法/OIA/index.html" class="text-sm px-3 py-2 rounded-full bg-white border text-sky-800">OIA 查經法</a>
     </div>
 
@@ -211,7 +211,7 @@
       </div>
       <div class="book-map-footer">
         <span>坐標採 WGS84 · 考古/site 傳統鑑別 · 點選標記查看經文</span>
-        <a href="../../../地圖/bible-maps/maps/judges/" target="_blank" rel="noopener">🌍 開啟 3D 互動地圖：士師時代 →</a>
+        <a href="../../../3D地圖/bible-maps/maps/judges/" target="_blank" rel="noopener">🌍 開啟 3D 互動地圖：士師時代 →</a>
       </div>
     </section>
     
@@ -251,8 +251,8 @@
   <script>VisitCounter.init('bible_study/經卷/舊約/歷史書/士師記/index',{scriptUrl:'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec',containerId:'visit-counter-container'});</script>
   
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <script src="../../../地圖/bible-maps/shared/book-map.js"></script>
-  <script src="../../../地圖/bible-maps/shared/book-study-ux.js"></script>
+  <script src="../../../3D地圖/bible-maps/shared/book-map.js"></script>
+  <script src="../../../3D地圖/bible-maps/shared/book-study-ux.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       BookMap.init({ places: [{"id":"shiloh","name_zh":"示羅","name_en":"Shiloh","lat":32.057,"lng":35.29,"type":"town","typeLabel":"城鎮","ref":"士 21:19","note":"會幕中心"},{"id":"tabor","name_zh":"他泊山","name_en":"Mount Tabor","lat":32.687,"lng":35.391,"type":"peak","typeLabel":"山嶺","ref":"士 4:6","note":"底波拉召巴拉"},{"id":"kishon","name_zh":"基順河","name_en":"Kishon","lat":32.55,"lng":35.12,"type":"bay","typeLabel":"水域","ref":"士 4:7","note":"基甸、底波拉戰場"},{"id":"ophrah","name_zh":"俄弗拉","name_en":"Ophrah","lat":32.189,"lng":35.203,"type":"town","typeLabel":"城鎮","ref":"士 6:11","note":"基甸蒙召"},{"id":"zorah","name_zh":"瑣拉","name_en":"Zorah","lat":31.758,"lng":34.978,"type":"town","typeLabel":"城鎮","ref":"士 13:2","note":"參孫出生地"},{"id":"gibeah","name_zh":"基比亞","name_en":"Gibeah","lat":31.823,"lng":35.239,"type":"town","typeLabel":"城鎮","ref":"士 19:12","note":"便雅憫危機"},{"id":"megiddo","name_zh":"米吉多","name_en":"Megiddo","lat":32.585,"lng":35.185,"type":"fort","typeLabel":"要塞","ref":"士 5:19","note":"他泊之戰"}] });

@@ -173,6 +173,10 @@
         animation-delay: 0.8s;
       }
 
+      .category-card:nth-child(9) {
+        animation-delay: 0.9s;
+      }
+
       .float-animation {
         animation: float 4s ease-in-out infinite;
       }
@@ -567,9 +571,64 @@
                   </div>
                 </a>
 
-                <!-- 互動地圖 -->
+                <!-- 2D 查經海報地圖 -->
                 <a
-                  href="地圖/bible-maps/"
+                  href="2D地圖/"
+                  class="category-card glass-card rounded-2xl p-8 hover:bg-white/90 group"
+                >
+                  <div class="space-y-6">
+                    <div
+                      class="w-16 h-16 rounded-xl bg-gradient-to-br from-amber-400 via-orange-500 to-amber-700 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform"
+                    >
+                      <svg
+                        class="w-8 h-8 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"
+                        />
+                      </svg>
+                    </div>
+                    <div class="text-center">
+                      <h3
+                        class="text-2xl font-semibold mb-2 group-hover:text-amber-700 transition-colors serif-font text-slate-900"
+                      >
+                        2D 路線地圖
+                      </h3>
+                      <p class="text-sm text-slate-600 mb-3">Bible Route Posters</p>
+                      <p class="text-sm text-slate-700 leading-relaxed">
+                        26 張繁體中文查經海報：路線、圖例、時間軸與重點摘要，適合小組投影或 A3 列印。
+                      </p>
+                    </div>
+                    <div
+                      class="flex items-center justify-center text-amber-700 group-hover:text-amber-800 transition-colors"
+                    >
+                      <span class="text-sm font-medium">瀏覽地圖</span>
+                      <svg
+                        class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </a>
+
+                <!-- 3D 互動地圖 -->
+                <a
+                  href="3D地圖/bible-maps/"
                   class="category-card glass-card rounded-2xl p-8 hover:bg-white/90 group"
                 >
                   <div class="space-y-6">
@@ -594,11 +653,11 @@
                       <h3
                         class="text-2xl font-semibold mb-2 group-hover:text-amber-700 transition-colors serif-font text-slate-900"
                       >
-                        互動地圖
+                        3D 互動地圖
                       </h3>
                       <p class="text-sm text-slate-600 mb-3">Interactive Bible Maps</p>
                       <p class="text-sm text-slate-700 leading-relaxed">
-                        14 張 3D 互動地圖：亞伯拉罕、出埃及、士師、大衛、先知、耶穌、保羅宣教至教會分裂，附歷史／人物／神學分析。
+                        14 張衛星地形 3D 地圖：自動導覽、中英字幕，附歷史／人物／神學分析。
                       </p>
                     </div>
                     <div

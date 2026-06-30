@@ -624,8 +624,8 @@
 
 <!-- BOOK-GEO-HEAD -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-  <link rel="stylesheet" href="../../../地圖/bible-maps/shared/book-map.css">
-  <link rel="stylesheet" href="../../../地圖/bible-maps/shared/book-study-ux.css"><!-- /BOOK-GEO-HEAD -->
+  <link rel="stylesheet" href="../../../3D地圖/bible-maps/shared/book-map.css">
+  <link rel="stylesheet" href="../../../3D地圖/bible-maps/shared/book-study-ux.css"><!-- /BOOK-GEO-HEAD -->
 </head>
   <body>
     <div class="page">
@@ -1403,13 +1403,13 @@
       </div>
       <div class="book-map-footer">
         <span>坐標採 WGS84 · 考古/site 傳統鑑別 · 點選標記查看經文</span>
-        <a href="../../../地圖/bible-maps/maps/jesus/" target="_blank" rel="noopener">🌍 開啟 3D 互動地圖：耶穌生平 →</a>
+        <a href="../../../3D地圖/bible-maps/maps/jesus/" target="_blank" rel="noopener">🌍 開啟 3D 互動地圖：耶穌生平 →</a>
       </div>
     </section><!-- /BOOK-GEO-MAP -->
 <!-- BOOK-GEO-SCRIPTS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <script src="../../../地圖/bible-maps/shared/book-map.js"></script>
-  <script src="../../../地圖/bible-maps/shared/book-study-ux.js"></script>
+  <script src="../../../3D地圖/bible-maps/shared/book-map.js"></script>
+  <script src="../../../3D地圖/bible-maps/shared/book-study-ux.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       BookMap.init({ places: [{"id":"capernaum","name_zh":"迦百農","name_en":"Capernaum","lat":32.881,"lng":35.575,"type":"town","typeLabel":"城鎮","ref":"可 1:21","note":"會堂趕鬼"},{"id":"galilee_sea","name_zh":"加利利海","name_en":"Sea of Galilee","lat":32.833,"lng":35.5,"type":"bay","typeLabel":"水域","ref":"可 4:1","note":"海邊講道"},{"id":"caesarea","name_zh":"該撒利亞","name_en":"Caesarea","lat":32.5,"lng":34.894,"type":"city","typeLabel":"城邑","ref":"可 8:27","note":"該撒利亞腓立比"},{"id":"jerusalem","name_zh":"耶路撒冷","name_en":"Jerusalem","lat":31.778,"lng":35.235,"type":"city","typeLabel":"城邑","ref":"可 11:11","note":"最後一周"}] });

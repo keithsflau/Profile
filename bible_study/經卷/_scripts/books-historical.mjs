@@ -6,7 +6,7 @@ export const historical = [
     links: [
       { href: '../../../舊約聖經人物/約書亞/index.html', label: '約書亞' },
       { href: '../../../舊約聖經人物/迦勒/index.html', label: '迦勒' },
-      { href: '../../../地圖/bible-maps/maps/exodus-canaan/index.html', label: '進迦南地圖' },
+      { href: '../../../3D地圖/bible-maps/maps/exodus-canaan/index.html', label: '進迦南地圖' },
       { href: '../../摩西五經/申命記/index.html', label: '先讀申命記' },
     ],
     structureNote: '全書以「過約旦—征戰—安息分地—立約選擇」為主軸，呼應申命記的應許與警告，並為士師時代鋪路。',
@@ -113,7 +113,7 @@ export const historical = [
       { href: '../../../舊約聖經人物/底波拉/index.html', label: '底波拉' },
       { href: '../../../舊約聖經人物/基甸/index.html', label: '基甸' },
       { href: '../../../舊約聖經人物/參孫/index.html', label: '參孫' },
-      { href: '../../../地圖/bible-maps/maps/judges/index.html', label: '士師時代地圖' },
+      { href: '../../../3D地圖/bible-maps/maps/judges/index.html', label: '士師時代地圖' },
     ],
     structureNote: '序言（1–2）說明循環模式；核心（3–16）記載十二士師；附錄（17–21）以米迦偶像與便雅憫戰爭呈現混亂極致。',
     background: {

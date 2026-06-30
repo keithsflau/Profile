@@ -18,8 +18,8 @@
   <link rel="stylesheet" href="../../../../visit-counter.css">
   
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-  <link rel="stylesheet" href="../../../地圖/bible-maps/shared/book-map.css">
-  <link rel="stylesheet" href="../../../地圖/bible-maps/shared/book-study-ux.css">
+  <link rel="stylesheet" href="../../../3D地圖/bible-maps/shared/book-map.css">
+  <link rel="stylesheet" href="../../../3D地圖/bible-maps/shared/book-study-ux.css">
 </head>
 <body class="bg-fuchsia-50/30 text-slate-900 min-h-screen">
   <header class="ux-header bg-gradient-to-br from-fuchsia-900 to-purple-950 text-white px-4 py-10">
@@ -165,7 +165,7 @@
       </div>
       <div class="book-map-footer">
         <span>坐標採 WGS84 · 考古/site 傳統鑑別 · 點選標記查看經文</span>
-        <a href="../../../地圖/bible-maps/maps/prophets/" target="_blank" rel="noopener">🌍 開啟 3D 互動地圖：先知時代 →</a>
+        <a href="../../../3D地圖/bible-maps/maps/prophets/" target="_blank" rel="noopener">🌍 開啟 3D 互動地圖：先知時代 →</a>
       </div>
     </section>
     
@@ -199,8 +199,8 @@
   <script>VisitCounter.init('bible_study/經卷/專題/以賽亞53章/index',{scriptUrl:'https://script.google.com/macros/s/AKfycby5jEjDAcEM6TttPbwwh1tvXPo_-W7YrNlKfJRV82PjkmAHvR_wILhA7h-zIRPF7oTRTw/exec',containerId:'visit-counter-container'});</script>
   
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <script src="../../../地圖/bible-maps/shared/book-map.js"></script>
-  <script src="../../../地圖/bible-maps/shared/book-study-ux.js"></script>
+  <script src="../../../3D地圖/bible-maps/shared/book-map.js"></script>
+  <script src="../../../3D地圖/bible-maps/shared/book-study-ux.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       BookMap.init({ places: [{"id":"jerusalem","name_zh":"耶路撒冷","name_en":"Jerusalem","lat":31.778,"lng":35.235,"type":"city","typeLabel":"城邑","ref":"賽 52:13","note":"僕人之歌背景"},{"id":"zion","name_zh":"錫安","name_en":"Zion","lat":31.776,"lng":35.234,"type":"peak","typeLabel":"山嶺","ref":"賽 53:8","note":"為本民受罰"},{"id":"gethsemane","name_zh":"客西馬尼","name_en":"Gethsemane","lat":31.78,"lng":35.24,"type":"peak","typeLabel":"山嶺","ref":"太 26:36","note":"新約受難起點"}] });

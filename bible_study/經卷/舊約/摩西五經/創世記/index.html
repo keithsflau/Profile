@@ -25,8 +25,8 @@
 
 <!-- BOOK-GEO-HEAD -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-  <link rel="stylesheet" href="../../../地圖/bible-maps/shared/book-map.css">
-  <link rel="stylesheet" href="../../../地圖/bible-maps/shared/book-study-ux.css"><!-- /BOOK-GEO-HEAD -->
+  <link rel="stylesheet" href="../../../3D地圖/bible-maps/shared/book-map.css">
+  <link rel="stylesheet" href="../../../3D地圖/bible-maps/shared/book-study-ux.css"><!-- /BOOK-GEO-HEAD -->
 </head>
 <body class="bg-amber-50/40 text-slate-900 min-h-screen">
   <header class="ux-header bg-gradient-to-br from-amber-800 to-orange-900 text-white px-4 py-10">
@@ -44,7 +44,7 @@
       <a href="../../創世記_第一章/index.html" class="text-sm px-4 py-2 rounded-full bg-amber-600 text-white font-medium hover:bg-amber-700">📖 創世記第一章專題</a>
       <a href="../../../舊約聖經人物/亞伯拉罕/index.html" class="text-sm px-3 py-2 rounded-full bg-white border border-amber-200 text-amber-900 hover:bg-amber-50">亞伯拉罕</a>
       <a href="../../../舊約聖經人物/約瑟/index.html" class="text-sm px-3 py-2 rounded-full bg-white border border-amber-200 text-amber-900 hover:bg-amber-50">約瑟</a>
-      <a href="../../../地圖/bible-maps/maps/abraham/index.html" class="text-sm px-3 py-2 rounded-full bg-white border border-amber-200 text-amber-900 hover:bg-amber-50">族長地圖</a>
+      <a href="../../../3D地圖/bible-maps/maps/abraham/index.html" class="text-sm px-3 py-2 rounded-full bg-white border border-amber-200 text-amber-900 hover:bg-amber-50">族長地圖</a>
       <a href="../../../查經/查經法/OIA/index.html" class="text-sm px-3 py-2 rounded-full bg-white border border-amber-200 text-amber-900 hover:bg-amber-50">OIA 查經法</a>
       <a href="../../專題/十二支派/index.html" class="text-sm px-3 py-2 rounded-full bg-white border border-amber-200 text-amber-900 hover:bg-amber-50">專題：十二支派</a>
       <a href="../../專題/基督於舊約的預表/index.html" class="text-sm px-3 py-2 rounded-full bg-white border border-amber-200 text-amber-900 hover:bg-amber-50">專題：基督預表</a>
@@ -289,7 +289,7 @@
       </div>
       <div class="book-map-footer">
         <span>坐標採 WGS84 · 考古/site 傳統鑑別 · 點選標記查看經文</span>
-        <a href="../../../地圖/bible-maps/maps/abraham/" target="_blank" rel="noopener">🌍 開啟 3D 互動地圖：亞伯拉罕生平 →</a>
+        <a href="../../../3D地圖/bible-maps/maps/abraham/" target="_blank" rel="noopener">🌍 開啟 3D 互動地圖：亞伯拉罕生平 →</a>
       </div>
     </section><!-- /BOOK-GEO-MAP -->
   </main>
@@ -321,8 +321,8 @@
 
 <!-- BOOK-GEO-SCRIPTS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <script src="../../../地圖/bible-maps/shared/book-map.js"></script>
-  <script src="../../../地圖/bible-maps/shared/book-study-ux.js"></script>
+  <script src="../../../3D地圖/bible-maps/shared/book-map.js"></script>
+  <script src="../../../3D地圖/bible-maps/shared/book-study-ux.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       BookMap.init({ places: [{"id":"ur","name_zh":"吾珥","name_en":"Ur","lat":30.962,"lng":46.103,"type":"city","typeLabel":"城邑","ref":"創 11:28","note":"亞伯蘭出身地；吾珥（Tell el-Muqayyar）"},{"id":"haran","name_zh":"哈蘭","name_en":"Haran","lat":36.867,"lng":39.033,"type":"city","typeLabel":"城邑","ref":"創 11:31","note":"家族中途停留；哈蘭"},{"id":"shechem","name_zh":"示劍","name_en":"Shechem","lat":32.213,"lng":35.289,"type":"town","typeLabel":"城鎮","ref":"創 12:6","note":"進迦南首站；示劍（Tell Balata）"},{"id":"bethel","name_zh":"伯特利","name_en":"Bethel","lat":31.927,"lng":35.222,"type":"town","typeLabel":"城鎮","ref":"創 12:8","note":"築壇求告耶和華"},{"id":"hebron","name_zh":"希伯崙","name_en":"Hebron","lat":31.524,"lng":35.099,"type":"town","typeLabel":"城鎮","ref":"創 13:18","note":"亞伯蘭與以撒寄居"},{"id":"beersheba","name_zh":"別是巴","name_en":"Beersheba","lat":31.245,"lng":34.793,"type":"town","typeLabel":"城鎮","ref":"創 21:31","note":"與亞比米勒立約"},{"id":"goshen","name_zh":"歌珊","name_en":"Goshen","lat":30.55,"lng":31.2,"type":"region","typeLabel":"地區","ref":"創 46:34","note":"約瑟接家族下埃及"},{"id":"moriah","name_zh":"摩利亞","name_en":"Moriah","lat":31.778,"lng":35.235,"type":"peak","typeLabel":"山嶺","ref":"創 22:2","note":"獻以撒之山"}] });
